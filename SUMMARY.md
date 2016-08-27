@@ -65,4 +65,5 @@
    * [EventBus](android/eventbus.md)
    * [面试题](android/questions.md)
 * [Spring](Spring)
+   * bean
 
