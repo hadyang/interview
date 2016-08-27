@@ -147,7 +147,7 @@ for(Annotation annotation : annotations){
 * 享元模式：String常量池、Integer.valueOf\(int i\)、Character.valueOf\(char c\)
 * 迭代器模式：Iterator
 * 职责链模式：ClassLoader的双亲委派模型
-* ## 解释器模式：正则表达式java.util.regex.Pattern
+* 解释器模式：正则表达式java.util.regex.Pattern
 
 
 ---
@@ -203,6 +203,7 @@ CAS作为知名无锁算法，那ConcurrentHashMap就没用锁了么？当然不
   JDK8允许我们给接口添加一个非抽象的方法实现，只需要使用default关键字即可，也可以定义被static修饰的静态方法
 
 * 对HashMap进行了改进，当单个桶的元素个数大于6时就会将实现改为红黑树实现，以避免构造重复的hashCode的攻击
+
 * 多并发进行了优化。如ConcurrentHashMap实现由分段加锁、锁分离改为CAS实现。
 * JDK8拓宽了注解的应用场景，注解几乎可以使用在任何元素上，并且允许在同一个地方多次使用同一个注解
 * Lambda表达式
@@ -226,8 +227,4 @@ CAS作为知名无锁算法，那ConcurrentHashMap就没用锁了么？当然不
 -XX:MaxPermSize 方法区最大容量
 
 -XX:+PrintGCDetails 收集器日志参数
-
-
-
-
 
