@@ -65,5 +65,5 @@
    * [EventBus](android/eventbus.md)
    * [面试题](android/questions.md)
 * [Spring](Spring)
-   * [bean](Spring/bean.md)
+   * [bean生命周期](Spring/bean.md)
 
