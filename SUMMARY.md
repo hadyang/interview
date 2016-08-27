@@ -1,7 +1,6 @@
 # Summary
 
 * [Introduction](README.md)
-   * S 
 * [计算机基础](basic/README.md)
    * [计算机网络](basic/net/README.md)
        * [网络分层](basic/net/osi.md)
