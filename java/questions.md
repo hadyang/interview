@@ -151,6 +151,27 @@ for(Annotation annotation : annotations){
 
 ---
 
+### **ConcurrentHashMap如何保证线程安全**
 
+JDK 1.7及以前：
 
+ConcurrentHashMap允许多个修改操作并发进行，其关键在于使用了锁分离技术。它使用了多个锁来控制对hash表的不同部分进行的修改。ConcurrentHashMap内部使用段\(Segment\)来表示这些不同的部分，每个段其实就是一个小的hash table，它们有自己的锁。只要多个修改操作发生在不同的段上，它们就可以并发进行。
+
+详细参考：
+
+[http:\/\/www.cnblogs.com\/ITtangtang\/p\/3948786.html](http://www.cnblogs.com/ITtangtang/p/3948786.html)
+
+[http:\/\/qifuguang.me\/2015\/09\/10\/\[Java并发包学习八\]深度剖析ConcurrentHashMap\/](http://qifuguang.me/2015/09/10/[Java%E5%B9%B6%E5%8F%91%E5%8C%85%E5%AD%A6%E4%B9%A0%E5%85%AB]%E6%B7%B1%E5%BA%A6%E5%89%96%E6%9E%90ConcurrentHashMap/)
+
+JDK 1.8：
+
+Segment虽保留，但已经简化属性，仅仅是为了兼容旧版本。
+
+插入时使用CAS算法：unsafe.compareAndSwapInt\(this, valueOffset, expect, update\)。 CAS\(Compare And Swap\)意思是如果valueOffset位置包含的值与expect值相同，则更新valueOffset位置的值为update，并返回true，否则不更新，返回false。插入时不允许key或value为null
+
+与Java8的HashMap有相通之处，底层依然由“数组”+链表+红黑树；
+
+底层结构存放的是TreeBin对象，而不是TreeNode对象；
+
+CAS作为知名无锁算法，那ConcurrentHashMap就没用锁了么？当然不是，当hash值与链表的头结点相同还是会synchronized上锁，锁链表。
 
