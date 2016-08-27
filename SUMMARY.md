@@ -64,6 +64,6 @@
     * [Activity、View及Window之间关系](android/activity-view-window.md)
     * [EventBus](android/eventbus.md)
     * [面试题](android/questions.md)
-* [Spring](Spring)
-    * [bean生命周期](Spring/bean生命周期.md)
+* [Spring](spring.md)
+    * [bean生命周期](bean生命周期.md)
 
