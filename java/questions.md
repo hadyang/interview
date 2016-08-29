@@ -139,3 +139,17 @@ for(Annotation annotation : annotations){
 |子类覆盖了父类上的方法|	否	|否|
 
 通过测试结果来看，`@Inherited` 只是可控制对类名上注解是否可以被继承。不能控制方法上的注解是否可以被继承。
+
+### 非静态内部类能定义静态方法吗？
+
+```Java
+public class OuterClass{
+    private static float f = 1.0f;
+
+    class InnerClass{
+        public static float func(){return f;}
+    }
+}
+```
+
+以上代码会出现编译错误，因为只有静态内部类才能定义静态方法。

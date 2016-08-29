@@ -17,7 +17,7 @@
 
 > 旧Activity的onPause先调用，然后调用新的Activity的onResume。
 
-当系统配置发生改变时(eg:屏幕旋转、键盘弹出...)，会调用`onSaveInstanceState()`方法保存当前Activity状态。当Activity重建的时候系统会将`onSaveInstanceState()`保存的数据传递给`onRestoreInstanceState()`和`onCreate`方法。**当Activity从可见变为不可见时** 也会调用`onSaveInstanceState()`，但是当Activity重新变为可见时 **不会** 调用`onRestoreInstanceState()`。**保存持久化数据的操作应该放在onPause()中**. `onSaveInstanceState()`方法只适合保存瞬态数据, 比如UI控件的状态, 成员变量的值等.
+当当前Activity可能被销毁时(eg:屏幕旋转...)，会调用`onSaveInstanceState()`方法保存当前Activity状态。当Activity重建的时候系统会将`onSaveInstanceState()`保存的数据传递给`onRestoreInstanceState()`和`onCreate`方法。**当Activity从可见变为不可见时** 也会调用`onSaveInstanceState()`，但是当Activity重新变为可见时 **不会** 调用`onRestoreInstanceState()`。**保存持久化数据的操作应该放在onPause()中**. `onSaveInstanceState()`方法只适合保存瞬态数据, 比如UI控件的状态, 成员变量的值等.
 
 如果当系统配置改变时，不希望重建Activity，可以给Activity指定`configChanges`属性。当被配置的系统配置发生改变时会调用`onConfigurationChanged()`方法，而不会调用`onSaveInstanceState()`。
 
