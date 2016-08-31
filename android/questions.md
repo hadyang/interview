@@ -68,7 +68,29 @@ ContentProvider 有以下两个特点：
   - **封装**：对数据进行封装，提供统一的接口，使用者完全不必关心这些数据是在DB，XML、Preferences或者网络请求来的。当项目需求要改变数据来源时，使用我们的地方完全不需要修改。
   - **提供一种跨进程数据共享的方式**。
 
-`Content Provider`组件在不同应用程序之间传输数据是基于匿名共享内存机制来实现的。
+`Content Provider`组件在不同应用程序之间传输数据是基于匿名共享内存机制来实现的。其主要的调用过程：
+
+  1. 通过ContentResolver先查找对应给定Uri的ContentProvider，返回对应的`BinderProxy`
+
+    - 如果该Provider尚未被调用进程使用过:
+      - 通过`ServiceManager`查找activity service得到`ActivityManagerService`对应`BinderProxy`
+      - 调用`BinderProxy`的transcat方法发送`GET_CONTENT_PROVIDER_TRANSACTION`命令，得到对应`ContentProvider`的`BinderProxy`。
+
+    - 如果该Provider已被调用进程使用过，则调用进程会保留使用过provider的HashMap。此时直接从此表查询即得。
+
+  2. 调用`BinderProxy`的`query()`
+
+***
+
+### 如何使用ContentProvider进行批量操作？
+
+通常进行数据的批量操作我们都会使用“事务”，但是`ContentProvider`如何进行批量操作呢？创建 `ContentProviderOperation` 对象数组，然后使用 `ContentResolver.applyBatch()` 将其分派给内容提供程序。您需将内容提供程序的授权传递给此方法，而不是特定内容 `URI`。这样可使数组中的每个 `ContentProviderOperation` 对象都能适用于其他表。调用 `ContentResolver.applyBatch()` 会返回结果数组。
+
+同时我们还可以通过`ContentObserver`对数据进行观察：
+
+  1. 创建我们特定的`ContentObserver`派生类，必须重载`onChange()`方法去处理回调后的功能实现
+  2. 利用`context.getContentResolover()`获得`ContentResolove`对象，接着调用`registerContentObserver()`方法去注册内容观察者，为指定的Uri注册一个`ContentObserver`派生类实例，当给定的Uri发生改变时，回调该实例对象去处理。
+  3. 由于`ContentObserver`的生命周期不同步于Activity和Service等，因此，在不需要时，需要手动的调用`unregisterContentObserver()`去取消注册。
 
 ***
 
