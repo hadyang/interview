@@ -27,6 +27,7 @@
         * [磁盘与文件](basic/op/disk.md)
         * [Linux系统](basic/op/linux.md)
         * [中断](basic/op/interrupt.md)
+        * [设备管理](basic/op/device.md)
         * [面试题](basic/op/questions.md)
     * [数据库系统](basic/database/README.md)
         * [事务](basic/database/transaction.md)
