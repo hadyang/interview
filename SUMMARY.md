@@ -61,7 +61,7 @@
     * [View绘制过程](android/draw.md)
     * [事件分发机制](android/event.md)
     * [Binder](android/binder.md)
-    * [OOM && ANR 优化](android/optimize.md)
+    * [性能优化](android/optimize.md)
     * [推送机制](android/push.md)
     * [进程保活](android/keep-live.md)
     * [Activity、View及Window之间关系](android/activity-view-window.md)
@@ -70,4 +70,3 @@
     * [面试题](android/questions.md)
 * [Spring](Spring/spring.md)
     * [基础](Spring/base.md)
-

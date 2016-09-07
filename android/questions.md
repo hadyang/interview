@@ -70,15 +70,15 @@ ContentProvider 有以下两个特点：
 
 `Content Provider`组件在不同应用程序之间传输数据是基于匿名共享内存机制来实现的。其主要的调用过程：
 
-  1. 通过ContentResolver先查找对应给定Uri的ContentProvider，返回对应的`BinderProxy`
+1. 通过ContentResolver先查找对应给定Uri的ContentProvider，返回对应的`BinderProxy`
 
-    - 如果该Provider尚未被调用进程使用过:
-      - 通过`ServiceManager`查找activity service得到`ActivityManagerService`对应`BinderProxy`
-      - 调用`BinderProxy`的transcat方法发送`GET_CONTENT_PROVIDER_TRANSACTION`命令，得到对应`ContentProvider`的`BinderProxy`。
+  - 如果该Provider尚未被调用进程使用过:
+    - 通过`ServiceManager`查找activity service得到`ActivityManagerService`对应`BinderProxy`
+    - 调用`BinderProxy`的transcat方法发送`GET_CONTENT_PROVIDER_TRANSACTION`命令，得到对应`ContentProvider`的`BinderProxy`。
 
-    - 如果该Provider已被调用进程使用过，则调用进程会保留使用过provider的HashMap。此时直接从此表查询即得。
+  - 如果该Provider已被调用进程使用过，则调用进程会保留使用过provider的HashMap。此时直接从此表查询即得。
 
-  2. 调用`BinderProxy`的`query()`
+2. 调用`BinderProxy`的`query()`
 
 ***
 
