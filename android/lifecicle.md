@@ -94,9 +94,11 @@
 
 #### 保存Activity状态
 
-当您的Activity开始停止时，系统会调用 `onSaveInstanceState()` 以便您的Activity可以保存带有键值对集合的状态信息。 此方法的默认实现保存有关Activity视图层次的状态信息，例如 EditText 小工具中的文本或ListView 的滚动位置。要保存Activity的更多状态信息，您必须实现 `onSaveInstanceState()` 并将键值对添加至 Bundle 对象。
+当您的Activity开始停止时，系统会调用 `onSaveInstanceState()` 以便您的Activity可以保存带有键值对集合的状态信息。 此方法的默认实现保存有关Activity视图层次的状态信息（只保存部分 View ），例如 EditText 小工具中的文本或ListView 的滚动位置。要保存Activity的更多状态信息，您必须实现 `onSaveInstanceState()` 并将键值对添加至 Bundle 对象。
 
 如果当系统配置改变时，不希望重建Activity，可以给Activity指定`configChanges`属性。当被配置的系统配置发生改变时会调用`onConfigurationChanged()`方法，而不会调用`onSaveInstanceState()`。
+
+> onSaveInstanceState() 的调用时机是不明确的，但是如果调用就一定会在 onStop()之前。
 
 #### 恢复Activity状态
 

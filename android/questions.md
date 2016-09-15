@@ -250,7 +250,7 @@ TextView通常用来显示普通文本，但是有时候需要对其中某些文
 
 ***
 
-#### Include、Merge、ViewStub的作用
+### Include、Merge、ViewStub的作用
 
 **Include**：布局重用
 
@@ -270,7 +270,7 @@ TextView通常用来显示普通文本，但是有时候需要对其中某些文
 
 ***
 
-#### Asset目录与res目录的区别
+### Asset目录与res目录的区别
 
   - **assets 目录**：不会在`R.java`文件下生成相应的标记，assets文件夹可以自己创建文件夹，必须使用`AssetsManager`类进行访问，存放到这里的资源在运行打包的时候都会打入程序安装包中，
 
@@ -282,6 +282,38 @@ TextView通常用来显示普通文本，但是有时候需要对其中某些文
 
 ***
 
-#### System.gc && Runtime.gc
+### System.gc && Runtime.gc
 
 `System.gc`和`Runtime.gc`是等效的，在`System.gc`内部也是调用的`Runtime.gc`。**调用两者都是通知虚拟机要进行gc，但是否立即回收还是延迟回收由JVM决定**。两者唯一的区别就是一个是类方法，一个是实例方法。
+
+***
+
+### Application 在多进程下会多次调用 onCreate() 么？
+
+当采用多进程的时候，比如下面的Service 配置：
+
+```XML
+<service
+    android:name=".MyService"
+    android:enabled="true"
+    android:exported="false"
+    android:process=":remote" />
+```
+
+> android:process 属性中 `:`的作用就是把这个名字附加到你的包所运行的标准进程名字的后面作为新的进程名称。
+
+这样配置会调用 onCreate() 两次。
+
+***
+
+### Theme && Style
+
+  - **Style** 是一组外观、样式的属性集合，适用于 View 和 Window 。
+
+  - **Theme** 是一种应用于整个 Activity 或者 Application ，而不是独立的 View。
+
+***
+
+### SQLiteOpenHelper.onCreate() 调用时机？
+
+在调`getReadableDatabase`或`getWritableDatabase`时，会判断指定的数据库是否存在，不存在则调`SQLiteDatabase.onCreate`创建， `onCreate`只在数据库第一次创建时才执行。

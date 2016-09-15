@@ -203,7 +203,7 @@ fabs(x) < 0.00001f
 
 ***
 
-### **你知道哪些JDK中用到的设计模式？**
+### 你知道哪些JDK中用到的设计模式？
 
 * 装饰模式：java.io
 * 单例模式：Runtime类
@@ -216,7 +216,7 @@ fabs(x) < 0.00001f
 
 ---
 
-### **ConcurrentHashMap如何保证线程安全**
+### ConcurrentHashMap如何保证线程安全
 
 JDK 1.7及以前：
 
@@ -242,7 +242,7 @@ CAS作为知名无锁算法，那ConcurrentHashMap就没用锁了么？当然不
 
 ---
 
-### **i++在多线程环境下是否存在问题，怎么解决？**
+### i++在多线程环境下是否存在问题，怎么解决？
 
 虽然递增操作++i是一种紧凑的语法，使其看上去只是一个操作，但这个操作并非原子的，因而它并不会作为一个不可分割的操作来执行。实际上，它包含了三个独立的操作：读取count的值，将值加1，然后将计算结果写入count。这是一个“读取 - 修改 - 写入”的操作序列，并且其结果状态依赖于之前的状态。所以在多线程环境下存在问题。
 
@@ -250,44 +250,47 @@ CAS作为知名无锁算法，那ConcurrentHashMap就没用锁了么？当然不
 
 ---
 
-### **new与newInstance\(\)的区别**
+### new与newInstance()的区别
 
-* new是一个关键字，它是调用new指令创建一个对象，然后调用构造方法来初始化这个对象，可以使用带参数的构造器
-* newInstance\(\)是Class的一个方法，在这个过程中，是先取了这个类的不带参数的构造器Constructor，然后调用构造器的newInstance方法来创建对象。
+  * new是一个关键字，它是调用new指令创建一个对象，然后调用构造方法来初始化这个对象，可以使用带参数的构造器
 
-  Class.newInstance\(\)不能带参数，如果要带参数需要取得对应的构造器，然后调用该构造器的Constructor.newInstance\(Object ... initargs\)方法
+  * newInstance()是Class的一个方法，在这个过程中，是先取了这个类的不带参数的构造器Constructor，然后调用构造器的newInstance方法来创建对象。
+
+  > Class.newInstance不能带参数，如果要带参数需要取得对应的构造器，然后调用该构造器的Constructor.newInstance(Object ... initargs)方法
 
 
 ---
 
-### **你了解哪些JDK1.8的新特性？**
+### 你了解哪些JDK1.8的新特性？
 
-* 接口的默认方法和静态方法
+  * 接口的默认方法和静态方法，JDK8允许我们给接口添加一个非抽象的方法实现，只需要使用default关键字即可。也可以定义被static修饰的静态方法。
 
-  JDK8允许我们给接口添加一个非抽象的方法实现，只需要使用default关键字即可，也可以定义被static修饰的静态方法
+  * 对HashMap进行了改进，当单个桶的元素个数大于6时就会将实现改为红黑树实现，以避免构造重复的hashCode的攻击
 
-* 对HashMap进行了改进，当单个桶的元素个数大于6时就会将实现改为红黑树实现，以避免构造重复的hashCode的攻击
+  * 多并发进行了优化。如ConcurrentHashMap实现由分段加锁、锁分离改为CAS实现。
 
-* 多并发进行了优化。如ConcurrentHashMap实现由分段加锁、锁分离改为CAS实现。
-* JDK8拓宽了注解的应用场景，注解几乎可以使用在任何元素上，并且允许在同一个地方多次使用同一个注解
-* Lambda表达式
+  * JDK8拓宽了注解的应用场景，注解几乎可以使用在任何元素上，并且允许在同一个地方多次使用同一个注解
+
+  * Lambda表达式
 
 ---
 
 ### 你用过哪些JVM参数？
 
--Xms 堆最小值
+  - Xms 堆最小值
 
--Xmx 堆最大值
+  - Xmx 堆最大值
 
--Xmn: 新生代容量
+  - Xmn: 新生代容量
 
--XX:SurvivorRatio 新生代中Eden与Surivor空间比例
+  - XX:SurvivorRatio 新生代中Eden与Surivor空间比例
 
--Xss 栈容量
+  - Xss 栈容量
 
--XX:PermSize 方法区初始容量
+  - XX:PermSize 方法区初始容量
 
--XX:MaxPermSize 方法区最大容量
+  - XX:MaxPermSize 方法区最大容量
 
--XX:+PrintGCDetails 收集器日志参数
+  - XX:+PrintGCDetails 收集器日志参数
+
+***

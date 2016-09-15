@@ -37,6 +37,7 @@
         * [面试题](basic/database/questions.md)
 * [Java基础](java/README.md)
     * [面向对象基础](java/oop.md)
+    * [运算符优先级](java/operator.md)
     * [集合框架](java/collection.md)
     * [Java分派机制](java/dispatcher.md)
     * [Java异常](java/exception.md)
@@ -67,6 +68,8 @@
     * [Activity、View及Window之间关系](android/activity-view-window.md)
     * [EventBus](android/eventbus.md)
     * [Intent](android/intent.md)
+    * [版本问题](android/version.md)
     * [面试题](android/questions.md)
 * [Spring](Spring/spring.md)
     * [基础](Spring/base.md)
+
