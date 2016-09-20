@@ -205,13 +205,19 @@ fabs(x) < 0.00001f
 
 ### 你知道哪些JDK中用到的设计模式？
 
-* 装饰模式：java.io
-* 单例模式：Runtime类
-* 简单工厂模式：Integer.valueOf方法
-* 享元模式：String常量池、Integer.valueOf\(int i\)、Character.valueOf\(char c\)
-* 迭代器模式：Iterator
-* 职责链模式：ClassLoader的双亲委派模型
-* 解释器模式：正则表达式java.util.regex.Pattern
+  * 装饰模式：java.io
+
+  * 单例模式：Runtime类
+
+  * 简单工厂模式：Integer.valueOf方法
+
+  * 享元模式：String常量池、Integer.valueOf\(int i\)、Character.valueOf\(char c\)
+
+  * 迭代器模式：Iterator
+
+  * 职责链模式：ClassLoader的双亲委派模型
+
+  * 解释器模式：正则表达式java.util.regex.Pattern
 
 
 ---
@@ -293,4 +299,7 @@ CAS作为知名无锁算法，那ConcurrentHashMap就没用锁了么？当然不
 
   - XX:+PrintGCDetails 收集器日志参数
 
+
 ***
+
+### 如何打破 ClassLoader 双亲委托？

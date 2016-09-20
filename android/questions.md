@@ -317,3 +317,68 @@ TextView通常用来显示普通文本，但是有时候需要对其中某些文
 ### SQLiteOpenHelper.onCreate() 调用时机？
 
 在调`getReadableDatabase`或`getWritableDatabase`时，会判断指定的数据库是否存在，不存在则调`SQLiteDatabase.onCreate`创建， `onCreate`只在数据库第一次创建时才执行。
+
+***
+
+### Removecallback 失效？
+
+Removecallback 必须是同一个Handler才能移除。
+
+***
+
+### Toast 如果会短时间内频繁显示怎么优化？
+
+```Java
+public void update(String msg){
+  toast.setText(msg);
+  toast.show();
+}
+```
+
+***
+
+### Notification 如何优化？
+
+可以通过 相同 ID 来更新 Notification 。
+
+***
+
+### 应用怎么判断自己是处于前台还是后台？
+
+主要是通过 `getRunningAppProcesses()` 方法来实现。
+
+```Java
+ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
+for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
+    if (appProcess.processName.equals(getPackageName())) {
+        if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+            Log.d(TAG, String.format("Foreground App:%s", appProcess.processName));
+        } else {
+            Log.d(TAG, "Background App:" + appProcess.processName);
+        }
+    }
+}
+```
+
+***
+
+### FragmentPagerAdapter 和 FragmentStateAdapter 的区别？
+
+`FragmentStatePagerAdapter` 是 `PagerAdapter` 的子类，这个适配器对实现多个 `Fragment` 界面的滑动是非常有用的，它的工作方式和listview是非常相似的。当Fragment对用户不可见的时候，整个Fragment会被销毁，只会保存Fragment的保存状态。基于这样的特性，`FragmentStatePagerAdapter` 比 `FragmentPagerAdapter` 更适合用于很多界面之间的转换，而且消耗更少的内存资源。
+
+***
+
+### Bitmap的本质？
+
+本质是 SkBitmap 详见 Pocket
+
+***
+
+### SurfaceView && View && GLSurfaceView
+
+  - `View`：显示视图，内置画布，提供图形绘制函数、触屏事件、按键事件函数等；**必须在UI主线程内更新画面，速度较慢**。
+
+  - `SurfaceView`：基于view视图进行拓展的视图类，更适合2D游戏的开发；**View的子类，类似使用双缓机制，在新的线程（也可以在UI线程）中更新画面所以刷新界面速度比 View 快**，但是会涉及到线程同步问题。
+
+　- `GLSurfaceView`：openGL专用。基于SurfaceView视图再次进行拓展的视图类，**专用于3D游戏开发的视图**。
