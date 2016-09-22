@@ -303,3 +303,25 @@ CAS作为知名无锁算法，那ConcurrentHashMap就没用锁了么？当然不
 ***
 
 ### 如何打破 ClassLoader 双亲委托？
+
+重写`loadClass()`方法。
+
+***
+
+### hashCode() && equals()
+
+`hashcode()` 返回该对象的哈希码值，支持该方法是为哈希表提供一些优点，例如，`java.util.Hashtable` 提供的哈希表。   
+
+在 Java 应用程序执行期间，在同一对象上多次调用 `hashCode` 方法时，必须一致地返回相同的整数，前提是对象上 `equals` 比较中所用的信息没有被修改（`equals`默认返回对象地址是否相等）。如果根据 `equals(Object) `方法，两个对象是相等的，那么在两个对象中的每个对象上调用 `hashCode` 方法都必须生成相同的整数结果。
+
+以下情况不是必需的：如果根据 `equals(java.lang.Object)` 方法，两个对象不相等，那么在两个对象中的任一对象上调用 `hashCode` 方法必定会生成不同的整数结果。但是，**程序员应该知道，为不相等的对象生成不同整数结果可以提高哈希表的性能**。   
+
+实际上，由 `Object` 类定义的 `hashCode` 方法确实会针对不同的对象返回不同的整数。（**这一般是通过将该对象的内部地址转换成一个整数来实现的，但是 JavaTM 编程语言不需要这种实现技巧I**。）   
+
+  - **hashCode的存在主要是用于查找的快捷性**，如 Hashtable，HashMap等，hashCode 是用来在散列存储结构中确定对象的存储地址的；
+
+  - 如果两个对象相同，就是适用于 `equals(java.lang.Object)` 方法，那么这两个对象的 `hashCode` 一定要相同；
+
+  - 如果对象的 `equals` 方法被重写，那么对象的 `hashCode` 也尽量重写，并且产生 `hashCode` 使用的对象，一定要和 `equals` 方法中使用的一致，否则就会违反上面提到的第2点；
+
+  - **两个对象的hashCode相同，并不一定表示两个对象就相同，也就是不一定适用于equals(java.lang.Object) 方法，只能够说明这两个对象在散列存储结构中，如Hashtable，他们“存放在同一个篮子里”**。
