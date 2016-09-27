@@ -7,7 +7,7 @@
   - `冒泡排序` — O(n²)
   - `插入排序` — O(n²)
   - `桶排序` — O(n); 需要 O(k) 额外空间
-  - `合并排序` — O(nlogn); 需要 O(n) 额外空间
+  - `归并排序` — O(nlogn); 需要 O(n) 额外空间
   - `二叉排序树排序`  — O(n log n) 期望时间; O(n²)最坏时间; 需要 O(n) 额外空间
   - `基数排序` — O(n·k); 需要 O(n) 额外空间
 
@@ -170,36 +170,41 @@ void selection_sort(int arr[], int len) {
   4. 直到无序区只有一个元素为止。
 
 
-```C
-
-void max_heap(int arr[], int start, int end) {
+```Java
+static void max_heap(int[] num, int start, int end) {
     int dad = start;
     int son = dad * 2 + 1;
 
     while (son < end) {
-        if (son + 1 < end && arr[son] < arr[son + 1])
+        if (son + 1 < end && num[son] < num[son + 1])
             son++;
-        if (arr[dad] > arr[son])//如果父节点大于子节点，则不用调整孙结点
+
+        if (num[dad] > num[son])
             return;
         else {
-            swap(arr[dad], arr[son]);
+            num[dad] ^= num[son];
+            num[son] ^= num[dad];
+            num[dad] ^= num[son];
+
             dad = son;
             son = dad * 2 + 1;
         }
     }
 }
 
-void heap_sort(int arr[], int len) {
-    for (int i = len / 2 - 1; i > 0; --i) {
-        max_heap(arr, i, len);
+static void heap_sort(int[] num) {
+    for (int i = num.length / 2 - 1; i >= 0; --i) {
+        max_heap(num, i, num.length);
     }
 
-    for (int j = len - 1; j > 0; --j) {
-        swap(arr[0], arr[j]);
-        max_heap(arr, 0, j);
+    for (int i = num.length - 1; i >= 0; --i) {
+        num[i] ^= num[0];
+        num[0] ^= num[i];
+        num[i] ^= num[0];
+
+        max_heap(num, 0, i);
     }
 }
-
 ```
 
 ## 归并排序
