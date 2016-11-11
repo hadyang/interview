@@ -64,7 +64,7 @@ umount <挂载点|设备>
 find [-H] [-L] [-P] [-Olevel] [-D help|tree|search|stat|rates|opt|exec] [path...] [expression]
 ```
 
-##grep
+## grep
 
 在文件中搜索指定字符所在行   
 格式： **grep [选项] 指定字符 文件**  
@@ -74,6 +74,8 @@ eg: grep -i ab /etc/inittab
 ```
 
 ## tar
+
+
 常用的打包压缩和解压命令之一<br/>格式: **tar 选项 [压缩后文件名] [目录]** 
 
 *注意：打包和压缩是两个不同概念，打包只是把所有文件放在一具类似包中，并不改变其大小，而压缩才会改变其大小*
