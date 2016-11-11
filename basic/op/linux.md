@@ -65,7 +65,8 @@ find [-H] [-L] [-P] [-Olevel] [-D help|tree|search|stat|rates|opt|exec] [path...
 
 ```
 
-## grep
+grep
+--
 
 在文件中搜索指定字符所在行   
 格式： **grep [选项] 指定字符 文件**  
@@ -76,7 +77,8 @@ eg: grep -i ab /etc/inittab
 
 ```
 
-## tar
+tar
+--
 
 常用的打包压缩和解压命令之一<br/>格式: **tar 选项 [压缩后文件名] [目录]** 
 
