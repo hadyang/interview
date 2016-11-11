@@ -62,30 +62,34 @@ umount <挂载点|设备>
 
 ```
 find [-H] [-L] [-P] [-Olevel] [-D help|tree|search|stat|rates|opt|exec] [path...] [expression]
+
 ```
 
 ## grep
 
 在文件中搜索指定字符所在行   
 格式： **grep [选项] 指定字符 文件**  
--i 忽略大小写 -r 递归  -v 排除指定字符串  -n 显示列数   
+-i 忽略大小写 -r 递归  -v 排除指定字符串  -n 显示列数 
+  
 ```
 eg: grep -i ab /etc/inittab 
+
 ```
 
 ## tar
-
 
 常用的打包压缩和解压命令之一<br/>格式: **tar 选项 [压缩后文件名] [目录]** 
 
 *注意：打包和压缩是两个不同概念，打包只是把所有文件放在一具类似包中，并不改变其大小，而压缩才会改变其大小*
 
 ```
+
 压缩时常用    
 -c 打包(create)  -v显示详细信息(view) -f指定文件名(filename)  -z 打包同时压缩    
 eg: tar -zvf word.tar word    
 
 解压缩时常用    
 -x 解包  -v显示详细信息(view) -f指定解压文件名(filename)  -z 解压缩    
-eg: tar -zxf word.tar     
+eg: tar -zxf word.tar    
+ 
 ```
