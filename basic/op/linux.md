@@ -53,28 +53,33 @@ sed命令行格式为：
 
 ## mount && umount
 
-```mount [选项] <-t 类型> [-o 挂载选项] <设备> <挂载点>
+```
+
+mount [选项] <-t 类型> [-o 挂载选项] <设备> <挂载点>
 
 umount <挂载点|设备>
+
 ```
 
 
 ##find
 
 ```
+
 find [-H] [-L] [-P] [-Olevel] [-D help|tree|search|stat|rates|opt|exec] [path...] [expression]
 
 ```
 
 
-grep
---
+##grep
+
 
 在文件中搜索指定字符所在行   
 格式： **grep [选项] 指定字符 文件**  
 -i 忽略大小写 -r 递归  -v 排除指定字符串  -n 显示列数 
   
 ```
+
 eg: grep -i ab /etc/inittab 
 
 ```
