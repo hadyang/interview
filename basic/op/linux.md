@@ -58,12 +58,14 @@ sed命令行格式为：
 umount <挂载点|设备>
 ```
 
-## find
+
+##find
 
 ```
 find [-H] [-L] [-P] [-Olevel] [-D help|tree|search|stat|rates|opt|exec] [path...] [expression]
 
 ```
+
 
 grep
 --
@@ -77,8 +79,9 @@ eg: grep -i ab /etc/inittab
 
 ```
 
-tar
---
+
+##tar
+
 
 常用的打包压缩和解压命令之一<br/>格式: **tar 选项 [压缩后文件名] [目录]** 
 
