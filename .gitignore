@@ -1,2 +1,3 @@
 _book
 *.pdf
+.DS_Store
