@@ -104,7 +104,7 @@ void insert_sort(int* a, int len) {
     for (int i = 1; i < len; ++i) {
         int j = i - 1;
         int temp = a[i];
-        while (temp < a[j] && j >= 0) {
+        while (j >= 0 && temp < a[j]) {
             a[j + 1] = a[j];
             j--;
         }
