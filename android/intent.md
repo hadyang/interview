@@ -18,7 +18,7 @@ Intent 分为两种类型：
 
 创建`显式 Intent` 启动 Activity 或服务时，系统将立即启动 Intent 对象中指定的应用组件。
 
-![](intent-filters.png)
+![](images/intent-filters.png)
 
 > 隐式 Intent 如何通过系统传递以启动其他 Activity 的图解
 

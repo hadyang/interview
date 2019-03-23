@@ -2,7 +2,7 @@
 
 ## Activity生命周期
 
-![](activity-basic-lifecycle.png)
+![](images/activity-basic-lifecycle.png)
 
 在上面的图中存在不同状态之间的过渡，但是，这些状态中只有三种可以是静态，也就是说 Activity 只能在三种状态之一下存在很长时间。
 
@@ -90,7 +90,7 @@
 
 要保存有关 Activity 状态的其他数据，您必须替代 `onSaveInstanceState()` 回调方法。当用户要离开 Activity 并在 Activity 意外销毁时向其传递将保存的 Bundle 对象时，系统会调用此方法。 如果系统必须稍后重新创建Activity实例，它会将相同的 Bundle 对象同时传递给 `onRestoreInstanceState()` 和 `onCreate()` 方法。
 
-![](basic-lifecycle-savestate.png)
+![](images/basic-lifecycle-savestate.png)
 
 #### 保存Activity状态
 
@@ -114,4 +114,4 @@
 
  >一个通过`context.startService()`方法启动的service，其他组件也可以通过`context.bindService()`与它绑定，在这种情况下，不能使用`stopSelf()`或者`context.stopService()`停止service，只能当所有客户解除绑定在调用`context.stopService()`才会终止。
 
-![](service_life.png)
+![](images/service_life.png)

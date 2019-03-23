@@ -45,7 +45,7 @@ Java虚拟机在识别Java class文件，产生了类型的二进制数据后，
 
 当Java虚拟机装载一个类，并执行了一些验证之后，类就可以进入准备阶段。**在准备阶段，Java虚拟机为类变量分配内存，设置默认初始值。但在到到初始化阶段之前，类变量都没有被初始化为真正的初始值。**
 
-![](java-default-value.png)
+![](images/java-default-value.png)
 
 >boolean在内部常常被实现为一个int，会被默认初始化为0。
 

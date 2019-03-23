@@ -2,11 +2,11 @@
 
 ### EventBus消息接收者注册流程
 
-![](EventBus.register.png)
+![](images/EventBus.register.png)
 
 ### EventBus Post流程
 
-![](EventBus.Post.png)
+![](images/EventBus.Post.png)
 
 
 `postToSubscription()`在这个方法中，实现了从发布者到调用者的调用过程。在这里有很重要的几个分支：

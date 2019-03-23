@@ -233,7 +233,7 @@ TextView通常用来显示普通文本，但是有时候需要对其中某些文
 
 #### App启动过程
 
-![](app_launch.jpg)
+![](images/app_launch.jpg)
 
   1. 应用的启动是从其他应用调用`startActivity`开始的。通过代理请求AMS启动Activity。
 

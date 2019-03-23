@@ -92,7 +92,7 @@ mysql> select * from A inner join B on A.name = B.name;
 -- +----+--------+----+--------+
 ```
 
-![](join_1.png)
+![](images/join_1.png)
 
 ### Left Join
 
@@ -111,7 +111,7 @@ mysql> select * from A left join B on A.name = B.name;
 -- 4 rows in set (0.00 sec)
 ```
 
-![](join_2.png)
+![](images/join_2.png)
 
 `left join`，（或`left outer join`:在Mysql中两者等价，推荐使用`left join`）左连接从左表(A)产生一套完整的记录，与匹配的记录(右表(B))。如果没有匹配，右侧将包含null。
 
@@ -128,7 +128,7 @@ mysql> select * from A left join B on A.name=B.name where A.id is null or B.id i
 -- 2 rows in set (0.00 sec)
 ```
 
-![](join_3.png)
+![](images/join_3.png)
 
 根据上面的例子可以求差集，如下：
 
@@ -152,7 +152,7 @@ WHERE A.id IS NULL;
 >union ：用于合并多个 select 语句的结果集，并去掉重复的值。
 >union all ：作用和 union 类似，但不会去掉重复的值。
 
-![](join_4.png)
+![](images/join_4.png)
 
 ### Cross join
 

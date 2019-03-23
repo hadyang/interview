@@ -1,6 +1,6 @@
 # Android系统架构
 
-![](arch.png)
+![](images/arch.png)
 
 ## 应用程序(Applications)
 

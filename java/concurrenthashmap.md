@@ -6,7 +6,7 @@
 
 > `ConcurrentHashMap`不允许`Key`或者`Value`的值为`NULL`
 
-![](ConcurrentHashMap.png)
+![](images/ConcurrentHashMap.png)
 
 ### Segment类
 

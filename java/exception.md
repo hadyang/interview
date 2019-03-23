@@ -2,9 +2,9 @@
 
 Java中有Error和Exception，它们都是继承自Throwable类。
 
-![](error.png)
+![](images/error.png)
 
-![](exception.png)
+![](images/exception.png)
 
 ## 二者的不同之处
 

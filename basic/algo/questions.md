@@ -10,4 +10,4 @@
 
 若结点x是双亲y的左孩子，则把x的右孩子，右孩子的右孩子，…，都与y用连线连起来，最后去掉所有双亲到右孩子的连线。
 
-![](algo_question_1.jpg)
+![](images/algo_question_1.jpg)

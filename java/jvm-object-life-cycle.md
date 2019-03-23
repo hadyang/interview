@@ -46,4 +46,4 @@ Java虚拟机通过判断类是否在被引用来进行垃圾收集。判断动�
   - 如果程序保持非`Class`实例的明确引用。
   - 如果在堆中还存在一个可触及的对象，在方法区中它的类型数据指向一个`Class`实例。
 
-![](touch-class-instance.png)
+![](images/touch-class-instance.png)

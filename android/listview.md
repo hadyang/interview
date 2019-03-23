@@ -6,7 +6,7 @@ ListView的实现离不开Adapter。可以这么理解：ListView中给出了数
 
 提一个问题：假设ListView中有10W个条项，那内存中会缓存10W个吗？答案当然是否定的。那么是如何实现的呢？下面这张图可以清晰地解释其中的原理:
 
-![](android-listview.jpg)
+![](images/android-listview.jpg)
 
 可以看到当一个View移出可视区域的时候，设为View1，它会被标记Recycle，然后可能：
 

@@ -72,7 +72,7 @@ Java虚拟机的根对象集合根据实现不同而不同，但是总会包含�
 
 JVM中的共划分为三个代：`新生代（Young Generation）`、`老年代（Old Generation）`和`持久代（Permanent Generation）`。其中持久代主要存放的是Java类的类信息，与垃圾收集要收集的Java对象关系不大。
 
-  ![](jvm-gc-1.jpg)
+  ![](images/jvm-gc-1.jpg)
 
   - `新生代`：所有新生成的对象首先都是放在新生代的，新生代采用复制回收算法。新生代的目标就是尽可能快速的收集掉那些生命周期短的对象。新生代分三个区。一个Eden区，两个Survivor区(一般而言)。**大部分对象在Eden区中生成。当Eden区满时，还存活的对象将被复制到Survivor区（两个中的一个），当这个Survivor区满时，此区的存活对象将被复制到另外一个Survivor区，当这个Survivor去也满了的时候，从第一个Survivor区复制过来的并且此时还存活的对象，将被复制“年老区(Tenured)”**。需要注意，Survivor的两个区是对称的，没先后关系，所以同一个区中可能同时存在从Eden复制过来 对象，和从前一个Survivor复制过来的对象，而复制到年老区的只有从第一个Survivor去过来的对象。而且，Survivor区总有一个是空的。
 
@@ -104,7 +104,7 @@ JVM中的共划分为三个代：`新生代（Young Generation）`、`老年代�
 
 垃圾收集器是内存回收的具体实现，下图展示了7种用于不同分代的收集器，两个收集器之间有连线表示可以搭配使用。下面的这些收集器没有“最好的”这一说，每种收集器都有最适合的使用场景。
 
-![](hotspot-jvm-1.6-garbage-collector.jpg)
+![](images/hotspot-jvm-1.6-garbage-collector.jpg)
 
 ### Serial收集器
 

@@ -4,7 +4,7 @@
 
 客户端隔一段时间就去服务器上获取一下信息，看是否有更新的信息出现，这就是轮询。我们可以通过`AlarmManager`来管理时间，当然时间的设置策略也是十分重要的，由于每次轮询都需要建立和释放TCP连接，所以在移动网络情况下耗电量相当大。
 
-![](android-radio-state.png)
+![](images/android-radio-state.png)
 
 >移动网络状态转换
 
@@ -24,7 +24,7 @@
 
 因为 IPv4 的 IP 量有限，运营商分配给手机终端的 IP 是运营商内网的 IP，手机要连接 Internet，就需要通过运营商的网关做一个网络地址转换（Network Address Translation，NAT）。简单的说运营商的网关需要维护一个外网 IP、端口到内网 IP、端口的对应关系，以确保内网的手机可以跟 Internet 的服务器通讯。
 
-![](push-nat.jpg)
+![](images/push-nat.jpg)
 
 >NAT 功能由图中的 GGSN 模块实现。
 
