@@ -50,4 +50,12 @@ Java类加载器是Java运行时环境（Java Runtime Environment）的一部分
 
 类加载器的一个重要用途是 **在JVM中为相同名称的Java类创建隔离空间**。在JVM中，**判断两个类是否相同，不仅是根据该类的二进制名称，还需要根据两个类的定义类加载器。** 只有两者完全一样，才认为两个类的是相同的。
 
-在允许两个类型之间对包内可见的成员进行访问前，虚拟机不但要确定这个两个类型属于同一个包，**还必须确认它们属于同一个运行时包－它们必须有同一个类装载器装载的。** 这样，java.lang.Virus和来自核心的java.lang的类不属于同一个运行时包，java.lang.Virus就不能访问JAVA API的java.lang包中的包内可见的成员。
+在允许两个类型之间对包内可见的成员进行访问前，虚拟机不但要确定这个两个类型属于同一个包，**还必须确认它们属于同一个运行时包－它们必须有同一个类装载器装载的。** 这样，`java.lang.Virus`和来自核心的`java.lang`的类不属于同一个运行时包，`java.lang.Virus`就不能访问`JAVA API`的`java.lang`包中的包内可见的成员。
+
+## [Tomcat & ClassLoader](https://blog.csdn.net/liweisnake/article/details/8470285)
+
+事实上，tomcat之所以造了一堆自己的classloader，大致是出于下面三类目的：
+
+   - 对于各个webapp中的class和lib，需要相互隔离，不能出现一个应用中加载的类库会影响另一个应用的情况；而对于许多应用，需要有共享的lib以便不浪费资源，举个例子，如果webapp1和webapp2都用到了log4j，可以将log4j提到tomcat/lib中，表示所有应用共享此类库，试想如果log4j很大，并且20个应用都分别加载，那实在是没有必要的。
+   - 与jvm一样的安全性问题。使用单独的classloader去装载tomcat自身的类库，以免其他恶意或无意的破坏；
+   - 热部署，相信大家一定为tomcat修改文件不用重启就自动重新装载类库而惊叹吧。

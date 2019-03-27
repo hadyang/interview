@@ -1,5 +1,7 @@
 # JVM垃圾回收
 
+> 本片文章均指 HotSpot 的GC
+
 Java堆中存放着大量的Java对象实例，在垃圾收集器回收内存前，第一件事情就是确定哪些对象是“活着的”，哪些是可以回收的。
 
 ## 引用计数算法
@@ -64,23 +66,51 @@ Java虚拟机的根对象集合根据实现不同而不同，但是总会包含�
 
 复制算法在对象存活率较高的情况下会复制很多的对象，效率会很低。标记--整理算法就解决了这样的问题，标记过程和标记--清除算法一样，但后续是将所有存活的对象都移动到内存的一端，然后清理掉端外界的对象。
 
-### 分代回收算法
+## 分代回收(HotSpot)
 
 在JVM中不同的对象拥有不同的生命周期，因此对于不同生命周期的对象也可以采用不同的垃圾回收方法，以提高效率，这就是分代回收算法的核心思想。
 
 在不进行对象存活时间区分的情况下，每次垃圾回收都是对整个堆空间进行回收，花费的时间相对会长。同时，因为每次回收都需要遍历所有存活对象，但实际上，对于生命周期长的对象而言，这种遍历是没有效果的，因为可能进行了很多次遍历，但是他们依旧存在。因此，分代垃圾回收采用分治的思想，进行代的划分，把不同生命周期的对象放在不同代上，不同代上采用最适合它的垃圾回收方式进行回收。
 
-JVM中的共划分为三个代：`新生代（Young Generation）`、`老年代（Old Generation）`和`持久代（Permanent Generation）`。其中持久代主要存放的是Java类的类信息，与垃圾收集要收集的Java对象关系不大。
+JVM中的共划分为三个代：`新生代（Young Generation）`、`老年代（Old Generation）`和`永久代（Permanent Generation）`。其中永久代主要存放的是Java类的类信息，与垃圾收集要收集的Java对象关系不大。
 
   ![](images/jvm-gc-1.jpg)
 
   - `新生代`：所有新生成的对象首先都是放在新生代的，新生代采用复制回收算法。新生代的目标就是尽可能快速的收集掉那些生命周期短的对象。新生代分三个区。一个Eden区，两个Survivor区(一般而言)。**大部分对象在Eden区中生成。当Eden区满时，还存活的对象将被复制到Survivor区（两个中的一个），当这个Survivor区满时，此区的存活对象将被复制到另外一个Survivor区，当这个Survivor去也满了的时候，从第一个Survivor区复制过来的并且此时还存活的对象，将被复制“年老区(Tenured)”**。需要注意，Survivor的两个区是对称的，没先后关系，所以同一个区中可能同时存在从Eden复制过来 对象，和从前一个Survivor复制过来的对象，而复制到年老区的只有从第一个Survivor去过来的对象。而且，Survivor区总有一个是空的。
-
-  > 在HotSpot虚拟机内部默认Eden和Survivor的大小比例是8:1， 也就是每次新生代中可用内存为整个新生代的90%，这大大提高了复制回收算法的效率。
+    > 在HotSpot虚拟机内部默认Eden和Survivor的大小比例是8:1， 也就是每次新生代中可用内存为整个新生代的90%，这大大提高了复制回收算法的效率。
 
   - `老年代`：在新生代中经历了N次垃圾回收后仍然存活的对象，就会被放到老年代中，老年代采用标记整理回收算法。因此，可以认为老年代中存放的都是一些生命周期较长的对象。
 
-  - `持久代`：用于存放静态文件，如final常量，static常量，常量池等。持久代对垃圾回收没有显著影响，但是有些应用可能动态生成或者调用一些class，例如Hibernate等，在这种时候需要设置一个比较大的持久代空间来存放这些运行过程中新增的类。
+  - `永久代`：HotSpot 的方法区实现，用于存储类信息、常量池、静态变量、JIT编译后的代码等数据
+
+## HotSpot 各版本永久代变化
+
+  - 在Java 6中，方法区中包含的数据，除了JIT编译生成的代码存放在`native memory`的`CodeCache`区域，其他都存放在永久代；
+  - 在Java 7中，`Symbol`的存储从`PermGen`移动到了`native memory`，并且把静态变量从`instanceKlass`末尾（位于`PermGen`内）移动到了`java.lang.Class`对象的末尾（位于普通`Java heap`内）；
+  - 在Java 8中，永久代被彻底移除，取而代之的是另一块与堆不相连的本地内存——元空间（`Metaspace`）,`‑XX:MaxPermSize` 参数失去了意义，取而代之的是`-XX:MaxMetaspaceSize`。
+
+### [移除永久代](https://www.sczyh30.com/posts/Java/jvm-metaspace/)
+
+`Java 8` 彻底将永久代 (`PermGen`) 移除出了 `HotSpot JVM`，将其原有的数据迁移至 `Java Heap` 或 `Metaspace`。
+
+在 `HotSpot JVM` 中，永久代中用于存放类和方法的元数据以及常量池，比如`Class`和`Method`。每当一个类初次被加载的时候，它的元数据都会放到永久代中。
+
+**永久代是有大小限制的**，因此如果加载的类太多，很有可能导致永久代内存溢出，即万恶的 `java.lang.OutOfMemoryError: PermGen` ，为此我们不得不对虚拟机做调优。
+
+那么，`Java 8` 中 `PermGen` 为什么被移出 `HotSpot JVM` 了？
+
+  - 由于 · 内存经常会溢出，引发恼人的 `java.lang.OutOfMemoryError: PermGen`，因此 `JVM` 的开发者希望这一块内存可以更灵活地被管理，不要再经常出现这样的 `OOM`
+  - 移除 `PermGen` 可以促进` HotSpot JVM` 与 `JRockit VM` 的融合，因为 `JRockit` 没有永久代。
+
+`根据上面的各种原因，PermGen` 最终被移除，**方法区移至 Metaspace，字符串常量移至 Java Heap**。
+
+### 元空间
+
+首先，Metaspace（元空间）是哪一块区域？官方的解释是：
+
+> In JDK 8, classes metadata is now stored in the native heap and this space is called Metaspace.
+
+也就是说，JDK 8 开始把类的元数据放到本地堆内存(native heap)中，这一块区域就叫 Metaspace，中文名叫元空间。
 
 ## 垃圾回收触发条件
 
@@ -96,7 +126,7 @@ JVM中的共划分为三个代：`新生代（Young Generation）`、`老年代�
 
   - 老年代（Tenured）被写满
 
-  - 持久代（Perm）被写满
+  - 永久代（Perm）被写满
 
   - System.gc()被显示调用
 
@@ -118,7 +148,7 @@ JVM中的共划分为三个代：`新生代（Young Generation）`、`老年代�
 
 ParNew是Serial的多线程版本，在回收算法、对象分配原则上都是一致的。ParNew收集器是许多运行在Server模式下的默认新生代垃圾收集器，其主要在于除了Serial收集器，目前只有ParNew收集器能够与CMS收集器配合工作。
 
-### Parallel Scavenge收集器
+### Parallel Scavenge收集器（1.8默认新生代）
 
 Parallel Scavenge收集器是一个新生代垃圾收集器，其使用的算法是`复制算法`，也是并行的多线程收集器。
 
@@ -130,7 +160,7 @@ Parallel Scavenge 收集器更关注可控制的吞吐量，吞吐量等于运�
 
 Serial Old收集器是Serial收集器的老年代版本，也是一个单线程收集器，采用“标记-整理算法”进行回收。其运行过程与Serial收集器一样。
 
-### Parallel Old收集器
+### Parallel Old收集器（1.8默认老年代）
 
 Parallel Old收集器是Parallel Scavenge收集器的老年代版本，使用多线程和`标记-整理`算法进行垃圾回收。其通常与Parallel Scavenge收集器配合使用，“吞吐量优先”收集器是这个组合的特点，在注重吞吐量和CPU资源敏感的场合，都可以使用这个组合。
 

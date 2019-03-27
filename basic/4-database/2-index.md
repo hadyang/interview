@@ -88,3 +88,9 @@
 与非聚集索引相比，聚集索引有着更快检索速度、更快的字段排序。
 
 在MySQL中`InnoDB`按照主键进行聚集，如果没有定义主键，`InnoDB`会试着使用唯一的非空索引来代替。如果没有这种索引，`InnoDB`就会定义隐藏的主键然后在上面进行聚集，但是主键和聚集索引是不等价的。在`InnoDB`中`Normal`索引即非聚集索引。
+
+
+## 参考链接
+
+- [MySQL 索引设计概要](https://draveness.me/sql-index-intro)
+- [MySQL 索引性能分析概要](https://draveness.me/sql-index-performance)
