@@ -57,34 +57,44 @@ void bubble_sort(int a[], int n)
 > - 最坏情况：时间复杂度为`O(n^2)`。因为最坏情况发生在每次划分过程产生的两个区间分别包含`n-1`个元素和`1`个元素的时候。
 > - 最好情况：每次划分选取的基准都是当前无序区的中值。如果每次划分过程产生的区间大小都为n/2，则快速排序法运行就快得多了。
 
-```C++
-  void Qsort(int a[], int low, int high)
-  {
-      if(low >= high)
-      {
-          return;
-      }
-      int first = low;
-      int last = high;
-      int key = a[first];
+```java
+public static void fastSort(int[] nums, int start, int end) {
+    if (start > end) {
+        return;
+    }
 
-      while(first < last)
-      {
-          while(first < last && a[last] >= key)
-          {
-              --last;
-          }
-          a[first] = a[last];
-          while(first < last && a[first] <= key)
-          {
-              ++first;
-          }
-          a[last] = a[first];    
-      }
-      a[first] = key;
-      Qsort(a, low, first-1);
-      Qsort(a, first+1, high);
-  }
+    if (end < 0 || start < 0 || end > nums.length - 1 || start > nums.length - 1) {
+        return;
+    }
+
+    int left = start, right = end;
+    int keyIndex = (left + right) / 2;
+
+    while (left < right) {
+        while (right > keyIndex && nums[right] > nums[keyIndex]) {
+            right--;
+        }
+
+        if (right > keyIndex) {
+            swap(nums, keyIndex, right);
+            keyIndex = right;
+        }
+
+        while (left < keyIndex && nums[left] < nums[keyIndex]) {
+            left++;
+        }
+
+        if (left < keyIndex) {
+            swap(nums, left, keyIndex);
+            keyIndex = left;
+        }
+        left++;
+    }
+
+    fastSort(nums, keyIndex + 1, end);
+    fastSort(nums, start, keyIndex - 1);
+
+}
 ```
 
 #### 快排的优化
