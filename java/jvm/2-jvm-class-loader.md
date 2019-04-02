@@ -10,10 +10,12 @@ Java类加载器是Java运行时环境（Java Runtime Environment）的一部分
 
   1. 装载--查找并装载类型的二进制数据。
   2. 链接--执行验证、准备以及解析(可选)
-    - 验证  确保被导入类型的正确性
-    - 准备  为类变量分配内存，并将其初始化为默认值。
-    - 解析  把类型中的符号引用转换为直接引用。
+    - 验证：确保被导入类型的正确性
+    - 准备：为类变量分配内存，并将其初始化为默认值。
+    - 解析：把类型中的符号引用转换为直接引用。
   3. 初始化--把类变量初始化为正确的初始值。
+  4. 使用
+  5. 卸载：类加载器加载的每个类和类加载器本身都被没有引用
 
 ## 分类
 
@@ -46,16 +48,28 @@ Java类加载器是Java运行时环境（Java Runtime Environment）的一部分
 
 >需要指出的是，Class Loader是对象，它的父子关系和类的父子关系没有任何关系。一对父子loader可能实例化自同一个 Class，也可能不是，甚至父loader实例化自子类，子loader实例化自父类。
 
+## defineClass vs findClass vs loadClass
+
+  - `loadclass`：判断是否已加载，使用双亲委派模型，请求父加载器，都为空，使用 `findclass`
+  - `findclass`：根据名称或位置加载 `.class` 字节码,然后使用 `defineClass`
+  - `defineclass`：解析定义 `.class` 字节流，返回 `class` 对象
+
 ## 运行时包
 
 类加载器的一个重要用途是 **在JVM中为相同名称的Java类创建隔离空间**。在JVM中，**判断两个类是否相同，不仅是根据该类的二进制名称，还需要根据两个类的定义类加载器。** 只有两者完全一样，才认为两个类的是相同的。
 
 在允许两个类型之间对包内可见的成员进行访问前，虚拟机不但要确定这个两个类型属于同一个包，**还必须确认它们属于同一个运行时包－它们必须有同一个类装载器装载的。** 这样，`java.lang.Virus`和来自核心的`java.lang`的类不属于同一个运行时包，`java.lang.Virus`就不能访问`JAVA API`的`java.lang`包中的包内可见的成员。
 
+## Class.getClassLoader vs Thread.getContextClassLoader
+
+  - 每个 `Class` 会使用自己的 `ClassLoader` 去加载其他的 `Class` 。如果 `ClassA.class` 引用了 `ClassB.class` ，那么 `ClassB` 需要能被 `ClassA` 的 `ClassLoader` 或者其 `父ClassLoader` 找到。
+
+  - `Thread.getContextClassLoader` 是当前线程使用的 `ClassLoader`。对象可以通过 `ClassLoaderC` 加载，并且传递到 `Classload` 是 `ClassLoaderD` 的线程里。在某些情况下，对象需要使用 `Thread.currentThread().getContextClassLoader()` 来加载 `ClassLoaderC` 不能获取的资源
+
 ## [Tomcat & ClassLoader](https://blog.csdn.net/liweisnake/article/details/8470285)
 
 事实上，tomcat之所以造了一堆自己的classloader，大致是出于下面三类目的：
 
-   - 对于各个webapp中的class和lib，需要相互隔离，不能出现一个应用中加载的类库会影响另一个应用的情况；而对于许多应用，需要有共享的lib以便不浪费资源，举个例子，如果webapp1和webapp2都用到了log4j，可以将log4j提到tomcat/lib中，表示所有应用共享此类库，试想如果log4j很大，并且20个应用都分别加载，那实在是没有必要的。
-   - 与jvm一样的安全性问题。使用单独的classloader去装载tomcat自身的类库，以免其他恶意或无意的破坏；
-   - 热部署，相信大家一定为tomcat修改文件不用重启就自动重新装载类库而惊叹吧。
+   - 对于各个 `webapp` 中的 `class` 和 `lib` ，需要相互隔离，不能出现一个应用中加载的类库会影响另一个应用的情况；而对于许多应用，需要有共享的lib以便不浪费资源，举个例子，如果 `webapp1` 和 `webapp2` 都用到了 log4j ，可以将 log4j 提到 `tomcat/lib` 中，表示所有应用共享此类库，试想如果 log4j 很大，并且 20 个应用都分别加载，那实在是没有必要的。
+   - 与 `jvm` 一样的安全性问题。使用单独的 `classloader` 去装载 `tomcat` 自身的类库，以免其他恶意或无意的破坏；
+   - 热部署，相信大家一定为 `tomcat` 修改文件不用重启就自动重新装载类库而惊叹吧。
