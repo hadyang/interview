@@ -9,6 +9,6 @@ type: docs
 
 页面生成工具：[Hugo](https://themes.gohugo.io/)
 
-主题：[hugp-book](https://themes.gohugo.io/hugo-book/)
+主题：[hugo-book](https://themes.gohugo.io/hugo-book/)
 
 预览地址：[Interview](https://hadyang.github.io/interview/)
