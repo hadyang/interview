@@ -22,6 +22,7 @@ before_script:
   - cp -r content interview_book/
   - cp config.yaml interview_book/
   - cd interview_book/
+  - rm config.toml
 
 script:
   - hugo
