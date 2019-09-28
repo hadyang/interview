@@ -14,8 +14,8 @@ notifications:
     on_failure: always
 
 before_install:
-  - wget https://github.com/gohugoio/hugo/releases/download/v0.58.3/hugo_0.58.3_Linux-64bit.deb
-  - sudo dpkg -i hugo_0.58.3_Linux-64bit.deb
+  - wget https://github.com/gohugoio/hugo/releases/download/v0.58.3/hugo_extended_0.58.3_Linux-64bit.deb
+  - sudo dpkg -i hugo_extended_0.58.3_Linux-64bit.deb
 
 before_script:
   - hugo new site interview_book
@@ -24,9 +24,7 @@ before_script:
   - cd interview_book/
   - rm config.toml
   - git submodule add https://github.com/alex-shpak/hugo-book themes/hugo-book
-  - cd themes/hugo-book/
-  - git checkout v3
-  - cd ../../
+
 
 script:
   - hugo
