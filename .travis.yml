@@ -23,6 +23,7 @@ before_script:
   - cp config.yaml interview_book/
   - cd interview_book/
   - rm config.toml
+  - git submodule add https://github.com/alex-shpak/hugo-book themes/book
 
 script:
   - hugo
