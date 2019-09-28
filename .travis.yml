@@ -19,7 +19,7 @@ before_install:
 
 before_script:
   - hugo new site interview_book
-  - cp content interview_book/
+  - cp -r content interview_book/
   - cp config.yaml interview_book/
   - cd interview_book/
 
