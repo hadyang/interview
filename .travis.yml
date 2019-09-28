@@ -1,0 +1,37 @@
+language: go
+
+go:
+- 1.x
+
+sudo: required
+dist: bionic
+
+notifications:
+  email:
+    recipients:
+      - shihaoyang129@gmail.com # 设置通知邮件
+    on_success: change
+    on_failure: always
+
+before_install:
+  - wget https://github.com/gohugoio/hugo/releases/download/v0.58.3/hugo_0.58.3_Linux-64bit.deb
+  - sudo dpkg -i hugo_0.58.3_Linux-64bit.deb
+
+script:
+  - hugo
+
+after_script:
+  - cd public
+  - git init
+  - git remote add origin https://$REF
+  - git add .
+  - git commit -m "Updated By Travis-CI With Build $TRAVIS_BUILD_NUMBER For Github Pages"
+  - git push --force --quiet "https://$TOKEN@$REF" master:gh-pages
+
+branches:
+  only:
+    - master
+
+env:
+  global:
+    - REF=github.com/hadyang/interview.git # 设置 github 地址
