@@ -1,5 +1,5 @@
 _book
 *.pdf
 .DS_Store
-public
-themes
+./public
+./themes
