@@ -17,6 +17,11 @@ before_install:
   - wget https://github.com/gohugoio/hugo/releases/download/v0.58.3/hugo_0.58.3_Linux-64bit.deb
   - sudo dpkg -i hugo_0.58.3_Linux-64bit.deb
 
+before_script:
+  - hugo new site interview_book
+  - cp content,config.yaml interview_book/
+  - cd interview_book/
+
 script:
   - hugo
 
