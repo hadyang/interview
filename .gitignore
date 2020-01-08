@@ -2,5 +2,5 @@ _book
 *.pdf
 .DS_Store
 public/
-themes/
 interview_book/
+resources
