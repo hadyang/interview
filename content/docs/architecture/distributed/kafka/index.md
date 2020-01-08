@@ -39,7 +39,9 @@ Producer 发送消息到 broker 时，会根据 Paritition 机制选择将其存
 
 可以在 `$KAFKA_HOME/config/server.properties` 中通过配置项 `num.partitions` 来指定新建 `Topic` 的默认 `Partition` 数量，也可在创建 `Topic` 时通过参数指定，同时也可以在 Topic 创建之后通过 Kafka 提供的工具修改。
 
-在发送一条消息时，可以指定这条消息的 `key` ，Producer 根据这个 `key` 和 Partition 机制来判断应该将这条消息发送到哪个 Parition 。Paritition机制可以通过指定 Producer 的 `paritition.class` 这一参数来指定，该 class 必须实现 `kafka.producer.Partitioner` 接口。
+- 指定了 patition，则直接使用
+- 未指定 patition 但指定 key，通过对 key 进行 hash 选出一个 patition
+- patition 和 key 都未指定，使用轮询选出一个 patition
 
 ## Consumer Group
 
@@ -56,6 +58,10 @@ Producer 发送消息到 broker 时，会根据 Paritition 机制选择将其存
 ![image](images/5290a719713da5ce4e83422ded5bdf0c.png)
 
 所以，如果你的分区数是 N ，那么最好线程数也保持为 N ，这样通常能够达到最大的吞吐量。超过 N 的配置只是浪费系统资源，因为多出的线程不会被分配到任何分区。
+
+- 如果消费线程大于 patition 数量，则有些线程将收不到消息
+- 如果 patition 数量大于消费线程数，则有些线程多收到多个 patition 的消息
+- 如果一个线程消费多个 patition，则无法保证你收到的消息的顺序，而一个 patition 内的消息是有序的
 
 ## Push vs. Pull　　
 
@@ -133,9 +139,63 @@ Producer 发送消息到 broker 时，会根据 Paritition 机制选择将其存
 
 ![image](images/09d68167fcb34b075259add9b81809cd.png)
 
+## Kafka 如何进行扩容的？
+
+假如集群有 3 个 broker，一共有 4 个 TP，每个 3 副本，均匀分布。现在要扩容一台机器，新 broker 加入集群后需要通过工具进行 TP 的迁移。一共迁移 3 个 TP 的副本到新 broker 上。等迁移结束之后，会重新进行 Leader balance。
+
+从微观的角度看，TP 从一台 broker 迁移到另一个 broker 的流程是怎么样的呢？咱们来看下 TP3 第三个副本，从 broker1 迁移到 broker4 的过程，如下图所示，broker4 作为 TP3 的 follower，从 broker1 上最早的 `offset` 进行获取数据，直到赶上最新的 `offset` 为止，新副本被放入 ISR 中，并移除 broker1 上的副本，迁移过程完毕。
+
+但在现有的扩容流程中存有如下问题：数据迁移从 TP3 的最初的 `offset` 开始拷贝数据，这会导致大量读磁盘，消耗大量的 I/O 资源，导致磁盘繁忙，从而造成 produce 操作延迟增长，产生抖动。所以整体迁移流程不够平滑。我们看下实际的监控到的数据。从中可以看到数据迁移中， `broker1` 上磁盘读量增大，磁盘 util 持续打满，produce 极其不稳定。
+
+针对这个问题，我们回到 Kafka 迁移的流程上看，理论上 Kafka 是一个缓存系统，不需要永久存储数据，很有可能费了很多工作迁移过来的数据根本就不会被使用，甚至马上就会被删除了。从这个角度上看，那么迁移数据时，为什么一定要从 partition 最初 `offset` 开始迁移数据呢？细想想，好像不需要这样。
+
+所以，解决这个问题的思路就比较简单了，在迁移 TP 时，**直接从 partition 最新的 offset 开始数据迁移**，但是要同步保持一段时间，主要是确保所有 consumer 都已经跟得上了。
+
+## Leader 选举过程
+
+### 控制器的选举
+
+在Kafka集群中会有一个或多个broker，其中有一个broker会被选举为控制器（Kafka Controller），它负责管理整个集群中所有分区和副本的状态等工作。比如当某个分区的 Leader 副本出现故障时，由控制器负责为该分区选举新的 Leader 副本。再比如当检测到某个分区的 ISR(In-Sync Replicas) 集合发生变化时，由控制器负责通知所有 broker 更新其元数据信息。
+
+Kafka Controller 的选举是依赖 Zookeeper 来实现的，在 Kafka 集群中哪个 broker 能够成功创建 `/controller` 这个临时（EPHEMERAL）节点他就可以成为 Kafka Controller。Kafka Controller 的出现是处于性能考虑，当 Kafka 集群规模很大，partition 达到成千上万时，当 broker 宕机时，造成集群内大量的调整，会造成大量 Watch 事件被触发，Zookeeper负载会过重。
+
+### 分区 Leader 的选举
+
+分区 Leader 副本的选举由 Kafka Controller 负责具体实施。当创建分区（创建主题或增加分区都有创建分区的动作）或分区上线（比如分区中原先的 Leader 副本下线，此时分区需要选举一个新的 Leader 上线来对外提供服务）的时候都需要执行 Leader 的选举动作。
+
+### 消费者相关的选举
+
+组协调器 GroupCoordinator 需要为消费组内的消费者选举出一个消费组的 Leader，这个选举的算法也很简单，分两种情况分析。如果消费组内还没有 Leader，那么第一个加入消费组的消费者即为消费组的 Leader。如果某一时刻 Leader 消费者由于某些原因退出了消费组，那么会重新选举一个新的 Leader。
+
+## 负载均衡
+
+### Producers 负载均衡
+
+对于同一个 topic 的不同 partition，Kafka 会尽力将这些 partition 分布到不同的 broker 服务器上，这种均衡策略实际上是基于 ZooKeeper 实现的。在一个 broker 启动时，会首先完成 broker 的注册过程，并注册一些诸如 “有哪些可订阅的 topic” 之类的元数据信息。producers 启动后也要到 ZooKeeper 下注册，创建一个临时节点来监听 broker 服务器列表的变化。由于在 ZooKeeper 下 broker 创建的也是临时节点，当 brokers 发生变化时，producers 可以得到相关的通知，从改变自己的 broker list。其它的诸如 topic 的变化以及 broker 和 topic 的关系变化，也是通过 ZooKeeper 的这种 Watcher 监听实现的。
+
+在生产中，必须指定 topic；但是对于 partition，有两种指定方式：
+  - 明确指定 `partition(0-N)`，则数据被发送到指定 partition；
+  - 设置为 `RD_KAFKA_PARTITION_UA` ，则 Kafka 会回调 `partitioner` 进行均衡选取， `partitioner` 方法需要自己实现。可以轮询或者传入 key 进行 hash。未实现则采用默认的随机方法 `rd_kafka_msg_partitioner_random` 随机选择。
+
+### Consumer 负载均衡
+
+Kafka 保证同一 consumer group 中只有一个 consumer 可消费某条消息，实际上，Kafka 保证的是稳定状态下每一个 consumer 实例只会消费某一个或多个特定的数据，而某个 partition 的数据只会被某一个特定的 consumer 实例所消费。这样设计的劣势是无法让同一个 consumer group 里的 consumer 均匀消费数据，优势是每个 consumer 不用都跟大量的 broker 通信，减少通信开销，同时也降低了分配难度，实现也更简单。另外，因为同一个 partition 里的数据是有序的，这种设计可以保证每个 partition 里的数据也是有序被消费。
+
+#### consumer 数量不等于 partition 数量
+
+如果某 consumer group 中 consumer 数量少于 partition 数量，则至少有一个 consumer 会消费多个 partition 的数据；如果 consumer 的数量与 partition 数量相同，则正好一个 consumer 消费一个 partition 的数据，而如果 consumer 的数量多于 partition 的数量时，会有部分 consumer 无法消费该 topic 下任何一条消息。
+
+#### 借助 ZooKeeper 实现负载均衡
+
+关于负载均衡，对于某些低级别的 API，consumer 消费时必须指定 topic 和 partition，这显然不是一种友好的均衡策略。基于高级别的 API，consumer 消费时只需制定 topic，借助 ZooKeeper 可以根据 partition 的数量和 consumer 的数量做到均衡的动态配置。
+
+consumers 在启动时会到 ZooKeeper 下以自己的 `conusmer-id` 创建临时节点 `/consumer/[group-id]/ids/[conusmer-id]`，并对 `/consumer/[group-id]/ids` 注册监听事件，当消费者发生变化时，同一 group 的其余消费者会得到通知。当然，消费者还要监听 broker 列表的变化。kafka 通常会将 partition 进行排序后，根据消费者列表，进行轮流的分配。
+
 ## 参考
 
-[Kafka设计解析](http://www.jasongj.com/2015/03/10/KafkaColumn1/)
-[Kafka的高可用](https://github.com/doocs/advanced-java/blob/master/docs/high-concurrency/how-to-ensure-high-availability-of-message-queues.md#kafka-%E7%9A%84%E9%AB%98%E5%8F%AF%E7%94%A8%E6%80%A7)
-[Kafka幂等性](https://github.com/doocs/advanced-java/blob/master/docs/high-concurrency/how-to-ensure-that-messages-are-not-repeatedly-consumed.md)
-[Kafka消息丢失](https://github.com/doocs/advanced-java/blob/master/docs/high-concurrency/how-to-ensure-the-reliable-transmission-of-messages.md#kafka)
+- [Kafka设计解析](http://www.jasongj.com/2015/03/10/KafkaColumn1/)
+- [Kafka的高可用](https://github.com/doocs/advanced-java/blob/master/docs/high-concurrency/how-to-ensure-high-availability-of-message-queues.md#kafka-%E7%9A%84%E9%AB%98%E5%8F%AF%E7%94%A8%E6%80%A7)
+- [Kafka幂等性](https://github.com/doocs/advanced-java/blob/master/docs/high-concurrency/how-to-ensure-that-messages-are-not-repeatedly-consumed.md)
+- [Kafka消息丢失](https://github.com/doocs/advanced-java/blob/master/docs/high-concurrency/how-to-ensure-the-reliable-transmission-of-messages.md#kafka)
+- [快手万亿级别 Kafka 集群应用实践与技术演进之路](https://www.infoq.cn/article/Q0o*QzLQiay31MWiOBJH)
+- [kafka的leader选举过程](https://www.jianshu.com/p/c987b5e055b0)
