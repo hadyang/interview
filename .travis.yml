@@ -14,8 +14,8 @@ notifications:
     on_failure: always
 
 before_install:
-  - wget https://github.com/gohugoio/hugo/releases/download/v0.58.3/hugo_extended_0.58.3_Linux-64bit.deb
-  - sudo dpkg -i hugo_extended_0.58.3_Linux-64bit.deb
+  - wget https://github.com/gohugoio/hugo/releases/download/v0.62.2/hugo_extended_0.62.2_Linux-64bit.deb
+  - sudo dpkg -i hugo_extended_0.62.2_Linux-64bit.deb
 
 before_script:
   - hugo new site interview_book

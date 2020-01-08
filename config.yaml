@@ -11,6 +11,8 @@ enableGitInfo: true
 # pygmentsStyle: monokailight
 pygmentsCodeFences: true
 
+disableKinds: ['taxonomy', 'taxonomyTerm']
+
 params:
   # (Optional, default 6) Set how many table of contents levels to be showed on page.
   # Use false/off to hide ToC, note that 0 will default to 6 (https://gohugo.io/functions/default/)
