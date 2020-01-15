@@ -1,7 +1,7 @@
 ---
 title: HDFS 
 date: 2020-01-14
-draft: true
+draft: false
 categories: architecture
 ---
 
