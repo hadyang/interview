@@ -81,6 +81,34 @@ Netty 的 Zero-copy 体现在如下几个个方面:
   - `ByteBuf` 支持 `slice` 操作, 因此可以将 `ByteBuf` 分解为多个共享同一个存储区域的 `ByteBuf`, 避免了内存的拷贝.
   - 通过 `FileRegion` 包装的 `FileChannel.tranferTo` 实现文件传输, 可以直接将文件缓冲区的数据发送到目标 `Channel` , 避免了传统通过循环 `write` 方式导致的内存拷贝问题.
 
+### 垃圾回收
+
+Netty 里 `HeapByteBuffer` 底下的 `byte[]` 能够依赖JVM GC自然回收；而 DirectByteBuffer 底下是 Java 堆外内存，除了等JVM GC，最好也能主动进行回收；所以，Netty ByteBuf需要在 JVM 的 GC 机制之外，有自己的引用计数器和回收过程。
+> 原生的 JVM GC 很难回收掉 DirectByteBuffer 所占用的 Native Memory
+
+Netty 中采用引用计数对 DirectByteBuffer 进行对象可达性检测，当 DirectByteBuffer 上的引用计数为 0 时将对象释放。
+
+```java
+@Override
+public boolean release() {
+    for (;;) {
+        int refCnt = this.refCnt;
+        if (refCnt == 0) {
+            throw new IllegalReferenceCountException(0, -1);
+        }
+        if (refCntUpdater.compareAndSet(this, refCnt, refCnt - 1)) {
+            if (refCnt == 1) {
+                deallocate();
+                return true;
+            }
+            return false;
+        }
+    }
+}
+```
+
+Netty 内存泄漏，主要是针对池化的 ByteBuf 。 ByteBuf 对象被 JVM GC 掉之前，没有调用 `release()` 把底下的 `DirectByteBuffer` 或`byte[]` 归还，会导致池越来越大。而非池化的 ByteBuf ，即使像 `DirectByteBuf` 那样可能会用到 `System.gc()` ，但终归会被 release 掉的，不会出大事。因此 Netty 默认会从分配的 ByteBuf 里抽样出大约 1% 的来进行跟踪。
+
 ## 源码
 
 ### ByteBuf

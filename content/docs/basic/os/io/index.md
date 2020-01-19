@@ -89,11 +89,11 @@ IO多路复用就是我们说的 `select，poll，epoll` ，有些地方也称�
 
 传统的 `select/poll` 另-个致命弱点就是当你拥有一个很大的 `socket` 集合，由于网络延时或者链路空闲，任一时刻只有少部分的 `socket` 是“活跃”的，但是 **`select/poll` 每次调用都会线性扫描全部的集合，导致效率呈现线性下降**。 `epoll` 不存在这个问题，它只会对“活跃”的 `socket` 进行操作，这是因为在内核实现中 `epoll` 是根据每个 `fd` 上面的 `callback` 函数实现的，那么，只有“活跃”的 `socket` 才会主动的去调用 `callback` 函数，其他 `idle` 状态 `socket` 则不会。**在这点上， `epoll` 实现了一个伪 AIO**。针对 `epoll` 和 `select` 性能对比的 `benchmark` 测试表明：**如果所有的 `socket` 都处于活跃态，例如一个高速 `LAN` 环境， `epoll` 并不比 `select/poll` 效率高太多；相反，如果过多使用 `epoll_ ctl` , 效率相比还有稍微的下降。但是一旦使用 `idleconnections` 模拟 `WAN` 环境，`epoll` 的效率就远在 `select/poll` 之上了**。
 
-##### 使用 mmap 加速内核与用户空间的消息传递。
+##### 使用 mmap 加速内核与用户空间的消息传递
 
-无论是 `select`，`poll` 还是 `epoll` 都需要内核把 FD 消息通知给用户空间，如何避免不必要的内存复制就显得非常重要， `epoll` 是通过内核和用户空间 `mmap` 同一块内存实现。
+无论是 `select`，`poll` 还是 `epoll` 都需要内核把 FD 消息通知给用户空间，如何避免不必要的内存复制（Zero Copy）就显得非常重要， `epoll` 是通过内核和用户空间 `mmap` 共享同一块内存来实现。
 
-##### Epoll 的 API 更加简单。
+##### Epoll 的 API 更加简单
 
 包括创建一个 `epoll` 描述符、添加监听事件、阻塞等待所监听的事件发生，关闭 `epoll` 描述符等。
 

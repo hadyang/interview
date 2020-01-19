@@ -72,6 +72,17 @@ while(keyIterator.hasNext()) {
 - `compact()`：将所有未读的数据拷贝到 Buffer 起始处。然后将 `position` 设到最后一个未读元素正后面。 `limit` 属性依然像 `clear()` 方法一样，设置成 `capacity` 。
 - `rewind()`：将 position 设回0，所以你可以重读 Buffer 中的所有数据，limit保持不变。
 
+### 堆内内存（HeapByteBuffer）
+
+HeapByteBuffer 是在 Java Heap 上分配的，但是Java NIO在读写到相应的 Channel 的时候，会先将 Java Heap 的 buffer 内容拷贝至直接内存—— Direct Memory。这样的话，无疑 DirectByteBuffer 的 IO 性能肯定强于使用 HeapByteBuffer ，它省去了临时 buffer 的拷贝开销。
+
+
+### 堆外内存（DirectByteBuffer）
+
+DirectByteBuffer 底层的数据其实是维护在 JVM 堆外的用户空间中， DirectByteBuffer 里维护了一个引用 address 指向了数据，从而操作数据。虽然 GC 仍然管理着 DirectBuffer 的回收，但它是使用 `PhantomReference` 来达到的，在平常的 Young GC 或者 mark and compact 的时候却不会在内存里搬动。如果IO的数量比较大，比如在网络发送很大的文件，那么 GC 的压力下降就会很明显。只有在 Full GC 以及调用 `System.gc` 的时候才会进行回收。
+
+DirectByteBuffer Java 堆内只会占用一个对象的指针引用的大小，堆外的的空间只有当 java 对象被回收时，才会被回收，这里会发现一个明显的不对称现象，就是堆外可能占用了很多，而堆内没占用多少，导致还没触发 GC ，那就很容易出现 Direct Memory 造成物理内存耗光。
+
 
 ## EchoNIOServer
 
