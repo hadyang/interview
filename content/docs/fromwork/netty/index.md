@@ -141,13 +141,13 @@ Netty 内存泄漏，主要是针对池化的 ByteBuf 。 ByteBuf 对象被 JVM 
 
 Netty 解决方案：
 
-```
+```java
 long currentTimeNanos = System.nanoTime();
 for (;;) {
     // 1.定时任务截止事时间快到了，中断本次轮询
-    ...
+    //...
     // 2.轮询过程中发现有任务加入，中断本次轮询
-    ...
+    //...
     // 3.阻塞式select操作
     selector.select(timeoutMillis);
     // 4.解决jdk的nio bug
@@ -164,7 +164,7 @@ for (;;) {
         break;
     }
     currentTimeNanos = time;
-    ...
+    //...
  }
 ```
 

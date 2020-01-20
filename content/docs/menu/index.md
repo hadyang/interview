@@ -28,6 +28,7 @@ headless: true
         - [IP]({{< relref "/docs/basic/net/ip/index.md" >}})
         - [HTTP]({{< relref "/docs/basic/net/http/index.md" >}})
         - [HTTPS]({{< relref "/docs/basic/net/https/index.md" >}})
+        - [Websocket]({{< relref "/docs/basic/net/websocket/index.md" >}})
     - [数据库]({{< relref "/docs/basic/database/_index.md" >}})
         - [事务]({{< relref "/docs/basic/database/transaction/index.md" >}})
         - [索引]({{< relref "/docs/basic/database/index/index.md" >}})
