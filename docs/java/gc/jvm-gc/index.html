@@ -27,15 +27,15 @@ Java虚拟机的根对象集合根据实现不同而不同，但是总会包含�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/java/gc/jvm-gc/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2019-08-21T11:00:41+08:00" />
+<meta property="article:modified_time" content="2020-01-19T16:59:43+08:00" />
 <title>JVM 垃圾回收 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/interview/book.min.b7fe34b8a4c4da05b2690b4aacfa71ddce0668cc6da3abb67dd3946844125444.css" integrity="sha256-t/40uKTE2gWyaQtKrPpx3c4GaMxto6u2fdOUaEQSVEQ=">
+<link rel="stylesheet" href="/interview/book.min.68d45956421753cdf6bcfc865ede445c56afc5bcaaebfe02961f44fe77d8f45a.css" integrity="sha256-aNRZVkIXU832vPyGXt5EXFavxbyq6/4Clh9E/nfY9Fo=">
 
 
-<script defer src="/interview/en.search.min.4daab1eda22baec10d130347f095a8463b951038b7e98060a59bcdc484ada980.js" integrity="sha256-Taqx7aIrrsENEwNH8JWoRjuVEDi36YBgpZvNxIStqYA="></script>
+<script defer src="/interview/en.search.min.4a44e4fc3cc862db20d80ddb87c8a0a76de1767929ed93d3103d784771c8a8ba.js" integrity="sha256-SkTk/DzIYtsg2A3bh8igp23hdnkp7ZPTED14R3HIqLo="></script>
 
 <!--
 Made with Book Theme
@@ -47,18 +47,18 @@ https://github.com/alex-shpak/hugo-book
 
 <body>
   <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="container flex">
-    <aside class="book-menu">
-      
-  <nav>
+  <main class="flex container">
+
+    <aside class="book-menu fixed">
+      <nav>
 <h2 class="book-brand">
-  <a href="/interview"><span>Interview</span>
+  <a href="https://hadyang.github.io/interview/"><span>Interview</span>
   </a>
 </h2>
 
 
 <div class="book-search">
-  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" />
   <div class="book-search-spinner spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
@@ -67,7 +67,7 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-  <ul>
+    <ul>
 <li><a href="/interview/docs/basic/">计算机基础</a>
 <ul>
 <li><a href="/interview/docs/basic/algo/">算法</a>
@@ -352,74 +352,15 @@ https://github.com/alex-shpak/hugo-book
 })();
 </script>
 
- 
     </aside>
 
     <div class="book-page">
-      <header class="book-header">
-        
-  <div class="flex align-center justify-between">
+      <header class="flex align-center justify-between book-header">
   <label for="menu-control">
     <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
-
   <strong>JVM 垃圾回收</strong>
-
-  <label for="toc-control">
-    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
-  </label>
-</div>
-
-
-  
-    <input type="checkbox" class="hidden" id="toc-control" />
-    <aside class="hidden clearfix">
-      
-  <nav id="TableOfContents">
-  <ul>
-    <li><a href="#引用计数算法">引用计数算法</a></li>
-    <li><a href="#根搜索算法">根搜索算法</a></li>
-    <li><a href="#引用对象">引用对象</a></li>
-    <li><a href="#垃圾回收算法">垃圾回收算法</a>
-      <ul>
-        <li><a href="#标记--清除算法">标记&ndash;清除算法</a></li>
-        <li><a href="#复制回收算法">复制回收算法</a></li>
-        <li><a href="#标记--整理算法">标记&ndash;整理算法</a></li>
-      </ul>
-    </li>
-    <li><a href="#分代回收hotspot">分代回收(HotSpot)</a></li>
-    <li><a href="#hotspot-各版本永久代变化">HotSpot 各版本永久代变化</a>
-      <ul>
-        <li><a href="#移除永久代httpswwwsczyh30compostsjavajvm-metaspace">移除永久代</a></li>
-        <li><a href="#元空间">元空间</a></li>
-      </ul>
-    </li>
-    <li><a href="#垃圾回收触发条件">垃圾回收触发条件</a>
-      <ul>
-        <li><a href="#scavenge-gc">Scavenge GC</a></li>
-        <li><a href="#full-gc">Full GC</a></li>
-        <li><a href="#堆外内存-gc">堆外内存 GC</a></li>
-      </ul>
-    </li>
-    <li><a href="#垃圾收集器">垃圾收集器</a>
-      <ul>
-        <li><a href="#serial收集器">Serial收集器</a></li>
-        <li><a href="#parnew收集器">ParNew收集器</a></li>
-        <li><a href="#parallel-scavenge收集器18默认新生代">Parallel Scavenge收集器（1.8默认新生代）</a></li>
-        <li><a href="#serial-old收集器">Serial Old收集器</a></li>
-        <li><a href="#parallel-old收集器18默认老年代">Parallel Old收集器（1.8默认老年代）</a></li>
-        <li><a href="#cms-收集器">CMS 收集器</a></li>
-        <li><a href="#g1收集器">G1收集器</a></li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-
-
-    </aside>
-  
- 
-      </header>
+</header>
 
       
 <article class="markdown"><h1 id="jvm垃圾回收">JVM垃圾回收</h1>
@@ -597,41 +538,41 @@ https://github.com/alex-shpak/hugo-book
 </ul>
 <p><strong>G1收集器可以实现在基本不牺牲吞吐量的情况下完成低停顿的内存回收，这是由于它极力的避免全区域的回收，G1收集器将Java堆（包括新生代和老年代）划分为多个区域（Region），并在后台维护一个优先列表，每次根据允许的时间，优先回收垃圾最多的区域</strong> 。</p>
 </article>
- 
 
-      <footer class="book-footer">
-        
-  <div class="flex justify-between">
+      <div class="book-footer justify-between">
+  
 
-
-
-
-
+  
+  
   <div>
-    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/java/gc/jvm-gc/index.md" target="_blank" rel="noopener">
+    
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/3ad3981966ea48cf0201c427c96db9656e45e265" title='Last modified by haoyang.shi | 2020-01-19' target="_blank">
+      <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
+      <span>2020-01-19</span>
+    </a>
+  </div>
+  
+  
+
+  
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/java/gc/jvm-gc/index.md" target="_blank">
       <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
       <span>Edit this page</span>
     </a>
   </div>
+  
 
 </div>
 
- 
-        
-  
-  <div class="book-comments">
-
-</div>
-  
- 
-      </footer>
       
     </div>
 
     
-    <aside class="book-toc">
-      
-  <nav id="TableOfContents">
+  
+
+  <aside class="book-toc levels-3 fixed">
+    <nav id="TableOfContents">
   <ul>
     <li><a href="#引用计数算法">引用计数算法</a></li>
     <li><a href="#根搜索算法">根搜索算法</a></li>
@@ -670,25 +611,13 @@ https://github.com/alex-shpak/hugo-book
     </li>
   </ul>
 </nav>
+  </aside>
 
- 
-    </aside>
-    
+
+
   </main>
 
   
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
-

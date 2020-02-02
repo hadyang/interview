@@ -11,15 +11,15 @@ public final int getAndAddInt(Object var1, long var2, int var4) { int var5; //�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/java/concurrent/atomic/" />
 <meta property="article:published_time" content="2020-01-22T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-01-22T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-02-02T16:31:10+08:00" />
 <title>AtomicInteger | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/interview/book.min.b7fe34b8a4c4da05b2690b4aacfa71ddce0668cc6da3abb67dd3946844125444.css" integrity="sha256-t/40uKTE2gWyaQtKrPpx3c4GaMxto6u2fdOUaEQSVEQ=">
+<link rel="stylesheet" href="/interview/book.min.68d45956421753cdf6bcfc865ede445c56afc5bcaaebfe02961f44fe77d8f45a.css" integrity="sha256-aNRZVkIXU832vPyGXt5EXFavxbyq6/4Clh9E/nfY9Fo=">
 
 
-<script defer src="/interview/en.search.min.4daab1eda22baec10d130347f095a8463b951038b7e98060a59bcdc484ada980.js" integrity="sha256-Taqx7aIrrsENEwNH8JWoRjuVEDi36YBgpZvNxIStqYA="></script>
+<script defer src="/interview/en.search.min.4a44e4fc3cc862db20d80ddb87c8a0a76de1767929ed93d3103d784771c8a8ba.js" integrity="sha256-SkTk/DzIYtsg2A3bh8igp23hdnkp7ZPTED14R3HIqLo="></script>
 
 <!--
 Made with Book Theme
@@ -31,18 +31,18 @@ https://github.com/alex-shpak/hugo-book
 
 <body>
   <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="container flex">
-    <aside class="book-menu">
-      
-  <nav>
+  <main class="flex container">
+
+    <aside class="book-menu fixed">
+      <nav>
 <h2 class="book-brand">
-  <a href="/interview"><span>Interview</span>
+  <a href="https://hadyang.github.io/interview/"><span>Interview</span>
   </a>
 </h2>
 
 
 <div class="book-search">
-  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" />
   <div class="book-search-spinner spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
@@ -51,7 +51,7 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-  <ul>
+    <ul>
 <li><a href="/interview/docs/basic/">计算机基础</a>
 <ul>
 <li><a href="/interview/docs/basic/algo/">算法</a>
@@ -336,42 +336,15 @@ https://github.com/alex-shpak/hugo-book
 })();
 </script>
 
- 
     </aside>
 
     <div class="book-page">
-      <header class="book-header">
-        
-  <div class="flex align-center justify-between">
+      <header class="flex align-center justify-between book-header">
   <label for="menu-control">
     <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
-
   <strong>AtomicInteger</strong>
-
-  <label for="toc-control">
-    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
-  </label>
-</div>
-
-
-  
-    <input type="checkbox" class="hidden" id="toc-control" />
-    <aside class="hidden clearfix">
-      
-  <nav id="TableOfContents">
-  <ul>
-    <li><a href="#atomicinteger">AtomicInteger</a></li>
-    <li><a href="#aba-问题">ABA 问题</a></li>
-    <li><a href="#atomicstampedreference">AtomicStampedReference</a></li>
-  </ul>
-</nav>
-
-
-    </aside>
-  
- 
-      </header>
+</header>
 
       
 <article class="markdown"><h2 id="atomicinteger">AtomicInteger</h2>
@@ -423,66 +396,54 @@ https://github.com/alex-shpak/hugo-book
 <h2 id="atomicstampedreference">AtomicStampedReference</h2>
 <p>对于 ABA 问题，比较有效的方案是引入版本号，内存中的值每发生一次变化，版本号都 <code>+1</code>；在进行CAS操作时，不仅比较内存中的值，也会比较版本号，只有当二者都没有变化时，CAS才能执行成功。 <code>AtomicStampedReference</code> 便是使用版本号来解决ABA问题的。类似的还有 <code>AtomicMarkableReference</code> ， <code>AtomicStampedReference</code> 是使用 pair 的 <code>int stamp</code> 作为计数器使用， <code>AtomicMarkableReference</code> 的 pair 使用的是 <code>boolean mark</code>。</p>
 </article>
- 
 
-      <footer class="book-footer">
-        
-  <div class="flex justify-between">
+      <div class="book-footer justify-between">
+  
 
-
-
-
-
+  
+  
   <div>
-    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/java/concurrent/atomic/index.md" target="_blank" rel="noopener">
+    
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/13fdd974fea3f9f826b41de089e5219c96eb4318" title='Last modified by haoyang.shi | 2020-02-02' target="_blank">
+      <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
+      <span>2020-02-02</span>
+    </a>
+  </div>
+  
+  
+
+  
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/java/concurrent/atomic/index.md" target="_blank">
       <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
       <span>Edit this page</span>
     </a>
   </div>
+  
 
 </div>
 
- 
-        
-  
-  <div class="book-comments">
-
-</div>
-  
- 
-      </footer>
       
     </div>
 
     
-    <aside class="book-toc">
-      
-  <nav id="TableOfContents">
+  
+
+  <aside class="book-toc levels-3 fixed">
+    <nav id="TableOfContents">
   <ul>
     <li><a href="#atomicinteger">AtomicInteger</a></li>
     <li><a href="#aba-问题">ABA 问题</a></li>
     <li><a href="#atomicstampedreference">AtomicStampedReference</a></li>
   </ul>
 </nav>
+  </aside>
 
- 
-    </aside>
-    
+
+
   </main>
 
   
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
-

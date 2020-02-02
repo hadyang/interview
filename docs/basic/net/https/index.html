@@ -15,15 +15,15 @@ Certificate: Data: Version: 3 (0x2) //版本号 Serial Number: //证书序列号
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/net/https/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2019-08-21T11:00:41+08:00" />
+<meta property="article:modified_time" content="2020-01-18T11:14:03+08:00" />
 <title>HTTPS | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/interview/book.min.b7fe34b8a4c4da05b2690b4aacfa71ddce0668cc6da3abb67dd3946844125444.css" integrity="sha256-t/40uKTE2gWyaQtKrPpx3c4GaMxto6u2fdOUaEQSVEQ=">
+<link rel="stylesheet" href="/interview/book.min.68d45956421753cdf6bcfc865ede445c56afc5bcaaebfe02961f44fe77d8f45a.css" integrity="sha256-aNRZVkIXU832vPyGXt5EXFavxbyq6/4Clh9E/nfY9Fo=">
 
 
-<script defer src="/interview/en.search.min.4daab1eda22baec10d130347f095a8463b951038b7e98060a59bcdc484ada980.js" integrity="sha256-Taqx7aIrrsENEwNH8JWoRjuVEDi36YBgpZvNxIStqYA="></script>
+<script defer src="/interview/en.search.min.4a44e4fc3cc862db20d80ddb87c8a0a76de1767929ed93d3103d784771c8a8ba.js" integrity="sha256-SkTk/DzIYtsg2A3bh8igp23hdnkp7ZPTED14R3HIqLo="></script>
 
 <!--
 Made with Book Theme
@@ -35,18 +35,18 @@ https://github.com/alex-shpak/hugo-book
 
 <body>
   <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="container flex">
-    <aside class="book-menu">
-      
-  <nav>
+  <main class="flex container">
+
+    <aside class="book-menu fixed">
+      <nav>
 <h2 class="book-brand">
-  <a href="/interview"><span>Interview</span>
+  <a href="https://hadyang.github.io/interview/"><span>Interview</span>
   </a>
 </h2>
 
 
 <div class="book-search">
-  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" />
   <div class="book-search-spinner spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
@@ -55,7 +55,7 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-  <ul>
+    <ul>
 <li><a href="/interview/docs/basic/">计算机基础</a>
 <ul>
 <li><a href="/interview/docs/basic/algo/">算法</a>
@@ -340,60 +340,15 @@ https://github.com/alex-shpak/hugo-book
 })();
 </script>
 
- 
     </aside>
 
     <div class="book-page">
-      <header class="book-header">
-        
-  <div class="flex align-center justify-between">
+      <header class="flex align-center justify-between book-header">
   <label for="menu-control">
     <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
-
   <strong>HTTPS</strong>
-
-  <label for="toc-control">
-    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
-  </label>
-</div>
-
-
-  
-    <input type="checkbox" class="hidden" id="toc-control" />
-    <aside class="hidden clearfix">
-      
-  <nav id="TableOfContents">
-  <ul>
-    <li><a href="#http-为什么不安全">HTTP 为什么不安全</a></li>
-    <li><a href="#https-如何保证安全">HTTPS 如何保证安全</a>
-      <ul>
-        <li><a href="#数字证书">数字证书</a></li>
-        <li><a href="#证书链">证书链</a></li>
-        <li><a href="#证书认证">证书认证</a></li>
-        <li><a href="#无-sni-支持问题">无 SNI 支持问题</a></li>
-        <li><a href="#证书选择">证书选择</a></li>
-        <li><a href="#证书的吊销">证书的吊销</a></li>
-        <li><a href="#ssltls协议httpwwwruanyifengcomblog201402ssl_tlshtml">SSL/TLS协议</a></li>
-        <li><a href="#tls-运行过程">TLS 运行过程</a></li>
-      </ul>
-    </li>
-    <li><a href="#https-的七个误解httpwwwruanyifengcomblog201102seven_myths_about_httpshtml">HTTPS 的七个误解</a></li>
-    <li><a href="#中间人攻击mitm">中间人攻击（MITM）</a>
-      <ul>
-        <li><a href="#tls对中间人攻击的抵御">TLS对中间人攻击的抵御</a></li>
-        <li><a href="#无法抵御中间人攻击的实例">无法抵御中间人攻击的实例</a></li>
-      </ul>
-    </li>
-    <li><a href="#参考链接">参考链接</a></li>
-  </ul>
-</nav>
-
-
-    </aside>
-  
- 
-      </header>
+</header>
 
       
 <article class="markdown"><h1 id="httpshttpszhwikipediaorgwikie8b685e69687e69cace4bca0e8be93e5ae89e585a8e58d8fe8aeae"><a href="https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%AE%89%E5%85%A8%E5%8D%8F%E8%AE%AE">HTTPS</a></h1>
@@ -607,41 +562,41 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="https://www.cnblogs.com/lulianqi/p/10558719.html">HTTPS中间人攻击实践（原理·实践）</a></li>
 </ul>
 </article>
- 
 
-      <footer class="book-footer">
-        
-  <div class="flex justify-between">
+      <div class="book-footer justify-between">
+  
 
-
-
-
-
+  
+  
   <div>
-    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/basic/net/https/index.md" target="_blank" rel="noopener">
+    
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/c9ace0693571b939cf8b2f333f08f258bacee86e" title='Last modified by haoyang.shi | 2020-01-18' target="_blank">
+      <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
+      <span>2020-01-18</span>
+    </a>
+  </div>
+  
+  
+
+  
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/basic/net/https/index.md" target="_blank">
       <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
       <span>Edit this page</span>
     </a>
   </div>
+  
 
 </div>
 
- 
-        
-  
-  <div class="book-comments">
-
-</div>
-  
- 
-      </footer>
       
     </div>
 
     
-    <aside class="book-toc">
-      
-  <nav id="TableOfContents">
+  
+
+  <aside class="book-toc levels-3 fixed">
+    <nav id="TableOfContents">
   <ul>
     <li><a href="#http-为什么不安全">HTTP 为什么不安全</a></li>
     <li><a href="#https-如何保证安全">HTTPS 如何保证安全</a>
@@ -666,25 +621,13 @@ https://github.com/alex-shpak/hugo-book
     <li><a href="#参考链接">参考链接</a></li>
   </ul>
 </nav>
+  </aside>
 
- 
-    </aside>
-    
+
+
   </main>
 
   
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
-

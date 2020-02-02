@@ -15,15 +15,15 @@ Reactor 无论是 C&#43;&#43; 还是 Java 编写的网络框架，大多数都�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/fromwork/netty/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2019-08-21T11:00:41+08:00" />
+<meta property="article:modified_time" content="2020-01-20T13:16:13+08:00" />
 <title>Netty | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/interview/book.min.b7fe34b8a4c4da05b2690b4aacfa71ddce0668cc6da3abb67dd3946844125444.css" integrity="sha256-t/40uKTE2gWyaQtKrPpx3c4GaMxto6u2fdOUaEQSVEQ=">
+<link rel="stylesheet" href="/interview/book.min.68d45956421753cdf6bcfc865ede445c56afc5bcaaebfe02961f44fe77d8f45a.css" integrity="sha256-aNRZVkIXU832vPyGXt5EXFavxbyq6/4Clh9E/nfY9Fo=">
 
 
-<script defer src="/interview/en.search.min.4daab1eda22baec10d130347f095a8463b951038b7e98060a59bcdc484ada980.js" integrity="sha256-Taqx7aIrrsENEwNH8JWoRjuVEDi36YBgpZvNxIStqYA="></script>
+<script defer src="/interview/en.search.min.4a44e4fc3cc862db20d80ddb87c8a0a76de1767929ed93d3103d784771c8a8ba.js" integrity="sha256-SkTk/DzIYtsg2A3bh8igp23hdnkp7ZPTED14R3HIqLo="></script>
 
 <!--
 Made with Book Theme
@@ -35,18 +35,18 @@ https://github.com/alex-shpak/hugo-book
 
 <body>
   <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="container flex">
-    <aside class="book-menu">
-      
-  <nav>
+  <main class="flex container">
+
+    <aside class="book-menu fixed">
+      <nav>
 <h2 class="book-brand">
-  <a href="/interview"><span>Interview</span>
+  <a href="https://hadyang.github.io/interview/"><span>Interview</span>
   </a>
 </h2>
 
 
 <div class="book-search">
-  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" />
   <div class="book-search-spinner spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
@@ -55,7 +55,7 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-  <ul>
+    <ul>
 <li><a href="/interview/docs/basic/">计算机基础</a>
 <ul>
 <li><a href="/interview/docs/basic/algo/">算法</a>
@@ -340,61 +340,15 @@ https://github.com/alex-shpak/hugo-book
 })();
 </script>
 
- 
     </aside>
 
     <div class="book-page">
-      <header class="book-header">
-        
-  <div class="flex align-center justify-between">
+      <header class="flex align-center justify-between book-header">
   <label for="menu-control">
     <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
-
   <strong>Netty</strong>
-
-  <label for="toc-control">
-    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
-  </label>
-</div>
-
-
-  
-    <input type="checkbox" class="hidden" id="toc-control" />
-    <aside class="hidden clearfix">
-      
-  <nav id="TableOfContents">
-  <ul>
-    <li><a href="#reactorhttpswwwinfoqcnarticlenetty-threading-model">Reactor</a>
-      <ul>
-        <li><a href="#单线程模型">单线程模型</a></li>
-        <li><a href="#多线程模型">多线程模型</a></li>
-        <li><a href="#主从多线程模型">主从多线程模型</a></li>
-      </ul>
-    </li>
-    <li><a href="#netty-的优势">Netty 的优势</a>
-      <ul>
-        <li><a href="#netty-为什么性能好">Netty 为什么性能好？</a></li>
-        <li><a href="#zero-copy">Zero Copy</a></li>
-        <li><a href="#垃圾回收">垃圾回收</a></li>
-      </ul>
-    </li>
-    <li><a href="#源码">源码</a>
-      <ul>
-        <li><a href="#bytebuf">ByteBuf</a></li>
-        <li><a href="#netty-启动以及链接建立过程">Netty 启动以及链接建立过程</a></li>
-      </ul>
-    </li>
-    <li><a href="#epoll-触发">Epoll 触发</a></li>
-    <li><a href="#jdk-nio-bughttpsbugsjavacombugdatabaseview_bugdobug_id6403933">JDK NIO BUG</a></li>
-  </ul>
-</nav>
-
-
-    </aside>
-  
- 
-      </header>
+</header>
 
       
 <article class="markdown"><h1 id="netty">Netty</h1>
@@ -528,41 +482,41 @@ https://github.com/alex-shpak/hugo-book
 </span><span style="color:#75715e"></span> <span style="color:#f92672">}</span>
 </code></pre></div><p><code>netty</code> 会在每次进行 <code>selector.select(timeoutMillis)</code> 之前记录一下开始时间 <code>currentTimeNanos</code> ，在 <code>select</code> 之后记录一下结束时间，<strong>判断 <code>select</code> 操作是否至少持续了 <code>timeoutMillis</code> 秒</strong>。如果持续的时间大于等于 <code>timeoutMillis</code> ，说明就是一次有效的轮询，重置 <code>selectCnt</code> 标志，否则，表明该阻塞方法并没有阻塞这么长时间，可能触发了 <code>jdk</code> 的空轮询 <code>bug</code> ，当空轮询的次数超过一个阀值的时候，默认是 <code>512</code> ，就开始重建 <code>selector</code></p>
 </article>
- 
 
-      <footer class="book-footer">
-        
-  <div class="flex justify-between">
+      <div class="book-footer justify-between">
+  
 
-
-
-
-
+  
+  
   <div>
-    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/fromwork/netty/index.md" target="_blank" rel="noopener">
+    
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/3ca64f728c7445cd6b8afa7436fd6c5678c1374c" title='Last modified by haoyang.shi | 2020-01-20' target="_blank">
+      <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
+      <span>2020-01-20</span>
+    </a>
+  </div>
+  
+  
+
+  
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/fromwork/netty/index.md" target="_blank">
       <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
       <span>Edit this page</span>
     </a>
   </div>
+  
 
 </div>
 
- 
-        
-  
-  <div class="book-comments">
-
-</div>
-  
- 
-      </footer>
       
     </div>
 
     
-    <aside class="book-toc">
-      
-  <nav id="TableOfContents">
+  
+
+  <aside class="book-toc levels-3 fixed">
+    <nav id="TableOfContents">
   <ul>
     <li><a href="#reactorhttpswwwinfoqcnarticlenetty-threading-model">Reactor</a>
       <ul>
@@ -588,25 +542,13 @@ https://github.com/alex-shpak/hugo-book
     <li><a href="#jdk-nio-bughttpsbugsjavacombugdatabaseview_bugdobug_id6403933">JDK NIO BUG</a></li>
   </ul>
 </nav>
+  </aside>
 
- 
-    </aside>
-    
+
+
   </main>
 
   
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
-

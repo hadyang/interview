@@ -17,15 +17,15 @@ ZooKeeper 的好处：
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/architecture/distributed/zk/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2019-08-21T11:00:41+08:00" />
+<meta property="article:modified_time" content="2020-01-19T16:59:43+08:00" />
 <title>Zookeeper | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/interview/book.min.b7fe34b8a4c4da05b2690b4aacfa71ddce0668cc6da3abb67dd3946844125444.css" integrity="sha256-t/40uKTE2gWyaQtKrPpx3c4GaMxto6u2fdOUaEQSVEQ=">
+<link rel="stylesheet" href="/interview/book.min.68d45956421753cdf6bcfc865ede445c56afc5bcaaebfe02961f44fe77d8f45a.css" integrity="sha256-aNRZVkIXU832vPyGXt5EXFavxbyq6/4Clh9E/nfY9Fo=">
 
 
-<script defer src="/interview/en.search.min.4daab1eda22baec10d130347f095a8463b951038b7e98060a59bcdc484ada980.js" integrity="sha256-Taqx7aIrrsENEwNH8JWoRjuVEDi36YBgpZvNxIStqYA="></script>
+<script defer src="/interview/en.search.min.4a44e4fc3cc862db20d80ddb87c8a0a76de1767929ed93d3103d784771c8a8ba.js" integrity="sha256-SkTk/DzIYtsg2A3bh8igp23hdnkp7ZPTED14R3HIqLo="></script>
 
 <!--
 Made with Book Theme
@@ -37,18 +37,18 @@ https://github.com/alex-shpak/hugo-book
 
 <body>
   <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="container flex">
-    <aside class="book-menu">
-      
-  <nav>
+  <main class="flex container">
+
+    <aside class="book-menu fixed">
+      <nav>
 <h2 class="book-brand">
-  <a href="/interview"><span>Interview</span>
+  <a href="https://hadyang.github.io/interview/"><span>Interview</span>
   </a>
 </h2>
 
 
 <div class="book-search">
-  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" />
   <div class="book-search-spinner spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
@@ -57,7 +57,7 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-  <ul>
+    <ul>
 <li><a href="/interview/docs/basic/">计算机基础</a>
 <ul>
 <li><a href="/interview/docs/basic/algo/">算法</a>
@@ -342,103 +342,15 @@ https://github.com/alex-shpak/hugo-book
 })();
 </script>
 
- 
     </aside>
 
     <div class="book-page">
-      <header class="book-header">
-        
-  <div class="flex align-center justify-between">
+      <header class="flex align-center justify-between book-header">
   <label for="menu-control">
     <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
-
   <strong>Zookeeper</strong>
-
-  <label for="toc-control">
-    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
-  </label>
-</div>
-
-
-  
-    <input type="checkbox" class="hidden" id="toc-control" />
-    <aside class="hidden clearfix">
-      
-  <nav id="TableOfContents">
-  <ul>
-    <li><a href="#分布式应用">分布式应用</a>
-      <ul>
-        <li><a href="#分布式应用的优点">分布式应用的优点</a></li>
-        <li><a href="#分布式应用的挑战">分布式应用的挑战</a></li>
-      </ul>
-    </li>
-    <li><a href="#zookeeper基础">ZooKeeper基础</a>
-      <ul>
-        <li><a href="#架构">架构</a></li>
-        <li><a href="#数据模型">数据模型</a></li>
-        <li><a href="#znode">Znode</a></li>
-        <li><a href="#sessions">Sessions</a></li>
-        <li><a href="#watcher">Watcher</a></li>
-      </ul>
-    </li>
-    <li><a href="#zookeeper-工作流程">Zookeeper 工作流程</a>
-      <ul>
-        <li><a href="#zookeeper-service-节点数量的影响">ZooKeeper Service 节点数量的影响</a></li>
-      </ul>
-    </li>
-    <li><a href="#zab-协议">ZAB 协议</a>
-      <ul>
-        <li><a href="#消息广播">消息广播</a></li>
-        <li><a href="#崩溃恢复保证数据一致性">崩溃恢复保证数据一致性</a></li>
-        <li><a href="#选举">选举</a></li>
-      </ul>
-    </li>
-    <li><a href="#应用场景">应用场景</a>
-      <ul>
-        <li><a href="#发布订阅">发布订阅</a></li>
-        <li><a href="#命名服务">命名服务</a></li>
-        <li><a href="#协调分布式事务">协调分布式事务</a></li>
-        <li><a href="#分布式锁">分布式锁</a></li>
-      </ul>
-    </li>
-    <li><a href="#zookeeper-的缺陷">ZooKeeper 的缺陷</a>
-      <ul>
-        <li><a href="#zookeeper-不是为高可用性设计的">zookeeper 不是为高可用性设计的</a></li>
-        <li><a href="#zookeeper-的选举过程速度很慢">zookeeper 的选举过程速度很慢</a></li>
-        <li><a href="#zookeeper-的性能是有限的">zookeeper 的性能是有限的</a></li>
-        <li><a href="#zookeeper-无法进行有效的权限控制">zookeeper 无法进行有效的权限控制</a></li>
-        <li><a href="#即使有了-zookeeper-也很难避免业务系统的数据不一致">即使有了 zookeeper 也很难避免业务系统的数据不一致</a></li>
-        <li><a href="#zookeeper-并不保证读取的是最新数据">Zookeeper 并不保证读取的是最新数据</a></li>
-        <li><a href="#我们能做什么">我们能做什么</a></li>
-      </ul>
-    </li>
-    <li><a href="#faq">FAQ</a>
-      <ul>
-        <li><a href="#客户端对-serverlist-的轮询机制是什么">客户端对 ServerList 的轮询机制是什么</a></li>
-        <li><a href="#客户端如何正确处理-connectionloss-连接断开-和-sessionexpired-session-过期两类连接异常">客户端如何正确处理 CONNECTIONLOSS (连接断开) 和 SESSIONEXPIRED (Session 过期)两类连接异常</a></li>
-        <li><a href="#一个客户端修改了某个节点的数据其它客户端能够马上获取到这个最新数据吗">一个客户端修改了某个节点的数据，其它客户端能够马上获取到这个最新数据吗</a></li>
-        <li><a href="#zk为什么不提供一个永久性的watcher注册机制">ZK为什么不提供一个永久性的Watcher注册机制</a></li>
-        <li><a href="#使用watch需要注意的几点">使用watch需要注意的几点</a></li>
-        <li><a href="#我能否收到每次节点变化的通知">我能否收到每次节点变化的通知</a></li>
-        <li><a href="#能为临时节点创建子节点吗">能为临时节点创建子节点吗</a></li>
-        <li><a href="#是否可以拒绝单个ip对zk的访问操作">是否可以拒绝单个IP对ZK的访问,操作</a></li>
-        <li><a href="#在getchildrenstring-path-boolean-watch注册对节点子节点的变化那么子节点的子节点变化能通知吗">在[getChildren(String path, boolean watch)]注册对节点子节点的变化，那么子节点的子节点变化能通知吗</a></li>
-        <li><a href="#创建的临时节点什么时候会被删除是连接一断就删除吗延时是多少">创建的临时节点什么时候会被删除，是连接一断就删除吗？延时是多少？</a></li>
-        <li><a href="#zookeeper是否支持动态进行机器扩容如果目前不支持那么要如何扩容呢">zookeeper是否支持动态进行机器扩容？如果目前不支持，那么要如何扩容呢？</a></li>
-        <li><a href="#zookeeper集群中个服务器之间是怎样通信的">ZooKeeper集群中个服务器之间是怎样通信的？</a></li>
-        <li><a href="#zookeeper是否会自动进行日志清理如果进行日志清理">zookeeper是否会自动进行日志清理？如果进行日志清理？</a></li>
-      </ul>
-    </li>
-    <li><a href="#参考文档">参考文档</a></li>
-  </ul>
-</nav>
-
-
-    </aside>
-  
- 
-      </header>
+</header>
 
       
 <article class="markdown"><h1 id="zookeeperhttpsdravenessmezookeeper-chubby"><a href="https://draveness.me/zookeeper-chubby">Zookeeper</a></h1>
@@ -722,41 +634,41 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="http://www.dengshenyu.com/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/2017/11/01/zookeeper.html">Zookeeper: 分布式过程协同技术详解</a></li>
 </ul>
 </article>
- 
 
-      <footer class="book-footer">
-        
-  <div class="flex justify-between">
+      <div class="book-footer justify-between">
+  
 
-
-
-
-
+  
+  
   <div>
-    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/architecture/distributed/zk/index.md" target="_blank" rel="noopener">
+    
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/3ad3981966ea48cf0201c427c96db9656e45e265" title='Last modified by haoyang.shi | 2020-01-19' target="_blank">
+      <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
+      <span>2020-01-19</span>
+    </a>
+  </div>
+  
+  
+
+  
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/architecture/distributed/zk/index.md" target="_blank">
       <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
       <span>Edit this page</span>
     </a>
   </div>
+  
 
 </div>
 
- 
-        
-  
-  <div class="book-comments">
-
-</div>
-  
- 
-      </footer>
       
     </div>
 
     
-    <aside class="book-toc">
-      
-  <nav id="TableOfContents">
+  
+
+  <aside class="book-toc levels-3 fixed">
+    <nav id="TableOfContents">
   <ul>
     <li><a href="#分布式应用">分布式应用</a>
       <ul>
@@ -824,25 +736,13 @@ https://github.com/alex-shpak/hugo-book
     <li><a href="#参考文档">参考文档</a></li>
   </ul>
 </nav>
+  </aside>
 
- 
-    </aside>
-    
+
+
   </main>
 
   
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
-

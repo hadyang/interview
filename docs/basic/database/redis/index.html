@@ -16,15 +16,15 @@ Redis 内部使用文件事件处理器 file event handler，这个文件事件�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/database/redis/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2019-08-21T11:00:41+08:00" />
+<meta property="article:modified_time" content="2020-01-16T14:29:30+08:00" />
 <title>Redis | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/interview/book.min.b7fe34b8a4c4da05b2690b4aacfa71ddce0668cc6da3abb67dd3946844125444.css" integrity="sha256-t/40uKTE2gWyaQtKrPpx3c4GaMxto6u2fdOUaEQSVEQ=">
+<link rel="stylesheet" href="/interview/book.min.68d45956421753cdf6bcfc865ede445c56afc5bcaaebfe02961f44fe77d8f45a.css" integrity="sha256-aNRZVkIXU832vPyGXt5EXFavxbyq6/4Clh9E/nfY9Fo=">
 
 
-<script defer src="/interview/en.search.min.4daab1eda22baec10d130347f095a8463b951038b7e98060a59bcdc484ada980.js" integrity="sha256-Taqx7aIrrsENEwNH8JWoRjuVEDi36YBgpZvNxIStqYA="></script>
+<script defer src="/interview/en.search.min.4a44e4fc3cc862db20d80ddb87c8a0a76de1767929ed93d3103d784771c8a8ba.js" integrity="sha256-SkTk/DzIYtsg2A3bh8igp23hdnkp7ZPTED14R3HIqLo="></script>
 
 <!--
 Made with Book Theme
@@ -36,18 +36,18 @@ https://github.com/alex-shpak/hugo-book
 
 <body>
   <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="container flex">
-    <aside class="book-menu">
-      
-  <nav>
+  <main class="flex container">
+
+    <aside class="book-menu fixed">
+      <nav>
 <h2 class="book-brand">
-  <a href="/interview"><span>Interview</span>
+  <a href="https://hadyang.github.io/interview/"><span>Interview</span>
   </a>
 </h2>
 
 
 <div class="book-search">
-  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" />
   <div class="book-search-spinner spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
@@ -56,7 +56,7 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-  <ul>
+    <ul>
 <li><a href="/interview/docs/basic/">计算机基础</a>
 <ul>
 <li><a href="/interview/docs/basic/algo/">算法</a>
@@ -341,87 +341,15 @@ https://github.com/alex-shpak/hugo-book
 })();
 </script>
 
- 
     </aside>
 
     <div class="book-page">
-      <header class="book-header">
-        
-  <div class="flex align-center justify-between">
+      <header class="flex align-center justify-between book-header">
   <label for="menu-control">
     <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
-
   <strong>Redis</strong>
-
-  <label for="toc-control">
-    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
-  </label>
-</div>
-
-
-  
-    <input type="checkbox" class="hidden" id="toc-control" />
-    <aside class="hidden clearfix">
-      
-  <nav id="TableOfContents">
-  <ul>
-    <li><a href="#线程模型">线程模型</a>
-      <ul>
-        <li><a href="#为啥-redis-单线程模型也能效率这么高">为啥 redis 单线程模型也能效率这么高？</a></li>
-      </ul>
-    </li>
-    <li><a href="#数据结构">数据结构</a></li>
-    <li><a href="#持久化">持久化：</a></li>
-    <li><a href="#一致性哈希算法">一致性哈希算法</a>
-      <ul>
-        <li><a href="#需求">需求</a></li>
-        <li><a href="#实现">实现</a></li>
-      </ul>
-    </li>
-    <li><a href="#实践httpsyikungithubio20160609e4b880e887b4e680a7e59388e5b88ce7ae97e6b395e79a84e79086e8a7a3e4b88ee5ae9ee8b7b5">实践</a>
-      <ul>
-        <li></li>
-      </ul>
-    </li>
-    <li><a href="#集群">集群</a>
-      <ul>
-        <li><a href="#哨兵----sentinel">哨兵 &ndash; Sentinel</a></li>
-        <li><a href="#redis-clusterhttpsredisiotopicscluster-tutorial">Redis Cluster</a></li>
-        <li><a href="#redis-sharding-集群">Redis Sharding 集群</a></li>
-      </ul>
-    </li>
-    <li><a href="#string">string</a>
-      <ul>
-        <li><a href="#缓冲区溢出">缓冲区溢出</a></li>
-        <li><a href="#减少修改字符串时带来的内存重分配次数">减少修改字符串时带来的内存重分配次数</a></li>
-        <li><a href="#二进制安全">二进制安全</a></li>
-      </ul>
-    </li>
-    <li><a href="#zset底层实现">zset底层实现</a></li>
-    <li><a href="#bitmap-实现">BitMap 实现</a></li>
-    <li><a href="#缓存穿透缓存击穿缓存雪崩">缓存穿透、缓存击穿、缓存雪崩</a>
-      <ul>
-        <li><a href="#缓存穿透">缓存穿透</a></li>
-        <li><a href="#缓存雪崩">缓存雪崩</a></li>
-        <li><a href="#缓存击穿">缓存击穿</a></li>
-      </ul>
-    </li>
-    <li><a href="#redis分布式锁">Redis分布式锁</a></li>
-    <li><a href="#数据淘汰机制">数据淘汰机制</a>
-      <ul>
-        <li><a href="#对象过期">对象过期</a></li>
-        <li><a href="#内存淘汰">内存淘汰</a></li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-
-
-    </aside>
-  
- 
-      </header>
+</header>
 
       
 <article class="markdown"><h1 id="redis">Redis</h1>
@@ -672,41 +600,41 @@ for item in range(ITEMS):
 <p>上面提到的LRU（Least Recently Used）策略，实际上 <strong>Redis 实现的 LRU 并不是可靠的 LRU</strong>，也就是名义上我们使用LRU算法淘汰键，但是实际上被淘汰的键并不一定是真正的最久没用的，这里涉及到一个权衡的问题，如果需要在全部键空间内搜索最优解，则必然会增加系统的开销，Redis是单线程的，也就是同一个实例在每一个时刻只能服务于一个客户端，所以耗时的操作一定要谨慎。</p>
 <p>为了在一定成本内实现相对的LRU，早期的 Redis 版本是 <strong>基于采样的 LRU</strong> ，也就是放弃全部键空间内搜索解改为采样空间搜索最优解。自从 Redis3.0 版本之后，Redis 作者对于基于采样的 LRU 进行了一些优化，目的是在一定的成本内让结果更靠近真实的 LRU。</p>
 </article>
- 
 
-      <footer class="book-footer">
-        
-  <div class="flex justify-between">
+      <div class="book-footer justify-between">
+  
 
-
-
-
-
+  
+  
   <div>
-    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/basic/database/redis/index.md" target="_blank" rel="noopener">
+    
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/b67a12b22fe0578b4f0dbb386d0995543d7ab146" title='Last modified by haoyang.shi | 2020-01-16' target="_blank">
+      <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
+      <span>2020-01-16</span>
+    </a>
+  </div>
+  
+  
+
+  
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/basic/database/redis/index.md" target="_blank">
       <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
       <span>Edit this page</span>
     </a>
   </div>
+  
 
 </div>
 
- 
-        
-  
-  <div class="book-comments">
-
-</div>
-  
- 
-      </footer>
       
     </div>
 
     
-    <aside class="book-toc">
-      
-  <nav id="TableOfContents">
+  
+
+  <aside class="book-toc levels-3 fixed">
+    <nav id="TableOfContents">
   <ul>
     <li><a href="#线程模型">线程模型</a>
       <ul>
@@ -758,25 +686,13 @@ for item in range(ITEMS):
     </li>
   </ul>
 </nav>
+  </aside>
 
- 
-    </aside>
-    
+
+
   </main>
 
   
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
