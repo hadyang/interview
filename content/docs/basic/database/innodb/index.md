@@ -119,6 +119,78 @@ CREATE TABLE users(
 
 上图展示了一个使用辅助索引查找一条表记录的过程：通过辅助索引查找到对应的主键，最后在聚集索引中使用主键获取对应的行记录，这也是通常情况下行记录的查找方式。
 
+#### 回表
+
+聚簇索引这种实现方式使得按主键的搜索十分高效，但是辅助索引搜索需要检索两遍索引：首先检索辅助索引获得主键，然后用主键到主索引中检索获得记录，这种行为被称之为 **回表**。回表会导致查询时多次读取磁盘，为减少IO MySQL 在辅助索引上进行优化，将辅助索引作为 **覆盖索引**（Covering index）。在查询的时候，如果 `SELECT` 子句中的字段为主键、辅助索引的键则不进行回表。
+
+在 `EXPLAIN` 命令下查看 `Extra` 字段，如果包含 `Using index` 则使用覆盖索引。下面通过例子直观的理解下，有表：
+
+```sql
+CREATE TABLE `Employee` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `Name` varchar(255) DEFAULT NULL,
+  `Salary` decimal(10,0) DEFAULT NULL,
+  `DepartmentId` int(11) DEFAULT NULL,
+  `update_ts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`Id`),
+  KEY `idx_update_ts` (`update_ts`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4;
+```
+
+1. 使用覆盖索引
+
+```sql
+explain SELECT Id,update_ts FROM Employee ORDER BY update_ts DESC LIMIT 10000, 10;
+```
+
+执行结果：
+
+```json
+  {
+    "id": 1,
+    "select_type": "SIMPLE",
+    "table": "Employee",
+    "partitions": null,
+    "type": "index",
+    "possible_keys": null,
+    "key": "idx_update_ts",
+    "key_len": "4",
+    "ref": null,
+    "rows": 6,
+    "filtered": 100.00,
+    "Extra": "Using index"
+  }
+```
+
+2. 不使用覆盖索引
+
+```sql
+explain SELECT Id,Salary FROM Employee ORDER BY update_ts DESC LIMIT 10000, 10;
+```
+
+执行结果：
+
+```json
+  {
+    "id": 1,
+    "select_type": "SIMPLE",
+    "table": "Employee",
+    "partitions": null,
+    "type": "ALL",
+    "possible_keys": null,
+    "key": null,
+    "key_len": null,
+    "ref": null,
+    "rows": 6,
+    "filtered": 100.00,
+    "Extra": "Using filesort"
+  }
+```
+
+> Using filesort：MySQL 服务内排序，未走索引
+
+第二个 SQL 不仅没使用覆盖索引，连 `update_ts` 上的辅助索引都没用上，有这样的差别我的猜测是：MySQL 为减少IO，从而选择不使用 `update_ts` 上的索引。
+
 ## [InnoDB 锁机制](https://segmentfault.com/a/1190000014133576)
 
 ![](images/e86d2bb63f9ecf327e588f352bb26d3b.png)
