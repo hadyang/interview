@@ -58,6 +58,7 @@ headless: true
     - [并发]({{< relref "/docs/java/concurrent/_index.md" >}})
         - [线程]({{< relref "/docs/java/concurrent/thread/index.md" >}})
         - [Volatile]({{< relref "/docs/java/concurrent/volatile/index.md" >}})
+        - [AtomicInteger]({{< relref "/docs/java/concurrent/atomic/index.md" >}})
         - [Synchronized]({{< relref "/docs/java/concurrent/synchronized/index.md" >}})
         - [AQS]({{< relref "/docs/java/concurrent/AQS/index.md" >}})
         - [CountDownLatch]({{< relref "/docs/java/concurrent/count-down-latch/index.md" >}})
