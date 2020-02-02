@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="二叉搜索树的后序遍历序列"><meta property="og:title" content="二叉搜索树的后序遍历序列" />
+<meta property="og:description" content="题目 牛客网
+输入一个整数数组，判断该数组是不是某二叉搜索树的后序遍历的结果。如果是则输出 Yes ,否则输出 No 。假设输入的数组的任意两个数字都互不相同。
+解题思路  后序遍历中，最后一个节点为 root 节点 由于 BST 的左子树都小于 root，右子树都大于 root，那么可以判定该节点是否为 BST 依次类推，通过递归方式，再判定左右子树  public boolean VerifySquenceOfBST(int[] sequence) { if (sequence.length == 0) { return false; } if (sequence.length == 1) { return true; } return isBST(sequence, 0, sequence.length - 1); } private boolean isBST(int[] sequence, int start, int end) { if (start &lt; 0 || end &lt; 0 || start &gt;= end) { return true; } int rootV = sequence[end]; int rightIndex = -1, rightV = Integer." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hadyang.github.io/interview/docs/offer/VerifySquenceOfBST/" />
+<meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
+<meta property="article:modified_time" content="2019-08-21T11:00:41+08:00" />
+<title>二叉搜索树的后序遍历序列 | Interview</title>
+<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/interview/book.min.b7fe34b8a4c4da05b2690b4aacfa71ddce0668cc6da3abb67dd3946844125444.css" integrity="sha256-t/40uKTE2gWyaQtKrPpx3c4GaMxto6u2fdOUaEQSVEQ=">
+
+
+<script defer src="/interview/en.search.min.4daab1eda22baec10d130347f095a8463b951038b7e98060a59bcdc484ada980.js" integrity="sha256-Taqx7aIrrsENEwNH8JWoRjuVEDi36YBgpZvNxIStqYA="></script>
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/interview"><span>Interview</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+  <ul>
+<li><a href="/interview/docs/basic/">计算机基础</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/">算法</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
+<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
+<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
+<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
+<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
+<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
+<li><a href="/interview/docs/basic/algo/sort/">排序算法</a></li>
+<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/os/">操作系统</a>
+<ul>
+<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
+<li><a href="/interview/docs/basic/os/concurrency/">并发</a></li>
+<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
+<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
+<li><a href="/interview/docs/basic/os/linux/">Linux系统</a></li>
+<li><a href="/interview/docs/basic/os/interrupt/">中断</a></li>
+<li><a href="/interview/docs/basic/os/device/">设备管理</a></li>
+<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
+<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/net/">计算机网络</a>
+<ul>
+<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
+<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
+<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
+<li><a href="/interview/docs/basic/net/http/">HTTP</a></li>
+<li><a href="/interview/docs/basic/net/https/">HTTPS</a></li>
+<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/">数据库</a>
+<ul>
+<li><a href="/interview/docs/basic/database/transaction/">事务</a></li>
+<li><a href="/interview/docs/basic/database/index/">索引</a></li>
+<li><a href="/interview/docs/basic/database/sql/">SQL</a></li>
+<li><a href="/interview/docs/basic/database/join/">连接</a></li>
+<li><a href="/interview/docs/basic/database/mysql/">MySQL</a></li>
+<li><a href="/interview/docs/basic/database/concurrent/">并发控制</a></li>
+<li><a href="/interview/docs/basic/database/innodb/">Innodb</a></li>
+<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/">Java</a>
+<ul>
+<li><a href="/interview/docs/java/oop/">OOP</a></li>
+<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
+<li><a href="/interview/docs/java/operator/">运算符</a></li>
+<li><a href="/interview/docs/java/exception/">异常</a></li>
+<li><a href="/interview/docs/java/generics/">泛型</a></li>
+<li><a href="/interview/docs/java/object/">Object</a></li>
+<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
+<li><a href="/interview/docs/java/proxy/">代理</a></li>
+<li><a href="/interview/docs/java/annotation/">注解</a></li>
+<li><a href="/interview/docs/java/questions/">面试题</a></li>
+<li><a href="/interview/docs/java/nio/">NIO</a></li>
+<li><a href="/interview/docs/java/">集合</a>
+<ul>
+<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
+<li><a href="/interview/docs/java/collection/Concurrenthashmap/">Concurrenthashmap</a></li>
+<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/concurrent/">并发</a>
+<ul>
+<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
+<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
+<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
+<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
+<li><a href="/interview/docs/java/concurrent/AQS/">AQS</a></li>
+<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
+<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
+<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<ul>
+<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
+<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/gc/">GC</a>
+<ul>
+<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
+<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/">框架</a>
+<ul>
+<li><a href="/interview/docs/fromwork/netty/">Netty</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
+<ul>
+<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/spring/">Spring</a>
+<ul>
+<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
+<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
+<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/">系统架构</a>
+<ul>
+<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
+<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
+<ul>
+<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/design/">系统设计</a>
+<ul>
+<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/distributed/">分布式</a>
+<ul>
+<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
+<li><a href="/interview/docs/architecture/distributed/session/">分布式Session</a></li>
+<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
+<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
+<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
+<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
+<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
+<li><a href="/interview/docs/architecture/distributed/kafka/">Kafka</a></li>
+<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
+<li><a href="/interview/docs/architecture/distributed/dubbo/">Dubbo</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
+<ul>
+<li><a href="/interview/docs/architecture/bigdata/algo/">基础算法</a></li>
+<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/offer/">剑指offer</a>
+<ul>
+<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
+<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
+<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
+<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
+<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
+<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
+<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
+<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
+<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
+<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
+<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
+<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
+<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
+<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
+<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
+<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
+<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
+<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
+<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
+<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
+<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
+<li><a href="/interview/docs/offer/VerifySquenceOfBST/"class=active>二叉搜索树的后序遍历序列</a></li>
+<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
+<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
+<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
+<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
+<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
+<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
+<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
+<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
+<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
+<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
+<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
+<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
+<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
+<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
+<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
+<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
+<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
+<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
+<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
+<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
+<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
+<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
+<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
+<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
+<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
+<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
+<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
+<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
+<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
+<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
+<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
+<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
+<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
+<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
+<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
+<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
+<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
+<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
+<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
+<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
+<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
+<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
+<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
+<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
+<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/leetcode/">LeetCode</a>
+<ul>
+<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
+<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
+<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
+<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
+<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
+<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
+<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
+<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
+<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
+<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
+<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
+<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
+<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
+<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
+<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
+<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
+<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
+<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
+<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
+<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
+<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
+<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
+<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
+<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
+<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
+<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
+<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
+<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
+<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
+<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
+<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
+<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+<script>
+(function() {
+  var menu = document.querySelector("aside.book-menu nav");
+  addEventListener("beforeunload", function(event) {
+    localStorage.setItem("menu.scrollTop", menu.scrollTop);
+  });
+  menu.scrollTop = localStorage.getItem("menu.scrollTop");
+})();
+</script>
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>二叉搜索树的后序遍历序列</strong>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#题目">题目</a></li>
+    <li><a href="#解题思路">解题思路</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+<article class="markdown"><h2 id="题目">题目</h2>
+<p><a href="https://www.nowcoder.com/practice/a861533d45854474ac791d90e447bafd?tpId=13&amp;tqId=11176&amp;rp=1&amp;ru=%2Fta%2Fcoding-interviews&amp;qru=%2Fta%2Fcoding-interviews%2Fquestion-ranking&amp;tPage=1">牛客网</a></p>
+<p>输入一个整数数组，判断该数组是不是某二叉搜索树的后序遍历的结果。如果是则输出 Yes ,否则输出 No 。假设输入的数组的任意两个数字都互不相同。</p>
+<h2 id="解题思路">解题思路</h2>
+<ol>
+<li>后序遍历中，最后一个节点为 root 节点</li>
+<li>由于 BST 的左子树都小于 root，右子树都大于 root，那么可以判定该节点是否为 BST</li>
+<li>依次类推，通过递归方式，再判定左右子树</li>
+</ol>
+<pre><code>public boolean VerifySquenceOfBST(int[] sequence) {
+    if (sequence.length == 0) {
+        return false;
+    }
+
+    if (sequence.length == 1) {
+        return true;
+    }
+
+    return isBST(sequence, 0, sequence.length - 1);
+}
+
+private boolean isBST(int[] sequence, int start, int end) {
+    if (start &lt; 0 || end &lt; 0 || start &gt;= end) {
+        return true;
+    }
+
+    int rootV = sequence[end];
+    int rightIndex = -1, rightV = Integer.MIN_VALUE;
+    for (int i = start; i &lt; end; i++) {
+        if (rightV == Integer.MIN_VALUE &amp;&amp; sequence[i] &gt; rootV) {
+            rightV = sequence[i];
+            rightIndex = i;
+            continue;
+        }
+
+        if (rightV != Integer.MIN_VALUE &amp;&amp; sequence[i] &lt; rootV) {
+            return false;
+        }
+    }
+
+    return isBST(sequence, start, rightIndex - 1) &amp;&amp; isBST(sequence, rightIndex, end - 1);
+}
+</code></pre></article>
+ 
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/offer/VerifySquenceOfBST/index.md" target="_blank" rel="noopener">
+      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
+      
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#题目">题目</a></li>
+    <li><a href="#解题思路">解题思路</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

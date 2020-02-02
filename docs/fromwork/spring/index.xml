@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Spring 基本 on Interview</title>
+    <link>https://hadyang.github.io/interview/docs/fromwork/spring/</link>
+    <description>Recent content in Spring 基本 on Interview</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Wed, 21 Aug 2019 11:00:41 +0800</lastBuildDate>
+    
+	<atom:link href="https://hadyang.github.io/interview/docs/fromwork/spring/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>AOP</title>
+      <link>https://hadyang.github.io/interview/docs/fromwork/spring/aop/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/fromwork/spring/aop/</guid>
+      <description>AOP AOP 的存在价值 在传统 OOP 编程里以对象为核心，整个软件系统由系列相互依赖的对象所组成，而这些对象将被抽象成一个一个的类，并允许使用类继承来管理类与类之间一般到特殊的关系。随着软件规模的增大，应用的逐渐升级，慢慢出现了一些 OOP 很难解决的问题。
+我们可以通过分析、抽象出一系列具有一定属性与行为的对象，并通过这些对象之间的协作来形成一个完整的软件功能。由于对象可以继承，因此我们可以把具有相同功能或相同特性的属性抽象到一个层次分明的类结构体系中。随着软件规范的不断扩大，专业化分工越来越系列，以及 OOP 应用实践的不断增多，随之也暴露出了一些 OOP 无法很好解决的问题。
+现在假设系统中有 3 段完全相似的代码，这些代码通常会采用“复制”、“粘贴”方式来完成，通过这种“复制”、“粘贴”方式开发出来的软件如图 1 所示。
+看到如上图所示的示意图，可能有的读者已经发现了这种做法的不足之处：如果有一天，上图中的深色代码段需要修改，那是不是要打开 3 个地方的代码进行修改？如果不是 3 个地方包含这段代码，而是 100 个地方，甚至是 1000 个地方包含这段代码段，那会是什么后果？
+为了解决这个问题，我们通常会采用将如上图所示的深色代码部分定义成一个方法，然后在 3 个代码段中分别调用该方法即可。在这种方式下，软件系统的结构如下图所示。</description>
+    </item>
+    
+    <item>
+      <title>IOC</title>
+      <link>https://hadyang.github.io/interview/docs/fromwork/spring/ioc/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/fromwork/spring/ioc/</guid>
+      <description>IOC Ioc—Inversion of Control，即“控制反转”，不是什么技术，而是一种设计思想。在Java 开发中，Ioc意味着将你设计好的对象交给容器控制，而不是传统的在你的对象内部直接控制。如何理解好Ioc呢？理解好Ioc的关键是要明确“谁控制谁，控制什么，为何是反转（有反转就应该有正转了），哪些方面反转了”，那我们来深入分析一下：
+　- 谁控制谁，控制什么：传统Java SE程序设计，我们直接在对象内部通过new进行创建对象，是程序主动去创建依赖对象；而IoC是有专门一个容器来创建这些对象，即由Ioc容器来控制对 象的创建；谁控制谁？当然是IoC 容器控制了对象；控制什么？那就是主要控制了外部资源获取（不只是对象包括比如文件等）。 - 为何是反转，哪些方面反转了：有反转就有正转，传统应用程序是由我们自己在对象中主动控制去直接获取依赖对象，也就是正转；而反转则是由容器来帮忙创建及注入依赖对象；为何是反转？因为由容器帮我们查找及注入依赖对象，对象只是被动的接受依赖对象，所以是反转；哪些方面反转了？依赖对象的获取被反转了。
+IoC能做什么 　IoC 不是一种技术，只是一种思想，一个重要的面向对象编程的法则，它能指导我们如何设计出松耦合、更优良的程序。传统应用程序都是由我们在类内部主动创建依赖对象，从而导致类与类之间高耦合，难于测试；有了IoC容器后，把创建和查找依赖对象的控制权交给了容器，由容器进行注入组合对象，所以对象与对象之间是 松散耦合，这样也方便测试，利于功能复用，更重要的是使得程序的整个体系结构变得非常灵活。
+IoC和DI DI—Dependency Injection，即“依赖注入”：组件之间依赖关系由容器在运行期决定，形象的说，即由容器动态的将某个依赖关系注入到组件之中。依赖注入的目的并非为软件系统带来更多功能，而是为了提升组件重用的频率，并为系统搭建一个灵活、可扩展的平台。通过依赖注入机制，我们只需要通过简单的配置，而无需任何代码就可指定目标需要的资源，完成自身的业务逻辑，而不需要关心具体的资源来自何处，由谁实现。
+理解DI的关键是：“谁依赖谁，为什么需要依赖，谁注入谁，注入了什么”，那我们来深入分析一下：
+ 谁依赖于谁：当然是应用程序依赖于IoC容器； 为什么需要依赖：应用程序需要IoC容器来提供对象需要的外部资源； 谁注入谁：很明显是IoC容器注入应用程序某个对象，应用程序依赖的对象； 注入了什么：就是注入某个对象所需要的外部资源（包括对象、资源、常量数据）。  IoC和DI由什么关系呢？其实它们是同一个概念的不同角度描述，由于控制反转概念比较含糊（可能只是理解为容器控制对象这一个层面，很难让人想到谁来维护对象关系），所以2004年大师级人物Martin Fowler又给出了一个新的名字：“依赖注入”，相对IoC 而言，“依赖注入”明确描述了“被注入对象依赖IoC容器配置依赖对象”。
+IOC vs Factory 简单来说，IOC 与 工厂模式 分别代表了 push 与 pull 的机制：
+ Pull 机制：类间接依赖于 Factory Method ，而 Factory Method 又依赖于具体类。 Push 机制：容器可以在一个位置配置所有相关组件，从而促进高维护和松耦合。  使用 工厂模式 的责任仍然在于类（尽管间接地）来创建新对象，而 依赖注入 将责任外包。
+循环依赖 Spring 为了解决单例的循环依赖问题，使用了 三级缓存 ，递归调用时发现 Bean 还在创建中即为循环依赖
+/** 一级缓存：用于存放完全初始化好的 bean **/ private final Map&amp;lt;String, Object&amp;gt; singletonObjects = new ConcurrentHashMap&amp;lt;String, Object&amp;gt;(256); /** 二级缓存：存放原始的 bean 对象（尚未填充属性），用于解决循环依赖 */ private final Map&amp;lt;String, Object&amp;gt; earlySingletonObjects = new HashMap&amp;lt;String, Object&amp;gt;(16); /** 三级级缓存：存放 bean 工厂对象，用于解决循环依赖 */ private final Map&amp;lt;String, ObjectFactory&amp;lt;?</description>
+    </item>
+    
+    <item>
+      <title>设计模式</title>
+      <link>https://hadyang.github.io/interview/docs/fromwork/spring/design-partten/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/fromwork/spring/design-partten/</guid>
+      <description>设计模式  代理模式：AOP 单例模式：默认 Bean 为单例 工厂模式：BeanFactory IOC：依赖倒置 or 依赖注入 MVC：spring web 模版方法模式：JdbcTemplate  </description>
+    </item>
+    
+  </channel>
+</rss>

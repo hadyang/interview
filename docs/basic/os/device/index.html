@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="设备管理"><meta property="og:title" content="设备管理" />
+<meta property="og:description" content="设备管理 外部设备分为两大类：
+ 存储型设备：以存储大量信息和快速检索为目标，在系统中存储持久性信息。 I/O型设备：如显示器、打印机等。  I/O硬件原理 I/O系统 通常把I/O设备及其接口线路、控制部件、通道和管理软件称为I/O系统，把计算机的内存和设备介质之间的信息传送操作称为I/O操作。可按照不同方式对设备进行分类：按I/O操作特性分为输入型设备、输出型设备和存储型设备；按I/O信息交换单位分为字符设备和块设备。
+ 输入、输出型设备通常是字符设备，存储型设备通常是块设备。
+ 存储型设备又分为顺序存储设备和直接存取设备。前者严格依赖信息的物理位置进行读写和定位，如磁带。后者的特点是存取任何一个物理块所需要的时间几乎不依赖于此信息所处的位置，如磁盘。
+I/O控制方式 轮询方式 轮询方式又称程序直接控制方式，使用查询指令测试设备控制器的忙闲状态位，确定内存和设备是否能交换数据。轮询方式采用三条指令：查询指令，查询设备是否就绪；读写指令，当设备就绪时执行数据交换；转移指令，当设备未就绪时执行转移指令指向查询指令继续查询。可见，在这种方式下CPU和设备只能串行工作。
+中断方式 在这种方式下CPU和设备之间传输数据的过程如下：
+  进程发出启动I/O指令，CPU加载控制信息到设备控制器的寄存器，然后进程继续执行不涉及本次I/O数据的任务，或放弃CPU等待设备I/O操作完成。
+  设备控制器检查寄存器的内容，按照I/O指令的要求执行相应I/O操作，一旦传输完成，设备控制器发出I/O中断请求信号。
+  CPU收到并响应I/O中断后，转向设备的I/O中断处理程序执行。
+  中断处理程序执行数据读取操作，将I/O缓冲寄存器的内容写入内存，操作结束后退出中断处理程序，返回发生中断前的状态。
+  进程调度程序在适当的时候让得到数据的进程恢复执行。
+  在I/O中断方式中，如果设备控制器的数据缓冲区较小，当缓冲器装满后便会发生中断，那么在数据传输过程中发生中断次数会很多，这样就消耗了大量CPU时间。
+DMA方式 虽然中断方式提高了CPU利用率，但是在响应中断请求后必须停止现行程序，转入中断处理程序并参与数据传输操作。在DMA(Direct Memory Access)方式中，内存和设备之间有一条数据通路成块地传送数据，无须CPU干预，实际数据传输操作由DMA直接完成。为实现DMA，至少需要以下逻辑部件：
+  内存地址寄存器：存放内存中需要交换数据的地址，DMA传送之前由程序送入首地址；DMA传送过程中，每次交换数据都把地址寄存器的内容加1。
+  字计数器：记录传送数据的总字数，每次传送一个字就把字计数器减1。
+  数据缓冲寄存器或数据缓冲区：暂存每次传送的数据。
+  设备地址寄存器：存放I/O信息的地址，如磁盘的柱面号。
+  中断机制和控制逻辑：用于向CPU提出I/O中断请求及CPU发来的I/O命令，管理DMA的传送过程。
+  通道方式 通道又称I/O处理器，能完成内存和设备之间的信息传送，与CPU并行地执行操作。采用I/O通道设计后，I/O操作过程如下：CPU在执行主程序时遇到I/O请求，启动在指定通道上选址的设备，一旦启动成功，通道开始控制设备进行操作，这时CPU就可以执行其他任务并与通道并行工作，直到I/O操作完成；当通道发出I/O操作结束中断时，处理器才响应并停止当前工作，转向I/O操作结束事件。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/os/device/" />
+<meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
+<meta property="article:modified_time" content="2019-08-21T11:00:41+08:00" />
+<title>设备管理 | Interview</title>
+<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/interview/book.min.b7fe34b8a4c4da05b2690b4aacfa71ddce0668cc6da3abb67dd3946844125444.css" integrity="sha256-t/40uKTE2gWyaQtKrPpx3c4GaMxto6u2fdOUaEQSVEQ=">
+
+
+<script defer src="/interview/en.search.min.4daab1eda22baec10d130347f095a8463b951038b7e98060a59bcdc484ada980.js" integrity="sha256-Taqx7aIrrsENEwNH8JWoRjuVEDi36YBgpZvNxIStqYA="></script>
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/interview"><span>Interview</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+  <ul>
+<li><a href="/interview/docs/basic/">计算机基础</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/">算法</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
+<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
+<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
+<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
+<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
+<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
+<li><a href="/interview/docs/basic/algo/sort/">排序算法</a></li>
+<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/os/">操作系统</a>
+<ul>
+<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
+<li><a href="/interview/docs/basic/os/concurrency/">并发</a></li>
+<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
+<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
+<li><a href="/interview/docs/basic/os/linux/">Linux系统</a></li>
+<li><a href="/interview/docs/basic/os/interrupt/">中断</a></li>
+<li><a href="/interview/docs/basic/os/device/"class=active>设备管理</a></li>
+<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
+<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/net/">计算机网络</a>
+<ul>
+<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
+<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
+<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
+<li><a href="/interview/docs/basic/net/http/">HTTP</a></li>
+<li><a href="/interview/docs/basic/net/https/">HTTPS</a></li>
+<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/">数据库</a>
+<ul>
+<li><a href="/interview/docs/basic/database/transaction/">事务</a></li>
+<li><a href="/interview/docs/basic/database/index/">索引</a></li>
+<li><a href="/interview/docs/basic/database/sql/">SQL</a></li>
+<li><a href="/interview/docs/basic/database/join/">连接</a></li>
+<li><a href="/interview/docs/basic/database/mysql/">MySQL</a></li>
+<li><a href="/interview/docs/basic/database/concurrent/">并发控制</a></li>
+<li><a href="/interview/docs/basic/database/innodb/">Innodb</a></li>
+<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/">Java</a>
+<ul>
+<li><a href="/interview/docs/java/oop/">OOP</a></li>
+<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
+<li><a href="/interview/docs/java/operator/">运算符</a></li>
+<li><a href="/interview/docs/java/exception/">异常</a></li>
+<li><a href="/interview/docs/java/generics/">泛型</a></li>
+<li><a href="/interview/docs/java/object/">Object</a></li>
+<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
+<li><a href="/interview/docs/java/proxy/">代理</a></li>
+<li><a href="/interview/docs/java/annotation/">注解</a></li>
+<li><a href="/interview/docs/java/questions/">面试题</a></li>
+<li><a href="/interview/docs/java/nio/">NIO</a></li>
+<li><a href="/interview/docs/java/">集合</a>
+<ul>
+<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
+<li><a href="/interview/docs/java/collection/Concurrenthashmap/">Concurrenthashmap</a></li>
+<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/concurrent/">并发</a>
+<ul>
+<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
+<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
+<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
+<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
+<li><a href="/interview/docs/java/concurrent/AQS/">AQS</a></li>
+<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
+<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
+<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<ul>
+<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
+<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/gc/">GC</a>
+<ul>
+<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
+<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/">框架</a>
+<ul>
+<li><a href="/interview/docs/fromwork/netty/">Netty</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
+<ul>
+<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/spring/">Spring</a>
+<ul>
+<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
+<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
+<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/">系统架构</a>
+<ul>
+<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
+<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
+<ul>
+<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/design/">系统设计</a>
+<ul>
+<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/distributed/">分布式</a>
+<ul>
+<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
+<li><a href="/interview/docs/architecture/distributed/session/">分布式Session</a></li>
+<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
+<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
+<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
+<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
+<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
+<li><a href="/interview/docs/architecture/distributed/kafka/">Kafka</a></li>
+<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
+<li><a href="/interview/docs/architecture/distributed/dubbo/">Dubbo</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
+<ul>
+<li><a href="/interview/docs/architecture/bigdata/algo/">基础算法</a></li>
+<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/offer/">剑指offer</a>
+<ul>
+<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
+<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
+<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
+<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
+<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
+<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
+<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
+<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
+<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
+<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
+<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
+<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
+<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
+<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
+<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
+<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
+<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
+<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
+<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
+<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
+<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
+<li><a href="/interview/docs/offer/VerifySquenceOfBST/">二叉搜索树的后序遍历序列</a></li>
+<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
+<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
+<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
+<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
+<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
+<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
+<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
+<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
+<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
+<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
+<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
+<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
+<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
+<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
+<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
+<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
+<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
+<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
+<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
+<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
+<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
+<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
+<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
+<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
+<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
+<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
+<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
+<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
+<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
+<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
+<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
+<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
+<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
+<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
+<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
+<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
+<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
+<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
+<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
+<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
+<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
+<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
+<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
+<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
+<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/leetcode/">LeetCode</a>
+<ul>
+<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
+<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
+<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
+<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
+<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
+<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
+<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
+<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
+<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
+<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
+<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
+<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
+<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
+<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
+<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
+<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
+<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
+<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
+<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
+<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
+<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
+<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
+<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
+<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
+<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
+<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
+<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
+<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
+<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
+<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
+<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
+<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+<script>
+(function() {
+  var menu = document.querySelector("aside.book-menu nav");
+  addEventListener("beforeunload", function(event) {
+    localStorage.setItem("menu.scrollTop", menu.scrollTop);
+  });
+  menu.scrollTop = localStorage.getItem("menu.scrollTop");
+})();
+</script>
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>设备管理</strong>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#io硬件原理">I/O硬件原理</a>
+      <ul>
+        <li><a href="#io系统">I/O系统</a></li>
+        <li><a href="#io控制方式">I/O控制方式</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+<article class="markdown"><h1 id="设备管理">设备管理</h1>
+<p>外部设备分为两大类：</p>
+<ul>
+<li><strong>存储型设备</strong>：以存储大量信息和快速检索为目标，在系统中存储持久性信息。</li>
+<li><strong>I/O型设备</strong>：如显示器、打印机等。</li>
+</ul>
+<h2 id="io硬件原理">I/O硬件原理</h2>
+<h3 id="io系统">I/O系统</h3>
+<p>通常把I/O设备及其接口线路、控制部件、通道和管理软件称为I/O系统，把计算机的内存和设备介质之间的信息传送操作称为I/O操作。可按照不同方式对设备进行分类：按I/O操作特性分为输入型设备、输出型设备和存储型设备；按I/O信息交换单位分为字符设备和块设备。</p>
+<blockquote>
+<p>输入、输出型设备通常是字符设备，存储型设备通常是块设备。</p>
+</blockquote>
+<p>存储型设备又分为顺序存储设备和直接存取设备。前者严格依赖信息的物理位置进行读写和定位，如磁带。后者的特点是存取任何一个物理块所需要的时间几乎不依赖于此信息所处的位置，如磁盘。</p>
+<h3 id="io控制方式">I/O控制方式</h3>
+<h4 id="轮询方式">轮询方式</h4>
+<p>轮询方式又称程序直接控制方式，使用查询指令测试设备控制器的忙闲状态位，确定内存和设备是否能交换数据。轮询方式采用三条指令：查询指令，查询设备是否就绪；读写指令，当设备就绪时执行数据交换；转移指令，当设备未就绪时执行转移指令指向查询指令继续查询。可见，在这种方式下CPU和设备只能串行工作。</p>
+<h4 id="中断方式">中断方式</h4>
+<p>在这种方式下CPU和设备之间传输数据的过程如下：</p>
+<ol>
+<li>
+<p>进程发出启动I/O指令，CPU加载控制信息到设备控制器的寄存器，然后进程继续执行不涉及本次I/O数据的任务，或放弃CPU等待设备I/O操作完成。</p>
+</li>
+<li>
+<p>设备控制器检查寄存器的内容，按照I/O指令的要求执行相应I/O操作，一旦传输完成，设备控制器发出I/O中断请求信号。</p>
+</li>
+<li>
+<p>CPU收到并响应I/O中断后，转向设备的I/O中断处理程序执行。</p>
+</li>
+<li>
+<p>中断处理程序执行数据读取操作，将I/O缓冲寄存器的内容写入内存，操作结束后退出中断处理程序，返回发生中断前的状态。</p>
+</li>
+<li>
+<p>进程调度程序在适当的时候让得到数据的进程恢复执行。</p>
+</li>
+</ol>
+<p>在I/O中断方式中，如果设备控制器的数据缓冲区较小，当缓冲器装满后便会发生中断，那么在数据传输过程中发生中断次数会很多，这样就消耗了大量CPU时间。</p>
+<h4 id="dma方式">DMA方式</h4>
+<p>虽然中断方式提高了CPU利用率，但是在响应中断请求后必须停止现行程序，转入中断处理程序并参与数据传输操作。在<code>DMA(Direct Memory Access)</code>方式中，内存和设备之间有一条数据通路成块地传送数据，无须CPU干预，实际数据传输操作由DMA直接完成。为实现DMA，至少需要以下逻辑部件：</p>
+<ol>
+<li>
+<p>内存地址寄存器：存放内存中需要交换数据的地址，DMA传送之前由程序送入首地址；DMA传送过程中，每次交换数据都把地址寄存器的内容加1。</p>
+</li>
+<li>
+<p>字计数器：记录传送数据的总字数，每次传送一个字就把字计数器减1。</p>
+</li>
+<li>
+<p>数据缓冲寄存器或数据缓冲区：暂存每次传送的数据。</p>
+</li>
+<li>
+<p>设备地址寄存器：存放I/O信息的地址，如磁盘的柱面号。</p>
+</li>
+<li>
+<p>中断机制和控制逻辑：用于向CPU提出I/O中断请求及CPU发来的I/O命令，管理DMA的传送过程。</p>
+</li>
+</ol>
+<h4 id="通道方式">通道方式</h4>
+<p>通道又称I/O处理器，能完成内存和设备之间的信息传送，与CPU并行地执行操作。采用I/O通道设计后，I/O操作过程如下：CPU在执行主程序时遇到I/O请求，启动在指定通道上选址的设备，一旦启动成功，通道开始控制设备进行操作，这时CPU就可以执行其他任务并与通道并行工作，直到I/O操作完成；当通道发出I/O操作结束中断时，处理器才响应并停止当前工作，转向I/O操作结束事件。</p>
+</article>
+ 
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/basic/os/device/index.md" target="_blank" rel="noopener">
+      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
+      
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#io硬件原理">I/O硬件原理</a>
+      <ul>
+        <li><a href="#io系统">I/O系统</a></li>
+        <li><a href="#io控制方式">I/O控制方式</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

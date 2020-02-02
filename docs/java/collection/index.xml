@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>集合框架 on Interview</title>
+    <link>https://hadyang.github.io/interview/docs/java/collection/</link>
+    <description>Recent content in 集合框架 on Interview</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Wed, 21 Aug 2019 11:00:41 +0800</lastBuildDate>
+    
+	<atom:link href="https://hadyang.github.io/interview/docs/java/collection/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>BlockingQueue</title>
+      <link>https://hadyang.github.io/interview/docs/java/collection/BlockQueue/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/collection/BlockQueue/</guid>
+      <description>BlockingQueue BlockingQueue 支持当获取队列元素但是队列为空时，会阻塞等待队列中有元素再返回；也支持添加元素时，如果队列已满，那么等到队列可以放入新元素时再放入。
+其提供了4种类型的方法：
+    Throws exception Special value Blocks Times out     Insert add(e) offer(e) put(e) offer(e, time, unit)   Remove remove() poll() take() poll(time, unit)   Examine element() peek() not applicable not applicable    BlockingQueue不接受 null 元素。所有实现应当抛出 NullPointerException 在所有的 add,put以及offer方法上。null被用来标记poll失败。
+在任意时刻，当有界BlockingQueue 队列元素放满之后，所有的元素都将在放入的时候阻塞。无界BlockingQueue 没有任何容量限制，容量大小始终是Integer.MAX_VALUE。
+BlockingQueue的实现是用于 生产者-消费者 的队列，同时也支持 Collection 接口。所以可通过remove(x)来移除队列里的一个元素。通常情况下，这样的操作效率不是很好，只在诸如队列消息被取消的情况下才会偶尔使用。
+BlockingQueue 的实现都是线程安全的。所有 queue 的方法都需要通过内部锁机制或者其他形式来进行并发控制来实现其原子操作。然而，Collection 接口的方法，比如：addAll, containsAll, retainAll 以及 removeAll 都没有必要进行原子操作，除非实现类有特别说明。所以对于addAll(c)有可能在添加部分c元素后抛出异常。</description>
+    </item>
+    
+    <item>
+      <title>ConcurrentHashmap</title>
+      <link>https://hadyang.github.io/interview/docs/java/collection/Concurrenthashmap/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/collection/Concurrenthashmap/</guid>
+      <description>ConcurrentHashmap JDK1.7 ConcurrentHashMap的锁分段技术：假如容器里有多把锁，每一把锁用于锁容器其中一部分数据，那么当多线程访问容器里不同数据段的数据时，线程间就不会存在锁竞争，从而可以有效的提高并发访问效率，这就是ConcurrentHashMap所使用的锁分段技术。首先将数据分成一段一段的存储，然后给每一段数据配一把锁，当一个线程占用锁访问其中一个段数据的时候，其他段的数据也能被其他线程访问。
+ ConcurrentHashMap不允许Key或者Value的值为NULL。ConcurrentMaps中不允许空值的主要原因是，在非并发映射中几乎不能容忍的模糊性是无法容纳的。主要的一点是如果map.get（key）返回null，则无法检测 key 是否显式映射为 null 或者 key 未映射。 在非并发映射中，您可以通过 map.contains（key） 进行检查，但在并发映射中，映射可能在调用之间发生了变化。
+ Segment类 Put 将一个HashEntry放入到该Segment中，使用自旋机制，减少了加锁的可能性。
+final V put(K key, int hash, V value, boolean onlyIfAbsent) { HashEntry&amp;lt;K,V&amp;gt; node = tryLock() ? null : scanAndLockForPut(key, hash, value); //如果加锁失败，则调用该方法 V oldValue; try { HashEntry&amp;lt;K,V&amp;gt;[] tab = table; int index = (tab.length - 1) &amp;amp; hash; //同hashMap相同的哈希定位方式 HashEntry&amp;lt;K,V&amp;gt; first = entryAt(tab, index); for (HashEntry&amp;lt;K,V&amp;gt; e = first;;) { if (e !</description>
+    </item>
+    
+    <item>
+      <title>HashMap</title>
+      <link>https://hadyang.github.io/interview/docs/java/collection/HashMap/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/collection/HashMap/</guid>
+      <description>HashMap 在get和put的过程中，计算下标时，先对hashCode进行hash操作，然后再通过hash值进一步计算下标，如下图所示：
+在对hashCode()计算hash时具体实现是这样的：
+static final int hash(Object key) { int h; return (key == null) ? 0 : (h = key.hashCode()) ^ (h &amp;gt;&amp;gt;&amp;gt; 16); }  可以看到这个函数大概的作用就是：高16bit不变，低16bit和高16bit做了一个异或。
+ 在设计hash函数时，因为目前的table长度n为2的幂，而计算下标的时候，是这样实现的(使用&amp;amp;位操作，而非%求余)。设计者认为这方法很容易发生碰撞。为什么这么说呢？不妨思考一下，在n - 1为15(0x1111)时，其实散列真正生效的只是低4bit的有效位，当然容易碰撞了。
+因此，设计者想了一个顾全大局的方法(综合考虑了速度、作用、质量)，就是把高16bit和低16bit异或了一下。设计者还解释到因为现在大多数的hashCode的分布已经很不错了，就算是发生了碰撞也用O(logn)的tree去做了。仅仅异或一下，既减少了系统的开销，也不会造成的因为高位没有参与下标的计算(table长度比较小时)，从而引起的碰撞。
+如果还是产生了频繁的碰撞，会发生什么问题呢？作者注释说，他们使用树来处理频繁的碰撞(we use trees to handle large sets of collisions in bins)，在JEP-180中，描述了这个问题：
+ Improve the performance of java.util.HashMap under high hash-collision conditions by using balanced trees rather than linked lists to store map entries. Implement the same improvement in the LinkedHashMap class.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="HTTP"><meta property="og:title" content="HTTP" />
+<meta property="og:description" content="HTTP  HTTP构建于TCP/IP协议之上，默认端口号是80。 HTTP是 无连接无状态 的。  无连接的含义是 限制每次连接只处理一个请求。服务器处理完客户的请求，并收到客户的应答后，即断开连接。后来使用了Keep-Alive技术。
+无状态是指 协议对于事务处理没有记忆能力，服务器不知道客户端是什么状态。即我们给服务器发送 HTTP 请求之后，服务器根据请求，会给我们发送数据过来，但是，发送完，不会记录任何信息。
+HTTP 协议这种特性有优点也有缺点，优点在于解放了服务器，每一次请求“点到为止”不会造成不必要连接占用，缺点在于每次请求会传输大量重复的内容信息。
+为了解决HTTP无状态的缺点，两种用于保持 HTTP 连接状态的技术就应运而生了，一个是 Cookie，而另一个则是 Session。Cookie在客户端记录状态，比如登录状态。Session在服务器记录状态。
+Http的报文结构 HTTP 请求报文头部  User-Agent：产生请求的浏览器类型。 Accept：客户端可识别的响应内容类型列表; Accept-Language：客户端可接受的自然语言; Accept-Encoding：客户端可接受的编码压缩格式; Accept-Charset：可接受的应答的字符集; Host：请求的主机名，允许多个域名同处一个IP 地址，即虚拟主机;（必选） Connection：连接方式(close 或 keep-alive); Cookie：存储于客户端扩展字段，向同一域名的服务端发送属于该域的cookie; 请求包体：在POST方法中使用。 Referer：包含一个URL，用户从该URL代表的页面出发访问当前请求的页面。 If-Modified-Since：文档的最后改动时间  HTTP 响应头  Allow	服务器支持哪些请求方法（如GET、POST等）。 Content-Encoding	文档的编码（Encode）方法。 Content-Length	表示内容长度。只有当浏览器使用持久HTTP连接时才需要这个数据。 Content-Type	表示后面的文档属于什么MIME类型。 Date	当前的GMT时间。你可以用setDateHeader来设置这个头以避免转换时间格式的麻烦。 Expires	应该在什么时候认为文档已经过期，从而不再缓存它。 Last-Modified	文档的最后改动时间。 Refresh	表示浏览器应该在多少时间之后刷新文档，以秒计。 Server	服务器名字。 Set-Cookie	设置和页面关联的Cookie。 ETag：被请求变量的实体值。ETag是一个可以与Web资源关联的记号（MD5值）。 Cache-Control：这个字段用于指定所有缓存机制在整个请求/响应链中必须服从的指令。   max-age：表示当访问此网页后的 x 秒内再次访问不会去服务器；no-cache，实际上Cache-Control: no-cache是会被缓存的，只不过每次在向客户端（浏览器）提供响应数据时，缓存都要向服务器评估缓存响应的有效性；no-store，这个才是响应不被缓存的意思；" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/net/http/" />
+<meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
+<meta property="article:modified_time" content="2019-08-21T11:00:41+08:00" />
+<title>HTTP | Interview</title>
+<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/interview/book.min.b7fe34b8a4c4da05b2690b4aacfa71ddce0668cc6da3abb67dd3946844125444.css" integrity="sha256-t/40uKTE2gWyaQtKrPpx3c4GaMxto6u2fdOUaEQSVEQ=">
+
+
+<script defer src="/interview/en.search.min.4daab1eda22baec10d130347f095a8463b951038b7e98060a59bcdc484ada980.js" integrity="sha256-Taqx7aIrrsENEwNH8JWoRjuVEDi36YBgpZvNxIStqYA="></script>
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/interview"><span>Interview</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+  <ul>
+<li><a href="/interview/docs/basic/">计算机基础</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/">算法</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
+<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
+<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
+<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
+<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
+<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
+<li><a href="/interview/docs/basic/algo/sort/">排序算法</a></li>
+<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/os/">操作系统</a>
+<ul>
+<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
+<li><a href="/interview/docs/basic/os/concurrency/">并发</a></li>
+<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
+<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
+<li><a href="/interview/docs/basic/os/linux/">Linux系统</a></li>
+<li><a href="/interview/docs/basic/os/interrupt/">中断</a></li>
+<li><a href="/interview/docs/basic/os/device/">设备管理</a></li>
+<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
+<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/net/">计算机网络</a>
+<ul>
+<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
+<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
+<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
+<li><a href="/interview/docs/basic/net/http/"class=active>HTTP</a></li>
+<li><a href="/interview/docs/basic/net/https/">HTTPS</a></li>
+<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/">数据库</a>
+<ul>
+<li><a href="/interview/docs/basic/database/transaction/">事务</a></li>
+<li><a href="/interview/docs/basic/database/index/">索引</a></li>
+<li><a href="/interview/docs/basic/database/sql/">SQL</a></li>
+<li><a href="/interview/docs/basic/database/join/">连接</a></li>
+<li><a href="/interview/docs/basic/database/mysql/">MySQL</a></li>
+<li><a href="/interview/docs/basic/database/concurrent/">并发控制</a></li>
+<li><a href="/interview/docs/basic/database/innodb/">Innodb</a></li>
+<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/">Java</a>
+<ul>
+<li><a href="/interview/docs/java/oop/">OOP</a></li>
+<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
+<li><a href="/interview/docs/java/operator/">运算符</a></li>
+<li><a href="/interview/docs/java/exception/">异常</a></li>
+<li><a href="/interview/docs/java/generics/">泛型</a></li>
+<li><a href="/interview/docs/java/object/">Object</a></li>
+<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
+<li><a href="/interview/docs/java/proxy/">代理</a></li>
+<li><a href="/interview/docs/java/annotation/">注解</a></li>
+<li><a href="/interview/docs/java/questions/">面试题</a></li>
+<li><a href="/interview/docs/java/nio/">NIO</a></li>
+<li><a href="/interview/docs/java/">集合</a>
+<ul>
+<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
+<li><a href="/interview/docs/java/collection/Concurrenthashmap/">Concurrenthashmap</a></li>
+<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/concurrent/">并发</a>
+<ul>
+<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
+<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
+<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
+<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
+<li><a href="/interview/docs/java/concurrent/AQS/">AQS</a></li>
+<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
+<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
+<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<ul>
+<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
+<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/gc/">GC</a>
+<ul>
+<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
+<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/">框架</a>
+<ul>
+<li><a href="/interview/docs/fromwork/netty/">Netty</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
+<ul>
+<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/spring/">Spring</a>
+<ul>
+<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
+<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
+<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/">系统架构</a>
+<ul>
+<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
+<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
+<ul>
+<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/design/">系统设计</a>
+<ul>
+<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/distributed/">分布式</a>
+<ul>
+<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
+<li><a href="/interview/docs/architecture/distributed/session/">分布式Session</a></li>
+<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
+<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
+<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
+<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
+<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
+<li><a href="/interview/docs/architecture/distributed/kafka/">Kafka</a></li>
+<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
+<li><a href="/interview/docs/architecture/distributed/dubbo/">Dubbo</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
+<ul>
+<li><a href="/interview/docs/architecture/bigdata/algo/">基础算法</a></li>
+<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/offer/">剑指offer</a>
+<ul>
+<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
+<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
+<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
+<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
+<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
+<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
+<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
+<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
+<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
+<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
+<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
+<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
+<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
+<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
+<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
+<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
+<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
+<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
+<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
+<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
+<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
+<li><a href="/interview/docs/offer/VerifySquenceOfBST/">二叉搜索树的后序遍历序列</a></li>
+<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
+<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
+<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
+<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
+<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
+<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
+<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
+<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
+<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
+<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
+<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
+<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
+<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
+<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
+<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
+<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
+<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
+<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
+<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
+<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
+<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
+<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
+<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
+<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
+<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
+<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
+<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
+<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
+<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
+<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
+<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
+<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
+<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
+<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
+<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
+<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
+<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
+<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
+<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
+<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
+<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
+<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
+<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
+<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
+<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/leetcode/">LeetCode</a>
+<ul>
+<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
+<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
+<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
+<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
+<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
+<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
+<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
+<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
+<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
+<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
+<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
+<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
+<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
+<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
+<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
+<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
+<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
+<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
+<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
+<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
+<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
+<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
+<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
+<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
+<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
+<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
+<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
+<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
+<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
+<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
+<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
+<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+<script>
+(function() {
+  var menu = document.querySelector("aside.book-menu nav");
+  addEventListener("beforeunload", function(event) {
+    localStorage.setItem("menu.scrollTop", menu.scrollTop);
+  });
+  menu.scrollTop = localStorage.getItem("menu.scrollTop");
+})();
+</script>
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>HTTP</strong>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#http的报文结构">Http的报文结构</a>
+      <ul>
+        <li><a href="#http-请求报文头部">HTTP 请求报文头部</a></li>
+        <li><a href="#http-响应头">HTTP 响应头</a></li>
+      </ul>
+    </li>
+    <li><a href="#http的状态码含义">Http的状态码含义。</a></li>
+    <li><a href="#http-request的几种类型">Http request的几种类型。</a></li>
+    <li><a href="#条件-get">条件 GET</a></li>
+    <li><a href="#持久连接">持久连接</a></li>
+    <li><a href="#跨站攻击">跨站攻击</a>
+      <ul>
+        <li><a href="#防范的方法">防范的方法</a></li>
+      </ul>
+    </li>
+    <li><a href="#断点续传">断点续传</a></li>
+    <li><a href="#一次http请求">一次HTTP请求</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+<article class="markdown"><h1 id="http">HTTP</h1>
+<ul>
+<li>HTTP构建于<code>TCP/IP</code>协议之上，默认端口号是80。</li>
+<li>HTTP是 <strong>无连接无状态</strong> 的。</li>
+</ul>
+<p>无连接的含义是 <strong>限制每次连接只处理一个请求</strong>。服务器处理完客户的请求，并收到客户的应答后，即断开连接。后来使用了<code>Keep-Alive</code>技术。</p>
+<p>无状态是指 <strong>协议对于事务处理没有记忆能力，服务器不知道客户端是什么状态</strong>。即我们给服务器发送 HTTP 请求之后，服务器根据请求，会给我们发送数据过来，但是，发送完，不会记录任何信息。</p>
+<p>HTTP 协议这种特性有优点也有缺点，优点在于解放了服务器，每一次请求“点到为止”不会造成不必要连接占用，<strong>缺点在于每次请求会传输大量重复的内容信息</strong>。</p>
+<p>为了解决HTTP无状态的缺点，两种用于保持 HTTP 连接状态的技术就应运而生了，一个是 <code>Cookie</code>，而另一个则是 <code>Session</code>。<code>Cookie</code>在客户端记录状态，比如登录状态。<code>Session</code>在服务器记录状态。</p>
+<h2 id="http的报文结构">Http的报文结构</h2>
+<h3 id="http-请求报文头部">HTTP 请求报文头部</h3>
+<ul>
+<li><code>User-Agent</code>：产生请求的浏览器类型。</li>
+<li><code>Accept</code>：客户端可识别的响应内容类型列表;</li>
+<li><code>Accept-Language</code>：客户端可接受的自然语言;</li>
+<li><code>Accept-Encoding</code>：客户端可接受的编码压缩格式;</li>
+<li><code>Accept-Charset</code>：可接受的应答的字符集;</li>
+<li><code>Host</code>：请求的主机名，允许多个域名同处一个IP 地址，即虚拟主机;（必选）</li>
+<li><code>Connection</code>：连接方式(close 或 <code>keep-alive</code>);</li>
+<li><code>Cookie</code>：存储于客户端扩展字段，向同一域名的服务端发送属于该域的cookie;</li>
+<li><code>请求包体</code>：在<code>POST</code>方法中使用。</li>
+<li><code>Referer</code>：包含一个URL，用户从该URL代表的页面出发访问当前请求的页面。</li>
+<li><code>If-Modified-Since</code>：文档的最后改动时间</li>
+</ul>
+<h3 id="http-响应头">HTTP 响应头</h3>
+<ul>
+<li><code>Allow</code>	服务器支持哪些请求方法（如GET、POST等）。</li>
+<li><code>Content-Encoding</code>	文档的编码（Encode）方法。</li>
+<li><code>Content-Length</code>	表示内容长度。只有当浏览器使用持久HTTP连接时才需要这个数据。</li>
+<li><code>Content-Type</code>	表示后面的文档属于什么MIME类型。</li>
+<li><code>Date</code>	当前的GMT时间。你可以用setDateHeader来设置这个头以避免转换时间格式的麻烦。</li>
+<li><code>Expires</code>	应该在什么时候认为文档已经过期，从而不再缓存它。</li>
+<li><code>Last-Modified</code>	文档的最后改动时间。</li>
+<li><code>Refresh</code>	表示浏览器应该在多少时间之后刷新文档，以秒计。</li>
+<li><code>Server</code>	服务器名字。</li>
+<li><code>Set-Cookie</code>	设置和页面关联的Cookie。</li>
+<li><code>ETag</code>：被请求变量的实体值。ETag是一个可以与Web资源关联的记号（MD5值）。</li>
+<li><code>Cache-Control</code>：这个字段用于指定所有缓存机制在整个请求/响应链中必须服从的指令。</li>
+</ul>
+<blockquote>
+<p>max-age：表示当访问此网页后的 x 秒内再次访问不会去服务器；no-cache，实际上Cache-Control: no-cache是会被缓存的，只不过每次在向客户端（浏览器）提供响应数据时，缓存都要向服务器评估缓存响应的有效性；no-store，这个才是响应不被缓存的意思；</p>
+</blockquote>
+<blockquote>
+<p><code>Last-Modified</code>与<code>If-Modified-Since</code>都是用来记录页面的最后修改时间。当客户端访问页面时，服务器会将页面最后修改时间通过 Last-Modified 标识由服务器发往客户端，客户端记录修改时间，再次请求本地存在的cache页面时，客户端会通过 If-Modified-Since 头将先前服务器端发过来的最后修改时间戳发送回去，服务器端通过这个时间戳判断客户端的页面是否是最新的，如果不是最新的，则返回新的内容，如果是最新的，则返回 304。</p>
+</blockquote>
+<h2 id="http的状态码含义">Http的状态码含义。</h2>
+<ul>
+<li><code>1**</code>	信息，服务器收到请求，需要请求者继续执行操作</li>
+<li><code>2**</code>	成功，操作被成功接收并处理</li>
+<li><code>3**</code>	重定向，需要进一步的操作以完成请求
+<ul>
+<li><code>301 Moved Permanently</code>。请求的资源已被永久的移动到新URI，返回信息会包括新的URI，浏览器会自动定向到新URI。今后任何新的请求都应使用新的URI代替</li>
+<li><code>302 Moved Temporarily</code>。与301类似。但资源只是临时被移动。客户端应继续使用原有URI</li>
+<li><code>304 Not Modified</code>。所请求的资源未修改，服务器返回此状态码时，不会返回任何资源。<strong>客户端通常会缓存访问过的资源，通过提供一个头信息指出客户端希望只返回在指定日期之后修改的资源</strong>。</li>
+</ul>
+</li>
+<li><code>4**</code>	客户端错误，请求包含语法错误或无法完成请求
+<ul>
+<li><code>400 Bad Request</code> 由于客户端请求有语法错误，不能被服务器所理解。</li>
+<li><code>401 Unauthorized</code> 请求未经授权。这个状态代码必须和WWW-Authenticate报头域一起使用</li>
+<li><code>403 Forbidden</code> 服务器收到请求，但是拒绝提供服务。服务器通常会在响应正文中给出不提供服务的原因</li>
+<li><code>404 Not Found</code> 请求的资源不存在，例如，输入了错误的URL</li>
+</ul>
+</li>
+<li><code>5**</code>	服务器错误，服务器在处理请求的过程中发生了错误
+<ul>
+<li><code>500 Internal Server Error</code> 服务器发生不可预期的错误，导致无法完成客户端的请求。</li>
+<li><code>503 Service Unavailable</code> 服务器当前不能够处理客户端的请求，在一段时间之后，服务器可能会恢复正常。</li>
+</ul>
+</li>
+</ul>
+<h2 id="http-request的几种类型">Http request的几种类型。</h2>
+<ul>
+<li><code>GET</code>	请求指定的页面信息，并返回实体主体。</li>
+<li><code>POST</code>	向指定资源提交数据进行处理请求（例如提交表单或者上传文件）。数据被包含在请求体中。POST请求可能会导致新的资源的建立和/或已有资源的修改。</li>
+<li><code>PUT</code>	从客户端向服务器传送的数据取代指定的文档的内容。</li>
+<li><code>DELETE</code>	请求服务器删除指定的页面。</li>
+</ul>
+<blockquote>
+<p>GET可提交的数据量受到URL长度的限制，HTTP协议规范没有对URL长度进行限制。这个限制是特定的浏览器及服务器对它的限制</p>
+</blockquote>
+<blockquote>
+<p>理论上讲，POST是没有大小限制的，HTTP协议规范也没有进行大小限制，出于安全考虑，服务器软件在实现时会做一定限制</p>
+</blockquote>
+<h2 id="条件-get">条件 GET</h2>
+<p>HTTP条件GET 是 <code>HTTP</code> 协议为了减少不必要的带宽浪费，提出的一种方案。实际上就是利用<code>If-Modified-Since</code>做浏览器缓存。</p>
+<h2 id="持久连接">持久连接</h2>
+<p>我们知道 HTTP 协议采用<code>请求-应答</code>模式，当使用普通模式，即非 Keep-Alive 模式时，每个请求/应答客户和服务器都要新建一个连接，完成之后立即断开连接（HTTP协议为无连接的协议）；当使用 <code>Keep-Alive 模式</code>（又称持久连接、连接重用）时，<code>Keep-Alive</code> 功能使客户端到服务器端的连接持续有效，当出现对服务器的后继请求时，<code>Keep-Alive</code> 功能避免了建立或者重新建立连接。</p>
+<p>在 HTTP 1.0 中, 没有官方的 <code>keep alive</code> 的操作。通常是在现有协议上添加一个指数。如果浏览器支持 keep-alive，它会在请求的包头中添加：</p>
+<pre><code>Connection: Keep-Alive
+</code></pre><p>然后当服务器收到请求，作出回应的时候，它也添加一个头在响应中：</p>
+<pre><code>Connection: Keep-Alive
+</code></pre><p>这样做，连接就不会中断（超过 Keep-Alive 规定的时间&ndash;服务器设置，意外断电等情况除外），而是保持连接。当客户端发送另一个请求时，它会使用同一个连接。这一直继续到客户端或服务器端认为会话已经结束，其中一方中断连接。</p>
+<p>在 HTTP 1.1 版本中，默认情况下所有连接都被保持，如果加入 &ldquo;Connection: close&rdquo; 才关闭。</p>
+<blockquote>
+<p>HTTP Keep-Alive 简单说就是保持当前的TCP连接，避免了重新建立连接。</p>
+</blockquote>
+<blockquote>
+<p><strong>HTTP 长连接不可能一直保持，例如 Keep-Alive: timeout=5, max=100，表示这个TCP通道可以保持5秒，max=100，表示这个长连接最多接收100次请求就断开</strong>。</p>
+</blockquote>
+<blockquote>
+<p>HTTP是一个无状态协议，这意味着每个请求都是独立的，Keep-Alive没能改变这个结果。另外，<strong>Keep-Alive也不能保证客户端和服务器之间的连接一定是活跃的</strong>，在HTTP1.1版本中也如此。唯一能保证的就是当连接被关闭时你能得到一个通知，所以不应该让程序依赖于Keep-Alive的保持连接特性，否则会有意想不到的后果。</p>
+</blockquote>
+<blockquote>
+<p>使用长连接之后，客户端、服务端怎么知道本次传输结束呢？两部分：1. 判断传输数据是否达到了Content-Length 指示的大小；2. 动态生成的文件没有 Content-Length ，它是分块传输（chunked），这时候就要根据 chunked 编码来判断，chunked 编码的数据在最后有一个空 chunked 块，表明本次传输数据结束。</p>
+</blockquote>
+<h2 id="跨站攻击">跨站攻击</h2>
+<p>CSRF（Cross-site request forgery，跨站请求伪造）伪造请求，冒充用户在站内的正常操作，比如爬虫。</p>
+<h3 id="防范的方法">防范的方法</h3>
+<ul>
+<li>关键操作只接受POST请求</li>
+<li>验证码</li>
+<li>检测 Referer</li>
+<li>Token
+<ul>
+<li>Token 要足够随机——只有这样才算不可预测</li>
+<li>Token 是一次性的，即每次请求成功后要更新Token——这样可以增加攻击难度，增加预测难度</li>
+<li>Token 要注意保密性——敏感操作使用 post，防止 Token 出现在 URL 中</li>
+</ul>
+</li>
+</ul>
+<h2 id="断点续传">断点续传</h2>
+<p>要实现断点续传的功能，通常都需要客户端记录下当前的下载进度，并在需要续传的时候通知服务端本次需要下载的内容片段。</p>
+<p>HTTP1.1协议中定义了断点续传相关的HTTP头 <code>Range</code> 和 <code>Content-Range</code> 字段，一个最简单的断点续传实现大概如下：</p>
+<ol>
+<li>客户端下载一个1024K的文件，已经下载了其中512K</li>
+<li>网络中断，客户端请求续传，因此需要在HTTP头中申明本次需要续传的片段：<code>Range:bytes=512000-</code>，这个头通知服务端从文件的512K位置开始传输文件。</li>
+<li>服务端收到断点续传请求，从文件的512K位置开始传输，并且在HTTP头中增加：<code>Content-Range:bytes 512000-/1024000</code>，并且此时服务端返回的HTTP状态码应该是<code>206</code>，而不是200。</li>
+</ol>
+<p>但是在实际场景中，会出现一种情况，即在终端发起续传请求时，URL对应的文件内容在服务端已经发生变化，此时续传的数据肯定是错误的。如何解决这个问题了？显然此时我们需要有一个标识文件唯一性的方法。在RFC2616中也有相应的定义，比如 <strong>实现Last-Modified来标识文件的最后修改时间，这样即可判断出续传文件时是否已经发生过改动</strong>。同时RFC2616中还定义有一个ETag的头，可以使用ETag头来放置文件的唯一标识，比如文件的MD5值。</p>
+<p>客户端在发起续传请求时应该在HTTP头中申明<code>If-Match</code> 或者 <code>If-Modified-Since</code> 字段，帮助服务端判别文件变化。</p>
+<h2 id="一次http请求">一次HTTP请求</h2>
+<ol>
+<li>域名解析
+1. 浏览器缓存
+2. 系统缓存
+3. hosts
+4. ISP DNS 缓存
+5. DNS 服务器搜索</li>
+<li>浏览器发送 HTTP 请求到目标服务器</li>
+<li>服务器永久重定向</li>
+<li>浏览器跟踪重定向地址</li>
+<li>服务器“处理”请求</li>
+<li>服务器发回一个HTML响应</li>
+<li>浏览器开始显示HTML</li>
+<li>浏览器请求获取嵌入在 HTML 中的对象（图片&amp;脚本等）</li>
+<li>浏览器发送异步（AJAX）请求</li>
+</ol>
+</article>
+ 
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/basic/net/http/index.md" target="_blank" rel="noopener">
+      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
+      
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#http的报文结构">Http的报文结构</a>
+      <ul>
+        <li><a href="#http-请求报文头部">HTTP 请求报文头部</a></li>
+        <li><a href="#http-响应头">HTTP 响应头</a></li>
+      </ul>
+    </li>
+    <li><a href="#http的状态码含义">Http的状态码含义。</a></li>
+    <li><a href="#http-request的几种类型">Http request的几种类型。</a></li>
+    <li><a href="#条件-get">条件 GET</a></li>
+    <li><a href="#持久连接">持久连接</a></li>
+    <li><a href="#跨站攻击">跨站攻击</a>
+      <ul>
+        <li><a href="#防范的方法">防范的方法</a></li>
+      </ul>
+    </li>
+    <li><a href="#断点续传">断点续传</a></li>
+    <li><a href="#一次http请求">一次HTTP请求</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

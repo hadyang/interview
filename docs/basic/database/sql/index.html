@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SQL"><meta property="og:title" content="SQL" />
+<meta property="og:description" content="SQL语句 CRUD CREATE TABLE CREATE TABLE `user` ( `id` INT AUTO_INCREMENT, `name` VARCHAR (20), PRIMARY KEY (`id`) );  VARCHAR记得指定长度。
+ UPDATE UPDATE 表名称 SET 列名称 = 新值 WHERE 列名称 = 某值 INSERT INSERT INTO 表名称 VALUES (值1, 值2,....) INSERT INTO table_name (列1, 列2,...) VALUES (值1, 值2,....) DELETE DELETE FROM 表名称 WHERE 列名称 = 值 修改表结构 ALTER TABLE table_name add column_name datatype ALTER TABLE table_name drop COLUMN column_name ALTER TABLE table_name modify COLUMN column_name datatype MySQL SQL 查询语句执行顺序  (7) - SELECT (8) - DISTINCT &lt;select_list&gt; (1) - FROM &lt;left_table&gt; (3) - &lt;join_type&gt; JOIN &lt;right_table&gt; (2) - ON &lt;join_condition&gt; (4) - WHERE &lt;where_condition&gt; (5) - GROUP BY &lt;group_by_list&gt; (6) - HAVING &lt;having_condition&gt; (9) - ORDER BY &lt;order_by_condition&gt; (10 - LIMIT &lt;limit_number&gt;  关于 SQL 语句的执行顺序，有三个值得我们注意的地方：" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/database/sql/" />
+<meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
+<meta property="article:modified_time" content="2019-08-21T11:00:41+08:00" />
+<title>SQL | Interview</title>
+<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/interview/book.min.b7fe34b8a4c4da05b2690b4aacfa71ddce0668cc6da3abb67dd3946844125444.css" integrity="sha256-t/40uKTE2gWyaQtKrPpx3c4GaMxto6u2fdOUaEQSVEQ=">
+
+
+<script defer src="/interview/en.search.min.4daab1eda22baec10d130347f095a8463b951038b7e98060a59bcdc484ada980.js" integrity="sha256-Taqx7aIrrsENEwNH8JWoRjuVEDi36YBgpZvNxIStqYA="></script>
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/interview"><span>Interview</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+  <ul>
+<li><a href="/interview/docs/basic/">计算机基础</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/">算法</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
+<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
+<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
+<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
+<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
+<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
+<li><a href="/interview/docs/basic/algo/sort/">排序算法</a></li>
+<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/os/">操作系统</a>
+<ul>
+<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
+<li><a href="/interview/docs/basic/os/concurrency/">并发</a></li>
+<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
+<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
+<li><a href="/interview/docs/basic/os/linux/">Linux系统</a></li>
+<li><a href="/interview/docs/basic/os/interrupt/">中断</a></li>
+<li><a href="/interview/docs/basic/os/device/">设备管理</a></li>
+<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
+<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/net/">计算机网络</a>
+<ul>
+<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
+<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
+<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
+<li><a href="/interview/docs/basic/net/http/">HTTP</a></li>
+<li><a href="/interview/docs/basic/net/https/">HTTPS</a></li>
+<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/">数据库</a>
+<ul>
+<li><a href="/interview/docs/basic/database/transaction/">事务</a></li>
+<li><a href="/interview/docs/basic/database/index/">索引</a></li>
+<li><a href="/interview/docs/basic/database/sql/"class=active>SQL</a></li>
+<li><a href="/interview/docs/basic/database/join/">连接</a></li>
+<li><a href="/interview/docs/basic/database/mysql/">MySQL</a></li>
+<li><a href="/interview/docs/basic/database/concurrent/">并发控制</a></li>
+<li><a href="/interview/docs/basic/database/innodb/">Innodb</a></li>
+<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/">Java</a>
+<ul>
+<li><a href="/interview/docs/java/oop/">OOP</a></li>
+<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
+<li><a href="/interview/docs/java/operator/">运算符</a></li>
+<li><a href="/interview/docs/java/exception/">异常</a></li>
+<li><a href="/interview/docs/java/generics/">泛型</a></li>
+<li><a href="/interview/docs/java/object/">Object</a></li>
+<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
+<li><a href="/interview/docs/java/proxy/">代理</a></li>
+<li><a href="/interview/docs/java/annotation/">注解</a></li>
+<li><a href="/interview/docs/java/questions/">面试题</a></li>
+<li><a href="/interview/docs/java/nio/">NIO</a></li>
+<li><a href="/interview/docs/java/">集合</a>
+<ul>
+<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
+<li><a href="/interview/docs/java/collection/Concurrenthashmap/">Concurrenthashmap</a></li>
+<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/concurrent/">并发</a>
+<ul>
+<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
+<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
+<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
+<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
+<li><a href="/interview/docs/java/concurrent/AQS/">AQS</a></li>
+<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
+<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
+<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<ul>
+<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
+<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/gc/">GC</a>
+<ul>
+<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
+<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/">框架</a>
+<ul>
+<li><a href="/interview/docs/fromwork/netty/">Netty</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
+<ul>
+<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/spring/">Spring</a>
+<ul>
+<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
+<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
+<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/">系统架构</a>
+<ul>
+<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
+<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
+<ul>
+<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/design/">系统设计</a>
+<ul>
+<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/distributed/">分布式</a>
+<ul>
+<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
+<li><a href="/interview/docs/architecture/distributed/session/">分布式Session</a></li>
+<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
+<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
+<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
+<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
+<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
+<li><a href="/interview/docs/architecture/distributed/kafka/">Kafka</a></li>
+<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
+<li><a href="/interview/docs/architecture/distributed/dubbo/">Dubbo</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
+<ul>
+<li><a href="/interview/docs/architecture/bigdata/algo/">基础算法</a></li>
+<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/offer/">剑指offer</a>
+<ul>
+<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
+<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
+<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
+<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
+<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
+<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
+<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
+<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
+<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
+<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
+<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
+<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
+<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
+<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
+<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
+<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
+<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
+<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
+<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
+<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
+<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
+<li><a href="/interview/docs/offer/VerifySquenceOfBST/">二叉搜索树的后序遍历序列</a></li>
+<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
+<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
+<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
+<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
+<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
+<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
+<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
+<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
+<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
+<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
+<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
+<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
+<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
+<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
+<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
+<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
+<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
+<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
+<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
+<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
+<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
+<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
+<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
+<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
+<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
+<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
+<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
+<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
+<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
+<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
+<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
+<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
+<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
+<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
+<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
+<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
+<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
+<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
+<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
+<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
+<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
+<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
+<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
+<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
+<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/leetcode/">LeetCode</a>
+<ul>
+<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
+<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
+<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
+<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
+<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
+<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
+<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
+<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
+<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
+<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
+<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
+<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
+<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
+<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
+<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
+<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
+<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
+<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
+<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
+<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
+<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
+<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
+<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
+<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
+<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
+<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
+<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
+<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
+<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
+<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
+<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
+<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+<script>
+(function() {
+  var menu = document.querySelector("aside.book-menu nav");
+  addEventListener("beforeunload", function(event) {
+    localStorage.setItem("menu.scrollTop", menu.scrollTop);
+  });
+  menu.scrollTop = localStorage.getItem("menu.scrollTop");
+})();
+</script>
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>SQL</strong>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#crud">CRUD</a>
+      <ul>
+        <li><a href="#create-table">CREATE TABLE</a></li>
+        <li><a href="#update">UPDATE</a></li>
+        <li><a href="#insert">INSERT</a></li>
+        <li><a href="#delete">DELETE</a></li>
+      </ul>
+    </li>
+    <li><a href="#修改表结构">修改表结构</a></li>
+    <li><a href="#mysql-sql-查询语句执行顺序">MySQL SQL 查询语句执行顺序</a></li>
+    <li><a href="#子查询">子查询</a></li>
+    <li><a href="#权限分配">权限分配</a></li>
+    <li><a href="#模糊查询">模糊查询</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+<article class="markdown"><h1 id="sql语句">SQL语句</h1>
+<h2 id="crud">CRUD</h2>
+<h3 id="create-table">CREATE TABLE</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#f92672">`</span><span style="color:#66d9ef">user</span><span style="color:#f92672">`</span> (
+  <span style="color:#f92672">`</span>id<span style="color:#f92672">`</span> INT AUTO_INCREMENT,
+  <span style="color:#f92672">`</span>name<span style="color:#f92672">`</span> VARCHAR (<span style="color:#ae81ff">20</span>),
+  <span style="color:#66d9ef">PRIMARY</span> <span style="color:#66d9ef">KEY</span> (<span style="color:#f92672">`</span>id<span style="color:#f92672">`</span>)
+);
+</code></pre></div><blockquote>
+<p>VARCHAR记得指定长度。</p>
+</blockquote>
+<h3 id="update">UPDATE</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">UPDATE</span> <span style="color:#960050;background-color:#1e0010">表</span><span style="color:#960050;background-color:#1e0010">名</span><span style="color:#960050;background-color:#1e0010">称</span> <span style="color:#66d9ef">SET</span> <span style="color:#960050;background-color:#1e0010">列</span><span style="color:#960050;background-color:#1e0010">名</span><span style="color:#960050;background-color:#1e0010">称</span> <span style="color:#f92672">=</span> <span style="color:#960050;background-color:#1e0010">新</span><span style="color:#960050;background-color:#1e0010">值</span> <span style="color:#66d9ef">WHERE</span> <span style="color:#960050;background-color:#1e0010">列</span><span style="color:#960050;background-color:#1e0010">名</span><span style="color:#960050;background-color:#1e0010">称</span> <span style="color:#f92672">=</span> <span style="color:#960050;background-color:#1e0010">某</span><span style="color:#960050;background-color:#1e0010">值</span>
+</code></pre></div><h3 id="insert">INSERT</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> <span style="color:#960050;background-color:#1e0010">表</span><span style="color:#960050;background-color:#1e0010">名</span><span style="color:#960050;background-color:#1e0010">称</span> <span style="color:#66d9ef">VALUES</span> (<span style="color:#960050;background-color:#1e0010">值</span><span style="color:#ae81ff">1</span>, <span style="color:#960050;background-color:#1e0010">值</span><span style="color:#ae81ff">2</span>,....)
+
+<span style="color:#66d9ef">INSERT</span> <span style="color:#66d9ef">INTO</span> <span style="color:#66d9ef">table_name</span> (<span style="color:#960050;background-color:#1e0010">列</span><span style="color:#ae81ff">1</span>, <span style="color:#960050;background-color:#1e0010">列</span><span style="color:#ae81ff">2</span>,...) <span style="color:#66d9ef">VALUES</span> (<span style="color:#960050;background-color:#1e0010">值</span><span style="color:#ae81ff">1</span>, <span style="color:#960050;background-color:#1e0010">值</span><span style="color:#ae81ff">2</span>,....)
+</code></pre></div><h3 id="delete">DELETE</h3>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">DELETE</span> <span style="color:#66d9ef">FROM</span> <span style="color:#960050;background-color:#1e0010">表</span><span style="color:#960050;background-color:#1e0010">名</span><span style="color:#960050;background-color:#1e0010">称</span> <span style="color:#66d9ef">WHERE</span> <span style="color:#960050;background-color:#1e0010">列</span><span style="color:#960050;background-color:#1e0010">名</span><span style="color:#960050;background-color:#1e0010">称</span> <span style="color:#f92672">=</span> <span style="color:#960050;background-color:#1e0010">值</span>
+</code></pre></div><h2 id="修改表结构">修改表结构</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">ALTER</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#66d9ef">table_name</span> <span style="color:#66d9ef">add</span> <span style="color:#66d9ef">column_name</span> datatype
+
+<span style="color:#66d9ef">ALTER</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#66d9ef">table_name</span> <span style="color:#66d9ef">drop</span> <span style="color:#66d9ef">COLUMN</span> <span style="color:#66d9ef">column_name</span>
+
+<span style="color:#66d9ef">ALTER</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#66d9ef">table_name</span> <span style="color:#66d9ef">modify</span> <span style="color:#66d9ef">COLUMN</span> <span style="color:#66d9ef">column_name</span> datatype
+</code></pre></div><h2 id="mysql-sql-查询语句执行顺序">MySQL SQL 查询语句执行顺序</h2>
+<ol>
+<li>(7) - SELECT</li>
+<li>(8) - DISTINCT &lt;select_list&gt;</li>
+<li>(1) - FROM &lt;left_table&gt;</li>
+<li>(3) - &lt;join_type&gt; JOIN &lt;right_table&gt;</li>
+<li>(2) - ON &lt;join_condition&gt;</li>
+<li>(4) - WHERE &lt;where_condition&gt;</li>
+<li>(5) - GROUP BY &lt;group_by_list&gt;</li>
+<li>(6) - HAVING &lt;having_condition&gt;</li>
+<li>(9) - ORDER BY &lt;order_by_condition&gt;</li>
+<li>(10 - LIMIT &lt;limit_number&gt;</li>
+</ol>
+<p>关于 SQL 语句的执行顺序，有三个值得我们注意的地方：</p>
+<ul>
+<li><strong>FROM 才是 SQL 语句执行的第一步，并非 SELECT</strong>。 数据库在执行 SQL 语句的第一步是将数据从硬盘加载到数据缓冲区中，以便对这些数据进行操作。</li>
+<li><strong>SELECT 是在大部分语句执行了之后才执行的，严格的说是在 FROM 和 GROUP BY 之后执行的</strong>。理解这一点是非常重要的，这就是你不能在 WHERE 中使用在 SELECT 中设定别名的字段作为判断条件的原因。</li>
+<li><strong>无论在语法上还是在执行顺序上， UNION 总是排在在 ORDER BY 之前</strong>。很多人认为每个 UNION 段都能使用 ORDER BY 排序，但是根据 SQL 语言标准和各个数据库 SQL 的执行差异来看，这并不是真的。尽管某些数据库允许 SQL 语句对子查询（subqueries）或者派生表（derived tables）进行排序，但是这并不说明这个排序在 UNION 操作过后仍保持排序后的顺序。</li>
+</ul>
+<p>虽然SQL的逻辑查询是根据上述进行查询，但是数据库也许并不会完全按照逻辑查询处理的方式来进行查询。MYSQL数据库有两个组件 <code>Parser</code>（分析SQL语句）和 <code>Optimizer</code>（优化）。</p>
+<p>从官方手册上看，可以理解为， <code>MySQL</code> 采用了基于开销的优化器，以确定处理查询的最解方式，也就是说执行查询之前，都会先选择一条自以为最优的方案，然后执行这个方案来获取结果。在很多情况下， <code>MySQL</code> 能够计算最佳的可能查询计划，但在某些情况下， <code>MySQL</code> 没有关于数据的足够信息，或者是提供太多的相关数据信息，估测就不那么友好了。</p>
+<p>存在索引的情况下，优化器优先使用条件用到索引且最优的方案。<strong>当 sql 条件有多个索引可以选择，mysql 优化器将直接使用效率最高的索引执行</strong>。</p>
+<h2 id="子查询">子查询</h2>
+<p>子查询按使用场合分：</p>
+<ul>
+<li><strong>作为主查询的结果数据</strong>：<code>select c1,(select f1 from tab2) as f11 from tab1</code>; #这里子查询应该只有一个数据（一行一列，标量子查询）</li>
+<li><strong>作为主查询的条件数据</strong>：<code>select c1 from tab1 where c1 in (select f1 from tab2)</code>; #这里子查询可以是多个数据（多行一列，列子查询，以及标量子查询，实际上行子查询也可能，但极少）</li>
+<li><strong>作为主查询的来源数据</strong>：<code>select c1 from (select f1 as c1, f2 from tab2) as t2</code>; #这里子查询可以是任意查询结果（表子查询）。</li>
+</ul>
+<h2 id="权限分配">权限分配</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">grant</span> <span style="color:#66d9ef">select</span>,<span style="color:#66d9ef">insert</span> <span style="color:#66d9ef">on</span> userdb.userinfo <span style="color:#66d9ef">to</span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">zhangsan</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">@</span><span style="color:#e6db74">&#39;</span><span style="color:#e6db74">localhost</span><span style="color:#e6db74">&#39;</span>
+</code></pre></div><h2 id="模糊查询">模糊查询</h2>
+<p><strong>%</strong>：表示任意0个或多个字符。可匹配任意类型和长度的字符，有些情况下若是中文，请使用两个百分号（%%）表示。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> test <span style="color:#66d9ef">where</span> text <span style="color:#66d9ef">like</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">%1%</span><span style="color:#e6db74">&#39;</span>;
+</code></pre></div><p><strong>_</strong> ： 表示任意单个字符。匹配单个任意字符，它常用来限制表达式的字符长度语句。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#75715e">--倒数第三个字符为 1 ，且最小长度为 5
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">select</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">from</span> test <span style="color:#66d9ef">where</span> text <span style="color:#66d9ef">like</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">__%1__</span><span style="color:#e6db74">&#39;</span>;
+</code></pre></div></article>
+ 
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/basic/database/sql/index.md" target="_blank" rel="noopener">
+      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
+      
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#crud">CRUD</a>
+      <ul>
+        <li><a href="#create-table">CREATE TABLE</a></li>
+        <li><a href="#update">UPDATE</a></li>
+        <li><a href="#insert">INSERT</a></li>
+        <li><a href="#delete">DELETE</a></li>
+      </ul>
+    </li>
+    <li><a href="#修改表结构">修改表结构</a></li>
+    <li><a href="#mysql-sql-查询语句执行顺序">MySQL SQL 查询语句执行顺序</a></li>
+    <li><a href="#子查询">子查询</a></li>
+    <li><a href="#权限分配">权限分配</a></li>
+    <li><a href="#模糊查询">模糊查询</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="String 常量池"><meta property="og:title" content="String 常量池" />
+<meta property="og:description" content="String 常量池 在 JAVA 语言中有 8 中基本类型和一种比较特殊的类型 String 。这些类型为了使他们在运行过程中速度更快，更节省内存，都提供了一种常量池的概念。常量池就类似一个 JAVA 系统级别提供的缓存。
+String 类型的常量池比较特殊。它的主要使用方法有两种：
+ 直接使用双引号声明出来的 String 对象会直接存储在常量池中 如果不是用双引号声明的 String 对象，可以使用 String 提供的 intern 方法。 intern 方法会从字符串常量池中查询当前字符串是否存在，若不存在就会将当前字符串放入常量池中  intern  /** * Returns a canonical representation for the string object. * &lt;p&gt; * A pool of strings, initially empty, is maintained privately by the * class {@code String}. * &lt;p&gt; * When the intern method is invoked, if the pool already contains a * string equal to this {@code String} object as determined by * the {@link #equals(Object)} method, then the string from the pool is * returned." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hadyang.github.io/interview/docs/java/jvm/string-constant-pool/" />
+<meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
+<meta property="article:modified_time" content="2019-08-21T11:00:41+08:00" />
+<title>String 常量池 | Interview</title>
+<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/interview/book.min.b7fe34b8a4c4da05b2690b4aacfa71ddce0668cc6da3abb67dd3946844125444.css" integrity="sha256-t/40uKTE2gWyaQtKrPpx3c4GaMxto6u2fdOUaEQSVEQ=">
+
+
+<script defer src="/interview/en.search.min.4daab1eda22baec10d130347f095a8463b951038b7e98060a59bcdc484ada980.js" integrity="sha256-Taqx7aIrrsENEwNH8JWoRjuVEDi36YBgpZvNxIStqYA="></script>
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/interview"><span>Interview</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+  <ul>
+<li><a href="/interview/docs/basic/">计算机基础</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/">算法</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
+<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
+<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
+<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
+<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
+<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
+<li><a href="/interview/docs/basic/algo/sort/">排序算法</a></li>
+<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/os/">操作系统</a>
+<ul>
+<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
+<li><a href="/interview/docs/basic/os/concurrency/">并发</a></li>
+<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
+<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
+<li><a href="/interview/docs/basic/os/linux/">Linux系统</a></li>
+<li><a href="/interview/docs/basic/os/interrupt/">中断</a></li>
+<li><a href="/interview/docs/basic/os/device/">设备管理</a></li>
+<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
+<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/net/">计算机网络</a>
+<ul>
+<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
+<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
+<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
+<li><a href="/interview/docs/basic/net/http/">HTTP</a></li>
+<li><a href="/interview/docs/basic/net/https/">HTTPS</a></li>
+<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/">数据库</a>
+<ul>
+<li><a href="/interview/docs/basic/database/transaction/">事务</a></li>
+<li><a href="/interview/docs/basic/database/index/">索引</a></li>
+<li><a href="/interview/docs/basic/database/sql/">SQL</a></li>
+<li><a href="/interview/docs/basic/database/join/">连接</a></li>
+<li><a href="/interview/docs/basic/database/mysql/">MySQL</a></li>
+<li><a href="/interview/docs/basic/database/concurrent/">并发控制</a></li>
+<li><a href="/interview/docs/basic/database/innodb/">Innodb</a></li>
+<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/">Java</a>
+<ul>
+<li><a href="/interview/docs/java/oop/">OOP</a></li>
+<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
+<li><a href="/interview/docs/java/operator/">运算符</a></li>
+<li><a href="/interview/docs/java/exception/">异常</a></li>
+<li><a href="/interview/docs/java/generics/">泛型</a></li>
+<li><a href="/interview/docs/java/object/">Object</a></li>
+<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
+<li><a href="/interview/docs/java/proxy/">代理</a></li>
+<li><a href="/interview/docs/java/annotation/">注解</a></li>
+<li><a href="/interview/docs/java/questions/">面试题</a></li>
+<li><a href="/interview/docs/java/nio/">NIO</a></li>
+<li><a href="/interview/docs/java/">集合</a>
+<ul>
+<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
+<li><a href="/interview/docs/java/collection/Concurrenthashmap/">Concurrenthashmap</a></li>
+<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/concurrent/">并发</a>
+<ul>
+<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
+<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
+<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
+<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
+<li><a href="/interview/docs/java/concurrent/AQS/">AQS</a></li>
+<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
+<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
+<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<ul>
+<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
+<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/"class=active>String 常量池</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/gc/">GC</a>
+<ul>
+<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
+<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/">框架</a>
+<ul>
+<li><a href="/interview/docs/fromwork/netty/">Netty</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
+<ul>
+<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/spring/">Spring</a>
+<ul>
+<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
+<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
+<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/">系统架构</a>
+<ul>
+<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
+<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
+<ul>
+<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/design/">系统设计</a>
+<ul>
+<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/distributed/">分布式</a>
+<ul>
+<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
+<li><a href="/interview/docs/architecture/distributed/session/">分布式Session</a></li>
+<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
+<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
+<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
+<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
+<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
+<li><a href="/interview/docs/architecture/distributed/kafka/">Kafka</a></li>
+<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
+<li><a href="/interview/docs/architecture/distributed/dubbo/">Dubbo</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
+<ul>
+<li><a href="/interview/docs/architecture/bigdata/algo/">基础算法</a></li>
+<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/offer/">剑指offer</a>
+<ul>
+<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
+<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
+<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
+<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
+<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
+<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
+<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
+<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
+<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
+<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
+<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
+<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
+<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
+<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
+<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
+<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
+<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
+<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
+<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
+<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
+<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
+<li><a href="/interview/docs/offer/VerifySquenceOfBST/">二叉搜索树的后序遍历序列</a></li>
+<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
+<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
+<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
+<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
+<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
+<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
+<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
+<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
+<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
+<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
+<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
+<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
+<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
+<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
+<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
+<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
+<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
+<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
+<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
+<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
+<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
+<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
+<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
+<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
+<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
+<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
+<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
+<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
+<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
+<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
+<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
+<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
+<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
+<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
+<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
+<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
+<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
+<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
+<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
+<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
+<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
+<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
+<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
+<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
+<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/leetcode/">LeetCode</a>
+<ul>
+<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
+<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
+<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
+<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
+<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
+<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
+<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
+<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
+<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
+<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
+<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
+<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
+<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
+<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
+<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
+<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
+<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
+<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
+<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
+<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
+<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
+<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
+<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
+<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
+<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
+<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
+<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
+<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
+<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
+<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
+<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
+<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+<script>
+(function() {
+  var menu = document.querySelector("aside.book-menu nav");
+  addEventListener("beforeunload", function(event) {
+    localStorage.setItem("menu.scrollTop", menu.scrollTop);
+  });
+  menu.scrollTop = localStorage.getItem("menu.scrollTop");
+})();
+</script>
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>String 常量池</strong>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#intern">intern</a>
+      <ul>
+        <li><a href="#jdk6">JDK6</a></li>
+        <li><a href="#jdk7">JDK7</a></li>
+        <li><a href="#小结">小结</a></li>
+        <li><a href="#使用范例">使用范例</a></li>
+        <li><a href="#不当使用">不当使用</a></li>
+      </ul>
+    </li>
+    <li><a href="#参考文档">参考文档</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+<article class="markdown"><h1 id="string-常量池">String 常量池</h1>
+<p>在 <code>JAVA</code> 语言中有 8 中基本类型和一种比较特殊的类型 <code>String</code> 。这些类型为了使他们在运行过程中速度更快，更节省内存，都提供了一种常量池的概念。常量池就类似一个 JAVA 系统级别提供的缓存。</p>
+<p><code>String</code> 类型的常量池比较特殊。它的主要使用方法有两种：</p>
+<ul>
+<li>直接使用双引号声明出来的 <code>String</code> 对象会直接存储在常量池中</li>
+<li>如果不是用双引号声明的 <code>String</code> 对象，可以使用 <code>String</code> 提供的 <code>intern</code> 方法。 <code>intern</code> 方法会从字符串常量池中查询当前字符串是否存在，若不存在就会将当前字符串放入常量池中</li>
+</ul>
+<h2 id="intern">intern</h2>
+<pre><code>    /**
+     * Returns a canonical representation for the string object.
+     * &lt;p&gt;
+     * A pool of strings, initially empty, is maintained privately by the
+     * class {@code String}.
+     * &lt;p&gt;
+     * When the intern method is invoked, if the pool already contains a
+     * string equal to this {@code String} object as determined by
+     * the {@link #equals(Object)} method, then the string from the pool is
+     * returned. Otherwise, this {@code String} object is added to the
+     * pool and a reference to this {@code String} object is returned.
+     * &lt;p&gt;
+     * It follows that for any two strings {@code s} and {@code t},
+     * {@code s.intern() == t.intern()} is {@code true}
+     * if and only if {@code s.equals(t)} is {@code true}.
+     * &lt;p&gt;
+     * All literal strings and string-valued constant expressions are
+     * interned. String literals are defined in section 3.10.5 of the
+     * &lt;cite&gt;The Java&amp;trade; Language Specification&lt;/cite&gt;.
+     *
+     * @return  a string that has the same contents as this string, but is
+     *          guaranteed to be from a pool of unique strings.
+     */
+    public native String intern();
+</code></pre><p>JAVA 使用 <code>jni</code> 调用 <code>c++</code> 实现的 <code>StringTable</code> 的 <code>intern</code> 方法,  <code>StringTable</code> 跟 Java 中的 <code>HashMap</code> 的实现是差不多的, 只是 <strong>不能自动扩容</strong>。默认大小是 <code>1009</code> 。</p>
+<p>要注意的是， <code>String</code> 的 <code>String Pool</code> 是一个固定大小的 <code>Hashtable</code> ，默认值大小长度是 <code>1009</code> ，如果放进 <code>String Pool</code> 的 <code>String</code> 非常多，就会造成 Hash 冲突严重，从而导致链表会很长，而链表长了后直接会造成的影响就是当调用 <code>String.intern</code> 时性能会大幅下降。</p>
+<p>在 JDK6 中 <code>StringTable</code> 是固定的，就是 <code>1009</code> 的长度，所以如果常量池中的字符串过多就会导致效率下降很快。在 <code>jdk7</code> 中， <code>StringTable</code> 的长度可以通过一个参数指定：</p>
+<pre><code>-XX:StringTableSize=99991
+</code></pre><blockquote>
+<p>在 JDK6 以及以前的版本中，字符串的常量池是放在堆的 Perm 区。在 JDK7 的版本中，字符串常量池已经从 Perm 区移到正常的 Java Heap 区域</p>
+</blockquote>
+<pre><code>public static void main(String[] args) {
+    String s = new String(&quot;1&quot;);
+    s.intern();
+    String s2 = &quot;1&quot;;
+    System.out.println(s == s2);
+
+    String s3 = new String(&quot;1&quot;) + new String(&quot;1&quot;);
+    s3.intern();
+    String s4 = &quot;11&quot;;
+    System.out.println(s3 == s4);
+}
+</code></pre><p>上述代码的执行结果：</p>
+<ul>
+<li>JDK6: <code>false false</code></li>
+<li>JDK7: <code>false true</code></li>
+</ul>
+<pre><code>public static void main(String[] args) {
+    String s = new String(&quot;1&quot;);
+    String s2 = &quot;1&quot;;
+    s.intern();
+    System.out.println(s == s2);
+
+    String s3 = new String(&quot;1&quot;) + new String(&quot;1&quot;);
+    String s4 = &quot;11&quot;;
+    s3.intern();
+    System.out.println(s3 == s4);
+}
+</code></pre><p>上述代码的执行结果：</p>
+<ul>
+<li>JDK6: <code>false false</code></li>
+<li>JDK7: <code>false false</code></li>
+</ul>
+<p>由于 JDK7 将字符串常量池移动到 Heap 中，导致上述版本差异，下面具体来分析下。</p>
+<h3 id="jdk6">JDK6</h3>
+<p><img src="./images/2019-04-12-09-49-38.png" alt=""></p>
+<blockquote>
+<p>图中绿色线条代表 string 对象的内容指向，黑色线条代表地址指向</p>
+</blockquote>
+<p>在 <code>jdk6</code> 中上述的所有打印都是 <code>false</code> ，因为 <code>jdk6</code> 中的常量池是放在 <code>Perm</code> 区中的， <code>Perm</code> 区和正常的 <code>JAVA Heap</code> 区域是完全分开的。上面说过如果是使用引号声明的字符串都是会直接在字符串常量池中生成，而 <code>new</code> 出来的 <code>String</code> 对象是放在 <code>JAVA Heap</code> 区域。所以拿一个 <code>JAVA Heap</code> 区域的对象地址和字符串常量池的对象地址进行比较肯定是不相同的，<strong>即使调用 <code>String.intern</code> 方法也是没有任何关系的</strong>。</p>
+<h3 id="jdk7">JDK7</h3>
+<p>因为字符串常量池移动到 JAVA Heap 区域后，再来解释为什么会有上述的打印结果。</p>
+<p><img src="./images/2019-04-12-10-01-01.png" alt=""></p>
+<ul>
+<li>在第一段代码中，先看 <code>s3</code> 和 <code>s4</code> 字符串。<code>String s3 = new String(&quot;1&quot;) + new String(&quot;1&quot;);</code>，这句代码中现在生成了 2个 最终对象，是字符串常量池中的 <code>“1”</code> 和 <code>JAVA Heap</code> 中的 <code>s3</code> 引用指向的对象。中间还有 2个 匿名的 <code>new String(&quot;1&quot;)</code> 我们不去讨论它们。此时 <code>s3</code> 引用对象内容是 <code>”11”</code> ，但此时常量池中是没有 <code>“11”</code> 对象的。</li>
+<li>接下来 <code>s3.intern();</code> 这一句代码，是将 <code>s3</code> 中的 <code>“11”</code> 字符串放入 <code>String</code> 常量池中，因为此时常量池中不存在 <code>“11”</code> 字符串，因此常规做法是跟 <code>jdk6</code> 图中表示的那样，在常量池中生成一个 <code>“11”</code> 的对象，关键点是 <code>jdk7</code> 中常量池不在 <code>Perm</code> 区域了，这块做了调整。<strong>常量池中不需要再存储一份对象，可以直接存储堆中的引用</strong>。这份引用指向 <code>s3</code> 引用的对象。 也就是说引用地址是相同的。</li>
+<li>最后 <code>String s4 = &quot;11&quot;;</code> 这句代码中 <code>”11”</code> 是显示声明的，因此会直接去常量池中创建，创建的时候发现已经有这个对象了，此时也就是指向 <code>s3</code> 引用对象的一个引用。所以 <code>s4</code> 引用就指向和 <code>s3</code> 一样了。因此最后的比较 <code>s3 == s4</code> 是 <code>true</code> 。</li>
+<li>再看 <code>s</code> 和 <code>s2</code> 对象。 <code>String s = new String(&quot;1&quot;);</code> 第一句代码，生成了2个对象。常量池中的 <code>“1”</code> 和 <code>JAVA Heap</code> 中的字符串对象。<code>s.intern();</code> 这一句是 <code>s</code> 对象去常量池中寻找后发现 <code>“1”</code> 已经在常量池里了。</li>
+<li>接下来 <code>String s2 = &quot;1&quot;;</code> 这句代码是生成一个 <code>s2</code> 的引用指向常量池中的 <code>“1”</code> 对象。 结果就是 <code>s</code> 和 <code>s2</code> 的引用地址明显不同。</li>
+</ul>
+<p>接下来是第二段代码：</p>
+<p><img src="./images/2019-04-12-10-06-01.png" alt=""></p>
+<ul>
+<li>第一段代码和第二段代码的改变就是 <code>s3.intern();</code> 的顺序是放在 <code>String s4 = &quot;11&quot;;</code> 后了。这样，首先执行 <code>String s4 = &quot;11&quot;;</code> 声明 <code>s4</code> 的时候常量池中是不存在 <code>“11”</code> 对象的，执行完毕后， <code>“11“</code> 对象是 <code>s4</code> 声明产生的新对象。然后再执行 <code>s3.intern();</code> 时，常量池中 <code>“11”</code> 对象已经存在了，因此 <code>s3</code> 和 <code>s4</code> 的引用是不同的。</li>
+<li>第二段代码中的 <code>s</code> 和 <code>s2</code> 代码中，<code>s.intern();</code>，这一句往后放也不会有什么影响了，因为对象池中在执行第一句代码<code>String s = new String(&quot;1&quot;);</code> 的时候已经生成 <code>“1”</code> 对象了。下边的 <code>s2</code> 声明都是直接从常量池中取地址引用的。 <code>s</code> 和 <code>s2</code> 的引用地址是不会相等的。</li>
+</ul>
+<h3 id="小结">小结</h3>
+<p>从上述的例子代码可以看出 <code>jdk7</code> 版本对 <code>intern</code> 操作和常量池都做了一定的修改。主要包括2点：</p>
+<ul>
+<li>将 <code>String</code> 常量池 从 <code>Perm</code> 区移动到了 <code>Java Heap</code> 区</li>
+<li><code>String#intern</code> 方法时，如果存在堆中的对象，会直接保存对象的引用，而不会重新创建对象。</li>
+</ul>
+<h3 id="使用范例">使用范例</h3>
+<pre><code>static final int MAX = 1000 * 10000;
+static final String[] arr = new String[MAX];
+
+public static void main(String[] args) throws Exception {
+    Integer[] DB_DATA = new Integer[10];
+    Random random = new Random(10 * 10000);
+    for (int i = 0; i &lt; DB_DATA.length; i++) {
+        DB_DATA[i] = random.nextInt();
+    }
+	long t = System.currentTimeMillis();
+    for (int i = 0; i &lt; MAX; i++) {
+        //arr[i] = new String(String.valueOf(DB_DATA[i % DB_DATA.length]));
+         arr[i] = new String(String.valueOf(DB_DATA[i % DB_DATA.length])).intern();
+    }
+
+	System.out.println((System.currentTimeMillis() - t) + &quot;ms&quot;);
+    System.gc();
+}
+</code></pre><p>运行的参数是：<code>-Xmx2g -Xms2g -Xmn1500M</code> 上述代码是一个演示代码，其中有两条语句不一样，一条是使用 intern，一条是未使用 intern。</p>
+<p>通过上述结果，我们发现不使用 <code>intern</code> 的代码生成了 <code>1000w</code> 个字符串，占用了大约 <code>640m</code> 空间。 使用了 <code>intern</code> 的代码生成了 <code>1345</code> 个字符串，占用总空间 <code>133k</code> 左右。其实通过观察程序中只是用到了 <code>10</code> 个字符串，所以准确计算后应该是正好相差 <code>100w</code> 倍。虽然例子有些极端，但确实能准确反应出 intern 使用后产生的巨大空间节省。</p>
+<p>细心的同学会发现使用了 <code>intern</code> 方法后时间上有了一些增长。这是因为程序中每次都是用了 <code>new String</code> 后，然后又进行 <code>intern</code> 操作的耗时时间，这一点如果在内存空间充足的情况下确实是无法避免的，但我们平时使用时，内存空间肯定不是无限大的，不使用 <code>intern</code> 占用空间导致 <code>jvm</code> 垃圾回收的时间是要远远大于这点时间的。 毕竟这里使用了 <code>1000w</code> 次 <code>intern</code> 才多出来1秒钟多的时间。</p>
+<h3 id="不当使用">不当使用</h3>
+<p><code>fastjson</code> 中对所有的 <code>json</code> 的 <code>key</code> 使用了 <code>intern</code> 方法，缓存到了字符串常量池中，这样每次读取的时候就会非常快，大大减少时间和空间。而且 <code>json</code> 的 <code>key</code> 通常都是不变的。这个地方没有考虑到大量的 <code>json key</code> 如果是变化的，那就会给字符串常量池带来很大的负担。</p>
+<p>这个问题 <code>fastjson</code> 在<code>1.1.24</code>版本中已经将这个漏洞修复了。程序加入了一个最大的缓存大小，超过这个大小后就不会再往字符串常量池中放了。</p>
+<h2 id="参考文档">参考文档</h2>
+<p><a href="https://tech.meituan.com/2014/03/06/in-depth-understanding-string-intern.html">深入解析String#intern</a></p>
+</article>
+ 
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/java/jvm/string-constant-pool/index.md" target="_blank" rel="noopener">
+      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
+      
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#intern">intern</a>
+      <ul>
+        <li><a href="#jdk6">JDK6</a></li>
+        <li><a href="#jdk7">JDK7</a></li>
+        <li><a href="#小结">小结</a></li>
+        <li><a href="#使用范例">使用范例</a></li>
+        <li><a href="#不当使用">不当使用</a></li>
+      </ul>
+    </li>
+    <li><a href="#参考文档">参考文档</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

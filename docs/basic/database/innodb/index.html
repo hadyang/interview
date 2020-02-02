@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="InnoDB"><meta property="og:title" content="InnoDB" />
+<meta property="og:description" content="InnoDB 数据存储  MySQL 存储格式可通过 SQL：SHOW TABLE STATUS IN {dbName} 查看
+ 与现有的大多数存储引擎一样，InnoDB 使用页作为磁盘管理的最小单位；数据在 InnoDB 存储引擎中都是按行存储的，每个 16KB 大小的页中可以存放 2-200 行的记录。
+当 InnoDB 存储数据时，它可以使用不同的行格式进行存储；MySQL 5.7 版本支持以下格式的行存储方式：
+ Antelope 是 InnoDB 最开始支持的文件格式，它包含两种行格式 Compact 和 Redundant ，它最开始并没有名字； Antelope 的名字是在新的文件格式 Barracuda 出现后才起的， Barracuda 的出现引入了两种新的行格式 Compressed 和 Dynamic ；InnoDB 对于文件格式都会向前兼容，而官方文档中也对之后会出现的新文件格式预先定义好了名字：Cheetah、Dragon、Elk 等等。
+ 两种行记录格式 Compact 和 Redundant 在磁盘上按照以下方式存储：
+Compact 和 Redundant 格式最大的不同就是记录格式的第一个部分；在 Compact 中，行记录的第一部分倒序存放了一行数据中列的长度（Length），而 Redundant 中存的是每一列的偏移量（Offset），从总体上上看， Compact 行记录格式相比 Redundant 格式能够减少 20% 的存储空间。
+行溢出数据 当 InnoDB 使用 Compact 或者 Redundant 格式存储极长的 VARCHAR 或者 BLOB 这类大对象时，我们并不会直接将所有的内容都存放在数据页节点中，而是将数据中的前 768 个字节存储在数据页中，后面会通过偏移量指向溢出页（off-page），最大768字节的作用是便于创建 前缀索引。溢出页（off-page）不存储在 B&#43;tree 中，使用的是uncompress BLOB page，并且每个字段的溢出都是存储独享。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/database/innodb/" />
+<meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
+<meta property="article:modified_time" content="2019-08-21T11:00:41+08:00" />
+<title>InnoDB | Interview</title>
+<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/interview/book.min.b7fe34b8a4c4da05b2690b4aacfa71ddce0668cc6da3abb67dd3946844125444.css" integrity="sha256-t/40uKTE2gWyaQtKrPpx3c4GaMxto6u2fdOUaEQSVEQ=">
+
+
+<script defer src="/interview/en.search.min.4daab1eda22baec10d130347f095a8463b951038b7e98060a59bcdc484ada980.js" integrity="sha256-Taqx7aIrrsENEwNH8JWoRjuVEDi36YBgpZvNxIStqYA="></script>
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/interview"><span>Interview</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+  <ul>
+<li><a href="/interview/docs/basic/">计算机基础</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/">算法</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
+<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
+<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
+<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
+<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
+<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
+<li><a href="/interview/docs/basic/algo/sort/">排序算法</a></li>
+<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/os/">操作系统</a>
+<ul>
+<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
+<li><a href="/interview/docs/basic/os/concurrency/">并发</a></li>
+<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
+<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
+<li><a href="/interview/docs/basic/os/linux/">Linux系统</a></li>
+<li><a href="/interview/docs/basic/os/interrupt/">中断</a></li>
+<li><a href="/interview/docs/basic/os/device/">设备管理</a></li>
+<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
+<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/net/">计算机网络</a>
+<ul>
+<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
+<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
+<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
+<li><a href="/interview/docs/basic/net/http/">HTTP</a></li>
+<li><a href="/interview/docs/basic/net/https/">HTTPS</a></li>
+<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/">数据库</a>
+<ul>
+<li><a href="/interview/docs/basic/database/transaction/">事务</a></li>
+<li><a href="/interview/docs/basic/database/index/">索引</a></li>
+<li><a href="/interview/docs/basic/database/sql/">SQL</a></li>
+<li><a href="/interview/docs/basic/database/join/">连接</a></li>
+<li><a href="/interview/docs/basic/database/mysql/">MySQL</a></li>
+<li><a href="/interview/docs/basic/database/concurrent/">并发控制</a></li>
+<li><a href="/interview/docs/basic/database/innodb/"class=active>Innodb</a></li>
+<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/">Java</a>
+<ul>
+<li><a href="/interview/docs/java/oop/">OOP</a></li>
+<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
+<li><a href="/interview/docs/java/operator/">运算符</a></li>
+<li><a href="/interview/docs/java/exception/">异常</a></li>
+<li><a href="/interview/docs/java/generics/">泛型</a></li>
+<li><a href="/interview/docs/java/object/">Object</a></li>
+<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
+<li><a href="/interview/docs/java/proxy/">代理</a></li>
+<li><a href="/interview/docs/java/annotation/">注解</a></li>
+<li><a href="/interview/docs/java/questions/">面试题</a></li>
+<li><a href="/interview/docs/java/nio/">NIO</a></li>
+<li><a href="/interview/docs/java/">集合</a>
+<ul>
+<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
+<li><a href="/interview/docs/java/collection/Concurrenthashmap/">Concurrenthashmap</a></li>
+<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/concurrent/">并发</a>
+<ul>
+<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
+<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
+<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
+<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
+<li><a href="/interview/docs/java/concurrent/AQS/">AQS</a></li>
+<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
+<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
+<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<ul>
+<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
+<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/gc/">GC</a>
+<ul>
+<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
+<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/">框架</a>
+<ul>
+<li><a href="/interview/docs/fromwork/netty/">Netty</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
+<ul>
+<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/spring/">Spring</a>
+<ul>
+<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
+<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
+<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/">系统架构</a>
+<ul>
+<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
+<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
+<ul>
+<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/design/">系统设计</a>
+<ul>
+<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/distributed/">分布式</a>
+<ul>
+<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
+<li><a href="/interview/docs/architecture/distributed/session/">分布式Session</a></li>
+<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
+<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
+<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
+<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
+<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
+<li><a href="/interview/docs/architecture/distributed/kafka/">Kafka</a></li>
+<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
+<li><a href="/interview/docs/architecture/distributed/dubbo/">Dubbo</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
+<ul>
+<li><a href="/interview/docs/architecture/bigdata/algo/">基础算法</a></li>
+<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/offer/">剑指offer</a>
+<ul>
+<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
+<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
+<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
+<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
+<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
+<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
+<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
+<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
+<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
+<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
+<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
+<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
+<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
+<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
+<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
+<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
+<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
+<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
+<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
+<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
+<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
+<li><a href="/interview/docs/offer/VerifySquenceOfBST/">二叉搜索树的后序遍历序列</a></li>
+<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
+<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
+<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
+<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
+<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
+<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
+<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
+<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
+<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
+<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
+<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
+<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
+<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
+<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
+<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
+<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
+<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
+<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
+<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
+<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
+<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
+<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
+<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
+<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
+<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
+<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
+<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
+<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
+<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
+<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
+<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
+<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
+<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
+<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
+<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
+<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
+<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
+<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
+<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
+<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
+<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
+<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
+<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
+<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
+<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/leetcode/">LeetCode</a>
+<ul>
+<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
+<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
+<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
+<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
+<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
+<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
+<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
+<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
+<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
+<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
+<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
+<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
+<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
+<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
+<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
+<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
+<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
+<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
+<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
+<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
+<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
+<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
+<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
+<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
+<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
+<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
+<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
+<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
+<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
+<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
+<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
+<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+<script>
+(function() {
+  var menu = document.querySelector("aside.book-menu nav");
+  addEventListener("beforeunload", function(event) {
+    localStorage.setItem("menu.scrollTop", menu.scrollTop);
+  });
+  menu.scrollTop = localStorage.getItem("menu.scrollTop");
+})();
+</script>
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>InnoDB</strong>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#数据存储">数据存储</a>
+      <ul>
+        <li><a href="#行溢出数据">行溢出数据</a></li>
+        <li><a href="#数据页结构">数据页结构</a></li>
+      </ul>
+    </li>
+    <li><a href="#索引">索引</a>
+      <ul>
+        <li><a href="#聚集索引和辅助索引">聚集索引和辅助索引</a></li>
+      </ul>
+    </li>
+    <li><a href="#innodb-锁机制httpssegmentfaultcoma1190000014133576">InnoDB 锁机制</a>
+      <ul>
+        <li><a href="#当前读--快照读">当前读 & 快照读</a></li>
+        <li><a href="#共享锁与独占锁">共享锁与独占锁</a></li>
+        <li><a href="#意向锁">意向锁</a></li>
+        <li><a href="#record-lock">Record Lock</a></li>
+        <li><a href="#gap-lock">Gap Lock</a></li>
+        <li><a href="#插入意向锁">插入意向锁</a></li>
+        <li><a href="#自增锁">自增锁</a></li>
+        <li><a href="#锁选择httphedengchengcomp771_toc374698309">锁选择</a></li>
+      </ul>
+    </li>
+    <li><a href="#innodb-事务隔离">InnoDB 事务隔离</a>
+      <ul>
+        <li><a href="#几种隔离级别">几种隔离级别</a></li>
+        <li><a href="#脏读">脏读</a></li>
+        <li><a href="#不可重复读">不可重复读</a></li>
+        <li><a href="#幻读">幻读</a></li>
+      </ul>
+    </li>
+    <li><a href="#加锁规则">加锁规则</a></li>
+    <li><a href="#参考连接">参考连接</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+<article class="markdown"><h1 id="innodb">InnoDB</h1>
+<h2 id="数据存储">数据存储</h2>
+<blockquote>
+<p>MySQL 存储格式可通过 SQL：<code>SHOW TABLE STATUS IN {dbName}</code> 查看</p>
+</blockquote>
+<p>与现有的大多数存储引擎一样，InnoDB 使用页作为磁盘管理的最小单位；数据在 InnoDB 存储引擎中都是按行存储的，每个 <code>16KB</code> 大小的页中可以存放 <code>2-200</code> 行的记录。</p>
+<p>当 InnoDB 存储数据时，它可以使用不同的行格式进行存储；MySQL 5.7 版本支持以下格式的行存储方式：</p>
+<p><img src="images/81407aa14450d2d6fac1a70961880aac.png" alt=""></p>
+<blockquote>
+<p><code>Antelope</code> 是 InnoDB 最开始支持的文件格式，它包含两种行格式 <code>Compact</code> 和 <code>Redundant</code> ，它最开始并没有名字； <code>Antelope</code> 的名字是在新的文件格式 <code>Barracuda</code> 出现后才起的， <code>Barracuda</code> 的出现引入了两种新的行格式 <code>Compressed</code> 和 <code>Dynamic</code> ；InnoDB 对于文件格式都会向前兼容，而官方文档中也对之后会出现的新文件格式预先定义好了名字：Cheetah、Dragon、Elk 等等。</p>
+</blockquote>
+<p>两种行记录格式 <code>Compact</code> 和 <code>Redundant</code> 在磁盘上按照以下方式存储：</p>
+<p><img src="images/a18d600fb632031a00937b1e667e446e.png" alt=""></p>
+<p><code>Compact</code> 和 <code>Redundant</code> 格式最大的不同就是记录格式的第一个部分；在 <code>Compact</code> 中，行记录的第一部分倒序存放了一行数据中列的长度（Length），而 <code>Redundant</code> 中存的是每一列的偏移量（Offset），从总体上上看， <code>Compact</code> 行记录格式相比 <code>Redundant</code> 格式能够减少 <code>20%</code> 的存储空间。</p>
+<h3 id="行溢出数据">行溢出数据</h3>
+<p>当 InnoDB 使用 <code>Compact</code> 或者 <code>Redundant</code> 格式存储极长的 <code>VARCHAR</code> 或者 <code>BLOB</code> 这类大对象时，我们并不会直接将所有的内容都存放在数据页节点中，而是将数据中的前 <code>768</code> 个字节存储在数据页中，后面会通过偏移量指向溢出页（off-page），最大768字节的作用是便于创建 <strong>前缀索引</strong>。溢出页（off-page）不存储在 B+tree 中，<strong>使用的是uncompress BLOB page，并且每个字段的溢出都是存储独享</strong>。</p>
+<p><img src="images/19af5612d981bf2ae2ea7d5b5b9b26ac.png" alt=""></p>
+<p>但是当我们使用新的行记录格式 <code>Compressed</code> 或者 <code>Dynamic</code> 时都只会在行记录中保存 <code>20</code> 个字节的指针，实际的数据都会存放在溢出页面中。</p>
+<p><img src="images/f7dc83f1b5cfb5f428adc404ce3cfa13.png" alt="image"></p>
+<p>当然在实际存储中，可能会对不同长度的 TEXT 和 BLOB 列进行优化。</p>
+<blockquote>
+<p>想要了解更多与 InnoDB 存储引擎中记录的数据格式的相关信息，可以阅读 <a href="https://dev.mysql.com/doc/internals/en/innodb-record-structure.html">InnoDB Record Structure</a></p>
+</blockquote>
+<h3 id="数据页结构">数据页结构</h3>
+<p>页是 InnoDB 存储引擎管理数据的最小磁盘单位，而 <code>B-Tree</code> 节点就是实际存放表中数据的页面，我们在这里将要介绍页是如何组织和存储记录的；首先，一个 InnoDB 页有以下七个部分：</p>
+<p><img src="images/771f5daaf406ec0990ca339c9a594bec.png" alt="image"></p>
+<p>每一个页中包含了两对 <code>header/trailer</code>：内部的 <code>Page Header/Page Directory</code> 关心的是页的状态信息，而 <code>Fil Header/Fil Trailer</code> 关心的是记录页的头信息。</p>
+<p>在页的头部和尾部之间就是用户记录和空闲空间了，每一个数据页中都包含 <code>Infimum</code> 和 <code>Supremum</code> 这两个虚拟的记录（可以理解为占位符）， <code>Infimum</code> 记录是比该页中任何主键值都要小的值， <code>Supremum</code> 是该页中的最大值：</p>
+<p><img src="images/85f36113b83bba8aa1ceb1d75bc97271.png" alt="image"></p>
+<p><code>User Records</code> 就是整个页面中真正用于存放行记录的部分，而 <code>Free Space</code> 就是空余空间了，它是一个链表的数据结构，为了保证插入和删除的效率，整个页面并不会按照主键顺序对所有记录进行排序，它会自动从左侧向右寻找空白节点进行插入，行记录在物理存储上并不是按照顺序的，它们之间的顺序是由 <code>next_record</code> 这一指针控制的。</p>
+<p><code>B+</code> 树在查找对应的记录时，并不会直接从树中找出对应的行记录，它只能获取记录所在的页，将整个页加载到内存中，再通过 <code>Page Directory</code> 中存储的稀疏索引和 <code>n_owned、next_record</code> 属性取出对应的记录，不过因为这一操作是在内存中进行的，所以通常会忽略这部分查找的耗时。这样就存在一个命中率的问题，如果一个page中能够相对的存放足够多的行，那么命中率就会相对高一些，性能就会有提升。</p>
+<p>Innodb的 page 大小默认为 <code>16kb</code>，Innodb存储引擎表为索引组织表，<strong>树底层的叶子节点为一双向链表，因此每个页中至少应该有两行记录，这就决定了 Innodb 在存储一行数据的时候不能够超过 <code>8kb</code></strong>，但事实上应该更小，因为还有一些 InnoDB 内部数据结构要存储。</p>
+<p>通常我们认为 <code>blob</code> 这类的大对象的存储会把数据存放在 off-page，其实不然，<strong>关键点还是要看一个 page 中到底能否存放两行数据，blob 可以完全存放在数据页中(单行长度没有超过 <code>8kb</code>)，而 <code>varchar</code> 类型的也有可能存放在溢出页中(单行长度超过 <code>8kb</code>，前 <code>768byte</code> 存放在数据页中)</strong>。</p>
+<h2 id="索引">索引</h2>
+<p>索引是数据库中非常非常重要的概念，它是存储引擎能够快速定位记录的秘密武器，对于提升数据库的性能、减轻数据库服务器的负担有着非常重要的作用；<strong>索引优化是对查询性能优化的最有效手段</strong>，它能够轻松地将查询的性能提高几个数量级。</p>
+<p>InnoDB 存储引擎在绝大多数情况下使用 B+ 树建立索引，这是关系型数据库中查找最为常用和有效的索引，但是 <strong>B+ 树索引并不能找到一个给定键对应的具体值，它只能找到数据行对应的页</strong>，然后正如上一节所提到的，数据库把整个页读入到内存中，并在内存中查找具体的数据行。</p>
+<p><img src="images/c60f9c70aa5f25cea0f109f4064e13ab.png" alt=""></p>
+<p>B+ 树是平衡树，它查找任意节点所耗费的时间都是完全相同的，比较的次数就是 B+ 树的高度；</p>
+<blockquote>
+<p><code>B+</code> 树的叶子节点存放所有指向关键字的指针，节点内部关键字记录和节点之间都根据关键字的大小排列。当顺序递增插入的时候，只有最后一个节点会在满掉的时候引起索引分裂，此时无需移动记录，只需创建一个新的节点即可。而当非递增插入的时候，会使得旧的节点分裂，还可能伴随移动记录，以便使得新数据能够插入其中。<strong>一般建议使用一列顺序递增的 ID 来作为主键</strong>，但不必是数据库的 <code>autoincrement</code> 字段，只要满足顺序增加即可，如 <code>twitter</code> 的 <code>snowflake</code> 即为顺序递增的 ID 生成器。</p>
+</blockquote>
+<h3 id="聚集索引和辅助索引">聚集索引和辅助索引</h3>
+<p>数据库中的 B+ 树索引可以分为聚集索引（clustered index）和辅助索引（secondary index），它们之间的最大区别就是，聚集索引中存放着一条行记录的全部信息，而辅助索引中只包含索引列和一个用于查找对应行记录的『书签』。</p>
+<h4 id="聚集索引">聚集索引</h4>
+<p>InnoDB 存储引擎中的表都是使用索引组织的，也就是按照键的顺序存放；聚集索引就是按照表中主键的顺序构建一颗 B+ 树，并在叶节点中存放表中的行记录数据。</p>
+<blockquote>
+<p>如果没有定义主键，则会使用非空的 UNIQUE键 做主键 ; 如果没有非空的 UNIQUE键 ，则系统生成一个6字节的 <code>rowid</code> 做主键;</p>
+</blockquote>
+<pre><code>CREATE TABLE users(
+    id INT NOT NULL,
+    first_name VARCHAR(20) NOT NULL,
+    last_name VARCHAR(20) NOT NULL,
+    age INT NOT NULL,
+    PRIMARY KEY(id),
+    KEY(last_name, first_name, age)
+    KEY(first_name)
+);
+</code></pre><p>如果使用上面的 SQL 在数据库中创建一张表，B+ 树就会使用 id 作为索引的键，并在叶子节点中存储一条记录中的所有信息。</p>
+<p><img src="images/4bc2f4c58303c2b20751ff20cd692d33.png" alt=""></p>
+<blockquote>
+<p>图中对 B+ 树的描述与真实情况下 B+ 树中的数据结构有一些差别，不过这里想要表达的主要意思是：<strong>聚集索引叶节点中保存的是整条行记录，而不是其中的一部分</strong>。</p>
+</blockquote>
+<p>聚集索引与表的物理存储方式有着非常密切的关系，所有正常的表应该 <strong>有且仅有一个</strong> 聚集索引（绝大多数情况下都是主键），表中的所有行记录数据都是按照 <strong>聚集索引</strong> 的顺序存放的。</p>
+<p>当我们使用聚集索引对表中的数据进行检索时，可以直接获得聚集索引所对应的整条行记录数据所在的页，不需要进行第二次操作。</p>
+<h4 id="辅助索引">辅助索引</h4>
+<p>数据库将 <strong>所有的非聚集索引都划分为辅助索引</strong>，但是这个概念对我们理解辅助索引并没有什么帮助；辅助索引也是通过 B+ 树实现的，但是它的叶节点并不包含行记录的全部数据，仅包含索引中的所有键和一个用于查找对应行记录的『书签』，在 InnoDB 中这个书签就是当前记录的主键。</p>
+<p>辅助索引的存在并不会影响聚集索引，因为聚集索引构成的 B+ 树是数据实际存储的形式，而辅助索引只用于加速数据的查找，所以一张表上往往有多个辅助索引以此来提升数据库的性能。</p>
+<blockquote>
+<p>一张表一定包含一个聚集索引构成的 B+ 树以及若干辅助索引的构成的 B+ 树。</p>
+</blockquote>
+<p><img src="images/1bef5c5161044e2cf889574577eef6c9.png" alt=""></p>
+<p>如果在表 <code>users</code> 中存在一个辅助索引 (<code>first_name, age</code>)，那么它构成的 B+ 树大致就是上图这样，按照 (first_name, age) 的字母顺序对表中的数据进行排序，当查找到主键时，再通过聚集索引获取到整条行记录。</p>
+<p><img src="images/2f31d7b8720a113ae5a7ed3c48a1c9d4.png" alt=""></p>
+<p>上图展示了一个使用辅助索引查找一条表记录的过程：通过辅助索引查找到对应的主键，最后在聚集索引中使用主键获取对应的行记录，这也是通常情况下行记录的查找方式。</p>
+<h4 id="回表">回表</h4>
+<p>聚簇索引这种实现方式使得按主键的搜索十分高效，但是辅助索引搜索需要检索两遍索引：首先检索辅助索引获得主键，然后用主键到主索引中检索获得记录，这种行为被称之为 <strong>回表</strong>。回表会导致查询时多次读取磁盘，为减少IO MySQL 在辅助索引上进行优化，将辅助索引作为 <strong>覆盖索引</strong>（Covering index）。在查询的时候，如果 <code>SELECT</code> 子句中的字段为主键、辅助索引的键则不进行回表。</p>
+<p>在 <code>EXPLAIN</code> 命令下查看 <code>Extra</code> 字段，如果包含 <code>Using index</code> 则使用覆盖索引。下面通过例子直观的理解下，有表：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#f92672">`</span>Employee<span style="color:#f92672">`</span> (
+  <span style="color:#f92672">`</span>Id<span style="color:#f92672">`</span> int(<span style="color:#ae81ff">11</span>) <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span> AUTO_INCREMENT,
+  <span style="color:#f92672">`</span>Name<span style="color:#f92672">`</span> varchar(<span style="color:#ae81ff">255</span>) <span style="color:#66d9ef">DEFAULT</span> <span style="color:#66d9ef">NULL</span>,
+  <span style="color:#f92672">`</span>Salary<span style="color:#f92672">`</span> decimal(<span style="color:#ae81ff">10</span>,<span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">DEFAULT</span> <span style="color:#66d9ef">NULL</span>,
+  <span style="color:#f92672">`</span>DepartmentId<span style="color:#f92672">`</span> int(<span style="color:#ae81ff">11</span>) <span style="color:#66d9ef">DEFAULT</span> <span style="color:#66d9ef">NULL</span>,
+  <span style="color:#f92672">`</span>update_ts<span style="color:#f92672">`</span> <span style="color:#66d9ef">timestamp</span> <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span> <span style="color:#66d9ef">DEFAULT</span> <span style="color:#66d9ef">CURRENT_TIMESTAMP</span>,
+  <span style="color:#66d9ef">PRIMARY</span> <span style="color:#66d9ef">KEY</span> (<span style="color:#f92672">`</span>Id<span style="color:#f92672">`</span>),
+  <span style="color:#66d9ef">KEY</span> <span style="color:#f92672">`</span>idx_update_ts<span style="color:#f92672">`</span> (<span style="color:#f92672">`</span>update_ts<span style="color:#f92672">`</span>) <span style="color:#66d9ef">USING</span> BTREE
+) ENGINE<span style="color:#f92672">=</span>InnoDB AUTO_INCREMENT<span style="color:#f92672">=</span><span style="color:#ae81ff">7</span> <span style="color:#66d9ef">DEFAULT</span> CHARSET<span style="color:#f92672">=</span>utf8mb4;
+</code></pre></div><ol>
+<li>使用覆盖索引</li>
+</ol>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">explain</span> <span style="color:#66d9ef">SELECT</span> Id,update_ts <span style="color:#66d9ef">FROM</span> Employee <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> update_ts <span style="color:#66d9ef">DESC</span> <span style="color:#66d9ef">LIMIT</span> <span style="color:#ae81ff">10000</span>, <span style="color:#ae81ff">10</span>;
+</code></pre></div><p>执行结果：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">  {
+    <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#ae81ff">1</span>,
+    <span style="color:#f92672">&#34;select_type&#34;</span>: <span style="color:#e6db74">&#34;SIMPLE&#34;</span>,
+    <span style="color:#f92672">&#34;table&#34;</span>: <span style="color:#e6db74">&#34;Employee&#34;</span>,
+    <span style="color:#f92672">&#34;partitions&#34;</span>: <span style="color:#66d9ef">null</span>,
+    <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;index&#34;</span>,
+    <span style="color:#f92672">&#34;possible_keys&#34;</span>: <span style="color:#66d9ef">null</span>,
+    <span style="color:#f92672">&#34;key&#34;</span>: <span style="color:#e6db74">&#34;idx_update_ts&#34;</span>,
+    <span style="color:#f92672">&#34;key_len&#34;</span>: <span style="color:#e6db74">&#34;4&#34;</span>,
+    <span style="color:#f92672">&#34;ref&#34;</span>: <span style="color:#66d9ef">null</span>,
+    <span style="color:#f92672">&#34;rows&#34;</span>: <span style="color:#ae81ff">6</span>,
+    <span style="color:#f92672">&#34;filtered&#34;</span>: <span style="color:#ae81ff">100.00</span>,
+    <span style="color:#f92672">&#34;Extra&#34;</span>: <span style="color:#e6db74">&#34;Using index&#34;</span>
+  }
+</code></pre></div><ol start="2">
+<li>不使用覆盖索引</li>
+</ol>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">explain</span> <span style="color:#66d9ef">SELECT</span> Id,Salary <span style="color:#66d9ef">FROM</span> Employee <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> update_ts <span style="color:#66d9ef">DESC</span> <span style="color:#66d9ef">LIMIT</span> <span style="color:#ae81ff">10000</span>, <span style="color:#ae81ff">10</span>;
+</code></pre></div><p>执行结果：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">  {
+    <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#ae81ff">1</span>,
+    <span style="color:#f92672">&#34;select_type&#34;</span>: <span style="color:#e6db74">&#34;SIMPLE&#34;</span>,
+    <span style="color:#f92672">&#34;table&#34;</span>: <span style="color:#e6db74">&#34;Employee&#34;</span>,
+    <span style="color:#f92672">&#34;partitions&#34;</span>: <span style="color:#66d9ef">null</span>,
+    <span style="color:#f92672">&#34;type&#34;</span>: <span style="color:#e6db74">&#34;ALL&#34;</span>,
+    <span style="color:#f92672">&#34;possible_keys&#34;</span>: <span style="color:#66d9ef">null</span>,
+    <span style="color:#f92672">&#34;key&#34;</span>: <span style="color:#66d9ef">null</span>,
+    <span style="color:#f92672">&#34;key_len&#34;</span>: <span style="color:#66d9ef">null</span>,
+    <span style="color:#f92672">&#34;ref&#34;</span>: <span style="color:#66d9ef">null</span>,
+    <span style="color:#f92672">&#34;rows&#34;</span>: <span style="color:#ae81ff">6</span>,
+    <span style="color:#f92672">&#34;filtered&#34;</span>: <span style="color:#ae81ff">100.00</span>,
+    <span style="color:#f92672">&#34;Extra&#34;</span>: <span style="color:#e6db74">&#34;Using filesort&#34;</span>
+  }
+</code></pre></div><blockquote>
+<p>Using filesort：MySQL 服务内排序，未走索引</p>
+</blockquote>
+<p>第二个 SQL 不仅没使用覆盖索引，连 <code>update_ts</code> 上的辅助索引都没用上，有这样的差别我的猜测是：MySQL 为减少IO，从而选择不使用 <code>update_ts</code> 上的索引。</p>
+<h2 id="innodb-锁机制httpssegmentfaultcoma1190000014133576"><a href="https://segmentfault.com/a/1190000014133576">InnoDB 锁机制</a></h2>
+<p><img src="images/e86d2bb63f9ecf327e588f352bb26d3b.png" alt=""></p>
+<p>InnoDB默认使用行锁，实现了两种标准的行锁——共享锁与排他锁；</p>
+<p>|行锁类型| 锁功能|锁兼容性|  加锁|释放锁|
+| :&mdash;&mdash;&mdash;&mdash;- | :&mdash;&mdash;&mdash;&mdash;- |
+|共享锁（读锁、S锁）| 允许获取共享锁的亊务读数据|与共享锁兼容，与排它锁不兼容| 只有 <code>SerializaWe</code> 隔离级别会默认为：读加共享锁；其他隔离级别下，可显示使用 <code>select...lock in share model</code> 为读加共享锁| 在事务提交或回滚后会自动同时释放锁；除了使用 <code>start transaction</code> 的方式显式开启事务，InnoDB 也会自动为增删改査语句开启事务，并自动提交或回滚；(<code>autocommit=1</code>)|
+|排它锁（写锁、X锁）|允许获取排它锁的事务更新或删除数据|与共享锁不兼容，与排它锁不兼容|在默认的 <code>Reapeatable Read</code> 隔离级别下，InnoDB 会自动为增删改操作的行加排它锁；也可显式使用 <code>select...for update</code> 为读加排它锁|&hellip;|</p>
+<blockquote>
+<ol>
+<li>除了显式加锁的情况，其他情况下的加锁与解锁都无需人工干预</li>
+<li>InnoDB 所有的行锁算法都是基于索引实现的，锁定的也都是索引或索引区间</li>
+</ol>
+</blockquote>
+<h3 id="当前读--快照读">当前读 &amp; 快照读</h3>
+<p><strong>当前读</strong>：即加锁读，读取记录的最新版本，会加锁保证其他并发事务不能修改当前记录，直至获取锁的事务释放锁；使用当前读的操作主要包括：<strong>显式加锁的读操作与插入/更新/删除等写操作</strong>，如下所示：</p>
+<pre><code>select * from table where ? lock in share mode;
+select * from table where ? for update;
+insert into table values (…);
+update table set ? where ?;
+delete from table where ?;
+</code></pre><blockquote>
+<p>注：当 <code>Update</code> SQL 被发给 <code>MySQL</code> 后， <code>MySQL Server</code> 会根据where条件，读取第一条满足条件的记录，然后 InnoDB 引擎会将第一条记录返回，并加锁，待 <code>MySQL Server</code> 收到这条加锁的记录之后，会再发起一个 <code>Update</code> 请求，更新这条记录。一条记录操作完成，再读取下一条记录，直至没有满足条件的记录为止。因此， <code>Update</code> 操作内部，就包含了当前读。同理， <code>Delete</code> 操作也一样。 <code>Insert</code> 操作会稍微有些不同，简单来说，就是 <code>Insert</code> 操作可能会触发 <code>Unique Key</code> 的冲突检查，也会进行一个当前读。</p>
+</blockquote>
+<p><strong>快照读：即不加锁读，读取记录的快照版本而非最新版本，通过MVCC实现</strong>；</p>
+<p>InnoDB 默认的 <code>RR</code> 事务隔离级别下，不显式加<code>lock in share mode</code>与<code>for update</code>的 <code>select</code> 操作都属于快照读，保证事务执行过程中只有第一次读之前提交的修改和自己的修改可见，其他的均不可见；</p>
+<h3 id="共享锁与独占锁">共享锁与独占锁</h3>
+<h3 id="意向锁">意向锁</h3>
+<p>InnoDB 支持多粒度的锁，允许表级锁和行级锁共存。一个类似于 <code>LOCK TABLES ... WRITE</code> 的语句会获得这个表的 <code>x</code> 锁。为了实现多粒度锁，InnoDB 使用了意向锁（简称 I 锁）。I 锁是表明一个事务稍后要获得针对一行记录的某种锁（<code>s or x</code>）的对应表的表级锁，有两种：</p>
+<ul>
+<li>意向排它锁（简称 IX 锁）表明一个事务意图在某个表中设置某些行的 x 锁</li>
+<li>意向共享锁（简称 IS 锁）表明一个事务意图在某个表中设置某些行的 s 锁</li>
+</ul>
+<p><code>SELECT ... LOCK IN SHARE MODE</code> 设置一个 <code>IS</code> 锁, <code>SELECT ... FOR UPDATE</code> 设置一个 <code>IX</code> 锁。意向锁的原则如下：</p>
+<ul>
+<li>一个事务必须先持有该表上的 IS 或者更强的锁才能持有该表中某行的 S 锁</li>
+<li>一个事务必须先持有该表上的 IX 锁才能持有该表中某行的 X 锁</li>
+</ul>
+<p>新请求的锁只有兼容已有锁才能被允许，否则必须等待不兼容的已有锁被释放。<strong>一个不兼容的锁请求不被允许是因为它会引起死锁，错误会发生</strong>。意向锁只会阻塞全表请求（比如 <code>LOCK TABLES ... WRITE</code> ）。<strong>意向锁的主要目的是展示某人正在锁定表中一行，或者将要锁定一行</strong>。</p>
+<p>更多信息参见：<a href="./6-concurrent_control.md">并发控制</a></p>
+<h3 id="record-lock">Record Lock</h3>
+<p>记录锁（Record Lock）是加到<strong>索引记录</strong>上的锁，假设我们存在下面的一张表 <code>users</code>：</p>
+<pre><code>    CREATE TABLE users(
+        id INT NOT NULL AUTO_INCREMENT,
+        last_name VARCHAR(255) NOT NULL,
+        first_name VARCHAR(255),
+        age INT,
+        PRIMARY KEY(id),
+        KEY(last_name),
+        KEY(age)
+    );
+</code></pre><p>如果我们使用 <code>id</code> 或者 <code>last_name</code> 作为 SQL 中 <code>WHERE</code> 语句的过滤条件，那么 InnoDB 就可以通过索引建立的 B+ 树找到行记录并添加索引，但是如果使用 <code>first_name</code> 作为过滤条件时，由于 InnoDB 不知道待修改的记录具体存放的位置，也无法对将要修改哪条记录提前做出判断就会锁定整个表。</p>
+<h3 id="gap-lock">Gap Lock</h3>
+<p>记录锁是在存储引擎中最为常见的锁，除了记录锁之外，InnoDB 中还存在间隙锁（Gap Lock），间隙锁是对索引记录中的一段连续区域的锁；当使用类似 <code>SELECT * FROM users WHERE id BETWEEN 10 AND 20 FOR UPDATE;</code> 的 SQL 语句时，就会阻止其他事务向表中插入 <code>id = 15</code> 的记录，因为整个范围都被间隙锁锁定了。</p>
+<blockquote>
+<p>间隙锁是存储引擎对于性能和并发做出的权衡，并且只用于某些事务隔离级别。</p>
+</blockquote>
+<p>虽然间隙锁中也分为共享锁和互斥锁，不过它们之间并不是互斥的，也就是不同的事务可以同时持有一段相同范围的共享锁和互斥锁，它唯一阻止的就是<strong>其他事务向这个范围中添加新的记录</strong>。</p>
+<h4 id="间隙锁的缺点">间隙锁的缺点</h4>
+<ul>
+<li>间隙锁有一个比较致命的弱点，就是当锁定一个范围键值之后，即使某些不存在的键值也会被无辜的锁定，而造成在锁定的时候无法插入锁定键值范围内的任何数据。在某些场景下这可能会对性能造成很大的危害</li>
+<li>当Query无法利用索引的时候， Innodb会放弃使用行级别锁定而改用表级别的锁定，造成并发性能的降低；</li>
+<li>当Quuery使用的索引并不包含所有过滤条件的时候，数据检索使用到的索引键所指向的数据可能有部分并不属于该Query的结果集的行列，但是也会被锁定，因为间隙锁锁定的是一个范围，而不是具体的索引键；</li>
+<li>当Query在使用索引定位数据的时候，如果使用的索引键一样但访问的数据行不同的时候（索引只是过滤条件的一部分），一样会被锁定</li>
+</ul>
+<h4 id="next-key-lock">Next-Key Lock</h4>
+<p>Next-Key 锁相比前两者就稍微有一些复杂，它是记录锁和记录前的间隙锁的结合，在 <code>users</code> 表中有以下记录：</p>
+<pre><code>    +------|-------------|--------------|-------+
+    |   id | last_name   | first_name   |   age |
+    |------|-------------|--------------|-------|
+    |    4 | stark       | tony         |    21 |
+    |    1 | tom         | hiddleston   |    30 |
+    |    3 | morgan      | freeman      |    40 |
+    |    5 | jeff        | dean         |    50 |
+    |    2 | donald      | trump        |    80 |
+    +------|-------------|--------------|-------+
+</code></pre><p>如果使用 Next-Key 锁，那么 Next-Key 锁就可以在需要的时候锁定以下的范围：</p>
+<pre><code>    (-∞, 21]
+    (21, 30]
+    (30, 40]
+    (40, 50]
+    (50, 80]
+    (80, ∞)
+</code></pre><blockquote>
+<p>既然叫 Next-Key 锁，锁定的应该是当前值和后面的范围，但是实际上却不是，Next-Key 锁锁定的是当前值和前面的范围。</p>
+</blockquote>
+<p>当我们更新一条记录，比如 <code>SELECT * FROM users WHERE age = 30 FOR UPDATE;</code>，InnoDB 不仅会在范围 <code>(21, 30]</code> 上加 Next-Key 锁，还会在这条该记录索引增长方向的范围 <code>(30, 40]</code> 加间隙锁，所以插入 <code>(21, 40]</code> 范围内的记录都会被锁定。</p>
+<blockquote>
+<p>Next-Key 锁的作用其实是为了解决幻读的问题。</p>
+</blockquote>
+<h3 id="插入意向锁">插入意向锁</h3>
+<p>插入意向锁是在插入一行记录操作之前设置的一种间隙锁，这个锁释放了一种插入方式的信号，亦即多个事务在相同的索引间隙插入时如果不是插入间隙中相同的位置就不需要互相等待。假设有索引值<code>4、7</code>，几个不同的事务准备插入<code>5、6</code>，每个锁都在获得插入行的独占锁之前用插入意向锁各自锁住了<code>4、7</code>之间的间隙，但是不阻塞对方因为插入行不冲突。</p>
+<h3 id="自增锁">自增锁</h3>
+<p>自增锁是一个特殊的表级锁，事务插入自增列的时候需要获取，最简单情况下如果一个事务插入一个值到表中，任何其他事务都要等待，这样第一个事物才能获得连续的主键值。</p>
+<h3 id="锁选择httphedengchengcomp771_toc374698309"><a href="http://hedengcheng.com/?p=771#_Toc374698309">锁选择</a></h3>
+<pre><code>+——-+————-+
+| id | name |
++——-+————-+
+| 1 | title1 |
++——-+————-+
+| 2 | title2 |
++——-+————-+
+| 3 | title3 |
++——-+————-+
+| 9 | title9 |
++——-+————-+
+| 10 | title10 |
++——-+————-+
+</code></pre><p>按照原理来说，<code>id&gt;5 and id&lt;7</code>这个查询条件，在表中找不到满足条件的项，因此会对第一个不满足条件的项(<code>id = 9</code>)上加GAP锁，防止后续其他事务插入满足条件的记录。</p>
+<p>而 <strong>GAP 锁与GAP 锁是不冲突的</strong>，那么为什么两个同时执行<code>id&gt;5 and id&lt;7</code>查询的事务会冲突呢？</p>
+<p>原因在于，<code>MySQL Server</code>并没有将<code>id&lt;7</code>这个查询条件下降到<code>InnoDB</code>引擎层，因此<code>InnoDB</code>看到的查询，是<code>id&gt;5</code>，正向扫描。读出的记录<code>id=9</code>，先加上<code>next key锁</code>(Lock X + GAP lock)，然后返回给 MySQL Server 进行判断。
+MySQL Server 此时才会判断返回的记录是否满足<code>id&lt;7</code>的查询条件。此处不满足，查询结束。</p>
+<p>因此，<code>id=9</code>记录上，真正持有的锁是<code>next key</code>锁，<strong>而<code>next key</code>锁之间是相互冲突的</strong>，这也说明了为什么两个<code>id&gt;5 and id&lt;7</code>查询的事务会冲突的原因。</p>
+<h2 id="innodb-事务隔离">InnoDB 事务隔离</h2>
+<h3 id="几种隔离级别">几种隔离级别</h3>
+<p>事务的隔离性是数据库处理数据的几大基础之一，而隔离级别其实就是提供给用户用于在性能和可靠性做出选择和权衡的配置项。</p>
+<p>ISO 和 ANIS SQL 标准制定了四种事务隔离级别，而 InnoDB 遵循了 SQL:1992 标准中的四种隔离级别：<code>READ UNCOMMITED</code>、<code>READ COMMITED</code>、<code>REPEATABLE READ</code> 和 <code>SERIALIZABLE</code>；每个事务的隔离级别其实都比上一级多解决了一个问题：</p>
+<ul>
+<li>
+<p><code>RAED UNCOMMITED</code>：使用查询语句不会加锁，可能会读到未提交的行（Dirty Read）；</p>
+<blockquote>
+<p>可以读取未提交记录。此隔离级别，不会使用，忽略。</p>
+</blockquote>
+</li>
+<li>
+<p><code>READ COMMITED</code>：只对记录加记录锁，而不会在记录之间加间隙锁，所以允许新的记录插入到被锁定记录的附近，所以再多次使用查询语句时，可能得到不同的结果（Non-Repeatable Read）；</p>
+<blockquote>
+<p>快照读忽略，本文不考虑。针对当前读，RC隔离级别保证对读取到的记录加锁 (记录锁)，存在幻读现象。</p>
+</blockquote>
+</li>
+<li>
+<p><code>REPEATABLE READ</code>：快照读忽略，本文不考虑。针对当前读，<strong>RR隔离级别保证对读取到的记录加锁 (记录锁)，同时保证对读取的范围加锁，新的满足查询条件的记录不能够插入 (间隙锁)</strong>，不存在幻读现象。</p>
+</li>
+<li>
+<p><code>SERIALIZABLE</code>：从MVCC并发控制退化为基于锁的并发控制。不区别快照读与当前读，所有的读操作均为当前读，读加读锁 (S锁)，写加写锁 (X锁)。</p>
+<blockquote>
+<p>Serializable隔离级别下，读写冲突，因此并发度急剧下降，在MySQL/InnoDB下不建议使用。</p>
+</blockquote>
+</li>
+</ul>
+<p>MySQL 中默认的事务隔离级别就是 <code>REPEATABLE READ</code>，但是它通过 Next-Key 锁也能够在某种程度上解决幻读的问题。</p>
+<p><img src="images/15a2370c552e932907f8b2d3587171ef.png" alt="image"></p>
+<p>接下来，我们将数据库中创建如下的表并通过个例子来展示在不同的事务隔离级别之下，会发生什么样的问题：</p>
+<pre><code>    CREATE TABLE test(
+        id INT NOT NULL,
+        UNIQUE(id)
+    );
+</code></pre><h3 id="脏读">脏读</h3>
+<blockquote>
+<p>在一个事务中，读取了其他事务未提交的数据。</p>
+</blockquote>
+<p>当事务的隔离级别为 <code>READ UNCOMMITED</code> 时，我们在 <code>SESSION 2</code> 中插入的<strong>未提交</strong>数据在 <code>SESSION 1</code> 中是可以访问的。</p>
+<p><img src="images/e4696fae4a417bdd70dd04f0786647ed.png" alt="image"></p>
+<h3 id="不可重复读">不可重复读</h3>
+<blockquote>
+<p>在一个事务中，同一行记录被访问了两次却得到了不同的结果。</p>
+</blockquote>
+<p>当事务的隔离级别为 <code>READ COMMITED</code> 时，虽然解决了脏读的问题，但是如果在 <code>SESSION 1</code> 先查询了<strong>一行</strong>数据，在这之后 <code>SESSION 2</code> 中修改了同一行数据并且提交了修改，在这时，如果 <code>SESSION 1</code> 中再次使用相同的查询语句，就会发现两次查询的结果不一样。</p>
+<p><img src="images/d2d41261df71879fab0eb54771688d78.png" alt="image"></p>
+<p>不可重复读的原因就是，在 <code>READ COMMITED</code> 的隔离级别下，存储引擎不会在查询记录时添加行锁，锁定 <code>id = 3</code> 这条记录。</p>
+<h3 id="幻读">幻读</h3>
+<blockquote>
+<p>在一个事务中，同一个范围内的记录被读取时，其他事务向这个范围添加了新的记录。</p>
+</blockquote>
+<p>重新开启了两个会话 <code>SESSION 1</code> 和 <code>SESSION 2</code>，在 <code>SESSION 1</code> 中我们查询全表的信息，没有得到任何记录；在 <code>SESSION 2</code> 中向表中插入一条数据并提交；由于 <code>REPEATABLE READ</code> 的原因，再次查询全表的数据时，我们获得到的仍然是空集，但是在向表中插入同样的数据却出现了错误。</p>
+<p><img src="images/b356bfdde7d52c6993a697c4529d2f6b.png" alt="image"></p>
+<p>这种现象在数据库中就被称作幻读，虽然我们使用查询语句得到了一个空的集合，但是插入数据时却得到了错误，好像之前的查询是幻觉一样。</p>
+<p>在标准的事务隔离级别中，幻读是由更高的隔离级别 <code>SERIALIZABLE</code> 解决的，但是它也可以通过 MySQL 提供的 <code>Next-Key</code> 锁解决：</p>
+<p><img src="images/8d3094a3893ae4d1806dfcb3a93b7dff.png" alt="image"></p>
+<p><code>REPEATABLE READ</code> 和 <code>READ UNCOMMITED</code> 其实是矛盾的，如果保证了前者就看不到已经提交的事务，如果保证了后者，就会导致两次查询的结果不同，MySQL 为我们提供了一种折中的方式，能够在 <code>REPEATABLE READ</code> 模式下加锁访问已经提交的数据，其本身并不能解决幻读的问题，而是通过文章前面提到的 <code>Next-Key</code> 锁来解决。</p>
+<h2 id="加锁规则">加锁规则</h2>
+<h2 id="参考连接">参考连接</h2>
+<ul>
+<li><a href="https://draveness.me/mysql-innodb">『浅入浅出』MySQL 和 InnoDB</a></li>
+<li><a href="https://dev.mysql.com/doc/refman/5.6/en/innodb-locks-set.html">Locks Set by Different SQL Statements in InnoDB</a></li>
+</ul>
+</article>
+ 
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/basic/database/innodb/index.md" target="_blank" rel="noopener">
+      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
+      
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#数据存储">数据存储</a>
+      <ul>
+        <li><a href="#行溢出数据">行溢出数据</a></li>
+        <li><a href="#数据页结构">数据页结构</a></li>
+      </ul>
+    </li>
+    <li><a href="#索引">索引</a>
+      <ul>
+        <li><a href="#聚集索引和辅助索引">聚集索引和辅助索引</a></li>
+      </ul>
+    </li>
+    <li><a href="#innodb-锁机制httpssegmentfaultcoma1190000014133576">InnoDB 锁机制</a>
+      <ul>
+        <li><a href="#当前读--快照读">当前读 & 快照读</a></li>
+        <li><a href="#共享锁与独占锁">共享锁与独占锁</a></li>
+        <li><a href="#意向锁">意向锁</a></li>
+        <li><a href="#record-lock">Record Lock</a></li>
+        <li><a href="#gap-lock">Gap Lock</a></li>
+        <li><a href="#插入意向锁">插入意向锁</a></li>
+        <li><a href="#自增锁">自增锁</a></li>
+        <li><a href="#锁选择httphedengchengcomp771_toc374698309">锁选择</a></li>
+      </ul>
+    </li>
+    <li><a href="#innodb-事务隔离">InnoDB 事务隔离</a>
+      <ul>
+        <li><a href="#几种隔离级别">几种隔离级别</a></li>
+        <li><a href="#脏读">脏读</a></li>
+        <li><a href="#不可重复读">不可重复读</a></li>
+        <li><a href="#幻读">幻读</a></li>
+      </ul>
+    </li>
+    <li><a href="#加锁规则">加锁规则</a></li>
+    <li><a href="#参考连接">参考连接</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

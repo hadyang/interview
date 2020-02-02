@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="ConcurrentHashmap"><meta property="og:title" content="ConcurrentHashmap" />
+<meta property="og:description" content="ConcurrentHashmap JDK1.7 ConcurrentHashMap的锁分段技术：假如容器里有多把锁，每一把锁用于锁容器其中一部分数据，那么当多线程访问容器里不同数据段的数据时，线程间就不会存在锁竞争，从而可以有效的提高并发访问效率，这就是ConcurrentHashMap所使用的锁分段技术。首先将数据分成一段一段的存储，然后给每一段数据配一把锁，当一个线程占用锁访问其中一个段数据的时候，其他段的数据也能被其他线程访问。
+ ConcurrentHashMap不允许Key或者Value的值为NULL。ConcurrentMaps中不允许空值的主要原因是，在非并发映射中几乎不能容忍的模糊性是无法容纳的。主要的一点是如果map.get（key）返回null，则无法检测 key 是否显式映射为 null 或者 key 未映射。 在非并发映射中，您可以通过 map.contains（key） 进行检查，但在并发映射中，映射可能在调用之间发生了变化。
+ Segment类 Put 将一个HashEntry放入到该Segment中，使用自旋机制，减少了加锁的可能性。
+final V put(K key, int hash, V value, boolean onlyIfAbsent) { HashEntry&lt;K,V&gt; node = tryLock() ? null : scanAndLockForPut(key, hash, value); //如果加锁失败，则调用该方法 V oldValue; try { HashEntry&lt;K,V&gt;[] tab = table; int index = (tab.length - 1) &amp; hash; //同hashMap相同的哈希定位方式 HashEntry&lt;K,V&gt; first = entryAt(tab, index); for (HashEntry&lt;K,V&gt; e = first;;) { if (e !" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hadyang.github.io/interview/docs/java/collection/Concurrenthashmap/" />
+<meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
+<meta property="article:modified_time" content="2019-08-21T11:00:41+08:00" />
+<title>ConcurrentHashmap | Interview</title>
+<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/interview/book.min.b7fe34b8a4c4da05b2690b4aacfa71ddce0668cc6da3abb67dd3946844125444.css" integrity="sha256-t/40uKTE2gWyaQtKrPpx3c4GaMxto6u2fdOUaEQSVEQ=">
+
+
+<script defer src="/interview/en.search.min.4daab1eda22baec10d130347f095a8463b951038b7e98060a59bcdc484ada980.js" integrity="sha256-Taqx7aIrrsENEwNH8JWoRjuVEDi36YBgpZvNxIStqYA="></script>
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/interview"><span>Interview</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+  <ul>
+<li><a href="/interview/docs/basic/">计算机基础</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/">算法</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
+<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
+<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
+<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
+<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
+<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
+<li><a href="/interview/docs/basic/algo/sort/">排序算法</a></li>
+<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/os/">操作系统</a>
+<ul>
+<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
+<li><a href="/interview/docs/basic/os/concurrency/">并发</a></li>
+<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
+<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
+<li><a href="/interview/docs/basic/os/linux/">Linux系统</a></li>
+<li><a href="/interview/docs/basic/os/interrupt/">中断</a></li>
+<li><a href="/interview/docs/basic/os/device/">设备管理</a></li>
+<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
+<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/net/">计算机网络</a>
+<ul>
+<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
+<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
+<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
+<li><a href="/interview/docs/basic/net/http/">HTTP</a></li>
+<li><a href="/interview/docs/basic/net/https/">HTTPS</a></li>
+<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/">数据库</a>
+<ul>
+<li><a href="/interview/docs/basic/database/transaction/">事务</a></li>
+<li><a href="/interview/docs/basic/database/index/">索引</a></li>
+<li><a href="/interview/docs/basic/database/sql/">SQL</a></li>
+<li><a href="/interview/docs/basic/database/join/">连接</a></li>
+<li><a href="/interview/docs/basic/database/mysql/">MySQL</a></li>
+<li><a href="/interview/docs/basic/database/concurrent/">并发控制</a></li>
+<li><a href="/interview/docs/basic/database/innodb/">Innodb</a></li>
+<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/">Java</a>
+<ul>
+<li><a href="/interview/docs/java/oop/">OOP</a></li>
+<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
+<li><a href="/interview/docs/java/operator/">运算符</a></li>
+<li><a href="/interview/docs/java/exception/">异常</a></li>
+<li><a href="/interview/docs/java/generics/">泛型</a></li>
+<li><a href="/interview/docs/java/object/">Object</a></li>
+<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
+<li><a href="/interview/docs/java/proxy/">代理</a></li>
+<li><a href="/interview/docs/java/annotation/">注解</a></li>
+<li><a href="/interview/docs/java/questions/">面试题</a></li>
+<li><a href="/interview/docs/java/nio/">NIO</a></li>
+<li><a href="/interview/docs/java/">集合</a>
+<ul>
+<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
+<li><a href="/interview/docs/java/collection/Concurrenthashmap/"class=active>Concurrenthashmap</a></li>
+<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/concurrent/">并发</a>
+<ul>
+<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
+<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
+<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
+<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
+<li><a href="/interview/docs/java/concurrent/AQS/">AQS</a></li>
+<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
+<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
+<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<ul>
+<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
+<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/gc/">GC</a>
+<ul>
+<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
+<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/">框架</a>
+<ul>
+<li><a href="/interview/docs/fromwork/netty/">Netty</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
+<ul>
+<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/spring/">Spring</a>
+<ul>
+<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
+<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
+<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/">系统架构</a>
+<ul>
+<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
+<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
+<ul>
+<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/design/">系统设计</a>
+<ul>
+<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/distributed/">分布式</a>
+<ul>
+<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
+<li><a href="/interview/docs/architecture/distributed/session/">分布式Session</a></li>
+<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
+<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
+<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
+<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
+<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
+<li><a href="/interview/docs/architecture/distributed/kafka/">Kafka</a></li>
+<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
+<li><a href="/interview/docs/architecture/distributed/dubbo/">Dubbo</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
+<ul>
+<li><a href="/interview/docs/architecture/bigdata/algo/">基础算法</a></li>
+<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/offer/">剑指offer</a>
+<ul>
+<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
+<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
+<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
+<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
+<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
+<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
+<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
+<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
+<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
+<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
+<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
+<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
+<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
+<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
+<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
+<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
+<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
+<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
+<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
+<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
+<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
+<li><a href="/interview/docs/offer/VerifySquenceOfBST/">二叉搜索树的后序遍历序列</a></li>
+<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
+<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
+<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
+<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
+<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
+<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
+<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
+<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
+<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
+<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
+<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
+<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
+<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
+<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
+<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
+<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
+<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
+<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
+<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
+<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
+<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
+<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
+<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
+<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
+<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
+<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
+<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
+<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
+<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
+<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
+<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
+<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
+<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
+<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
+<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
+<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
+<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
+<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
+<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
+<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
+<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
+<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
+<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
+<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
+<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/leetcode/">LeetCode</a>
+<ul>
+<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
+<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
+<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
+<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
+<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
+<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
+<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
+<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
+<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
+<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
+<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
+<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
+<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
+<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
+<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
+<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
+<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
+<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
+<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
+<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
+<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
+<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
+<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
+<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
+<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
+<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
+<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
+<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
+<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
+<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
+<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
+<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+<script>
+(function() {
+  var menu = document.querySelector("aside.book-menu nav");
+  addEventListener("beforeunload", function(event) {
+    localStorage.setItem("menu.scrollTop", menu.scrollTop);
+  });
+  menu.scrollTop = localStorage.getItem("menu.scrollTop");
+})();
+</script>
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>ConcurrentHashmap</strong>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#jdk17">JDK1.7</a>
+      <ul>
+        <li><a href="#segment类">Segment类</a></li>
+        <li><a href="#put-1">Put</a></li>
+        <li><a href="#get">Get</a></li>
+        <li><a href="#size">Size</a></li>
+      </ul>
+    </li>
+    <li><a href="#jdk18">JDK1.8</a>
+      <ul>
+        <li><a href="#put-2">Put</a></li>
+        <li><a href="#get-1">Get</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+<article class="markdown"><h1 id="concurrenthashmaphttpscrossoverjietop20180723java-seniorconcurrenthashmap"><a href="https://crossoverjie.top/2018/07/23/java-senior/ConcurrentHashMap/">ConcurrentHashmap</a></h1>
+<h2 id="jdk17">JDK1.7</h2>
+<p><code>ConcurrentHashMap</code>的锁分段技术：假如容器里有多把锁，每一把锁用于锁容器其中一部分数据，那么当多线程访问容器里不同数据段的数据时，线程间就不会存在锁竞争，从而可以有效的提高并发访问效率，这就是<code>ConcurrentHashMap</code>所使用的锁分段技术。首先将数据分成一段一段的存储，然后给每一段数据配一把锁，当一个线程占用锁访问其中一个段数据的时候，其他段的数据也能被其他线程访问。</p>
+<blockquote>
+<p><code>ConcurrentHashMap</code>不允许<code>Key</code>或者<code>Value</code>的值为<code>NULL</code>。ConcurrentMaps中不允许空值的主要原因是，在非并发映射中几乎不能容忍的模糊性是无法容纳的。主要的一点是如果<code>map.get（key）</code>返回<code>null</code>，则无法检测 key 是否显式映射为 null 或者 key 未映射。 在非并发映射中，您可以通过 <code>map.contains（key）</code> 进行检查，但在并发映射中，映射可能在调用之间发生了变化。</p>
+</blockquote>
+<p><img src="images/ConcurrentHashMap.png" alt=""></p>
+<h3 id="segment类">Segment类</h3>
+<h4 id="put">Put</h4>
+<p>将一个HashEntry放入到该<code>Segment</code>中，使用自旋机制，减少了加锁的可能性。</p>
+<pre><code>final V put(K key, int hash, V value, boolean onlyIfAbsent) {
+    HashEntry&lt;K,V&gt; node = tryLock() ? null :
+        scanAndLockForPut(key, hash, value); //如果加锁失败，则调用该方法
+    V oldValue;
+    try {
+        HashEntry&lt;K,V&gt;[] tab = table;
+        int index = (tab.length - 1) &amp; hash; //同hashMap相同的哈希定位方式
+        HashEntry&lt;K,V&gt; first = entryAt(tab, index);
+        for (HashEntry&lt;K,V&gt; e = first;;) {
+            if (e != null) {
+        //若不为null，则持续查找，知道找到key和hash值相同的节点，将其value更新
+                K k;
+                if ((k = e.key) == key ||
+                    (e.hash == hash &amp;&amp; key.equals(k))) {
+                    oldValue = e.value;
+                    if (!onlyIfAbsent) {
+                        e.value = value;
+                        ++modCount;
+                    }
+                    break;
+                }
+                e = e.next;
+            }
+            else { //若头结点为null
+                if (node != null) //在遍历key对应节点链时没有找到相应的节点
+                    node.setNext(first);
+                    //当前修改并不需要让其他线程知道，在锁退出时修改自然会
+                    //更新到内存中,可提升性能
+                else
+                    node = new HashEntry&lt;K,V&gt;(hash, key, value, first);
+                int c = count + 1;
+                if (c &gt; threshold &amp;&amp; tab.length &lt; MAXIMUM_CAPACITY)
+                    rehash(node); //如果超过阈值，则进行rehash操作
+                else
+                    setEntryAt(tab, index, node);
+                ++modCount;
+                count = c;
+                oldValue = null;
+                break;
+            }
+        }
+    } finally {
+        unlock();
+    }
+    return oldValue;
+}
+</code></pre><h4 id="scanandlockforput">scanAndLockForPut</h4>
+<p>该操作持续查找key对应的节点链中是否已存在该节点，如果没有找到已存在的节点，则预创建一个新节点，并且尝试n次，直到尝试次数超出限制，才真正进入等待状态，即所谓的 <strong>自旋等待</strong>。</p>
+<pre><code>private HashEntry&lt;K,V&gt; scanAndLockForPut(K key, int hash, V value) {
+    //根据hash值找到segment中的HashEntry节点
+    HashEntry&lt;K,V&gt; first = entryForHash(this, hash); //首先获取头结点
+    HashEntry&lt;K,V&gt; e = first;
+    HashEntry&lt;K,V&gt; node = null;
+    int retries = -1; // negative while locating node
+    while (!tryLock()) {  //持续遍历该哈希链
+        HashEntry&lt;K,V&gt; f; // to recheck first below
+        if (retries &lt; 0) {
+            if (e == null) {
+                if (node == null) //若不存在要插入的节点，则创建一个新的节点
+                    node = new HashEntry&lt;K,V&gt;(hash, key, value, null);
+                retries = 0;
+            }
+            else if (key.equals(e.key))
+                retries = 0;
+            else
+                e = e.next;
+        }
+        else if (++retries &gt; MAX_SCAN_RETRIES) {
+        //尝试次数超出限制，则进行自旋等待
+            lock();
+            break;
+        }
+        /*当在自旋过程中发现节点链的链头发生了变化，则更新节点链的链头，
+        并重置retries值为－1，重新为尝试获取锁而自旋遍历*/
+        else if ((retries &amp; 1) == 0 &amp;&amp;
+                 (f = entryForHash(this, hash)) != first) {
+            e = first = f; // re-traverse if entry changed
+            retries = -1;
+        }
+    }
+    return node;
+}
+</code></pre><h4 id="remove">remove</h4>
+<p>用于移除某个节点，返回移除的节点值。</p>
+<pre><code>final V remove(Object key, int hash, Object value) {
+    if (!tryLock())
+        scanAndLock(key, hash);
+    V oldValue = null;
+    try {
+        HashEntry&lt;K,V&gt;[] tab = table;
+        int index = (tab.length - 1) &amp; hash;
+        //根据这种哈希定位方式来定位对应的HashEntry
+        HashEntry&lt;K,V&gt; e = entryAt(tab, index);
+        HashEntry&lt;K,V&gt; pred = null;
+        while (e != null) {
+            K k;
+            HashEntry&lt;K,V&gt; next = e.next;
+            if ((k = e.key) == key ||
+                (e.hash == hash &amp;&amp; key.equals(k))) {
+                V v = e.value;
+                if (value == null || value == v || value.equals(v)) {
+                    if (pred == null)
+                        setEntryAt(tab, index, next);
+                    else
+                        pred.setNext(next);
+                    ++modCount;
+                    --count;
+                    oldValue = v;
+                }
+                break;
+            }
+            pred = e;
+            e = next;
+        }
+    } finally {
+        unlock();
+    }
+    return oldValue;
+}
+</code></pre><h4 id="clear">Clear</h4>
+<p>要首先对整个<code>segment</code>加锁，然后将每一个<code>HashEntry</code>都设置为<code>null</code>。</p>
+<pre><code>final void clear() {
+    lock();
+    try {
+        HashEntry&lt;K,V&gt;[] tab = table;
+        for (int i = 0; i &lt; tab.length ; i++)
+            setEntryAt(tab, i, null);
+        ++modCount;
+        count = 0;
+    } finally {
+        unlock();
+    }
+}
+</code></pre><h3 id="put-1">Put</h3>
+<pre><code>public V put(K key, V value) {
+    Segment&lt;K,V&gt; s;
+    if (value == null)
+        throw new NullPointerException();
+    int hash = hash(key); //求出key的hash值
+    int j = (hash &gt;&gt;&gt; segmentShift) &amp; segmentMask;
+    //求出key在segments数组中的哪一个segment中
+    if ((s = (Segment&lt;K,V&gt;)UNSAFE.getObject           
+         (segments, (j &lt;&lt; SSHIFT) + SBASE)) == null)  
+        s = ensureSegment(j); //使用unsafe操作取出该segment
+    return s.put(key, hash, value, false); //向segment中put元素
+}
+</code></pre><h3 id="get">Get</h3>
+<pre><code>public V get(Object key) {
+    Segment&lt;K,V&gt; s;
+    HashEntry&lt;K,V&gt;[] tab;
+    int h = hash(key); //找出对应的segment的位置
+    long u = (((h &gt;&gt;&gt; segmentShift) &amp; segmentMask) &lt;&lt; SSHIFT) + SBASE;
+    if ((s = (Segment&lt;K,V&gt;)UNSAFE.getObjectVolatile(segments, u)) != null &amp;&amp;
+        (tab = s.table) != null) {  //使用Unsafe获取对应的Segmen
+        for (HashEntry&lt;K,V&gt; e = (HashEntry&lt;K,V&gt;) UNSAFE.getObjectVolatile
+                 (tab, ((long)(((tab.length - 1) &amp; h)) &lt;&lt; TSHIFT) + TBASE);
+             e != null; e = e.next) { //找出对应的HashEntry，从头开始遍历
+            K k;
+            if ((k = e.key) == key || (e.hash == h &amp;&amp; key.equals(k)))
+                return e.value;
+        }
+    }
+    return null;
+}
+</code></pre><h3 id="size">Size</h3>
+<p>求出所有的HashEntry的数目，<strong>先尝试的遍历查找、计算2遍</strong>，如果两遍遍历过程中整个Map没有发生修改（即两次所有Segment实例中modCount值的和一致），则可以认为整个查找、计算过程中Map没有发生改变。否则,需要对所有segment实例进行加锁、计算、解锁，然后返回。</p>
+<pre><code>public int size() {
+
+   final Segment&lt;K,V&gt;[] segments = this.segments;
+   int size;
+   boolean overflow; // true if size overflows 32 bits
+   long sum;         // sum of modCounts
+   long last = 0L;   // previous sum
+   int retries = -1; // first iteration isn't retry
+   try {
+       for (;;) {
+           if (retries++ == RETRIES_BEFORE_LOCK) {
+               for (int j = 0; j &lt; segments.length; ++j)
+                   ensureSegment(j).lock(); // force creation
+           }
+           sum = 0L;
+           size = 0;
+           overflow = false;
+           for (int j = 0; j &lt; segments.length; ++j) {
+               Segment&lt;K,V&gt; seg = segmentAt(segments, j);
+               if (seg != null) {
+                   sum += seg.modCount;
+                   int c = seg.count;
+                   if (c &lt; 0 || (size += c) &lt; 0)
+                       overflow = true;
+               }
+           }
+           if (sum == last)
+               break;
+           last = sum;
+       }
+   } finally {
+       if (retries &gt; RETRIES_BEFORE_LOCK) {
+           for (int j = 0; j &lt; segments.length; ++j)
+               segmentAt(segments, j).unlock();
+       }
+   }
+   return overflow ? Integer.MAX_VALUE : size;
+}
+</code></pre><h2 id="jdk18">JDK1.8</h2>
+<p>在JDK1.8中对ConcurrentHashmap做了两个改进：</p>
+<ul>
+<li>
+<p>取消<code>segments</code>字段，直接采用<code>transient volatile HashEntry&lt;K,V&gt;[] table</code>保存数据，<strong>采用table数组元素作为锁，从而实现了对每一行数据进行加锁，进一步减少并发冲突的概率</strong>。</p>
+</li>
+<li>
+<p>将原先 <strong>table数组＋单向链表</strong> 的数据结构，变更为 <strong>table数组＋单向链表＋红黑树</strong> 的结构。对于 hash 表来说，最核心的能力在于将 key hash 之后能均匀的分布在数组中。如果 hash 之后散列的很均匀，那么 table 数组中的每个队列长度主要为 0 或者 1 。但实际情况并非总是如此理想，虽然 <code>ConcurrentHashMap</code> 类默认的加载因子为 <code>0.75</code>，但是在数据量过大或者运气不佳的情况下，还是会存在一些队列长度过长的情况，如果还是采用单向列表方式，那么查询某个节点的时间复杂度为 $$O(n)$$；因此，对于个数超过 8 (默认值)的链表，jdk1.8 中采用了红黑树的结构，那么查询的时间复杂度可以降低到 $$O(logN)$$，可以改进性能。</p>
+</li>
+</ul>
+<h3 id="put-2">Put</h3>
+<pre><code>final V putVal(K key, V value, boolean onlyIfAbsent) {
+    if (key == null || value == null) throw new NullPointerException();
+    // 得到 hash 值
+    int hash = spread(key.hashCode());
+    // 用于记录相应链表的长度
+    int binCount = 0;
+    for (Node&lt;K,V&gt;[] tab = table;;) {
+        Node&lt;K,V&gt; f; int n, i, fh;
+        // 如果数组&quot;空&quot;，进行数组初始化
+        if (tab == null || (n = tab.length) == 0)
+            // 初始化数组，后面会详细介绍
+            tab = initTable();
+
+        // 找该 hash 值对应的数组下标，得到第一个节点 f
+        else if ((f = tabAt(tab, i = (n - 1) &amp; hash)) == null) {
+            // 如果数组该位置为空，
+            //    用一次 CAS 操作将这个新值放入其中即可，这个 put 操作差不多就结束了，可以拉到最后面了
+            //          如果 CAS 失败，那就是有并发操作，进到下一个循环就好了
+            if (casTabAt(tab, i, null,
+                         new Node&lt;K,V&gt;(hash, key, value, null)))
+                break;                   // no lock when adding to empty bin
+        }
+        // hash 居然可以等于 MOVED，这个需要到后面才能看明白，不过从名字上也能猜到，肯定是因为在扩容
+        else if ((fh = f.hash) == MOVED)
+            // 帮助数据迁移，这个等到看完数据迁移部分的介绍后，再理解这个就很简单了
+            tab = helpTransfer(tab, f);
+
+        else { // 到这里就是说，f 是该位置的头结点，而且不为空
+
+            V oldVal = null;
+            // 获取数组该位置的头结点的监视器锁
+            synchronized (f) {
+                if (tabAt(tab, i) == f) {
+                    if (fh &gt;= 0) { // 头结点的 hash 值大于 0，说明是链表
+                        // 用于累加，记录链表的长度
+                        binCount = 1;
+                        // 遍历链表
+                        for (Node&lt;K,V&gt; e = f;; ++binCount) {
+                            K ek;
+                            // 如果发现了&quot;相等&quot;的 key，判断是否要进行值覆盖，然后也就可以 break 了
+                            if (e.hash == hash &amp;&amp;
+                                ((ek = e.key) == key ||
+                                 (ek != null &amp;&amp; key.equals(ek)))) {
+                                oldVal = e.val;
+                                if (!onlyIfAbsent)
+                                    e.val = value;
+                                break;
+                            }
+                            // 到了链表的最末端，将这个新值放到链表的最后面
+                            Node&lt;K,V&gt; pred = e;
+                            if ((e = e.next) == null) {
+                                pred.next = new Node&lt;K,V&gt;(hash, key,
+                                                          value, null);
+                                break;
+                            }
+                        }
+                    }
+                    else if (f instanceof TreeBin) { // 红黑树
+                        Node&lt;K,V&gt; p;
+                        binCount = 2;
+                        // 调用红黑树的插值方法插入新节点
+                        if ((p = ((TreeBin&lt;K,V&gt;)f).putTreeVal(hash, key,
+                                                       value)) != null) {
+                            oldVal = p.val;
+                            if (!onlyIfAbsent)
+                                p.val = value;
+                        }
+                    }
+                }
+            }
+
+            if (binCount != 0) {
+                // 判断是否要将链表转换为红黑树，临界值和 HashMap 一样，也是 8
+                if (binCount &gt;= TREEIFY_THRESHOLD)
+                    // 这个方法和 HashMap 中稍微有一点点不同，那就是它不是一定会进行红黑树转换，
+                    // 如果当前数组的长度小于 64，那么会选择进行数组扩容，而不是转换为红黑树
+                    //    具体源码我们就不看了，扩容部分后面说
+                    treeifyBin(tab, i);
+                if (oldVal != null)
+                    return oldVal;
+                break;
+            }
+        }
+    }
+    //
+    addCount(1L, binCount);
+    return null;
+}
+</code></pre><h3 id="get-1">Get</h3>
+<ul>
+<li>计算 hash 值</li>
+<li>根据 hash 值找到数组对应位置: <code>(n - 1) &amp; h</code></li>
+<li>根据该位置处结点性质进行相应查找
+<ul>
+<li>如果该位置为 null ，那么直接返回 null 就可以了</li>
+<li>如果该位置处的节点刚好就是我们需要的，返回该节点的值即可</li>
+<li>如果该位置节点的 hash 值小于 0，说明正在扩容，或者是红黑树，后面我们再介绍 find 方法</li>
+<li>如果以上 3 条都不满足，那就是链表，进行遍历比对即可</li>
+</ul>
+</li>
+</ul>
+</article>
+ 
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/java/collection/Concurrenthashmap/index.md" target="_blank" rel="noopener">
+      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
+      
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#jdk17">JDK1.7</a>
+      <ul>
+        <li><a href="#segment类">Segment类</a></li>
+        <li><a href="#put-1">Put</a></li>
+        <li><a href="#get">Get</a></li>
+        <li><a href="#size">Size</a></li>
+      </ul>
+    </li>
+    <li><a href="#jdk18">JDK1.8</a>
+      <ul>
+        <li><a href="#put-2">Put</a></li>
+        <li><a href="#get-1">Get</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

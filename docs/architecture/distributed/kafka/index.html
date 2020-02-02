@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Kafka"><meta property="og:title" content="Kafka" />
+<meta property="og:description" content="Kafka 术语  Broker：Kafka 集群包含一个或多个服务器，这种服务器被称为 broker 。 Topic：每条发布到 Kafka 集群的消息都有一个类别，这个类别被称为 Topic。（物理上不同 Topic 的消息分开存储，逻辑上一个 Topic 的消息虽然保存于一个或多个 broker 上，但用户只需指定消息的 Topic 即可生产或消费数据而不必关心数据存于何处）。 Partition： Partition 是物理上的概念，每个 Topic 包含一个或多个 Partition 。 Producer：负责发布消息到 Kafka broker。 Consumer：消息消费者，向 Kafka broker 读取消息的客户端。 Consumer Group：每个 Consumer 属于一个特定的 Consumer Group（可为每个 Consumer 指定 group name，若不指定 group name 则属于默认的 group）。  拓扑结构 如上图所示，一个典型的 Kafka 集群中包含若干 Producer （可以是web前端产生的Page View，或者是服务器日志，系统CPU、Memory等），若干 broker （Kafka支持水平扩展，一般broker数量越多，集群吞吐率越高），若干 Consumer Group ，以及一个 Zookeeper 集群。 Kafka 通过 Zookeeper 管理集群配置，选举 leader ，以及在 Consumer Group 发生变化时进行 rebalance。 Producer 使用 push 模式将消息发布到broker，Consumer使用pull模式从broker订阅并消费消息。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hadyang.github.io/interview/docs/architecture/distributed/kafka/" />
+<meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
+<meta property="article:modified_time" content="2019-08-21T11:00:41+08:00" />
+<title>Kafka | Interview</title>
+<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/interview/book.min.b7fe34b8a4c4da05b2690b4aacfa71ddce0668cc6da3abb67dd3946844125444.css" integrity="sha256-t/40uKTE2gWyaQtKrPpx3c4GaMxto6u2fdOUaEQSVEQ=">
+
+
+<script defer src="/interview/en.search.min.4daab1eda22baec10d130347f095a8463b951038b7e98060a59bcdc484ada980.js" integrity="sha256-Taqx7aIrrsENEwNH8JWoRjuVEDi36YBgpZvNxIStqYA="></script>
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/interview"><span>Interview</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+  <ul>
+<li><a href="/interview/docs/basic/">计算机基础</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/">算法</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
+<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
+<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
+<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
+<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
+<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
+<li><a href="/interview/docs/basic/algo/sort/">排序算法</a></li>
+<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/os/">操作系统</a>
+<ul>
+<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
+<li><a href="/interview/docs/basic/os/concurrency/">并发</a></li>
+<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
+<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
+<li><a href="/interview/docs/basic/os/linux/">Linux系统</a></li>
+<li><a href="/interview/docs/basic/os/interrupt/">中断</a></li>
+<li><a href="/interview/docs/basic/os/device/">设备管理</a></li>
+<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
+<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/net/">计算机网络</a>
+<ul>
+<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
+<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
+<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
+<li><a href="/interview/docs/basic/net/http/">HTTP</a></li>
+<li><a href="/interview/docs/basic/net/https/">HTTPS</a></li>
+<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/">数据库</a>
+<ul>
+<li><a href="/interview/docs/basic/database/transaction/">事务</a></li>
+<li><a href="/interview/docs/basic/database/index/">索引</a></li>
+<li><a href="/interview/docs/basic/database/sql/">SQL</a></li>
+<li><a href="/interview/docs/basic/database/join/">连接</a></li>
+<li><a href="/interview/docs/basic/database/mysql/">MySQL</a></li>
+<li><a href="/interview/docs/basic/database/concurrent/">并发控制</a></li>
+<li><a href="/interview/docs/basic/database/innodb/">Innodb</a></li>
+<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/">Java</a>
+<ul>
+<li><a href="/interview/docs/java/oop/">OOP</a></li>
+<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
+<li><a href="/interview/docs/java/operator/">运算符</a></li>
+<li><a href="/interview/docs/java/exception/">异常</a></li>
+<li><a href="/interview/docs/java/generics/">泛型</a></li>
+<li><a href="/interview/docs/java/object/">Object</a></li>
+<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
+<li><a href="/interview/docs/java/proxy/">代理</a></li>
+<li><a href="/interview/docs/java/annotation/">注解</a></li>
+<li><a href="/interview/docs/java/questions/">面试题</a></li>
+<li><a href="/interview/docs/java/nio/">NIO</a></li>
+<li><a href="/interview/docs/java/">集合</a>
+<ul>
+<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
+<li><a href="/interview/docs/java/collection/Concurrenthashmap/">Concurrenthashmap</a></li>
+<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/concurrent/">并发</a>
+<ul>
+<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
+<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
+<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
+<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
+<li><a href="/interview/docs/java/concurrent/AQS/">AQS</a></li>
+<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
+<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
+<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<ul>
+<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
+<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/gc/">GC</a>
+<ul>
+<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
+<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/">框架</a>
+<ul>
+<li><a href="/interview/docs/fromwork/netty/">Netty</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
+<ul>
+<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/spring/">Spring</a>
+<ul>
+<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
+<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
+<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/">系统架构</a>
+<ul>
+<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
+<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
+<ul>
+<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/design/">系统设计</a>
+<ul>
+<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/distributed/">分布式</a>
+<ul>
+<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
+<li><a href="/interview/docs/architecture/distributed/session/">分布式Session</a></li>
+<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
+<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
+<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
+<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
+<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
+<li><a href="/interview/docs/architecture/distributed/kafka/"class=active>Kafka</a></li>
+<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
+<li><a href="/interview/docs/architecture/distributed/dubbo/">Dubbo</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
+<ul>
+<li><a href="/interview/docs/architecture/bigdata/algo/">基础算法</a></li>
+<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/offer/">剑指offer</a>
+<ul>
+<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
+<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
+<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
+<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
+<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
+<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
+<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
+<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
+<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
+<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
+<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
+<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
+<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
+<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
+<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
+<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
+<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
+<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
+<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
+<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
+<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
+<li><a href="/interview/docs/offer/VerifySquenceOfBST/">二叉搜索树的后序遍历序列</a></li>
+<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
+<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
+<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
+<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
+<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
+<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
+<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
+<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
+<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
+<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
+<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
+<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
+<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
+<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
+<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
+<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
+<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
+<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
+<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
+<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
+<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
+<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
+<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
+<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
+<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
+<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
+<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
+<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
+<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
+<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
+<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
+<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
+<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
+<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
+<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
+<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
+<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
+<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
+<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
+<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
+<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
+<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
+<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
+<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
+<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/leetcode/">LeetCode</a>
+<ul>
+<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
+<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
+<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
+<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
+<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
+<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
+<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
+<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
+<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
+<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
+<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
+<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
+<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
+<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
+<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
+<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
+<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
+<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
+<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
+<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
+<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
+<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
+<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
+<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
+<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
+<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
+<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
+<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
+<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
+<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
+<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
+<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+<script>
+(function() {
+  var menu = document.querySelector("aside.book-menu nav");
+  addEventListener("beforeunload", function(event) {
+    localStorage.setItem("menu.scrollTop", menu.scrollTop);
+  });
+  menu.scrollTop = localStorage.getItem("menu.scrollTop");
+})();
+</script>
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>Kafka</strong>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#术语">术语</a></li>
+    <li><a href="#拓扑结构">拓扑结构</a></li>
+    <li><a href="#topic--partition">Topic & Partition</a></li>
+    <li><a href="#producer-消息路由">Producer 消息路由</a></li>
+    <li><a href="#consumer-group">Consumer Group</a></li>
+    <li><a href="#consumer-个数与-parition-数有什么关系">Consumer 个数与 Parition 数有什么关系？</a></li>
+    <li><a href="#push-vs-pull">Push vs. Pull　　</a></li>
+    <li><a href="#高可用性">高可用性</a></li>
+    <li><a href="#消息幂等性">消息幂等性</a></li>
+    <li><a href="#消息丢失">消息丢失</a>
+      <ul>
+        <li><a href="#消费端弄丢了数据">消费端弄丢了数据</a></li>
+        <li><a href="#kafka-弄丢了数据">Kafka 弄丢了数据</a></li>
+        <li><a href="#生产者会不会弄丢数据">生产者会不会弄丢数据？</a></li>
+      </ul>
+    </li>
+    <li><a href="#消息的顺序性">消息的顺序性</a></li>
+    <li><a href="#kafka-如何进行扩容的">Kafka 如何进行扩容的？</a></li>
+    <li><a href="#leader-选举过程">Leader 选举过程</a>
+      <ul>
+        <li><a href="#控制器的选举">控制器的选举</a></li>
+        <li><a href="#分区-leader-的选举">分区 Leader 的选举</a></li>
+        <li><a href="#消费者相关的选举">消费者相关的选举</a></li>
+      </ul>
+    </li>
+    <li><a href="#负载均衡">负载均衡</a>
+      <ul>
+        <li><a href="#producers-负载均衡">Producers 负载均衡</a></li>
+        <li><a href="#consumer-负载均衡">Consumer 负载均衡</a></li>
+      </ul>
+    </li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+<article class="markdown"><h1 id="kafka">Kafka</h1>
+<h2 id="术语">术语</h2>
+<ul>
+<li><strong>Broker</strong>：Kafka 集群包含一个或多个服务器，这种服务器被称为 <code>broker</code> 。</li>
+<li><strong>Topic</strong>：每条发布到 Kafka 集群的消息都有一个类别，这个类别被称为 Topic。（物理上不同 Topic 的消息分开存储，逻辑上一个 Topic 的消息虽然保存于一个或多个 broker 上，但用户只需指定消息的 Topic 即可生产或消费数据而不必关心数据存于何处）。</li>
+<li><strong>Partition</strong>： <code>Partition</code> 是物理上的概念，每个 <code>Topic</code> 包含一个或多个 <code>Partition</code> 。</li>
+<li><strong>Producer</strong>：负责发布消息到 Kafka broker。</li>
+<li><strong>Consumer</strong>：消息消费者，向 Kafka broker 读取消息的客户端。</li>
+<li><strong>Consumer Group</strong>：每个 <code>Consumer</code> 属于一个特定的 <code>Consumer Group</code>（可为每个 Consumer 指定 group name，若不指定 group name 则属于默认的 group）。</li>
+</ul>
+<h2 id="拓扑结构">拓扑结构</h2>
+<p><img src="images/9a9bab37c896c086e2fee7b3e15a9ae3.png" alt="image"></p>
+<p>如上图所示，一个典型的 <code>Kafka</code> 集群中包含若干 <code>Producer</code> （可以是web前端产生的Page View，或者是服务器日志，系统CPU、Memory等），若干 <code>broker</code> （Kafka支持水平扩展，一般broker数量越多，集群吞吐率越高），若干 <code>Consumer Group</code> ，以及一个 <code>Zookeeper</code> 集群。 <code>Kafka</code> 通过 <code>Zookeeper</code> 管理集群配置，选举 <code>leader</code> ，以及在 <code>Consumer Group</code> 发生变化时进行 rebalance。 <code>Producer</code> 使用 push 模式将消息发布到broker，Consumer使用pull模式从broker订阅并消费消息。</p>
+<h2 id="topic--partition">Topic &amp; Partition</h2>
+<p><strong>Topic 在逻辑上可以被认为是一个 queue</strong> ，每条消费都必须指定它的 <code>Topic</code> ，可以简单理解为必须指明把这条消息放进哪个 <code>queue</code> 里。为了使得 Kafka 的吞吐率可以线性提高，<strong>物理上把 <code>Topic</code> 分成一个或多个 <code>Partition</code></strong> ，每个 <code>Partition</code> 在物理上对应一个文件夹，该文件夹下存储这个 <code>Partition</code> 的所有消息和索引文件。若创建 <code>topic1</code> 和 <code>topic2</code> 两个 <code>topic</code> ，且分别有 13 个和 19 个分区，则整个集群上会相应会生成共 32 个文件夹（本文所用集群共8个节点，此处 <code>topic1</code> 和 <code>topic2</code> <code>replication-factor</code> 均为1）。</p>
+<blockquote>
+<p>Partition 都是通过 顺序读写，所以效率很高</p>
+</blockquote>
+<blockquote>
+<p>replication-factor 配置 partition 副本数。配置副本之后,每个 partition 都有一个唯一的 leader ，有 0 个或多个 follower 。所有的读写操作都在 leader 上完成，followers 从 leader 消费消息来复制 message，就跟普通的 consumer 消费消息一样。一般情况下 partition 的数量大于等于 broker 的数量，并且所有 partition 的 leader 均匀分布在 broker 上。</p>
+</blockquote>
+<p>对于传统的 MQ 而言，一般会删除已经被消费的消息，而 Kafka 集群会保留所有的消息，无论其被消费与否。当然，因为磁盘限制，不可能永久保留所有数据（实际上也没必要），因此 Kafka 提供两种策略删除旧数据。一是基于时间，二是基于 Partition 文件大小。</p>
+<h2 id="producer-消息路由">Producer 消息路由</h2>
+<p>Producer 发送消息到 broker 时，会根据 Paritition 机制选择将其存储到哪一个 Partition 。如果 Partition 机制设置合理，所有消息可以均匀分布到不同的 Partition 里，这样就实现了负载均衡。如果一个 Topic 对应一个文件，那这个文件所在的机器I/O将会成为这个 Topic 的性能瓶颈，而有了 Partition 后，不同的消息可以并行写入不同 broker 的不同 Partition 里，极大的提高了吞吐率。</p>
+<p>可以在 <code>$KAFKA_HOME/config/server.properties</code> 中通过配置项 <code>num.partitions</code> 来指定新建 <code>Topic</code> 的默认 <code>Partition</code> 数量，也可在创建 <code>Topic</code> 时通过参数指定，同时也可以在 Topic 创建之后通过 Kafka 提供的工具修改。</p>
+<ul>
+<li>指定了 patition，则直接使用</li>
+<li>未指定 patition 但指定 key，通过对 key 进行 hash 选出一个 patition</li>
+<li>patition 和 key 都未指定，使用轮询选出一个 patition</li>
+</ul>
+<h2 id="consumer-group">Consumer Group</h2>
+<p><img src="images/e54deac5512215cfc6801890bb83d792.png" alt="image"></p>
+<p>这是 Kafka 用来实现一个 Topic 消息的广播（发给所有的 Consumer ）和单播（发给某一个 Consumer ）的手段。一个 Topic 可以对应多个 Consumer Group 。如果需要实现广播，只要每个 Consumer 有一个独立的 Group 就可以了。要实现单播只要所有的 Consumer 在同一个 Group 里。用 Consumer Group 还可以将 Consumer 进行自由的分组而不需要多次发送消息到不同的 Topic 。</p>
+<h2 id="consumer-个数与-parition-数有什么关系">Consumer 个数与 Parition 数有什么关系？</h2>
+<p><strong>topic 下的一个分区只能被同一个 consumer group 下的一个 consumer 线程来消费</strong>，但反之并不成立，即一个 consumer 线程可以消费多个分区的数据。比如 Kafka 提供的 <code>ConsoleConsumer</code> ，默认就只是一个线程来消费所有分区的数据。</p>
+<blockquote>
+<p>即分区数决定了同组消费者个数的上限</p>
+</blockquote>
+<p><img src="images/5290a719713da5ce4e83422ded5bdf0c.png" alt="image"></p>
+<p>所以，如果你的分区数是 N ，那么最好线程数也保持为 N ，这样通常能够达到最大的吞吐量。超过 N 的配置只是浪费系统资源，因为多出的线程不会被分配到任何分区。</p>
+<ul>
+<li>如果消费线程大于 patition 数量，则有些线程将收不到消息</li>
+<li>如果 patition 数量大于消费线程数，则有些线程多收到多个 patition 的消息</li>
+<li>如果一个线程消费多个 patition，则无法保证你收到的消息的顺序，而一个 patition 内的消息是有序的</li>
+</ul>
+<h2 id="push-vs-pull">Push vs. Pull　　</h2>
+<p>作为一个消息系统，Kafka 遵循了传统的方式，选择由 Producer 向 broker <code>push</code> 消息并由 Consumer 从 broker <code>pull</code> 消息。事实上，push 模式和 pull 模式各有优劣。</p>
+<ul>
+<li>Push模式 很难适应消费速率不同的消费者，因为消息发送速率是由broker决定的。push模式的目标是尽可能以最快速度传递消息，但是这样很容易造成 Consumer 来不及处理消息，典型的表现就是拒绝服务以及网络拥塞。</li>
+<li>Pull模式 可以根据Consumer的消费能力以适当的速率消费消息。</li>
+</ul>
+<p>对于 Kafka 而言，Pull模式 更合适。Pull模式 可简化 broker 的设计，Consumer 可自主控制消费消息的速率，同时 Consumer 可以自己控制消费方式——即可批量消费也可逐条消费，同时还能选择不同的提交方式从而实现不同的传输语义。</p>
+<h2 id="高可用性">高可用性</h2>
+<p><code>Kafka 0.8</code> 以前，是没有 HA 机制的，就是任何一个 <code>broker</code> 宕机了，那个 <code>broker</code> 上的 <code>partition</code> 就废了，没法写也没法读，没有什么高可用性可言。</p>
+<p>比如说，我们假设创建了一个 <code>topic</code> ，指定其 <code>partition</code> 数量是 <code>3</code> 个，分别在三台机器上。但是，如果第二台机器宕机了，会导致这个 <code>topic</code> 的 <code>1/3</code> 的数据就丢了，因此这个是做不到高可用的。</p>
+<p><img src="images/ab965081f1e5ff28386d90ba18a17d6d.png" alt="image"></p>
+<p><code>Kafka 0.8</code> 以后，提供了 <code>HA</code> 机制，就是 <code>replica</code> <strong>副本机制</strong>。每个 <code>partition</code> 的数据都会同步到其它机器上，形成自己的多个 <code>replica</code> 副本。所有 <code>replica</code> 会选举一个 <code>leader</code> 出来，那么生产和消费都跟这个 <code>leader</code> 打交道，然后其他 <code>replica</code> 就是 <code>follower</code> 。写的时候， <code>leader</code> 会负责把数据同步到所有 <code>follower</code> 上去，读的时候就直接读 <code>leader</code> 上的数据即可。 <code>Kafka</code> 会均匀地将一个 <code>partition</code> 的所有 <code>replica</code> 分布在不同的机器上，这样才可以提高容错性。</p>
+<p><img src="images/a0de8d416add777aef97683192fd15db.png" alt="image"></p>
+<p>这么搞，就有所谓的高可用性了，因为如果某个 <code>broker</code> 宕机了，没事儿，那个 <code>broker</code> 上面的 <code>partition</code> 在其他机器上都有副本的，如果这上面有某个 <code>partition</code> 的 <code>leader</code> ，那么此时会从 <code>follower</code> 中 <strong>重新选举</strong> 一个新的 <code>leader</code> 出来，大家继续读写那个新的 <code>leader</code> 即可。这就有所谓的高可用性了。</p>
+<ul>
+<li><strong>写数据</strong> 的时候，生产者就写 <code>leader</code> ，然后 <code>leader</code> 将数据落地写本地磁盘，接着其他 <code>follower</code> 自己主动从 <code>leader</code> 来 <code>pull</code> 数据。一旦所有 <code>follower</code> 同步好数据了，就会发送 <code>ack</code> 给 <code>leader</code> ， <strong><code>leader</code> 收到所有 <code>follower</code> 的 <code>ack</code> 之后，就会返回写成功的消息给生产者</strong>。（当然，这只是其中一种模式，还可以适当调整这个行为）</li>
+<li><strong>消费</strong> 的时候，只会从 <code>leader</code> 去读，但是 <strong>只有当一个消息已经被所有 <code>follower</code> 都同步成功返回 <code>ack</code> 的时候，这个消息才会被消费者读到</strong>。</li>
+</ul>
+<h2 id="消息幂等性">消息幂等性</h2>
+<p><code>Kafka</code> 实际上有个 <code>offset</code> 的概念，就是每个消息写进去，都有一个 <code>offset</code> ，代表消息的序号，然后 <strong><code>consumer</code> 消费了数据之后，每隔一段时间（定时定期），会把自己消费过的消息的 <code>offset</code> 提交一下</strong>，表示“我已经消费过了，下次我要是重启啥的，你就让我继续从上次消费到的 <code>offset</code> 来继续消费吧”。</p>
+<p>但是凡事总有意外，比如我们之前生产经常遇到的，就是你有时候重启系统，看你怎么重启了，如果碰到点着急的，直接 <code>kill</code> 进程了，再重启。这会导致 <code>consumer</code> 有些消息处理了，但是没来得及提交 <code>offset</code> ，尴尬了。重启之后，<strong>少数消息会再次消费一次</strong>。</p>
+<p>幂等性，通俗点说，<strong>一个数据，或者一个请求，给你重复来多次，你得确保对应的数据是不会改变的，不能出错</strong>。其实重复消费不可怕，可怕的是你没考虑到重复消费之后，怎么保证幂等性？其实还是得 <strong>结合业务来思考</strong>，这里给几个思路：</p>
+<ul>
+<li>比如你拿个数据要写库，你先根据主键查一下，如果这数据都有了，你就别插入了，update 一下好吧。</li>
+<li>比如你是写 Redis ，那没问题了，反正每次都是 set，天然幂等性。</li>
+<li>比如你不是上面两个场景，那做的稍微复杂一点，你需要让生产者发送每条数据的时候，里面加一个全局唯一的 id，类似订单 id 之类的东西，然后你这里消费到了之后，先根据这个 id 去比如 Redis 里查一下，之前消费过吗？如果没有消费过，你就处理，然后这个 id 写 Redis。如果消费过了，那你就别处理了，保证别重复处理相同的消息即可。</li>
+<li>比如基于数据库的唯一键来保证重复数据不会重复插入多条。因为有唯一键约束了，重复数据插入只会报错，不会导致数据库中出现脏数据。</li>
+</ul>
+<h2 id="消息丢失">消息丢失</h2>
+<h3 id="消费端弄丢了数据">消费端弄丢了数据</h3>
+<p>唯一可能导致消费者弄丢数据的情况，就是说，你消费到了这个消息，然后消费者那边 <strong>自动提交了 <code>offset</code></strong> ，让 <code>Kafka</code> 以为你已经消费好了这个消息，但其实你才刚准备处理这个消息，你还没处理，你自己就挂了，此时这条消息就丢咯。</p>
+<p><code>Kafka</code> 会自动提交 <code>offset</code> ，那么只要关闭自动提交 <code>offset</code> ，在处理完之后自己手动提交 <code>offset</code> ，就可以保证数据不会丢。但是此时确实还是可能会有重复消费，比如你刚处理完，还没提交 <code>offset</code> ，结果自己挂了，此时肯定会重复消费一次，自己 <strong>保证幂等性</strong> 就好了。</p>
+<h3 id="kafka-弄丢了数据">Kafka 弄丢了数据</h3>
+<p>这块比较常见的一个场景，就是 <code>Kafka</code> 某个 <code>broker</code> 宕机，然后重新选举 <code>partition</code> 的 <code>leader</code> 。大家想想，要是此时其他的 <code>follower</code> 刚好还有些数据没有同步，结果此时 <code>leader</code> 挂了，然后选举某个 <code>follower</code> 成 <code>leader</code> 之后，不就少了一些数据？这就丢了一些数据啊。</p>
+<p>此时一般是要求起码设置如下 4 个参数：</p>
+<ul>
+<li>给 <code>topic</code> 设置 <code>replication.factor</code> 参数：这个值必须大于 1，要求每个 <code>partition</code> 必须有 <strong>至少</strong> 2 个副本。</li>
+<li>在 <code>Kafka</code> 服务端设置 <code>min.insync.replicas</code> 参数：这个值必须大于 1，这个是 <strong>要求一个 <code>leader</code> 至少感知到有至少一个 <code>follower</code> 还跟自己保持联系</strong>，没掉队，这样才能确保 <code>leader</code> 挂了还有一个 <code>follower</code> 吧。</li>
+<li>在 <code>producer</code> 端设置 <code>acks=all</code>：这个是要求每条数据，<strong>必须是写入所有 <code>replica</code> 之后，才能认为是写成功了</strong>。</li>
+<li>在 <code>producer</code> 端设置 <code>retries=MAX</code>（很大很大很大的一个值，无限次重试的意思）：这个是要求 <strong>一旦写入失败，就无限重试</strong>，卡在这里了。</li>
+</ul>
+<p>这样配置之后，至少在 Kafka <code>broker</code> 端就可以保证在 <code>leader</code> 所在 <code>broker</code> 发生故障，进行 <code>leader</code> 切换时，数据不会丢失。</p>
+<h3 id="生产者会不会弄丢数据">生产者会不会弄丢数据？</h3>
+<p>如果按照上述的思路设置了 <code>acks=all</code>，一定不会丢，要求是，你的 <code>leader</code> 接收到消息，所有的 <code>follower</code> 都同步到了消息之后，才认为本次写成功了。如果没满足这个条件，生产者可以自动不断的重试，重试无限次。</p>
+<h2 id="消息的顺序性">消息的顺序性</h2>
+<p>比如说我们建了一个 <code>topic</code> ，有三个 <code>partition</code> 。生产者在写的时候，其实可以指定一个 <code>key</code> ，比如说我们指定了某个订单 <code>id</code> 作为 <code>key</code> ，那么这个订单相关的数据，一定会被分发到同一个 <code>partition</code> 中去，而且这个 <code>partition</code> 中的数据一定是有顺序的。</p>
+<p>消费者从 <code>partition</code> 中取出来数据的时候，也一定是有顺序的。到这里，顺序还是 <code>ok</code> 的，没有错乱。接着，我们在消费者里可能会搞 <strong>多个线程来并发处理消息</strong>。而多个线程并发跑的话，顺序可能就乱掉了。</p>
+<p><img src="images/7d529fbf2f856582c2eb3ee787ede5fd.png" alt="image"></p>
+<p>解决方案：</p>
+<ul>
+<li>一个 <code>topic</code> ，一个 <code>partition</code> ，一个 <code>consumer</code> ，内部单线程消费，单线程吞吐量太低，一般不会用这个。</li>
+<li>写 <code>N</code> 个内存 <code>queue</code> ，具有相同 <code>key</code> 的数据都到同一个内存 <code>queue</code> ；然后对于 N 个线程，每个线程分别消费一个内存 <code>queue</code> 即可，这样就能保证顺序性。</li>
+</ul>
+<p><img src="images/09d68167fcb34b075259add9b81809cd.png" alt="image"></p>
+<h2 id="kafka-如何进行扩容的">Kafka 如何进行扩容的？</h2>
+<p>假如集群有 3 个 broker，一共有 4 个 TP，每个 3 副本，均匀分布。现在要扩容一台机器，新 broker 加入集群后需要通过工具进行 TP 的迁移。一共迁移 3 个 TP 的副本到新 broker 上。等迁移结束之后，会重新进行 Leader balance。</p>
+<p>从微观的角度看，TP 从一台 broker 迁移到另一个 broker 的流程是怎么样的呢？咱们来看下 TP3 第三个副本，从 broker1 迁移到 broker4 的过程，如下图所示，broker4 作为 TP3 的 follower，从 broker1 上最早的 <code>offset</code> 进行获取数据，直到赶上最新的 <code>offset</code> 为止，新副本被放入 ISR 中，并移除 broker1 上的副本，迁移过程完毕。</p>
+<p>但在现有的扩容流程中存有如下问题：数据迁移从 TP3 的最初的 <code>offset</code> 开始拷贝数据，这会导致大量读磁盘，消耗大量的 I/O 资源，导致磁盘繁忙，从而造成 produce 操作延迟增长，产生抖动。所以整体迁移流程不够平滑。我们看下实际的监控到的数据。从中可以看到数据迁移中， <code>broker1</code> 上磁盘读量增大，磁盘 util 持续打满，produce 极其不稳定。</p>
+<p>针对这个问题，我们回到 Kafka 迁移的流程上看，理论上 Kafka 是一个缓存系统，不需要永久存储数据，很有可能费了很多工作迁移过来的数据根本就不会被使用，甚至马上就会被删除了。从这个角度上看，那么迁移数据时，为什么一定要从 partition 最初 <code>offset</code> 开始迁移数据呢？细想想，好像不需要这样。</p>
+<p>所以，解决这个问题的思路就比较简单了，在迁移 TP 时，<strong>直接从 partition 最新的 offset 开始数据迁移</strong>，但是要同步保持一段时间，主要是确保所有 consumer 都已经跟得上了。</p>
+<h2 id="leader-选举过程">Leader 选举过程</h2>
+<h3 id="控制器的选举">控制器的选举</h3>
+<p>在Kafka集群中会有一个或多个broker，其中有一个broker会被选举为控制器（Kafka Controller），它负责管理整个集群中所有分区和副本的状态等工作。比如当某个分区的 Leader 副本出现故障时，由控制器负责为该分区选举新的 Leader 副本。再比如当检测到某个分区的 ISR(In-Sync Replicas) 集合发生变化时，由控制器负责通知所有 broker 更新其元数据信息。</p>
+<p>Kafka Controller 的选举是依赖 Zookeeper 来实现的，在 Kafka 集群中哪个 broker 能够成功创建 <code>/controller</code> 这个临时（EPHEMERAL）节点他就可以成为 Kafka Controller。Kafka Controller 的出现是处于性能考虑，当 Kafka 集群规模很大，partition 达到成千上万时，当 broker 宕机时，造成集群内大量的调整，会造成大量 Watch 事件被触发，Zookeeper负载会过重。</p>
+<h4 id="controller-脑裂">Controller 脑裂</h4>
+<p>kafka 中只有一个控制器 controller 负责分区的 leader 选举，同步 broker 的新增或删除消息，但有时由于网络问题，可能同时有两个 broker 认为自己是 controller ，这时候其他的 broker 就会发生脑裂。</p>
+<p>解决方案：每当新的 controller 产生的时候就会在 ZK 中生成一个全新的、数值更大的 controller epoch 的标识，并同步给其他的 broker 进行保存，这样当第二个 controller 发送指令时，其他的 broker 就会自动忽略。</p>
+<h3 id="分区-leader-的选举">分区 Leader 的选举</h3>
+<p>分区 Leader 副本的选举由 Kafka Controller 负责具体实施。当创建分区（创建主题或增加分区都有创建分区的动作）或分区上线（比如分区中原先的 Leader 副本下线，此时分区需要选举一个新的 Leader 上线来对外提供服务）的时候都需要执行 Leader 的选举动作。</p>
+<h3 id="消费者相关的选举">消费者相关的选举</h3>
+<p>组协调器 GroupCoordinator 需要为消费组内的消费者选举出一个消费组的 Leader，这个选举的算法也很简单，分两种情况分析。如果消费组内还没有 Leader，那么第一个加入消费组的消费者即为消费组的 Leader。如果某一时刻 Leader 消费者由于某些原因退出了消费组，那么会重新选举一个新的 Leader。</p>
+<h2 id="负载均衡">负载均衡</h2>
+<h3 id="producers-负载均衡">Producers 负载均衡</h3>
+<p>对于同一个 topic 的不同 partition，Kafka 会尽力将这些 partition 分布到不同的 broker 服务器上，这种均衡策略实际上是基于 ZooKeeper 实现的。在一个 broker 启动时，会首先完成 broker 的注册过程，并注册一些诸如 “有哪些可订阅的 topic” 之类的元数据信息。producers 启动后也要到 ZooKeeper 下注册，创建一个临时节点来监听 broker 服务器列表的变化。由于在 ZooKeeper 下 broker 创建的也是临时节点，当 brokers 发生变化时，producers 可以得到相关的通知，从改变自己的 broker list。其它的诸如 topic 的变化以及 broker 和 topic 的关系变化，也是通过 ZooKeeper 的这种 Watcher 监听实现的。</p>
+<p>在生产中，必须指定 topic；但是对于 partition，有两种指定方式：</p>
+<ul>
+<li>明确指定 <code>partition(0-N)</code>，则数据被发送到指定 partition；</li>
+<li>设置为 <code>RD_KAFKA_PARTITION_UA</code> ，则 Kafka 会回调 <code>partitioner</code> 进行均衡选取， <code>partitioner</code> 方法需要自己实现。可以轮询或者传入 key 进行 hash。未实现则采用默认的随机方法 <code>rd_kafka_msg_partitioner_random</code> 随机选择。</li>
+</ul>
+<h3 id="consumer-负载均衡">Consumer 负载均衡</h3>
+<p>Kafka 保证同一 consumer group 中只有一个 consumer 可消费某条消息，实际上，Kafka 保证的是稳定状态下每一个 consumer 实例只会消费某一个或多个特定的数据，而某个 partition 的数据只会被某一个特定的 consumer 实例所消费。这样设计的劣势是无法让同一个 consumer group 里的 consumer 均匀消费数据，优势是每个 consumer 不用都跟大量的 broker 通信，减少通信开销，同时也降低了分配难度，实现也更简单。另外，因为同一个 partition 里的数据是有序的，这种设计可以保证每个 partition 里的数据也是有序被消费。</p>
+<h4 id="consumer-数量不等于-partition-数量">consumer 数量不等于 partition 数量</h4>
+<p>如果某 consumer group 中 consumer 数量少于 partition 数量，则至少有一个 consumer 会消费多个 partition 的数据；如果 consumer 的数量与 partition 数量相同，则正好一个 consumer 消费一个 partition 的数据，而如果 consumer 的数量多于 partition 的数量时，会有部分 consumer 无法消费该 topic 下任何一条消息。</p>
+<h4 id="借助-zookeeper-实现负载均衡">借助 ZooKeeper 实现负载均衡</h4>
+<p>关于负载均衡，对于某些低级别的 API，consumer 消费时必须指定 topic 和 partition，这显然不是一种友好的均衡策略。基于高级别的 API，consumer 消费时只需制定 topic，借助 ZooKeeper 可以根据 partition 的数量和 consumer 的数量做到均衡的动态配置。</p>
+<p>consumers 在启动时会到 ZooKeeper 下以自己的 <code>conusmer-id</code> 创建临时节点 <code>/consumer/[group-id]/ids/[conusmer-id]</code>，并对 <code>/consumer/[group-id]/ids</code> 注册监听事件，当消费者发生变化时，同一 group 的其余消费者会得到通知。当然，消费者还要监听 broker 列表的变化。kafka 通常会将 partition 进行排序后，根据消费者列表，进行轮流的分配。</p>
+<h2 id="参考">参考</h2>
+<ul>
+<li><a href="http://www.jasongj.com/2015/03/10/KafkaColumn1/">Kafka设计解析</a></li>
+<li><a href="https://github.com/doocs/advanced-java/blob/master/docs/high-concurrency/how-to-ensure-high-availability-of-message-queues.md#kafka-%E7%9A%84%E9%AB%98%E5%8F%AF%E7%94%A8%E6%80%A7">Kafka的高可用</a></li>
+<li><a href="https://github.com/doocs/advanced-java/blob/master/docs/high-concurrency/how-to-ensure-that-messages-are-not-repeatedly-consumed.md">Kafka幂等性</a></li>
+<li><a href="https://github.com/doocs/advanced-java/blob/master/docs/high-concurrency/how-to-ensure-the-reliable-transmission-of-messages.md#kafka">Kafka消息丢失</a></li>
+<li><a href="https://www.infoq.cn/article/Q0o*QzLQiay31MWiOBJH">快手万亿级别 Kafka 集群应用实践与技术演进之路</a></li>
+<li><a href="https://www.jianshu.com/p/c987b5e055b0">kafka的leader选举过程</a></li>
+</ul>
+</article>
+ 
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/architecture/distributed/kafka/index.md" target="_blank" rel="noopener">
+      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
+      
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#术语">术语</a></li>
+    <li><a href="#拓扑结构">拓扑结构</a></li>
+    <li><a href="#topic--partition">Topic & Partition</a></li>
+    <li><a href="#producer-消息路由">Producer 消息路由</a></li>
+    <li><a href="#consumer-group">Consumer Group</a></li>
+    <li><a href="#consumer-个数与-parition-数有什么关系">Consumer 个数与 Parition 数有什么关系？</a></li>
+    <li><a href="#push-vs-pull">Push vs. Pull　　</a></li>
+    <li><a href="#高可用性">高可用性</a></li>
+    <li><a href="#消息幂等性">消息幂等性</a></li>
+    <li><a href="#消息丢失">消息丢失</a>
+      <ul>
+        <li><a href="#消费端弄丢了数据">消费端弄丢了数据</a></li>
+        <li><a href="#kafka-弄丢了数据">Kafka 弄丢了数据</a></li>
+        <li><a href="#生产者会不会弄丢数据">生产者会不会弄丢数据？</a></li>
+      </ul>
+    </li>
+    <li><a href="#消息的顺序性">消息的顺序性</a></li>
+    <li><a href="#kafka-如何进行扩容的">Kafka 如何进行扩容的？</a></li>
+    <li><a href="#leader-选举过程">Leader 选举过程</a>
+      <ul>
+        <li><a href="#控制器的选举">控制器的选举</a></li>
+        <li><a href="#分区-leader-的选举">分区 Leader 的选举</a></li>
+        <li><a href="#消费者相关的选举">消费者相关的选举</a></li>
+      </ul>
+    </li>
+    <li><a href="#负载均衡">负载均衡</a>
+      <ul>
+        <li><a href="#producers-负载均衡">Producers 负载均衡</a></li>
+        <li><a href="#consumer-负载均衡">Consumer 负载均衡</a></li>
+      </ul>
+    </li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

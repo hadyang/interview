@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Interview</title>
+    <link>https://hadyang.github.io/interview/docs/architecture/</link>
+    <description>Recent content on Interview</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Wed, 21 Aug 2019 11:00:41 +0800</lastBuildDate>
+    
+	<atom:link href="https://hadyang.github.io/interview/docs/architecture/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>系统架构基础</title>
+      <link>https://hadyang.github.io/interview/docs/architecture/base/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/architecture/base/</guid>
+      <description>系统架构基础 分布式系统的最大难点，就是各个节点的状态如何同步。CAP 定理是这方面的基本定理，也是理解分布式系统的起点。
+1998年，加州大学的计算机科学家 Eric Brewer 提出，分布式系统有三个指标。
+Consistency Availability Partition tolerance 它们的第一个字母分别是 C、A、P。Eric Brewer 说，这三个指标不可能同时做到。这个结论就叫做 CAP 定理。
+CAP 它指出对于一个分布式计算系统来说，不可能同时满足以下三点：
+ 一致性（Consistency） （等同于所有节点访问同一份最新的数据副本） 可用性（Availability）（每次请求都能获取到非错的响应——但是不保证获取的数据为最新数据） 分区容错性（Partition tolerance）（以实际效果而言，分区相当于对通信的时限要求。系统如果不能在时限内达成数据一致性，就意味着发生了分区的情况，必须就当前操作在C和A之间做出选择。）  数据一致性模型 一些分布式系统通过复制数据来提高系统的可靠性和容错性，并且将数据的不同的副本存放在不同的机器，由于维护数据副本的一致性代价高，因此许多系统采用弱一致性来提高性能，一些不同的一致性模型也相继被提出。
+ 强一致性： 要求无论更新操作实在哪一个副本执行，之后所有的读操作都要能获得最新的数据。 弱一致性：用户读到某一操作对系统特定数据的更新需要一段时间，我们称这段时间为“不一致性窗口”。 最终一致性：是弱一致性的一种特例，保证用户最终能够读取到某操作对系统特定数据的更新。  一致性解决方案  分布式事务：两段提交 分布式锁 MQ 消息持久化 重试 幂等 Paxos 算法  服务可用性 可用性，意思是只要收到用户的请求，服务器就必须给出回应。
+高可用解决方案  负载均衡： 降级：当服务器压力剧增的情况下，根据当前业务情况及流量对一些服务和页面有策略的降级，以此释放服务器资源以保证核心任务的正常运行。 熔断：对于目标服务的请求和调用大量超时或失败，这时应该熔断该服务的所有调用，并且对于后续调用应直接返回，从而快速释放资源，确保在目标服务不可用的这段时间内，所有对它的调用都是立即返回，不会阻塞的。再等到目标服务好转后进行接口恢复。 流量控制： 异地多活：  熔断是减少由于下游服务故障对自己的影响；而降级则是在整个系统的角度上，考虑业务整体流量，保护核心业务稳定。
+分区容错性 大多数分布式系统都分布在多个子网络。每个子网络就叫做一个区（partition）。分区容错的意思是，区间通信可能失败。比如，一台服务器放在中国，另一台服务器放在美国，这就是两个区，它们之间可能无法通信。
+般来说，分区容错无法避免，因此可以认为 CAP 的 P 总是成立。CAP 定理告诉我们，剩下的 C 和 A 无法同时做到。</description>
+    </item>
+    
+  </channel>
+</rss>

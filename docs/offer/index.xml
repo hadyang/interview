@@ -1,0 +1,764 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Interview</title>
+    <link>https://hadyang.github.io/interview/docs/offer/</link>
+    <description>Recent content on Interview</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Wed, 21 Aug 2019 11:00:41 +0800</lastBuildDate>
+    
+	<atom:link href="https://hadyang.github.io/interview/docs/offer/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>不用加减乘除做加法</title>
+      <link>https://hadyang.github.io/interview/docs/offer/Add/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/Add/</guid>
+      <description>题目 牛客网
+写一个函数，求两个整数之和，要求在函数体内不得使用+、-、*、/四则运算符号。
+解题思路  将加法分解成两步 两个数不计算进位相加得到 sum，计算进位 carry 再将进位加上：sum = sum + carry 直到没有进位为止  public int Add(int num1, int num2) { int sum, carry; do { sum = num1 ^ num2; carry = (num1 &amp;amp; num2) &amp;lt;&amp;lt; 1; num1 = sum; num2 = carry; } while (num2 != 0); return sum; } </description>
+    </item>
+    
+    <item>
+      <title>丑数</title>
+      <link>https://hadyang.github.io/interview/docs/offer/GetUglyNumber/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/GetUglyNumber/</guid>
+      <description>牛客网
+把只包含质因子2、3和5的数称作丑数（Ugly Number）。例如6、8都是丑数，但14不是，因为它包含质因子7。 习惯上我们把1当做是第一个丑数。求按从小到大的顺序的第N个丑数。
+解题思路  通过保存已有丑数的方式，用空间换时间 对于已有丑数 $$M$$ ，那么下一个丑数 $$M=\min(M_{2}\times2,M_{3}\times3,M_{5}\times5)$$ $$M_{max}$$ 是目前最大的丑数，那么 $$M_{2}$$ 是已有丑数中 $$M_{2}\times2$$ 第一个大于 $$M_{max}$$ 的丑数  public int GetUglyNumber_Solution(int index) { if (index == 0) { return 0; } if (index == 1) { return 1; } ArrayList&amp;lt;Integer&amp;gt; list = new ArrayList&amp;lt;&amp;gt;(index); list.add(1); int preIndex2 = 0; int preIndex3 = 0; int preIndex5 = 0; for (int i = 0; i &amp;lt; index; i++) { int next2 = list.</description>
+    </item>
+    
+    <item>
+      <title>两个链表的第一个公共结点</title>
+      <link>https://hadyang.github.io/interview/docs/offer/FindFirstCommonNode/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/FindFirstCommonNode/</guid>
+      <description>题目 牛客网
+输入两个链表，找出它们的第一个公共结点。
+解决思路 空间复杂度 O(n) 的算法  使用辅助容器，保存第一个链表的所有元素 遍历第二个链表，并对比当前节点是否在辅助容器中  /** * 空间 O(n) * * @param pHead1 * @param pHead2 * @return */ public ListNode FindFirstCommonNode_1(ListNode pHead1, ListNode pHead2) { Set&amp;lt;ListNode&amp;gt; node1s = new HashSet&amp;lt;&amp;gt;(); while (pHead1 != null) { node1s.add(pHead1); pHead1 = pHead1.next; } while (pHead2 != null) { if (node1s.contains(pHead2)) { return pHead2; } pHead2 = pHead2.next; } return null; } 空间复杂度 O(1) 的算法  由于两个链表有可能不一样长，首先通过遍历找到他们的长度 移动较长的那个链表，使得两个链表长度一致 同步遍历两个链表   原理：如果两个链表相交，那么它们一定有相同的尾节点</description>
+    </item>
+    
+    <item>
+      <title>个骰子的点数</title>
+      <link>https://hadyang.github.io/interview/docs/offer/SumOfNDice/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/SumOfNDice/</guid>
+      <description>题目 把 n 个骰子扔在地上，所有骰子朝上一面的和为 s，输入 n，打印 s 所有可能值的概率
+解题思路  首先考虑一个骰子的情况，那么有 1～6 出现的次数均为 1 再增加一个骰子时，由于各个点数出现的概率一致。用 $$f(n,s)=f(n-1,s-1)+f(n-1,s-2)+f(n-1,s-3)+f(n-1,s-4)+f(n-1,s-5)+f(n-1,s-6)$$ 使用两个数组循环求解  public void SumOfNDice(int n) { if (n &amp;lt; 1) { return; } int[][] nums = new int[2][n * 6 + 1]; int flag = 0; //初始化第一个骰子各总和出现的次数 int maxLen = nums[0].length; for (int i = 1; i &amp;lt; maxLen; i++) { nums[flag][i] = 1; } for (int i = 2; i &amp;lt;= n; i++) { int newFlag = flag ^ 0x01; Arrays.</description>
+    </item>
+    
+    <item>
+      <title>二叉搜索树与双向链表</title>
+      <link>https://hadyang.github.io/interview/docs/offer/BST-Link-Convert/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/BST-Link-Convert/</guid>
+      <description>题目 牛客网
+输入一棵二叉搜索树，将该二叉搜索树转换成一个排序的双向链表。要求不能创建任何新的结点，只能调整树中结点指针的指向。
+解题思路  由于 BST 的特性，采用中序遍历正好符合排序 要考虑 root 节点要与 左节点的最大值连接，与右节点的最小值连接 增加一个已排序链表的指针，指向最后一个已排序节点  public TreeNode Convert(TreeNode pRootOfTree) { if (pRootOfTree == null) { return null; } TreeNode[] nodeList = {new TreeNode(-1)}; ConvertToLink(pRootOfTree, nodeList); TreeNode cursor = pRootOfTree; while (cursor.left != null) { cursor = cursor.left; } cursor.right.left = null; return cursor.right; } private void ConvertToLink(TreeNode root, TreeNode[] nodeList) { if (root == null) { return; } ConvertToLink(root.left, nodeList); root.left = nodeList[0]; nodeList[0].</description>
+    </item>
+    
+    <item>
+      <title>二叉搜索树的后序遍历序列</title>
+      <link>https://hadyang.github.io/interview/docs/offer/VerifySquenceOfBST/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/VerifySquenceOfBST/</guid>
+      <description>题目 牛客网
+输入一个整数数组，判断该数组是不是某二叉搜索树的后序遍历的结果。如果是则输出 Yes ,否则输出 No 。假设输入的数组的任意两个数字都互不相同。
+解题思路  后序遍历中，最后一个节点为 root 节点 由于 BST 的左子树都小于 root，右子树都大于 root，那么可以判定该节点是否为 BST 依次类推，通过递归方式，再判定左右子树  public boolean VerifySquenceOfBST(int[] sequence) { if (sequence.length == 0) { return false; } if (sequence.length == 1) { return true; } return isBST(sequence, 0, sequence.length - 1); } private boolean isBST(int[] sequence, int start, int end) { if (start &amp;lt; 0 || end &amp;lt; 0 || start &amp;gt;= end) { return true; } int rootV = sequence[end]; int rightIndex = -1, rightV = Integer.</description>
+    </item>
+    
+    <item>
+      <title>二叉搜索树的第</title>
+      <link>https://hadyang.github.io/interview/docs/offer/BSTKthNode/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/BSTKthNode/</guid>
+      <description>题目 给定一棵二叉搜索树，请找出其中的第 k 小的结点。例如，5，3，7，2，4，6，8 中，按结点数值大小顺序第三小结点的值为4。
+牛客网
+解题思路  BST 中序遍历的结果就是排序后的结果  public TreeNode KthNode(TreeNode pRoot, int k) { TreeNode[] nodes = new TreeNode[1]; int[] ints = {0}; KthNode(pRoot, k, nodes, ints); return nodes[0]; } private void KthNode(TreeNode root, int k, TreeNode[] res, int[] cursor) { if (root == null) return; if (res[0] != null) return; KthNode(root.left, k, res, cursor); cursor[0]++; if (cursor[0] == k) { res[0] = root; return; } KthNode(root.</description>
+    </item>
+    
+    <item>
+      <title>二叉树中和为某一值的路径</title>
+      <link>https://hadyang.github.io/interview/docs/offer/FindPath/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/FindPath/</guid>
+      <description>题目 二叉树中和为某一值的路径
+输入一颗二叉树的跟节点和一个整数，打印出二叉树中结点值的和为输入整数的所有路径。路径定义为从树的根结点开始往下一直到叶结点所经过的结点形成一条路径。(注意: 在返回值的 list 中，数组长度大的数组靠前)
+解题思路  将走过的路径记录下来，当走过路径总和 = target 并且当前节点是叶子节点时，该路径符合要求 通过递归遍历所有可能的路径  public ArrayList&amp;lt;ArrayList&amp;lt;Integer&amp;gt;&amp;gt; FindPath(TreeNode root, int target) { ArrayList&amp;lt;ArrayList&amp;lt;Integer&amp;gt;&amp;gt; res = new ArrayList&amp;lt;&amp;gt;(); FindPath(res, new LinkedList&amp;lt;&amp;gt;(), root, 0, target); res.sort(Comparator.comparingInt(list -&amp;gt; -list.size())); return res; } private void FindPath(ArrayList&amp;lt;ArrayList&amp;lt;Integer&amp;gt;&amp;gt; res, LinkedList&amp;lt;Integer&amp;gt; path, TreeNode node, int pathSum, int target) { if (node == null) { return; } if (pathSum &amp;gt; target) { return; } if (pathSum + node.val == target &amp;amp;&amp;amp; node.</description>
+    </item>
+    
+    <item>
+      <title>二叉树的下一个结点</title>
+      <link>https://hadyang.github.io/interview/docs/offer/GetNext/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/GetNext/</guid>
+      <description>题目 给定一个二叉树和其中的一个结点，请找出中序遍历顺序的下一个结点并且返回。注意，树中的结点不仅包含左右子结点，同时包含指向父结点的指针。
+解题思路 考虑以下二叉树：
+其中序遍历的结果是：d,b,h,e,i,a,f,c,g
+ 当前节点有右子树：右子树的最左节点 &amp;ndash; b 节点 当前节点无右子树并且为父节点的左子树：父节点 &amp;ndash; d 节点 当前节点无右子树并且为父节点的右子树：第一个祖先节点为左节点的节点 &amp;ndash; i 节点  public TreeLinkNode GetNext(TreeLinkNode pNode) { if (pNode == null) return null; TreeLinkNode parent = pNode.next; if (pNode.right == null) { if (parent == null) { return null; } //右节点 if (parent.right == pNode) { TreeLinkNode cursor = parent; while (true) { TreeLinkNode p = cursor.next; if (p == null) return null; if (cursor == p.</description>
+    </item>
+    
+    <item>
+      <title>二叉树的深度</title>
+      <link>https://hadyang.github.io/interview/docs/offer/TreeDepth/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/TreeDepth/</guid>
+      <description>题目 牛客网
+输入一棵二叉树，求该树的深度。从根结点到叶结点依次经过的结点（含根、叶结点）形成树的一条路径，最长路径的长度为树的深度。
+解题思路  深度优先遍历  public int TreeDepth(TreeNode root) { int[] max = {0}; depth(root, max, 1); return max[0]; } private void depth(TreeNode root, int[] max, int curDepth) { if (root == null) return; if (curDepth &amp;gt; max[0]) max[0] = curDepth; depth(root.left, max, curDepth + 1); depth(root.right, max, curDepth + 1); } </description>
+    </item>
+    
+    <item>
+      <title>二进制中</title>
+      <link>https://hadyang.github.io/interview/docs/offer/number-of-one/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/number-of-one/</guid>
+      <description>题目 [](https://www.nowcoder.com/practice/8ee967e43c2c4ec193b040ea7fbb10b8?tpId=13&amp;amp;tqId=11164&amp;amp;rp=1&amp;amp;ru=%2Fta%2Fcoding-interviews&amp;amp;qru=%2Fta%2Fcoding-interviews%2Fquestion-ranking&amp;amp;tPage=1)
+输入一个整数，输出该数二进制表示中1的个数。其中负数用补码表示。
+解题思路  负数是补码表示 &amp;gt;&amp;gt;&amp;gt; 为无符号右移，&amp;gt;&amp;gt;为有符号右移，当 n 为负数是会增加多余的1  public int NumberOf1(int n) { int mask = 0x01; int res = 0; int t = n; while (t != 0) { if ((t &amp;amp; mask) == 1) { res++; } t = t &amp;gt;&amp;gt;&amp;gt; 1; } return res; } </description>
+    </item>
+    
+    <item>
+      <title>从上往下打印二叉树</title>
+      <link>https://hadyang.github.io/interview/docs/offer/PrintFromTopToBottom/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/PrintFromTopToBottom/</guid>
+      <description>题目 牛客网
+从上往下打印出二叉树的每个节点，同层节点从左至右打印。
+解题思路  层次遍历，通过队列进行辅助遍历  public ArrayList&amp;lt;Integer&amp;gt; PrintFromTopToBottom(TreeNode root) { ArrayList&amp;lt;Integer&amp;gt; res = new ArrayList&amp;lt;&amp;gt;(); LinkedList&amp;lt;TreeNode&amp;gt; nodeQueue = new LinkedList&amp;lt;&amp;gt;(); if (root == null) { return res; } nodeQueue.addLast(root); while (!nodeQueue.isEmpty()) { TreeNode node = nodeQueue.pollFirst(); if (node == null) { continue; } nodeQueue.addLast(node.left); nodeQueue.addLast(node.right); res.add(node.val); } return res; } </description>
+    </item>
+    
+    <item>
+      <title>从尾到头打印链表</title>
+      <link>https://hadyang.github.io/interview/docs/offer/print-link-from-tail/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/print-link-from-tail/</guid>
+      <description>题目 牛客网
+输入一个链表，按链表值从尾到头的顺序返回一个ArrayList。
+解题思路  栈  public ArrayList&amp;lt;Integer&amp;gt; printListFromTailToHead(ListNode listNode) { LinkedList&amp;lt;Integer&amp;gt; stack = new LinkedList&amp;lt;&amp;gt;(); while (listNode != null) { stack.addLast(listNode.val); listNode = listNode.next; } ArrayList&amp;lt;Integer&amp;gt; res = new ArrayList&amp;lt;&amp;gt;(); while (!stack.isEmpty()) { res.add(stack.pollLast()); } return res; } 递归：当链表过长时，会导致栈溢出  public ArrayList&amp;lt;Integer&amp;gt; printListFromTailToHead(ListNode listNode) { ArrayList&amp;lt;Integer&amp;gt; res = new ArrayList&amp;lt;&amp;gt;(); print(res,listNode); return res; } private void print(ArrayList&amp;lt;Integer&amp;gt; res, ListNode listNode) { if (listNode == null) return; print(res, listNode.next); res.</description>
+    </item>
+    
+    <item>
+      <title>剪绳子</title>
+      <link>https://hadyang.github.io/interview/docs/offer/CutRope/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/CutRope/</guid>
+      <description>题目 给定一根长度为n的绳子，请把绳子剪成m段（m、n都是整数，n&amp;gt;1并且m&amp;gt;1），每段绳子的长度记为k[0],k[1],…,k[m]。请问k[0]* k[1] * … *k[m]可能的最大乘积是多少？
+解题思路  尽可能剪长度为 3 的绳子 当长度剩下的为 4 时，不能再减去 3，而是 2*2  public int cutRope(int n) { if (n &amp;lt; 2) return 0; if (n == 2) return 1; if (n == 3) return 2; int timesOf3 = n / 3; if (n - timesOf3 * 3 == 1) { timesOf3 = 1; } int timesOf2 = (n - (timesOf3 * 3)) / 2; return (int) (Math.</description>
+    </item>
+    
+    <item>
+      <title>包含</title>
+      <link>https://hadyang.github.io/interview/docs/offer/MinStack/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/MinStack/</guid>
+      <description>题目 牛客网
+定义栈的数据结构，请在该类型中实现一个能够得到栈中所含最小元素的 min 函数（时间复杂度应为O（1））。
+解题思路  通过增加最小栈来记录当前最小节点  private LinkedList&amp;lt;Integer&amp;gt; stack = new LinkedList&amp;lt;&amp;gt;(); private LinkedList&amp;lt;Integer&amp;gt; min = new LinkedList&amp;lt;&amp;gt;(); public void push(int node) { stack.addLast(node); if (min.isEmpty()) { min.addLast(node); return; } if (node &amp;lt; min.peekLast()) { min.addLast(node); } else { min.addLast(min.peekLast()); } } public void pop() { if (stack.isEmpty()) { return; } stack.removeLast(); min.removeLast(); } public int top() { if (stack.peekLast() == null) { return 0; } return stack.</description>
+    </item>
+    
+    <item>
+      <title>单例</title>
+      <link>https://hadyang.github.io/interview/docs/offer/Singleton/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/Singleton/</guid>
+      <description>题目 设计一个类，我们只能生成该类的一个实例
+解题思路  线程安全 延迟加载 序列化与反序列化安全  /** * 需要额外的工作(Serializable、transient、readResolve())来实现序列化，否则每次反序列化一个序列化的对象实例时都会创建一个新的实例。 * &amp;lt;p&amp;gt; * 可能会有人使用反射强行调用我们的私有构造器（如果要避免这种情况，可以修改构造器，让它在创建第二个实例的时候抛异常）。 * * @author haoyang.shi */ public class Singleton { private Singleton() { } public static Singleton getInstance() { return Holder.instance; } private static final class Holder { private static Singleton instance = new Singleton(); } } /** * 使用枚举除了线程安全和防止反射强行调用构造器之外，还提供了自动序列化机制，防止反序列化的时候创建新的对象。 * &amp;lt;p&amp;gt; * 因此，Effective Java推荐尽可能地使用枚举来实现单例。 */ enum SingletonEnum { INSTANCE; private String name; public String getName() { return name; } public void setName(String name) { this.</description>
+    </item>
+    
+    <item>
+      <title>反转链表</title>
+      <link>https://hadyang.github.io/interview/docs/offer/revert-link/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/revert-link/</guid>
+      <description>题目 牛客网
+输入一个链表，反转链表后，输出新链表的表头。
+解题思路  三个指针  public ListNode ReverseList(ListNode head) { if (head == null || head.next == null) { return head; } ListNode pre = head, cur = head.next, next; pre.next = null; while (cur != null) { next = cur.next; cur.next = pre; pre = cur; cur = next; } return pre; } </description>
+    </item>
+    
+    <item>
+      <title>合并两个排序的链表</title>
+      <link>https://hadyang.github.io/interview/docs/offer/merge-sort-link/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/merge-sort-link/</guid>
+      <description>题目 牛客网
+输入两个单调递增的链表，输出两个链表合成后的链表，当然我们需要合成后的链表满足单调不减规则。
+解题思路  双指针指向两个链表 循环选取最小值，加入结果集  public ListNode Merge(ListNode list1, ListNode list2) { ListNode head = new ListNode(-1); ListNode cursor = head; while (list1 != null || list2 != null) { if (list1 == null) { while (list2 != null) { cursor.next = list2; cursor = cursor.next; list2 = list2.next; } continue; } if (list2 == null) { while (list1 != null) { cursor.next = list1; cursor = cursor.</description>
+    </item>
+    
+    <item>
+      <title>和为</title>
+      <link>https://hadyang.github.io/interview/docs/offer/FindContinuousSequence/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/FindContinuousSequence/</guid>
+      <description>题目 牛客网
+输出所有和为S的连续正数序列。序列内按照从小至大的顺序，序列间按照开始数字从小到大的顺序
+解题思路  与上一个题目类似，需要确定的是序列的最大值，不超过 sum 使用窗口模式，两个指针定义一个窗口，和为 t  public ArrayList&amp;lt;ArrayList&amp;lt;Integer&amp;gt;&amp;gt; FindContinuousSequence(int sum) { ArrayList&amp;lt;ArrayList&amp;lt;Integer&amp;gt;&amp;gt; res = new ArrayList&amp;lt;&amp;gt;(); if (sum == 1) { return res; } int start = 1, end = 2; int t = start + end; while (start &amp;lt; end) { if (t == sum) { ArrayList&amp;lt;Integer&amp;gt; ints = new ArrayList&amp;lt;&amp;gt;(); for (int i = start; i &amp;lt;= end; i++) { ints.add(i); } res.add(ints); t -= start; start++; } else if (t &amp;gt; sum) { t -= start; start++; } else { if (end &amp;gt;= sum) break; end++; t += end; } } return res; } </description>
+    </item>
+    
+    <item>
+      <title>和为</title>
+      <link>https://hadyang.github.io/interview/docs/offer/FindNumbersWithSum/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/FindNumbersWithSum/</guid>
+      <description>题目 牛客网
+输入一个递增排序的数组和一个数字S，在数组中查找两个数，使得他们的和正好是S，如果有多对数字的和等于S，输出两个数的乘积最小的。
+ 对应每个测试案例，输出两个数，小的先输出。
+ 解题思路  利用二分查找的思想，由于是排序数组，通过两个指针来进行遍历  public ArrayList&amp;lt;Integer&amp;gt; FindNumbersWithSum(int[] array, int sum) { ArrayList&amp;lt;Integer&amp;gt; res = new ArrayList&amp;lt;&amp;gt;(); if (array == null || array.length == 1) { return res; } int start = 0, end = array.length - 1; int minMulti = Integer.MAX_VALUE; int a = -1, b = -1; while (start &amp;lt; end) { int t = array[start] + array[end]; if (t == sum) { int multi = array[start] * array[end]; if (multi &amp;lt; minMulti) { a = array[start]; b = array[end]; minMulti = multi; } start++; end--; } else if (t &amp;gt; sum) end--; else start++; } if (a == -1 || b == -1) { return res; } res.</description>
+    </item>
+    
+    <item>
+      <title>圆圈中最后剩下的数</title>
+      <link>https://hadyang.github.io/interview/docs/offer/LastRemaining/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/LastRemaining/</guid>
+      <description>题目 牛客网
+每年六一儿童节,牛客都会准备一些小礼物去看望孤儿院的小朋友,今年亦是如此。HF 作为牛客的资深元老,自然也准备了一些小游戏。其中,有个游戏是这样的:首先,让小朋友们围成一个大圈。然后,他随机指定一个数m,让编号为0的小朋友开始报数。每次喊到m-1的那个小朋友要出列唱首歌,然后可以在礼品箱中任意的挑选礼物,并且不再回到圈中,从他的下一个小朋友开始,继续0&amp;hellip;m-1报数&amp;hellip;.这样下去&amp;hellip;.直到剩下最后一个小朋友,可以不用表演,并且拿到牛客名贵的“名侦探柯南”典藏版。请你试着想下,哪个小朋友会得到这份礼品呢？(注：小朋友的编号是从 0 到 n-1 )
+解题思路 模拟 最简单直接的解法，但是时间效率不够
+public int LastRemaining_Solution(int n, int m) { if (n == 1) return 1; LinkedList&amp;lt;Integer&amp;gt; data = new LinkedList&amp;lt;&amp;gt;(); for (int i = 0; i &amp;lt; n; i++) { data.addLast(i); } while (data.size() != 1) { for (int i = 0; i &amp;lt; m; i++) { Integer first = data.pollFirst(); if (i != m - 1) { data.addLast(first); } } } return data.</description>
+    </item>
+    
+    <item>
+      <title>在</title>
+      <link>https://hadyang.github.io/interview/docs/offer/O1DeleteNode/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/O1DeleteNode/</guid>
+      <description>题目 给定单向链表的头指针以及待删除的指针，定义一个函数在 O(1) 的时间复杂度下删除
+解题思路  待删除节点非尾节点，将后一个节点的值复制到当前节点，然后删除后一个节点 待删除节点为尾节点，从头节点开始，找到待删除节点的前一个节点进行删除  public void O1DeleteNode(ListNode head, ListNode needDelete) { if (needDelete.next != null) { ListNode next = needDelete.next.next; needDelete.val = needDelete.next.val; needDelete.next = next; } else { ListNode cursor = head; while (cursor != null) { if (cursor.next == needDelete) break; cursor = cursor.next; } if (cursor == null) return; cursor.next = needDelete.next; } } </description>
+    </item>
+    
+    <item>
+      <title>在排序数组中查找数字</title>
+      <link>https://hadyang.github.io/interview/docs/offer/CountOfSortedArray/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/CountOfSortedArray/</guid>
+      <description>题目 统计一个数字在排序数组中出现的次数。
+解题思路  通过二分查找分别找到 n 的第一个位置和最后一个位置 再进行计算就可以得出结果  public int countOfSortedArray2(int[] nums, int n) { if (nums == null || nums.length == 0) return 0; int firstN = getFirstN(nums, n); int lastN = getLastN(nums, n); return lastN - firstN + 1; } private int getFirstN(int[] nums, int n) { int s = 0, e = nums.length - 1; int mid = -1; while (s &amp;lt;= e) { mid = (s + e) / 2; if (mid &amp;gt; 0 &amp;amp;&amp;amp; nums[mid - 1] == n) { e = mid - 1; continue; } if (nums[mid] &amp;gt; n) { e = mid - 1; continue; } if (nums[mid] &amp;lt; n) { s = mid + 1; continue; } break; } return mid; } private int getLastN(int[] nums, int n) { int s = 0, e = nums.</description>
+    </item>
+    
+    <item>
+      <title>复杂链表的复制</title>
+      <link>https://hadyang.github.io/interview/docs/offer/CloneLink/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/CloneLink/</guid>
+      <description>题目 牛客网
+输入一个复杂链表（每个节点中有节点值，以及两个指针，一个指向下一个节点，另一个特殊指针指向任意一个节点），返回结果为复制后复杂链表的 head 。（注意，输出结果中请不要返回参数中的节点引用，否则判题程序会直接返回空）
+解题思路  复制每个节点，如：复制节点 A 得到 A1 ，将 A1 插入节点 A 后面 遍历链表，并将 A1-&amp;gt;random = A-&amp;gt;random-&amp;gt;next; 将链表拆分成原链表和复制后的链表  public RandomListNode Clone(RandomListNode pHead) { if (pHead == null) { return null; } RandomListNode cursor = pHead; while (cursor != null) { RandomListNode copyNode = new RandomListNode(cursor.label); RandomListNode nextNode = cursor.next; cursor.next = copyNode; copyNode.next = nextNode; cursor = nextNode; } cursor = pHead; while (cursor != null) { RandomListNode copyNode = cursor.</description>
+    </item>
+    
+    <item>
+      <title>字符串的排列</title>
+      <link>https://hadyang.github.io/interview/docs/offer/Permutation/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/Permutation/</guid>
+      <description>题目 牛客网
+输入一个字符串,按字典序打印出该字符串中字符的所有排列。例如输入字符串abc,则打印出由字符a,b,c所能排列出来的所有字符串abc,acb,bac,bca,cab和cba。
+输入描述:输入一个字符串,长度不超过9(可能有字符重复),字符只包括大小写字母。
+解题思路  将字符串划分为两个部分，第一个字符以及后面的其他字符 将第一个字符和后面所有字符进行交换  对于 abc 这个字符串，计算出的排列顺序为：
+abc acb bac bca cba cab 代码：
+public ArrayList&amp;lt;String&amp;gt; Permutation(String str) { Set&amp;lt;String&amp;gt; res = new HashSet&amp;lt;&amp;gt;(); if (str == null || str.length() == 0) { return new ArrayList&amp;lt;&amp;gt;(); } Permutation(res, str.toCharArray(), 0); ArrayList&amp;lt;String&amp;gt; list = new ArrayList&amp;lt;&amp;gt;(res); list.sort(String::compareTo); return list; } private void Permutation(Set&amp;lt;String&amp;gt; res, char[] chars, int start) { if (start == chars.length) { res.add(new String(chars)); return; } for (int i = start; i &amp;lt; chars.</description>
+    </item>
+    
+    <item>
+      <title>对称的二叉树</title>
+      <link>https://hadyang.github.io/interview/docs/offer/IsSymmetrical/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/IsSymmetrical/</guid>
+      <description>题目 请实现一个函数，用来判断一颗二叉树是不是对称的。注意，如果一个二叉树同此二叉树的镜像是同样的，定义其为对称的。
+解题思路  定义一个对称的前序遍历，即root -&amp;gt; right -&amp;gt; left 与普通的前序遍历进行对比 相同则认为树是对称的  boolean isSymmetrical(TreeNode pRoot) { LinkedList&amp;lt;Integer&amp;gt; scanner = new LinkedList&amp;lt;&amp;gt;(); LinkedList&amp;lt;Integer&amp;gt; symmetricalScanner = new LinkedList&amp;lt;&amp;gt;(); preScanner(scanner, pRoot); symmetricalPreScanner(symmetricalScanner, pRoot); return scanner.equals(symmetricalScanner); } /** * 普通的前序遍历 * @param res * @param root */ private void preScanner(LinkedList&amp;lt;Integer&amp;gt; res, TreeNode root) { if (root == null) { res.addLast(null); return; } res.addLast(root.val); preScanner(res, root.left); preScanner(res, root.right); } /** * 先右再左的前序遍历 * @param res * @param root */ private void symmetricalPreScanner(LinkedList&amp;lt;Integer&amp;gt; res, TreeNode root) { if (root == null) { res.</description>
+    </item>
+    
+    <item>
+      <title>左旋转字符串</title>
+      <link>https://hadyang.github.io/interview/docs/offer/LeftRotateString/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/LeftRotateString/</guid>
+      <description>题目 牛客网
+汇编语言中有一种移位指令叫做循环左移（ROL），现在有个简单的任务，就是用字符串模拟这个指令的运算结果。对于一个给定的字符序列S，请你把其循环左移K位后的序列输出。例如，字符序列S=”abcXYZdef”,要求输出循环左移3位后的结果，即“XYZdefabc”。是不是很简单？OK，搞定它！
+解题思路  对于 abcXYZdef 左移 3位，可以将字符串分为两个部分：abc &amp;amp; XYZdef 分别将两个部分进行反转得到：cba &amp;amp; fedZYX 将两部分和在一起再进行反转：XYZdefabc  public String LeftRotateString(String str, int n) { if (str == null || str.trim().equals(&amp;quot;&amp;quot;)) return str; String res = revert(str, 0, n - 1); res = revert(res, n, str.length() - 1); res = revert(res, 0, str.length() - 1); return res; } private String revert(String str, int start, int end) { char[] chars = str.toCharArray(); while (start &amp;lt; end) { char t = chars[start]; chars[start] = chars[end]; chars[end] = t; start++; end--; } return new String(chars); } </description>
+    </item>
+    
+    <item>
+      <title>序列化二叉树</title>
+      <link>https://hadyang.github.io/interview/docs/offer/SerializeTree/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/SerializeTree/</guid>
+      <description>题目 请实现两个函数，分别用来序列化和反序列化二叉树
+解题思路  通过前序遍历，进行序列化和反序列化 对于空节点用 $ 来代替  String Serialize(TreeNode root) { if (root==null) return &amp;quot;&amp;quot;; LinkedList&amp;lt;String&amp;gt; res = new LinkedList&amp;lt;&amp;gt;(); serialize(res, root); StringBuilder builder = new StringBuilder(); res.forEach(v-&amp;gt; builder.append(v).append(&amp;quot;,&amp;quot;)); return builder.toString(); } private void serialize(LinkedList&amp;lt;String&amp;gt; res, TreeNode root) { if (root == null) { res.addLast(&amp;quot;$&amp;quot;); return; } res.addLast(String.valueOf(root.val)); serialize(res, root.left); serialize(res, root.right); } TreeNode Deserialize(String str) { if (str == null || str.length() == 0) return null; return deserialize(str.</description>
+    </item>
+    
+    <item>
+      <title>扑克牌顺子</title>
+      <link>https://hadyang.github.io/interview/docs/offer/isContinuous/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/isContinuous/</guid>
+      <description>题目 牛客网
+LL今天心情特别好,因为他去买了一副扑克牌,发现里面居然有 2 个大王, 2 个小王(一副牌原本是 54 张)&amp;hellip;他随机从中抽出了 5 张牌,想测测自己的手气,看看能不能抽到顺子,如果抽到的话,他决定去买体育彩票,嘿嘿！！“红心A,黑桃3,小王,大王,方片5”,“Oh My God!”不是顺子&amp;hellip;..LL不高兴了,他想了想,决定大\小 王可以看成任何数字,并且A看作1,J为11,Q为12,K为13。上面的5张牌就可以变成“1,2,3,4,5”(大小王分别看作2和4),“So Lucky!”。LL决定去买体育彩票啦。 现在,要求你使用这幅牌模拟上面的过程,然后告诉我们 LL 的运气如何， 如果牌能组成顺子就输出 true，否则就输出 false。为了方便起见,你可以认为大小王是0。
+解题思路  对数组进行排序 计算非0元素之间的间隔总和 如果有相同元素则直接认为失败 如果间隔大于0，那么间隔的总个数等于0的总个数，即为成功  public boolean isContinuous(int[] numbers) { if (numbers == null || numbers.length &amp;lt; 5) return false; Arrays.sort(numbers); int count = 0; int zeroCount = 0; int pre = -1; for (int number : numbers) { if (number == 0) { zeroCount++; continue; } if (pre == -1) pre = number; else { int t = number - pre - 1; if (t &amp;gt; 0) { count += t; } else if (t &amp;lt; 0) return false; pre = number; } } if (count == 0) return true; else return count == zeroCount; } </description>
+    </item>
+    
+    <item>
+      <title>打印最大的</title>
+      <link>https://hadyang.github.io/interview/docs/offer/printn/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/printn/</guid>
+      <description>输入n，打印出 1 到最大的 n 位十进制数。比如输入3，则打印出1、2、3 直到最大的 3 位数 999。
+解题思路  n 可能很大，导致输出的数字超过 int 或者 long  public void PrintN(int n) { if (n &amp;lt;= 0) { return; } String res = &amp;quot;0&amp;quot;; while (true) { boolean all9 = true; res = Plus(res, 1); System.out.println(res); for (int i = 0; i &amp;lt; res.length(); i++) { if (res.charAt(i) != &#39;9&#39;) { all9 = false; break; } } if (all9 &amp;amp;&amp;amp; res.length() == n) { break; } } } private String Plus(String t, int i) { char[] chars = t.</description>
+    </item>
+    
+    <item>
+      <title>把数字翻译成字符串</title>
+      <link>https://hadyang.github.io/interview/docs/offer/TranslateNumToStr/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/TranslateNumToStr/</guid>
+      <description>题目 给定一个数字，按照如下规则翻译成字符串：0 翻译成“a”，1 翻译成“b”… 25翻译成“z”。一个数字有多种翻译可能，例如12258一共有5种，分别是bccfi，bwfi，bczi，mcfi，mzi。实现一个函数，用来计算一个数字有多少种不同的翻译方法。
+解题思路  定义 $$f(i)$$ 表示第 i 位有多少种翻译的方法，动态规划方程：$$f(i)=f(i+1)+g(i,i+1) \times f(i+2)$$ 其中 $$g(i,i+1)$$ 表示 i,i+1 是否能组成 10 ~ 25  public int translateNumToStr(int num) { char[] str = String.valueOf(num).toCharArray(); int[] res = new int[str.length]; for (int i = str.length - 1; i &amp;gt;= 0; i--) { if (i + 1 &amp;gt;= str.length) { res[i] = 1; continue; } res[i] = res[i + 1]; if (i + 2 &amp;lt; str.</description>
+    </item>
+    
+    <item>
+      <title>把数组排成最小的数</title>
+      <link>https://hadyang.github.io/interview/docs/offer/PrintMinNumber/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/PrintMinNumber/</guid>
+      <description>题目 把数组排成最小的数
+输入一个正整数数组，把数组里所有数字拼接起来排成一个数，打印能拼接出的所有数字中最小的一个。例如输入数组{3，32，321}，则打印出这三个数字能排成的最小数字为321323。
+解题思路  最直接的办法就是，找到数组中数字的所有排列组合，找到最小的 对于 $$m, n$$，可以组成 $$mn , nm$$ 这两个数，如果 $$mn &amp;lt; nm$$ 那么，$$m$$ 应该在 $$n$$ 之前 对于一组数，可以通过上述规则进行排序，依次打印出来就是最小的数 由于组合之后的数可能超出 int 的表示范围，注意使用字符串来处理大数问题  public String PrintMinNumber(int[] numbers) { List&amp;lt;String&amp;gt; nums = new ArrayList&amp;lt;&amp;gt;(); for (int number : numbers) { nums.add(String.valueOf(number)); } nums.sort(Comparator.comparing(s -&amp;gt; s, (o1, o2) -&amp;gt; (o1 + o2).compareTo(o2 + o1))); StringJoiner joiner = new StringJoiner(&amp;quot;&amp;quot;); nums.forEach(joiner::add); return joiner.toString(); } </description>
+    </item>
+    
+    <item>
+      <title>搜索二维矩阵</title>
+      <link>https://hadyang.github.io/interview/docs/offer/search-a-2d-matrix/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/search-a-2d-matrix/</guid>
+      <description>题目 Leetcode
+编写一个高效的算法来搜索 m x n 矩阵 matrix 中的一个目标值 target。该矩阵具有以下特性：
+ 每行的元素从左到右升序排列。 每列的元素从上到下升序排列。  示例:
+现有矩阵 matrix 如下：
+[ [1, 4, 7, 11, 15], [2, 5, 8, 12, 19], [3, 6, 9, 16, 22], [10, 13, 14, 17, 24], [18, 21, 23, 26, 30] ]  给定 target = 5，返回 true。 给定 target = 20，返回 false。  解题思路 二维数组是有规律的：右上角的数字是一列中最小的、一行中最大的，通过这个数字和 target 进行对比，可以将一行或者一列作为候选区域排出，那么 target 可能存在的范围缩小，最终得出结果。
+public boolean searchMatrix(int[][] matrix, int target) { if (matrix.</description>
+    </item>
+    
+    <item>
+      <title>数字在排序数组中出现的次数</title>
+      <link>https://hadyang.github.io/interview/docs/offer/GetNumberOfK/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/GetNumberOfK/</guid>
+      <description>题目 牛客网
+统计一个数字在排序数组中出现的次数。
+解题思路  利用二分查找，找到任意一个 k 由于 k 有多个，并且当前找到的 k 可能在任意位置。所以，在当前 k 的前后进行遍历查找  public int GetNumberOfK(int[] array, int k) { if (array == null || array.length == 0) { return 0; } //二分查找 int start = 0, end = array.length - 1; int t = -1; while (start &amp;lt; end) { int mid = (start + end) / 2; if (array[mid] == k) { t = mid; break; } else if (array[mid] &amp;gt; k) { end = mid - 1; } else { start = mid + 1; } } if (array[start] == k) { t = start; } if (t == -1) { return 0; } //左侧 int sum = 0; int a = t; while (a &amp;gt;= 0 &amp;amp;&amp;amp; array[a] == k) { sum++; a--; } //右侧 a = t + 1; while (a &amp;lt; array.</description>
+    </item>
+    
+    <item>
+      <title>数字序列中的某一位的数字</title>
+      <link>https://hadyang.github.io/interview/docs/offer/NOfNumberSerialize/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/NOfNumberSerialize/</guid>
+      <description>题目 数字以0123456789101112131415…的格式序列化到一个字符序列中。在这个序列中，第5位（从0开始计数，即从第0位开始）是5，第13位是1，第19位是4，等等。请写一个函数，求任意第n位对应的数字。
+解题思路  可以将 n 进行拆分，1位数一共10个数字、10位，2位数一共90个数字、180位，依此类推 当确定 n 所在位数范围时，对位数取商，计算出 n 位对应的数字 a，再取余，计算出结果位于 a 的第几位  public int nOfNumberSerialize(int n) { int i = 1; int count = 0; int nLeft = n; while (true) { nLeft -= count; count = countOfIntegers(i) * i; if (nLeft &amp;lt; count) { break; } i++; } int a = nLeft / i; String s = String.valueOf(a); return s.charAt(nLeft % i) - &#39;0&#39;; } private int countOfIntegers(int n) { int sum = 0; if (n == 1) { sum = 10; } else { sum = (int) (9 * Math.</description>
+    </item>
+    
+    <item>
+      <title>数据流中的中位数</title>
+      <link>https://hadyang.github.io/interview/docs/offer/StreamMid/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/StreamMid/</guid>
+      <description>题目 牛客网
+如何得到一个数据流中的中位数？如果从数据流中读出奇数个数值，那么中位数就是所有数值排序之后位于中间的数值。如果从数据流中读出偶数个数值，那么中位数就是所有数值排序之后中间两个数的平均值。我们使用 Insert() 方法读取数据流，使用 GetMedian() 方法获取当前读取数据的中位数。
+解题思路  同两个堆来表示中位数的左右两部分，左边是大根堆，右边是小根堆 在插入元素时，两边元素个数最多只能相差1，并且要保证左边的元素均小于右边的元素 当插入大堆的元素大于部分小堆元素时，需要将大堆的 top 元素移动到小堆，反之亦然  private PriorityQueue&amp;lt;Integer&amp;gt; maxHeap = new PriorityQueue&amp;lt;&amp;gt;((o1, o2) -&amp;gt; -o1.compareTo(o2)); private PriorityQueue&amp;lt;Integer&amp;gt; minHeap = new PriorityQueue&amp;lt;&amp;gt;(); private int size = 0; public void Insert(Integer num) { if (size % 2 == 0) { maxHeap.add(num); if (minHeap.isEmpty() || num &amp;gt; minHeap.peek()) { minHeap.add(maxHeap.poll()); } } else { minHeap.add(num); if (maxHeap.isEmpty() || num &amp;lt; maxHeap.peek()) { maxHeap.add(minHeap.poll()); } } size++; } public Double GetMedian() { if (maxHeap.</description>
+    </item>
+    
+    <item>
+      <title>数组中出现次数超过一半的数字</title>
+      <link>https://hadyang.github.io/interview/docs/offer/MoreThanHalfNum/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/MoreThanHalfNum/</guid>
+      <description>题目 牛客网
+数组中有一个数字出现的次数超过数组长度的一半，请找出这个数字。例如输入一个长度为9的数组{1,2,3,2,2,2,5,4,2}。由于数字2在数组中出现了5次，超过数组长度的一半，因此输出 2 。如果不存在则输出 0 。
+解题思路  由于数组的特性，在排序数组中，超过半数的数字一定包含中位数 通过 partition 方法，借用快排的思想，随机选取一个 key，将数组中小于 key 的移动到 key 的左侧，数组中大于 key 的移动到 key 的右侧 最终找到中位数的下标，还需要检查中位数是否超过半数  public int MoreThanHalfNum_Solution(int[] array) { int start = 0, end = array.length - 1; int mid = array.length / 2; int index = partition(array, start, end); if (index == mid) { return array[index]; } while (index != mid &amp;amp;&amp;amp; start &amp;lt;= end) { if (index &amp;gt; mid) { end = index - 1; index = partition(array, start, end); } else { start = index + 1; index = partition(array, start, end); } } if (checkIsHalf(array, index)) return array[index]; return 0; } private boolean checkIsHalf(int[] array, int index) { if (index &amp;lt; 0) { return false; } int count = 0; for (int i : array) { if (array[index] == i) { count++; } } return count &amp;gt; array.</description>
+    </item>
+    
+    <item>
+      <title>数组中只出现一次的数字</title>
+      <link>https://hadyang.github.io/interview/docs/offer/FindNumsAppearOnce/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/FindNumsAppearOnce/</guid>
+      <description>题目 牛客网
+一个整型数组里除了两个数字之外，其他的数字都出现了两次。请写程序找出这两个只出现一次的数字。
+解题思路  两个相等的数字进行异或的结果为0 在这个特殊的数组中，重复出现的数字只能为2次，那么如果将所有数字异或 就等价与将两个不同的数字进行异或 异或的结果肯定有一位为1，那么这两个不同的数字，在这一位上不同。 找到第一个为1的位，并将第一位为1的位是否为1作为分组条件，相同的数字一定在同一个分组里，整个数组分组异或 得到两个结果，即为两个不同的数  /** * num1,num2分别为长度为1的数组。传出参数。将num1[0],num2[0]设置为返回结果 * @param array * @param num1 * @param num2 */ public void FindNumsAppearOnce(int[] array, int num1[], int num2[]) { if (array == null || array.length &amp;lt; 3) { return; } int result = array[0]; for (int i = 1; i &amp;lt; array.length; i++) { result ^= array[i]; } //找到第一个为1的位 int indexOfFirstBit1 = 0; int temp = result; while (temp !</description>
+    </item>
+    
+    <item>
+      <title>数组中的逆序对</title>
+      <link>https://hadyang.github.io/interview/docs/offer/InversePairs/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/InversePairs/</guid>
+      <description>题目 牛客网
+在数组中的两个数字，如果前面一个数字大于后面的数字，则这两个数字组成一个逆序对。输入一个数组,求出这个数组中的逆序对的总数P。并将P对1000000007取模的结果输出。 即输出P%1000000007
+输入描述: 题目保证输入的数组中没有的相同的数字
+数据范围：
+	对于%50的数据,size&amp;lt;=10^4 对于%75的数据,size&amp;lt;=10^5 对于%100的数据,size&amp;lt;=2*10^5 解题思路 1. 使用归并排序的方式，划分子数组 2. 两个子数组进行对比，有两个分别指向两个数组末尾的指针 `f,s`，数组分割下标为 `mid`，如果 `array[f] &amp;gt; array[s]`那么，就有`s - mid`个 `array[f]` 的逆序 3. 依此类推，最终将数组排序，并且获得结果  public int InversePairs(int[] array) { long[] sum = {0}; if (array == null || array.length == 0) { return (int) sum[0]; } int[] temp = new int[array.length]; mergeSort(array, 0, array.length - 1, temp, sum); return (int) (sum[0] % 1000000007); } private void mergeSort(int[] array, int start, int end, int[] temp, long[] sum) { if (start == end) { return; } int mid = (start + end) / 2; mergeSort(array, start, mid, temp, sum); mergeSort(array, mid + 1, end, temp, sum); int f = mid, s = end; int t = end; while (f &amp;gt;= start &amp;amp;&amp;amp; s &amp;gt;= mid + 1) { if (array[f] &amp;gt; array[s]) { temp[t--] = array[f--]; sum[0] += s - mid; } else { temp[t--] = array[s--]; } } while (f &amp;gt;= start) { temp[t--] = array[f--]; } while (s &amp;gt;= mid + 1) { temp[t--] = array[s--]; } for (int i = end, j = end; i &amp;gt;= start; ) { array[j--] = temp[i--]; } } </description>
+    </item>
+    
+    <item>
+      <title>数组中重复的数字</title>
+      <link>https://hadyang.github.io/interview/docs/offer/Duplicate/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/Duplicate/</guid>
+      <description>题目 在一个长度为n的数组里的所有数字都在0到 n-1 的范围内。 数组中某些数字是重复的，但不知道有几个数字是重复的。也不知道每个数字重复几次。请找出数组中任意一个重复的数字。 例如，如果输入长度为7的数组{2,3,1,0,2,5,3}，那么对应的输出是第一个重复的数字2。
+解题思路 解法一  由于数组内数字在 0 ~ n-1 的范围内，可以将数组按 数字做下标 进行重排序 将 n 放置到 num[n] 上，交换之前再判定在 num[n] 上是否为相同数字  public boolean duplicate(int numbers[], int length, int[] duplication) { if (numbers == null || numbers.length == 0) return false; for (int i = 0; i &amp;lt; numbers.length; i++) { while (numbers[i] != i) { int number = numbers[i]; int wrongNum = numbers[number]; if (number == wrongNum) { duplication[0] = number; return true; } swap(numbers, i, number); } } return false; } private static void swap(int[] nums, int i, int j) { int temp = nums[i]; nums[i] = nums[j]; nums[j] = temp; } 解法二  把数字 1 ~ n 划分为 1 ~ m、m+1 ~ n，统计两个子数组中每个数字在 1~n 出现的次数 如果出现的次数大于 m，那么重复数字一定在 1 ~ m 中 继续这样进行划分，可以找到重复数组  </description>
+    </item>
+    
+    <item>
+      <title>整数中</title>
+      <link>https://hadyang.github.io/interview/docs/offer/NumberOfOneBetweenOneAndN/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/NumberOfOneBetweenOneAndN/</guid>
+      <description>题目 牛客网
+求出1~13的整数中 1 出现的次数,并算出 100~1300 的整数中1出现的次数？为此他特别数了一下 1~13 中包含1的数字有 1、10、11、12、13 因此共出现 6 次,但是对于后面问题他就没辙了。ACMer 希望你们帮帮他,并把问题更加普遍化,可以很快的求出任意非负整数区间中1出现的次数（从1 到 n 中1出现的次数）。
+解题思路  假定 $$n=21345$$ 将数字分为首位和非首位两个部分 对于首位为 1 的情况，如果首位 $$&amp;gt;1$$ 那么$$sum=sum+10^{len(n)-1}$$，如果首位 $$=1$$ 那么 $$sum=sum+1$$ 对于非首位 1，指定其中一位为 1，根据排列组合有 $$10^{len(n)-2}\times(len(n)-1)$$ 个。那么非首位 1 总共有 $$2\times10^{len(n)-2}\times(len(n)-1)$$  public int NumberOf1Between1AndN_Solution(int n) { int[] res = {0}; NumberOf1Between1AndN(res, n); return res[0]; } private void NumberOf1Between1AndN(int[] res, int n) { //假设 num=21345 String num = String.valueOf(n); int firstNum = num.charAt(0) - &#39;0&#39;; if (num.</description>
+    </item>
+    
+    <item>
+      <title>斐波纳切数列</title>
+      <link>https://hadyang.github.io/interview/docs/offer/fibonacci/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/fibonacci/</guid>
+      <description>题目 牛客网
+大家都知道斐波那契数列，现在要求输入一个整数n，请你输出斐波那契数列的第n项（从0开始，第0项为0）。n&amp;lt;=39
+解题思路  递归计算很慢，是最简单的算法  public int Fibonacci(int n) { if (n == 0) { return 0; } if (n == 1) { return 1; } int l = 1, ll = 0; for (int i = 2; i &amp;lt;= n; i++) { int t = ll + l; ll = l; l = t; } return l; } </description>
+    </item>
+    
+    <item>
+      <title>旋转数组的最小数字</title>
+      <link>https://hadyang.github.io/interview/docs/offer/find-minimum-in-rotated-sorted-array/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/find-minimum-in-rotated-sorted-array/</guid>
+      <description>题目 牛客网
+把一个数组最开始的若干个元素搬到数组的末尾，我们称之为数组的旋转。 输入一个非减排序的数组的一个旋转，输出旋转数组的最小元素。 例如数组{3,4,5,1,2}为{1,2,3,4,5}的一个旋转，该数组的最小值为1。 NOTE：给出的所有元素都大于0，若数组大小为0，请返回0。
+解题思路  旋转之后的数组存在两个上升序列，最小元素在两个上升序列的中间 用两个指针在两个序列中找到最大和最小的值，这样 end 指向的数则为最小  public int minNumberInRotateArray(int[] array) { if (array.length == 0) { return 0; } int start = 0, end = array.length - 1; while (end - start != 1) { int mid = (start + end) / 2; if (array[mid] &amp;gt;= array[start]) { start = mid; } if (array[mid] &amp;lt;= array[end]) { end = mid; } } return array[end]; } </description>
+    </item>
+    
+    <item>
+      <title>替换空格</title>
+      <link>https://hadyang.github.io/interview/docs/offer/replay-space/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/replay-space/</guid>
+      <description>题目 牛客网
+请实现一个函数，将一个字符串中的每个空格替换成“%20”。例如，当字符串为We Are Happy.则经过替换之后的字符串为 We%20Are%20Happy。
+解题思路  通过字符串中空格的个数，计算新字符串长度 两个指针进行字符串拷贝，当遇到‘ ’时替换为 %20  public String replaceSpace(StringBuffer str) { char[] chars = str.toString().toCharArray(); StringBuilder res = new StringBuilder(); for (char c : chars) { if (c == &#39; &#39;) res.append(&amp;quot;%20&amp;quot;); else res.append(c); } return res.toString(); } </description>
+    </item>
+    
+    <item>
+      <title>最小的</title>
+      <link>https://hadyang.github.io/interview/docs/offer/GetLeastNumbers/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/GetLeastNumbers/</guid>
+      <description>题目 牛客网
+输入n个整数，找出其中最小的K个数。例如输入4,5,1,6,2,7,3,8这8个数字，则最小的4个数字是1,2,3,4,。
+解题思路 Partition 该算法基于 Partition
+public ArrayList&amp;lt;Integer&amp;gt; GetLeastNumbers_Solution_Partition(int[] input, int k) { ArrayList&amp;lt;Integer&amp;gt; res = new ArrayList&amp;lt;&amp;gt;(); if (k &amp;gt; input.length || k &amp;lt; 1) { return res; } int start = 0, end = input.length - 1; int index = partition(input, start, end); while (index != k - 1) { if (index &amp;gt; k - 1) { end = index - 1; index = partition(input, start, end); } else { start = index + 1; index = partition(input, start, end); } } for (int i = 0; i &amp;lt; input.</description>
+    </item>
+    
+    <item>
+      <title>最小的</title>
+      <link>https://hadyang.github.io/interview/docs/offer/GetLeastNumbersSolution/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/GetLeastNumbersSolution/</guid>
+      <description>题目 牛客网
+输入n个整数，找出其中最小的K个数。例如输入4,5,1,6,2,7,3,8这8个数字，则最小的4个数字是1,2,3,4,。
+解题思路  利用堆排序原理，计算出最小的 k 个数  public ArrayList&amp;lt;Integer&amp;gt; GetLeastNumbers_Solution(int[] input, int k) { ArrayList&amp;lt;Integer&amp;gt; res = new ArrayList&amp;lt;&amp;gt;(); if (k &amp;gt; input.length || k == 0) { return res; } for (int i = input.length - 1; i &amp;gt;= 0; i--) { minHeap(input, 0, i); swap(input, 0, i); res.add(input[i]); if (res.size() == k) break; } return res; } private void minHeap(int[] heap, int start, int end) { if (start == end) { return; } int childLeft = start * 2 + 1; int childRight = childLeft + 1; if (childLeft &amp;lt;= end) { minHeap(heap, childLeft, end); if (heap[childLeft] &amp;lt; heap[start]) { swap(heap, start, childLeft); } } if (childRight &amp;lt;= end) { minHeap(heap, childRight, end); if (heap[childRight] &amp;lt; heap[start]) { swap(heap, start, childRight); } } } private void swap(int[] nums, int a, int b) { int t = nums[a]; nums[a] = nums[b]; nums[b] = t; } </description>
+    </item>
+    
+    <item>
+      <title>最长不含重复字符的子字符串</title>
+      <link>https://hadyang.github.io/interview/docs/offer/LongestNoRepeatSubString/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/LongestNoRepeatSubString/</guid>
+      <description>题目 LeetCode
+给定一个字符串，请你找出其中不含有重复字符的 最长子串 的长度。
+输入: &amp;quot;abcabcbb&amp;quot; 输出: 3 解释: 因为无重复字符的最长子串是 &amp;quot;abc&amp;quot;，所以其长度为 3。 解题思路  用 Map 记录字符所在位置，当遇到重复字符时，移动 start 指针 替换 Map 中下标，并计算子串长度  public int longestNoRepeatSubString(String str) { if (str == null || str.length() == 0) return 0; HashMap&amp;lt;Character, Integer&amp;gt; temp = new HashMap&amp;lt;&amp;gt;(); char[] chars = str.toCharArray(); int res = 0, start = 0; for (int i = 0; i &amp;lt; chars.length; i++) { if (temp.containsKey(chars[i])) { start = Math.</description>
+    </item>
+    
+    <item>
+      <title>机器人的运动范围</title>
+      <link>https://hadyang.github.io/interview/docs/offer/MovingCount/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/MovingCount/</guid>
+      <description>题目 地上有一个m行和n列的方格。一个机器人从坐标 0,0 的格子开始移动，每一次只能向左，右，上，下四个方向移动一格，但是不能进入行坐标和列坐标的数位之和大于k的格子。 例如，当k为 18 时，机器人能够进入方格（35,37），因为3+5+3+7 = 18。但是，它不能进入方格（35,38），因为3+5+3+8 = 19。请问该机器人能够达到多少个格子？
+解题思路  </description>
+    </item>
+    
+    <item>
+      <title>栈的压入</title>
+      <link>https://hadyang.github.io/interview/docs/offer/IsPopOrder/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/IsPopOrder/</guid>
+      <description>题目 牛客网
+输入两个整数序列，第一个序列表示栈的压入顺序，请判断第二个序列是否可能为该栈的弹出顺序。假设压入栈的所有数字均不相等。例如序列1,2,3,4,5是某栈的压入顺序，序列4,5,3,2,1是该压栈序列对应的一个弹出序列，但4,3,5,1,2就不可能是该压栈序列的弹出序列。（注意：这两个序列的长度是相等的）
+解题思路  通过 Stack 进行模拟 push，当 pop 的节点等于 Stack 的 top 节点时，pop Stack 最后如果 Stack 剩余数据，则判定为 false  public boolean IsPopOrder(int[] pushA, int[] popA) { if (pushA.length != popA.length) { return false; } if (pushA.length == 0) { return false; } LinkedList&amp;lt;Integer&amp;gt; stack = new LinkedList&amp;lt;&amp;gt;(); int j = 0; for (int value : pushA) { stack.addLast(value); while (stack.peekLast() != null &amp;amp;&amp;amp; popA[j] == stack.getLast()) { j++; stack.</description>
+    </item>
+    
+    <item>
+      <title>树的子结构</title>
+      <link>https://hadyang.github.io/interview/docs/offer/HasSubtree/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/HasSubtree/</guid>
+      <description>题目 牛客网
+输入两棵二叉树A，B，判断B是不是A的子结构。（ps：我们约定空树不是任意一个树的子结构）
+解题思路  遍历查找相等根节点 通过递归查找当前根节点下是否包含子树 root2  public boolean HasSubtree(TreeNode root1, TreeNode root2) { if (root2 == null) { return false; } LinkedList&amp;lt;TreeNode&amp;gt; pipeline = new LinkedList&amp;lt;&amp;gt;(); pipeline.addLast(root1); while (!pipeline.isEmpty()) { TreeNode node = pipeline.pop(); if (node == null) { continue; } pipeline.addLast(node.left); pipeline.addLast(node.right); if (node.val == root2.val &amp;amp;&amp;amp; isSub(node, root2)) { return true; } } return false; } private boolean isSub(TreeNode root1, TreeNode root2) { if (root1 == null &amp;amp;&amp;amp; root2 == null) { return true; } if (root1 == null) { return false; } if (root2 == null) { return true; } if (root1.</description>
+    </item>
+    
+    <item>
+      <title>正则表达式匹配</title>
+      <link>https://hadyang.github.io/interview/docs/offer/PatternMatch/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/PatternMatch/</guid>
+      <description>请实现一个函数用来匹配包括&#39;.&#39;和&#39;*&#39;的正则表达式。模式中的字符&#39;.&#39;表示任意一个字符，而&#39;*&#39;表示它前面的字符可以出现任意次（包含0次）。 在本题中，匹配是指字符串的所有字符匹配整个模式。例如，字符串&amp;quot;aaa&amp;quot;与模式&amp;quot;a.a&amp;quot;和&amp;quot;ab*ac*a&amp;quot;匹配，但是与&amp;quot;aa.a&amp;quot;和&amp;quot;ab*a&amp;quot;均不匹配
+解题思路  对于 * 有三种匹配模式：匹配0次，1次以及多次 对于 . 只有一种匹配模式  public boolean match(char[] str, char[] pattern) { if (str.length == 0 &amp;amp;&amp;amp; new String(pattern).replaceAll(&amp;quot;.\\*&amp;quot;, &amp;quot;&amp;quot;).length() == 0) { return true; } return match(str, 0, pattern, 0); } private boolean match(char[] str, int i, char[] pattern, int j) { if (i == str.length &amp;amp;&amp;amp; j == pattern.length) { return true; } if (j &amp;gt;= pattern.length) return false; if (j + 1 &amp;lt; pattern.</description>
+    </item>
+    
+    <item>
+      <title>求</title>
+      <link>https://hadyang.github.io/interview/docs/offer/sum/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/sum/</guid>
+      <description>题目 牛客网
+求1+2+3+&amp;hellip;+n，要求不能使用乘除法、for、while、if、else、switch、case等关键字及条件判断语句（A?B:C）。
+解题思路  利用递归代替循环  public int Sum_Solution(int n) { int ans = n; boolean t = ((ans != 0) &amp;amp;&amp;amp; ((ans += Sum_Solution(n - 1)) != 0)); return ans; } </description>
+    </item>
+    
+    <item>
+      <title>滑动窗口的最大值</title>
+      <link>https://hadyang.github.io/interview/docs/offer/MaxInWindows/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/MaxInWindows/</guid>
+      <description>题目 牛客网
+给定一个数组和滑动窗口的大小，找出所有滑动窗口里数值的最大值。例如，如果输入数组{2,3,4,2,6,2,5,1}及滑动窗口的大小3，那么一共存在6个滑动窗口，他们的最大值分别为{4,4,6,6,6,5}； 针对数组{2,3,4,2,6,2,5,1}的滑动窗口有以下6个： {[2,3,4],2,6,2,5,1}， {2,[3,4,2],6,2,5,1}， {2,3,[4,2,6],2,5,1}， {2,3,4,[2,6,2],5,1}， {2,3,4,2,[6,2,5],1}， {2,3,4,2,6,[2,5,1]}。
+解题思路  使用一个队列来保存最大值和次大的值  public ArrayList&amp;lt;Integer&amp;gt; maxInWindows(int[] num, int size) { ArrayList&amp;lt;Integer&amp;gt; res = new ArrayList&amp;lt;&amp;gt;(); if (size == 0) return res; LinkedList&amp;lt;Integer&amp;gt; queue = new LinkedList&amp;lt;&amp;gt;(); for (int i = 0; i &amp;lt; num.length; i++) { while (queue.peekFirst() != null &amp;amp;&amp;amp; i - queue.peekFirst() &amp;gt;= size) { queue.removeFirst(); } while (queue.peekLast() != null &amp;amp;&amp;amp; i - queue.peekLast() &amp;gt;= size) { queue.</description>
+    </item>
+    
+    <item>
+      <title>用两个栈实现一个队列</title>
+      <link>https://hadyang.github.io/interview/docs/offer/two-stack-fifo/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/two-stack-fifo/</guid>
+      <description>题目 牛客网
+用两个栈来实现一个队列，完成队列的 Push 和 Pop 操作。 队列中的元素为int类型。
+解题思路  用 stack1 作为 push 队列，将元素 push 到 stack1 用 stack2 作为 pop 队列，当 stack2 为空时则将 stack1 的数据 push 到 stack2，否则直接 pop stack2  相当于将两个 stack 拼接：-&amp;gt; stack1 &amp;lt;::&amp;gt; stack2 -&amp;gt;
+Stack&amp;lt;Integer&amp;gt; pushStack = new Stack&amp;lt;&amp;gt;(); Stack&amp;lt;Integer&amp;gt; popStack = new Stack&amp;lt;&amp;gt;(); public void push(int node) { pushStack.push(node); } public int pop() { if (popStack.isEmpty()) { while (!pushStack.isEmpty()) { popStack.push(pushStack.pop()); } } if (popStack.</description>
+    </item>
+    
+    <item>
+      <title>矩阵中的路径</title>
+      <link>https://hadyang.github.io/interview/docs/offer/hasPath/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/hasPath/</guid>
+      <description>题目 请设计一个函数，用来判断在一个矩阵中是否存在一条包含某字符串所有字符的路径。路径可以从矩阵中的任意一个格子开始，每一步可以在矩阵中向左，向右，向上，向下移动一个格子。如果一条路径经过了矩阵中的某一个格子，则之后不能再次进入这个格子。 例如 a b c e s f c s a d e e 这样的 3 X 4 矩阵中包含一条字符串&amp;quot;bcced&amp;quot;的路径，但是矩阵中不包含&amp;quot;abcb&amp;quot;路径，因为字符串的第一个字符b占据了矩阵中的第一行第二个格子之后，路径不能再次进入该格子。
+解题思路  简单的回溯查找  static int[][] steps = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}}; public boolean hasPath(char[] matrix, int rows, int cols, char[] str) { char[][] _matrix = new char[rows][cols]; int k = 0; for (int i = 0; i &amp;lt; _matrix.length; i++) { for (int j = 0; j &amp;lt; _matrix[i].</description>
+    </item>
+    
+    <item>
+      <title>礼物的最大值</title>
+      <link>https://hadyang.github.io/interview/docs/offer/MaxGift/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/MaxGift/</guid>
+      <description>题目 在一个 m*n 的棋盘中的每一个格都放一个礼物，每个礼物都有一定的价值（价值大于0）.你可以从棋盘的左上角开始拿各种里的礼物，并每次向左或者向下移动一格，直到到达棋盘的右下角。给定一个棋盘及上面个的礼物，请计算你最多能拿走多少价值的礼物？
+比如说现在有一个如下的棋盘:
+在这个棋盘中，按照1，12，5，7，7，16，5的顺序可以拿到总价值最大的礼物。
+解题思路  动态规划，定义 $$f(x,y)$$ 表示x,y点上能获取的最大数 状态转移方程：$$f(x,y)=\max(f(x-1,y),f(x,y-1))+g(x,y)$$ 可以考虑使用一维数组进行记录  public int maxGift(int[][] matrix) { for (int i = 0; i &amp;lt; matrix.length; i++) { for (int j = 0; j &amp;lt; matrix[i].length; j++) { int a = i &amp;gt; 0 ? matrix[i - 1][j] : 0; int b = j &amp;gt; 0 ? matrix[i][j - 1] : 0; matrix[i][j] += Math.max(a, b); } } System.out.println(Arrays.deepToString(matrix)); return matrix[matrix.</description>
+    </item>
+    
+    <item>
+      <title>第一个只出现一次的字符</title>
+      <link>https://hadyang.github.io/interview/docs/offer/FirstNotRepeatingChar/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/FirstNotRepeatingChar/</guid>
+      <description>题目 牛客网
+在一个字符串(0&amp;lt;=字符串长度&amp;lt;=10000，全部由字母组成)中找到第一个只出现一次的字符,并返回它的位置, 如果没有则返回 -1（需要区分大小写）.
+解题思路  通过 LinkedHashMap 记录数组顺序，然后计算字符出现的次数 遍历找到第一个只出现 1次 的字符  public int FirstNotRepeatingChar(String str) { LinkedHashMap&amp;lt;Character, Integer&amp;gt; data = new LinkedHashMap&amp;lt;&amp;gt;(); char[] chars = str.toCharArray(); for (char c : chars) { Integer count = data.getOrDefault(c, 0); data.put(c, count + 1); } Character res = null; for (Character c : data.keySet()) { if (data.get(c) == 1) { res = c; break; } } if (res == null) { return -1; } for (int i = 0; i &amp;lt; chars.</description>
+    </item>
+    
+    <item>
+      <title>翻转单词顺序列</title>
+      <link>https://hadyang.github.io/interview/docs/offer/ReverseSentence/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/ReverseSentence/</guid>
+      <description>题目 牛客网
+牛客最近来了一个新员工 Fish ，每天早晨总是会拿着一本英文杂志，写些句子在本子上。同事Cat对Fish写的内容颇感兴趣，有一天他向Fish借来翻看，但却读不懂它的意思。例如，“student. a am I”。后来才意识到，这家伙原来把句子单词的顺序翻转了，正确的句子应该是“I am a student.”。Cat对一一的翻转这些单词顺序可不在行，你能帮助他么？
+解题思路 public String ReverseSentence(String str) { if(str == null || str.trim().equals(&amp;quot;&amp;quot;)) return str; String[] split = str.split(&amp;quot; &amp;quot;); StringBuilder builder = new StringBuilder(); for (int i = split.length - 1; i &amp;gt;= 0; i--) { builder.append(split[i]); if (i != 0) builder.append(&amp;quot; &amp;quot;); } return builder.toString(); } </description>
+    </item>
+    
+    <item>
+      <title>股票的最大利润</title>
+      <link>https://hadyang.github.io/interview/docs/offer/MaxProfit/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/MaxProfit/</guid>
+      <description>题目 一只股票在某些时间节点的价格为{9,11,8,5,7,12,16,14}。如果我们能在价格为 5 的时候买入并在价格为 16 时卖出，则能获得最大的利润为 11.
+解题思路  要先买入才能卖出，先找最低价格点 再找最低价格之后的最高价格，用 maxProfit 表示最大利润  public int maxProfit(int[] nums) { if (nums == null || nums.length == 0) return 0; int min = Integer.MAX_VALUE; int maxProfit = 0; for (int i = 0; i &amp;lt; nums.length; i++) { min = Math.min(min, nums[i]); maxProfit = Math.max(maxProfit, nums[i] - min); } return maxProfit; } </description>
+    </item>
+    
+    <item>
+      <title>表示数值的字符串</title>
+      <link>https://hadyang.github.io/interview/docs/offer/IsNumeric/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/IsNumeric/</guid>
+      <description>题目 请实现一个函数用来判断字符串是否表示数值（包括整数和小数）。例如，字符串&amp;quot;+100&amp;rdquo;,&amp;ldquo;5e2&amp;rdquo;,&amp;quot;-123&amp;rdquo;,&amp;ldquo;3.1416&amp;quot;和&amp;rdquo;-1E-16&amp;quot;都表示数值。 但是&amp;quot;12e&amp;rdquo;,&amp;ldquo;1a3.14&amp;rdquo;,&amp;ldquo;1.2.3&amp;rdquo;,&amp;ldquo;+-5&amp;quot;和&amp;quot;12e+4.3&amp;quot;都不是。
+解题思路  数字符合 A[.[B]][e|EC] 和 .B[e|EC] 的表达式，其中 A 表示整数部分，B 表示小数部分，C 表示指数部分 A 可以有正负，但是 B 没有 e|E 之前、之后都必须有数字  public boolean isNumeric(char[] str) { if (str == null || str.length == 0) return false; int index = scanInteger(str, 0); boolean numeric = index != 0; //小数 if (index &amp;lt; str.length &amp;amp;&amp;amp; str[index] == &#39;.&#39;) { index++; int pre = index; index = scanUnsignedInteger(str, index); //1. 小数可以没有整数部分 //2. 小数后可以没有数字 //3.</description>
+    </item>
+    
+    <item>
+      <title>调整数组顺序使奇数位于偶数前面</title>
+      <link>https://hadyang.github.io/interview/docs/offer/reOrderArray/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/reOrderArray/</guid>
+      <description>题目 牛客网
+输入一个整数数组，实现一个函数来调整该数组中数字的顺序，使得所有的奇数位于数组的前半部分，所有的偶数位于数组的后半部分，并保证奇数和奇数，偶数和偶数之间的相对位置不变。
+解题思路  需要保证排序的稳定性 采用冒泡算法进行排序  public void reOrderArray(int[] array) { if (array.length &amp;lt;= 1) { return; } for (int i = array.length - 1; i &amp;gt;= 0; i--) { for (int j = i; j &amp;lt; array.length - 1; j++) { if (array[j] % 2 == 0 &amp;amp;&amp;amp; array[j + 1] % 2 == 1) swap(array, j, j + 1); } } } private void swap(int[] array, int a, int b) { int t = array[a]; array[a] = array[b]; array[b] = t; } </description>
+    </item>
+    
+    <item>
+      <title>连续子数组的最大和</title>
+      <link>https://hadyang.github.io/interview/docs/offer/FindGreatestSumOfSubArray/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/FindGreatestSumOfSubArray/</guid>
+      <description>题目 牛客网
+例如:{6,-3,-2,7,-15,1,2,2},连续子向量的最大和为8(从第0个开始,到第3个为止)。给一个数组，返回它的最大连续子序列的和，你会不会被他忽悠住？(子向量的长度至少是1)
+解题思路 通过动态规划计算最大和，$$f(i)$$ 定义为以第 $$i$$ 个数字结尾的子数组的最大和，那么 $$max(f(i))$$ 就有以下公式：
+$$ max(f(i))=\begin{cases} num[i] &amp;amp; i=0 or f(i)&amp;lt;0\
+num[i]+f(i) &amp;amp; i\ne0 and f(i)&amp;gt;0 \end{cases} $$
+public int FindGreatestSumOfSubArray(int[] array) { if (array == null || array.length == 0) { return 0; } int max = array[0]; int sum = 0; for (int a : array) { if (sum + a &amp;gt; a) { sum += a; } else { sum = a; } if (sum &amp;gt; max) { max = sum; } } return max; } </description>
+    </item>
+    
+    <item>
+      <title>重建二叉树</title>
+      <link>https://hadyang.github.io/interview/docs/offer/reConstructBinaryTree/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/reConstructBinaryTree/</guid>
+      <description>[](https://www.nowcoder.com/practice/8a19cbe657394eeaac2f6ea9b0f6fcf6?tpId=13&amp;amp;tqId=11157&amp;amp;tPage=1&amp;amp;rp=1&amp;amp;ru=%2Fta%2Fcoding-interviews&amp;amp;qru=%2Fta%2Fcoding-interviews%2Fquestion-ranking)
+输入某二叉树的前序遍历和中序遍历的结果，请重建出该二叉树。假设输入的前序遍历和中序遍历的结果中都不含重复的数字。例如输入前序遍历序列{1,2,4,7,3,5,6,8}和中序遍历序列{4,7,2,1,5,3,8,6}，则重建二叉树并返回。
+解题思路  通过前序遍历找到 root 节点 那么在 中序遍历中 root 节点的左侧则是左子树，右侧是右子树 依次类推，递归生成节点的左子树和右子树 构建过程由下往上  public TreeNode reConstructBinaryTree(int[] pre, int[] in) { Map&amp;lt;Integer, Integer&amp;gt; preIndex = new HashMap&amp;lt;&amp;gt;(); for (int i = 0; i &amp;lt; pre.length; i++) { preIndex.put(pre[i], i); } return buildTree(preIndex, in, 0, in.length - 1); } private TreeNode buildTree(Map&amp;lt;Integer, Integer&amp;gt; preIndex, int[] in, int start, int end) { if (start == end) { return new TreeNode(in[start]); } int indexOfRoot = start; for (int i = start; i &amp;lt;= end; i++) { if (preIndex.</description>
+    </item>
+    
+    <item>
+      <title>链表中倒数第</title>
+      <link>https://hadyang.github.io/interview/docs/offer/FindKthToTail/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/FindKthToTail/</guid>
+      <description>题目 牛客网
+输入一个链表，输出该链表中倒数第k个结点。
+解题思路  两个指针，快指针先走 k 步，然后慢指针在向前移动，当快指针遍历结束，慢指针指向倒数第 k 个节点 需要考虑倒数 k 个节点不存在的情况  public ListNode FindKthToTail(ListNode head, int k) { if (head == null) { return null; } ListNode cursor = head; ListNode cursorK = head; int i = 0; while (cursorK != null) { cursorK = cursorK.next; if (i &amp;gt;= k) { cursor = cursor.next; } i++; } if (i &amp;lt; k) { return null; } return cursor; } </description>
+    </item>
+    
+    <item>
+      <title>链表中环的入口结点</title>
+      <link>https://hadyang.github.io/interview/docs/offer/EntryNodeOfLoop/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/EntryNodeOfLoop/</guid>
+      <description>题目 给一个链表，若其中包含环，请找出该链表的环的入口结点，否则，输出null。
+解题思路  首先通过 快慢指针（快：每次走两步；慢：每次走一步）确定是否有环 当有环时，再从头节点出发，与快指针按 相同速度 向前移动，当 cursor = fast 则找到环入口  public ListNode EntryNodeOfLoop(ListNode pHead) { if (pHead == null || pHead.next == null) return null; ListNode fast = pHead, slow = pHead; while (fast.next != null) { slow = slow.next; fast = fast.next.next; if (fast == slow) break; } if (fast != slow) return null; ListNode cursor = pHead; while (cursor != fast) { cursor = cursor.</description>
+    </item>
+    
+    <item>
+      <title>镜像二叉树</title>
+      <link>https://hadyang.github.io/interview/docs/offer/mirror-tree/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/mirror-tree/</guid>
+      <description>题目 镜像二叉树
+操作给定的二叉树，将其变换为源二叉树的镜像。
+输入描述:
+二叉树的镜像定义：源二叉树 8 / \ 6 10 / \ / \ 5 7 9 11 镜像二叉树 8 / \ 10 6 / \ / \ 11 9 7 5 解题思路  从上到下进行左右节点交换  public void Mirror(TreeNode root) { if (root == null) return; TreeNode temp = root.left; root.left = root.right; root.right = temp; Mirror(root.left); Mirror(root.right); } </description>
+    </item>
+    
+    <item>
+      <title>顺时针打印矩阵</title>
+      <link>https://hadyang.github.io/interview/docs/offer/PrintMatrix/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/PrintMatrix/</guid>
+      <description>题目 [](https://www.nowcoder.com/practice/9b4c81a02cd34f76be2659fa0d54342a?tpId=13&amp;amp;tqId=11172&amp;amp;rp=1&amp;amp;ru=%2Fta%2Fcoding-interviews&amp;amp;qru=%2Fta%2Fcoding-interviews%2Fquestion-ranking&amp;amp;tPage=1)
+输入一个矩阵，按照从外向里以顺时针的顺序依次打印出每一个数字，例如，如果输入如下4 X 4矩阵： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 则依次打印出数字1,2,3,4,8,12,16,15,14,13,9,5,6,7,11,10.
+解题思路  通过4个指针，表示可打印区域，并对区域进行收缩 非 n*n 的矩阵，对于剩余非 4 边遍历的元素，要考虑边界  public ArrayList&amp;lt;Integer&amp;gt; printMatrix(int[][] matrix) { ArrayList&amp;lt;Integer&amp;gt; res = new ArrayList&amp;lt;&amp;gt;(); if (matrix.length == 0) { return res; } if (matrix.length == 1) { for (int i : matrix[0]) { res.add(i); } return res; } int top = 0, bottom = matrix.</description>
+    </item>
+    
+    <item>
+      <title>题目</title>
+      <link>https://hadyang.github.io/interview/docs/offer/power/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/offer/power/</guid>
+      <description>牛客网
+给定一个 double 类型的浮点数 base 和 int 类型的整数 exponent 。求 base 的 exponent 次方。
+解题思路  当 n 为偶数时，$$a^n = a^{n/2} * a^{n/2}$$ 当 n 为奇数时，$$a^n = a^{n/2} * a^{n/2} * a$$ 可以利用类似斐波纳切的方式，利用递归来进行求解  public double Power(double base, int exponent) { if (base == 0) { return 0; } if (base == 1) { return 1; } int t_exponent = Math.abs(exponent); double t = PositivePower(base, t_exponent); return exponent &amp;gt; 0 ?</description>
+    </item>
+    
+  </channel>
+</rss>

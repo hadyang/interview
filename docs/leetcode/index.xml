@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Interview</title>
+    <link>https://hadyang.github.io/interview/docs/leetcode/</link>
+    <description>Recent content on Interview</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Wed, 21 Aug 2019 11:00:41 +0800</lastBuildDate>
+    
+	<atom:link href="https://hadyang.github.io/interview/docs/leetcode/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>三数之和</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/threeSum/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/threeSum/</guid>
+      <description>头条重点
+题目 给定一个包含 n 个整数的数组 nums ，判断 nums 中是否存在三个元素 a，b，c ，使得 a + b + c = 0 ？找出所有满足条件且不重复的三元组。
+注意：答案中不可以包含重复的三元组。
+例如, 给定数组 nums = [-1, 0, 1, 2, -1, -4]， 满足要求的三元组集合为： [ [-1, 0, 1], [-1, -1, 2] ] 解题思路  将数组排序 固定一位数，然后通过两个指针对撞，寻找总和为 0 的三个数  public static List&amp;lt;List&amp;lt;Integer&amp;gt;&amp;gt; threeSum(int[] nums) { if (nums.length &amp;lt; 3) { return Collections.emptyList(); } Set&amp;lt;List&amp;lt;Integer&amp;gt;&amp;gt; res = new HashSet&amp;lt;&amp;gt;(); Arrays.sort(nums); int zCount = 0; for (int num : nums) { if (num == 0) { zCount++; } } for (int i = 0; i &amp;lt; nums.</description>
+    </item>
+    
+    <item>
+      <title>两数相加</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/addTwoNumbers/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/addTwoNumbers/</guid>
+      <description>两数相加 头条重点
+题目 给出两个 非空 的链表用来表示两个非负的整数。其中，它们各自的位数是按照 逆序 的方式存储的，并且它们的每个节点只能存储 一位 数字。
+如果，我们将这两个数相加起来，则会返回一个新的链表来表示它们的和。
+您可以假设除了数字 0 之外，这两个数都不会以 0 开头。
+示例： 输入：(2 -&amp;gt; 4 -&amp;gt; 3) + (5 -&amp;gt; 6 -&amp;gt; 4) 输出：7 -&amp;gt; 0 -&amp;gt; 8 原因：342 + 465 = 807 解题思路 public ListNode addTwoNumbers(ListNode l1, ListNode l2) { if (l1 == null || l2 == null) { return null; } StringBuilder builder1 = new StringBuilder(); while (l1 != null) { builder1.append(l1.val); l1 = l1.</description>
+    </item>
+    
+    <item>
+      <title>买卖股票的最佳时机</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/maxProfit/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/maxProfit/</guid>
+      <description>头条重点
+题目 给定一个数组，它的第 i 个元素是一支给定股票第 i 天的价格。如果你最多只允许完成一笔交易（即买入和卖出一支股票），设计一个算法来计算你所能获取的最大利润。
+注意你不能在买入股票前卖出股票。
+示例 1: 输入: [7,1,5,3,6,4] 输出: 5 解释: 在第 2 天（股票价格 = 1）的时候买入，在第 5 天（股票价格 = 6）的时候卖出，最大利润 = 6-1 = 5 。 注意利润不能是 7-1 = 6, 因为卖出价格需要大于买入价格。 示例 2: 输入: [7,6,4,3,1] 输出: 0 解释: 在这种情况下, 没有交易完成, 所以最大利润为 0。 解题思路  要先买入才能卖出，先找最低价格点 再找最低价格之后的最高价格，用 res 表示最大利润  public int maxProfit(int[] prices) { if (prices.length &amp;lt;= 1) { return 0; } int res = 0; int minBuy = prices[0]; for (int price : prices) { res = Math.</description>
+    </item>
+    
+    <item>
+      <title>买卖股票的最佳时机</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/maxProfit2/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/maxProfit2/</guid>
+      <description>头条重点
+题目 给定一个数组，它的第 i 个元素是一支给定股票第 i 天的价格。设计一个算法来计算你所能获取的最大利润。你可以尽可能地完成更多的交易（多次买卖一支股票）。
+注意：你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）。
+示例 1: 输入: [7,1,5,3,6,4] 输出: 7 解释: 在第 2 天（股票价格 = 1）的时候买入，在第 3 天（股票价格 = 5）的时候卖出, 这笔交易所能获得利润 = 5-1 = 4 。 随后，在第 4 天（股票价格 = 3）的时候买入，在第 5 天（股票价格 = 6）的时候卖出, 这笔交易所能获得利润 = 6-3 = 3 。 示例 2: 输入: [1,2,3,4,5] 输出: 4 解释: 在第 1 天（股票价格 = 1）的时候买入，在第 5 天 （股票价格 = 5）的时候卖出, 这笔交易所能获得利润 = 5-1 = 4 。 注意你不能在第 1 天和第 2 天接连购买股票，之后再将它们卖出。 因为这样属于同时参与了多笔交易，你必须在再次购买前出售掉之前的股票。 示例 3: 输入: [7,6,4,3,1] 输出: 0 解释: 在这种情况下, 没有交易完成, 所以最大利润为 0。 解题思路  贪心算法，尽可能的多进行交易  public int maxProfit(int[] prices) { if (prices.</description>
+    </item>
+    
+    <item>
+      <title>二叉树的最近公共祖先</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/lowestCommonAncestor/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/lowestCommonAncestor/</guid>
+      <description>题目 给定一个二叉树, 找到该树中两个指定节点的最近公共祖先。
+百度百科中最近公共祖先的定义为：“对于有根树 T 的两个结点 p、q，最近公共祖先表示为一个结点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大（一个节点也可以是它自己的祖先）。”
+示例 1: 输入: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1 输出: 3 解释: 节点 5 和节点 1 的最近公共祖先是节点 3。 解题思路  通过 DFS 找到节点的路径 从头开始遍历两个节点的路径，找到最后一个相等的节点  public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) { LinkedList&amp;lt;TreeNode&amp;gt; pathP = new LinkedList&amp;lt;&amp;gt;(); LinkedList&amp;lt;TreeNode&amp;gt; pathQ = new LinkedList&amp;lt;&amp;gt;(); findNodePath(pathP, root, p); findNodePath(pathQ, root, q); TreeNode last = null; while (!</description>
+    </item>
+    
+    <item>
+      <title>全 O(1) 的数据结构</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/AllOne/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/AllOne/</guid>
+      <description>全 O(1) 的数据结构 题目 实现一个数据结构支持以下操作：
+ Inc(key) - 插入一个新的值为 1 的 key。或者使一个存在的 key 增加一，保证 key 不为空字符串。 Dec(key) - 如果这个 key 的值是 1，那么把他从数据结构中移除掉。否者使一个存在的 key 值减一。如果这个 key 不存在，这个函数不做任何事情。key 保证不为空字符串。 GetMaxKey() - 返回 key 中值最大的任意一个。如果没有元素存在，返回一个空字符串&amp;rdquo;&amp;quot;。 GetMinKey() - 返回 key 中值最小的任意一个。如果没有元素存在，返回一个空字符串&amp;rdquo;&amp;quot;。  挑战：以 O(1) 的时间复杂度实现所有操作。
+解题思路  设计一个 Bucket 保存所有值为 value 的 key 并且有临近 value 的 Bucket 指针  class AllOne { /** Initialize your data structure here. */ public AllOne() { } private static class Bucket { private int value; private Set&amp;lt;String&amp;gt; keys = new HashSet&amp;lt;&amp;gt;(); private Bucket next; private Bucket pre; public Bucket(int value) { this.</description>
+    </item>
+    
+    <item>
+      <title>反转链表</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/reverseList/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/reverseList/</guid>
+      <description>头条重点
+题目 反转一个单链表。
+示例: 输入: 1-&amp;gt;2-&amp;gt;3-&amp;gt;4-&amp;gt;5-&amp;gt;NULL 输出: 5-&amp;gt;4-&amp;gt;3-&amp;gt;2-&amp;gt;1-&amp;gt;NULL 解题思路  三个指针进行反转  public ListNode reverseList(ListNode head) { if (head == null) { return head; } if (head.next == null) { return head; } ListNode pre = head; ListNode cur = head.next; while (cur != null) { ListNode next = cur.next; cur.next = pre; pre = cur; cur = next; } head.next = null; return pre; } </description>
+    </item>
+    
+    <item>
+      <title>合并</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/mergeKLists/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/mergeKLists/</guid>
+      <description>头条重点
+题目 合并 k 个排序链表，返回合并后的排序链表。请分析和描述算法的复杂度。
+示例: 输入: [ 1-&amp;gt;4-&amp;gt;5, 1-&amp;gt;3-&amp;gt;4, 2-&amp;gt;6 ] 输出: 1-&amp;gt;1-&amp;gt;2-&amp;gt;3-&amp;gt;4-&amp;gt;4-&amp;gt;5-&amp;gt;6 解题思路  通过小根堆，将所有元素放入小根堆 从小根堆依次取出数据  public ListNode mergeKLists(ListNode[] lists) { if (lists == null) { return null; } Queue&amp;lt;ListNode&amp;gt; set = new PriorityQueue&amp;lt;&amp;gt;(Comparator.comparingInt(o -&amp;gt; o.val)); for (ListNode node : lists) { while (node != null) { set.add(node); node = node.next; } } ListNode head = new ListNode(-1); ListNode res = head; ListNode cur; while ((cur = set.</description>
+    </item>
+    
+    <item>
+      <title>合并两个有序链表</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/mergeTwoLists/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/mergeTwoLists/</guid>
+      <description>题目 将两个有序链表合并为一个新的有序链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。
+示例： 输入：1-&amp;gt;2-&amp;gt;4, 1-&amp;gt;3-&amp;gt;4 输出：1-&amp;gt;1-&amp;gt;2-&amp;gt;3-&amp;gt;4-&amp;gt;4 解题思路 public ListNode mergeTwoLists(ListNode l1, ListNode l2) { if (l1 == null &amp;amp;&amp;amp; l2 == null) { return null; } if (l1 == null) { return l2; } if (l2 == null) { return l1; } ListNode head; if (l1.val &amp;gt; l2.val) { head = l2; l2 = l2.next; } else { head = l1; l1 = l1.next; } ListNode res = head; while (true) { ListNode cur; if (l1 == null &amp;amp;&amp;amp; l2 == null) { break; } if (l1 == null) { cur = l2; l2 = l2.</description>
+    </item>
+    
+    <item>
+      <title>合并区间</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/mergeRagen/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/mergeRagen/</guid>
+      <description>题目 给出一个区间的集合，请合并所有重叠的区间。
+示例 1: 输入: [[1,3],[2,6],[8,10],[15,18]] 输出: [[1,6],[8,10],[15,18]] 解释: 区间 [1,3] 和 [2,6] 重叠, 将它们合并为 [1,6]. 示例 2: 输入: [[1,4],[4,5]] 输出: [[1,5]] 解释: 区间 [1,4] 和 [4,5] 可被视为重叠区间。 解题思路  将区间按起始地址排序 遍历所有区间，如果 Last 与当前区间没有重合，则将当前区间加入结果集合。 如果重合，并且 last.end &amp;lt; t.end，修改 Last 的边界  public List&amp;lt;Interval&amp;gt; merge(List&amp;lt;Interval&amp;gt; intervals) { if (intervals.size() &amp;lt;= 1) { return intervals; } intervals.sort(Comparator.comparingInt(o -&amp;gt; o.start)); List&amp;lt;Interval&amp;gt; res = new ArrayList&amp;lt;&amp;gt;(); res.add(intervals.get(0)); for (int i = 1; i &amp;lt; intervals.</description>
+    </item>
+    
+    <item>
+      <title>复原</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/restoreIpAddresses/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/restoreIpAddresses/</guid>
+      <description>头条重点
+题目 给定一个只包含数字的字符串，复原它并返回所有可能的 IP 地址格式。
+示例: 输入: &amp;quot;25525511135&amp;quot; 输出: [&amp;quot;255.255.11.135&amp;quot;, &amp;quot;255.255.111.35&amp;quot;] 解题思路  利用回溯法，遍历所有可能的 IP  public static List&amp;lt;String&amp;gt; restoreIpAddresses(String s) { if (s.length() &amp;gt; 12 || s.length() &amp;lt; 4) { return Collections.emptyList(); } List&amp;lt;String&amp;gt; res = new ArrayList&amp;lt;&amp;gt;(); ArrayList&amp;lt;String&amp;gt; ip = new ArrayList&amp;lt;&amp;gt;(); for (int i = 0; i &amp;lt; 4; i++) { ip.add(&amp;quot;&amp;quot;); } p(res, s.toCharArray(), 0, ip, 0); return res; } private static void p(List&amp;lt;String&amp;gt; res, char[] chars, int startIndex, List&amp;lt;String&amp;gt; ip, int segmentIndex) { StringBuilder builder = new StringBuilder(); for (int i = startIndex; i &amp;lt; chars.</description>
+    </item>
+    
+    <item>
+      <title>字符串的排列</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/checkInclusion/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/checkInclusion/</guid>
+      <description>字符串的排列 题目 给定两个字符串 s1 和 s2，写一个函数来判断 s2 是否包含 s1 的排列。
+换句话说，第一个字符串的排列之一是第二个字符串的子串。
+示例1: 输入: s1 = &amp;quot;ab&amp;quot; s2 = &amp;quot;eidbaooo&amp;quot; 输出: True 解释: s2 包含 s1 的排列之一 (&amp;quot;ba&amp;quot;). 解题思路  这道题，我们用到的算法是 滑动窗口 首先字符串s1的排列的可能性应该是它的长度的阶乘，因为字符串长度可能为10000，所以找出所有排列情况是不太可能。 我们可以转换思路，不要关注排列的形式，而是关注排列中元素的数量关系 比如 aab，那么，转换为数量关系就是{a:2,b:1}，因为 S1 长度为 3，所以我们的窗口长度也为3 如果我们在 S2 的找到了这样一个窗口符合出现 a 的次数是两个， b 是一个，那么 S2 就是包含 S1 的排列的  public boolean checkInclusion(String s1, String s2) { int len1 = s1.length(); int len2 = s2.length(); int[] c1 = new int[26]; int[] c2 = new int[26]; for (char c : s1.</description>
+    </item>
+    
+    <item>
+      <title>字符串相乘</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/StringMultiply/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/StringMultiply/</guid>
+      <description>题目 给定两个以字符串形式表示的非负整数 num1 和 num2，返回 num1 和 num2 的乘积，它们的乘积也表示为字符串形式。
+示例 1: 输入: num1 = &amp;quot;2&amp;quot;, num2 = &amp;quot;3&amp;quot; 输出: &amp;quot;6&amp;quot;  num1 和 num2 的长度小于110。 num1 和 num2 只包含数字 0-9。 num1 和 num2 均不以零开头，除非是数字 0 本身。 不能使用任何标准库的大数类型（比如 BigInteger）或直接将输入转换为整数来处理。  解题思路   对于字符串 num2 中的每一位数与字符串 num1 相乘所得的结果，不再分开计算最后相加，而是先全部累加，最后再考虑进位的影响。
+  对于最终结果的第i + j位数，可以由 num1 数组的第 i 位数和 num2 数组的第 j 位数组成。
+  public String multiply(String num1, String num2) { if (num1.</description>
+    </item>
+    
+    <item>
+      <title>岛屿的最大面积</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/maxAreaOfIsland/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/maxAreaOfIsland/</guid>
+      <description>头条重点
+题目 给定一个包含了一些 0 和 1的非空二维数组 grid , 一个 岛屿 是由四个方向 (水平或垂直) 的 1 (代表土地) 构成的组合。你可以假设二维矩阵的四个边缘都被水包围着。
+找到给定的二维数组中最大的岛屿面积。(如果没有岛屿，则返回面积为0。)
+示例 1: [[0,0,1,0,0,0,0,1,0,0,0,0,0], [0,0,0,0,0,0,0,1,1,1,0,0,0], [0,1,1,0,1,0,0,0,0,0,0,0,0], [0,1,0,0,1,1,0,0,1,0,1,0,0], [0,1,0,0,1,1,0,0,1,1,1,0,0], [0,0,0,0,0,0,0,0,0,0,1,0,0], [0,0,0,0,0,0,0,1,1,1,0,0,0], [0,0,0,0,0,0,0,1,1,0,0,0,0]] 对于上面这个给定矩阵应返回 6。注意答案不应该是11，因为岛屿只能包含水平或垂直的四个方向的‘1’。 示例 2: [[0,0,0,0,0,0,0,0]] 对于上面这个给定的矩阵, 返回 0。 注意: 给定的矩阵 grid 的长度和宽度都不超过 50。 解题思路  通过循环遍历，找到 1 再通过递归遍历该 1 临近的所有 1，并计算总面积  private static int[][] steps = new int[][]{{1, 0}, {0, 1}, {-1, 0}, {0, -1}}; /** * 上学时做过，属于图的 DFS * @param grid * @return */ public static int maxAreaOfIsland(int[][] grid) { if (grid.</description>
+    </item>
+    
+    <item>
+      <title>排序链表</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/sortList/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/sortList/</guid>
+      <description>头条重点
+题目 在 O(n log n) 时间复杂度和常数级空间复杂度下，对链表进行排序。
+示例 1: 输入: 4-&amp;gt;2-&amp;gt;1-&amp;gt;3 输出: 1-&amp;gt;2-&amp;gt;3-&amp;gt;4 示例 2: 输入: -1-&amp;gt;5-&amp;gt;3-&amp;gt;4-&amp;gt;0 输出: -1-&amp;gt;0-&amp;gt;3-&amp;gt;4-&amp;gt;5 解题思路  通过快慢指针将链表拆分 递归进行拆分，再通过合并两个排序链表的方式进行合并 类似于归并排序  public ListNode sortList(ListNode head) { if (head == null || head.next == null) { return head; } ListNode slow = head, fast = head; while (fast.next != null &amp;amp;&amp;amp; fast.next.next != null) { fast = fast.next.next; slow = slow.next; } ListNode mid = slow.next; slow.next = null; ListNode l1 = sortList(head); ListNode l2 = sortList(mid); return merge(l1, l2); } private ListNode merge(ListNode l1, ListNode l2) { if (l1 == null) { return l2; } if (l2 == null) { return l1; } ListNode head,res; if (l1.</description>
+    </item>
+    
+    <item>
+      <title>接雨水</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/trap/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/trap/</guid>
+      <description>头条重点
+题目 给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。
+上面是由数组 [0,1,0,2,1,0,1,3,2,1,2,1] 表示的高度图，在这种情况下，可以接 6 个单位的雨水（蓝色部分表示雨水）。 感谢 Marcos 贡献此图。
+示例: 输入: [0,1,0,2,1,0,1,3,2,1,2,1] 输出: 6 解题思路  首先找到最高点，然后从首尾向中间遍历，找到局部高点，然后就可以计算总量  public int trap(int[] height) { if (height.length &amp;lt;= 2) { return 0; } int max = 0, maxIndex = 0; for (int i = 0; i &amp;lt; height.length; i++) { if (height[i] &amp;gt; max) { max = height[i]; maxIndex = i; } } int total = 0; int topIndex = 0;//局部最高点 for (int i = 0; i &amp;lt; maxIndex; i++) { if (height[topIndex] &amp;lt; height[i]) { topIndex = i; } else { total += height[topIndex] - height[i]; } } topIndex = height.</description>
+    </item>
+    
+    <item>
+      <title>搜索旋转排序数组</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/searchRote/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/searchRote/</guid>
+      <description>头条重点
+题目 假设按照升序排序的数组在预先未知的某个点上进行了旋转。( 例如，数组 [0,1,2,4,5,6,7] 可能变为 [4,5,6,7,0,1,2] )。
+搜索一个给定的目标值，如果数组中存在这个目标值，则返回它的索引，否则返回 -1 。
+你可以假设数组中不存在重复的元素。
+你的算法时间复杂度必须是 O(log n) 级别。
+示例 1: 输入: nums = [4,5,6,7,0,1,2], target = 0 输出: 4 示例 2: 输入: nums = [4,5,6,7,0,1,2], target = 3 输出: -1 解题思路  旋转数组是分为两段有序，主要得注意 mid 落在哪个段上  public static int search(int[] nums, int target) { int start = 0, end = nums.length - 1; while (start &amp;lt;= end) { int mid = (start + end) / 2; if (nums[mid]==target) return mid; if (nums[mid] &amp;gt;= nums[start]) { if (target &amp;lt; nums[mid] &amp;amp;&amp;amp; target &amp;gt;= nums[start]) { end = mid - 1; } else { start = mid + 1; } } if (nums[mid] &amp;lt;= nums[end]) { if (target &amp;gt; nums[mid] &amp;amp;&amp;amp; target &amp;lt;= nums[end]) { start = mid + 1; } else { end = mid - 1; } } } return -1; } </description>
+    </item>
+    
+    <item>
+      <title>数组中的第K个最大元素</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/findKthLargest/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/findKthLargest/</guid>
+      <description>数组中的第K个最大元素 题目 在未排序的数组中找到第 k 个最大的元素。请注意，你需要找的是数组排序后的第 k 个最大的元素，而不是第 k 个不同的元素。
+示例 1: 输入: [3,2,1,5,6,4] 和 k = 2 输出: 5 示例 2: 输入: [3,2,3,1,2,4,5,5,6] 和 k = 4 输出: 4 解题思路  利用快排的思想，当排序到 k 后，停止排序，输出结果  public static int findKthLargest(int[] nums, int k) { fastSort(nums, 0, nums.length - 1); return nums[nums.length - k]; } public static void fastSort(int[] nums, int start, int end) { if (nums.length &amp;lt;= 1) { return; } if (start &amp;gt; end) { return; } if (end &amp;lt; 0 || start &amp;lt; 0 || end &amp;gt; nums.</description>
+    </item>
+    
+    <item>
+      <title>无重复字符的最长子串</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/lengthOfLongestSubstring/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/lengthOfLongestSubstring/</guid>
+      <description>头条重点
+题目 给定一个字符串，请你找出其中不含有重复字符的 最长子串 的长度。
+输入: &amp;quot;abcabcbb&amp;quot; 输出: 3 解释: 因为无重复字符的最长子串是 &amp;quot;abc&amp;quot;，所以其长度为 3。 解题思路  用 Map 记录字符所在位置，当遇到重复字符时，移动 start 指针 替换 Map 中下标，并计算子串长度  public int lengthOfLongestSubstring(String str) { if (str == null || str.length() == 0) return 0; HashMap&amp;lt;Character, Integer&amp;gt; temp = new HashMap&amp;lt;&amp;gt;(); char[] chars = str.toCharArray(); int res = 0, start = 0; for (int i = 0; i &amp;lt; chars.length; i++) { if (temp.containsKey(chars[i])) { start = Math.</description>
+    </item>
+    
+    <item>
+      <title>最大子序和</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/maxSubArray/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/maxSubArray/</guid>
+      <description>头条重点
+题目 给定一个整数数组 nums ，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
+示例: 输入: [-2,1,-3,4,-1,2,1,-5,4], 输出: 6 解释: 连续子数组 [4,-1,2,1] 的和最大，为 6。 进阶: 如果你已经实现复杂度为 O(n) 的解法，尝试使用更为精妙的分治法求解。
+解题思路   动态规划：$$f(i)=\begin{cases}num[i]&amp;amp;f(i-1)+num[i]&amp;lt;num[i]\f(i-1)+num[i] &amp;amp;f(i-1)+num[i]&amp;gt;num[i]\end{cases}$$
+  用result[i]保存以数字nums[i]结尾的最大子序和，然后不断更新result数组的最大值即可。总的时间复杂度O(n)
+  public int maxSubArray(int[] nums) { if (nums.length == 0) { return 0; } if (nums.length == 1) { return nums[0]; } int[] res = new int[nums.length]; res[0] = nums[0]; int max = res[0]; for (int i = 1; i &amp;lt; nums.length; i++) { int curMax = nums[i] + res[i - 1]; if (curMax &amp;gt; nums[i]) { res[i] = curMax; } else { res[i] = nums[i]; } max = Math.</description>
+    </item>
+    
+    <item>
+      <title>最小栈</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/MinStack/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/MinStack/</guid>
+      <description>头条重点
+题目 设计一个支持 push，pop，top 操作，并能在常数时间内检索到最小元素的栈。
+push(x) &amp;ndash; 将元素 x 推入栈中。 pop() &amp;ndash; 删除栈顶的元素。 top() &amp;ndash; 获取栈顶元素。 getMin() &amp;ndash; 检索栈中的最小元素。
+示例: MinStack minStack = new MinStack(); minStack.push(-2); minStack.push(0); minStack.push(-3); minStack.getMin(); --&amp;gt; 返回 -3. minStack.pop(); minStack.top(); --&amp;gt; 返回 0. minStack.getMin(); --&amp;gt; 返回 -2. 解题思路 class MinStack { /** initialize your data structure here. */ public MinStack() { } private LinkedList&amp;lt;Integer&amp;gt; stack = new LinkedList&amp;lt;&amp;gt;(); private Queue&amp;lt;Integer&amp;gt; minStack = new PriorityQueue&amp;lt;&amp;gt;(); public void push(int x) { stack.</description>
+    </item>
+    
+    <item>
+      <title>最长公共前缀</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/longestCommonPrefix/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/longestCommonPrefix/</guid>
+      <description>题目 编写一个函数来查找字符串数组中的最长公共前缀。
+如果不存在公共前缀，返回空字符串 &amp;ldquo;&amp;quot;。
+示例 1: 输入: [&amp;quot;flower&amp;quot;,&amp;quot;flow&amp;quot;,&amp;quot;flight&amp;quot;] 输出: &amp;quot;fl&amp;quot; 解题思路  找到最短字符串 多个字符串逐个字符比较  public String longestCommonPrefix(String[] strs) { if (strs.length == 0) { return &amp;quot;&amp;quot;; } int minLen = strs[0].length(); for (String str : strs) { minLen = Math.min(minLen, str.length()); } char[][] data = new char[strs.length][minLen]; for (int i = 0; i &amp;lt; strs.length; i++) { char[] chars = strs[i].toCharArray(); System.arraycopy(chars, 0, data[i], 0, minLen); } StringBuilder res = new StringBuilder(); for (int i = 0; i &amp;lt; minLen; i++) { for (int j = 1; j &amp;lt; data.</description>
+    </item>
+    
+    <item>
+      <title>最长连续序列</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/longestConsecutive/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/longestConsecutive/</guid>
+      <description>题目 给定一个未排序的整数数组，找出最长连续序列的长度。
+要求算法的时间复杂度为 O(n)。
+示例: 输入: [100, 4, 200, 1, 3, 2] 输出: 4 解释: 最长连续序列是 [1, 2, 3, 4]。它的长度为 4。 解题思路  用 Set 保存所有数字 遍历数组，查找当前数字之前、之后的数，并计算个数  public static int longestConsecutive(int[] nums) { if (nums.length &amp;lt;= 1) { return nums.length; } Set&amp;lt;Integer&amp;gt; set = new HashSet&amp;lt;&amp;gt;(); for (int num : nums) { set.add(num); } int pre, after, max = 0; for (int num : nums) { int temp = 1; set.</description>
+    </item>
+    
+    <item>
+      <title>最长连续递增序列</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/findLengthOfLCIS/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/findLengthOfLCIS/</guid>
+      <description>题目 给定一个未经排序的整数数组，找到最长且连续的的递增序列。
+示例 1: 输入: [1,3,5,4,7] 输出: 3 解释: 最长连续递增序列是 [1,3,5], 长度为3。 尽管 [1,3,5,7] 也是升序的子序列, 但它不是连续的，因为5和7在原数组里被4隔开。 示例 2: 输入: [2,2,2,2,2] 输出: 1 解释: 最长连续递增序列是 [2], 长度为1。 解题思路  用两个变量记录序列开始和结束的下标 从左到右遍历，如果下一个节点小当前节点则移动 start，否则移动end，并更新 max  public static int findLengthOfLCIS(int[] nums) { if (nums.length == 0) { return 0; } if (nums.length == 1) { return 1; } int start = 0, end = 0; int max = 1; for (int i = 1; i &amp;lt; nums.</description>
+    </item>
+    
+    <item>
+      <title>朋友圈</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/findCircleNum/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/findCircleNum/</guid>
+      <description>朋友圈 头条重点
+题目 班上有 N 名学生。其中有些人是朋友，有些则不是。他们的友谊具有是传递性。如果已知 A 是 B 的朋友，B 是 C 的朋友，那么我们可以认为 A 也是 C 的朋友。所谓的朋友圈，是指所有朋友的集合。
+给定一个 N * N 的矩阵 M，表示班级中学生之间的朋友关系。如果M[i][j] = 1，表示已知第 i 个和 j 个学生互为朋友关系，否则为不知道。你必须输出所有学生中的已知的朋友圈总数。
+示例 1: 输入: [[1,1,0], [1,1,0], [0,0,1]] 输出: 2 说明：已知学生0和学生1互为朋友，他们在一个朋友圈。 第2个学生自己在一个朋友圈。所以返回2。 示例 2: 输入: [[1,1,0], [1,1,1], [0,1,1]] 输出: 1 说明：已知学生0和学生1互为朋友，学生1和学生2互为朋友，所以学生0和学生2也是朋友，所以他们三个在一个朋友圈，返回1。 注意：
+ N 在[1,200]的范围内。 对于所有学生，有M[i][i] = 1。 如果有M[i][j] = 1，则有M[j][i] = 1。  解题思路  逐个遍历所有学生，将他所有朋友标记  public int findCircleNum(int[][] M) { if (M.</description>
+    </item>
+    
+    <item>
+      <title>环形链表 II</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/detectCycle/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/detectCycle/</guid>
+      <description>环形链表 II 题目 给定一个链表，返回链表开始入环的第一个节点。 如果链表无环，则返回 null。
+为了表示给定链表中的环，我们使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。 如果 pos 是 -1，则在该链表中没有环。
+解题思路  首先通过快慢指针确定链表是否有环 再使用一个指针从头节点与快慢指针相遇节点同步长前进，最终找到环的入口  public ListNode detectCycle(ListNode head) { ListNode fast = head, slow = head; ListNode meetNode = null; while (fast != null &amp;amp;&amp;amp; fast.next != null) { fast = fast.next.next; slow = slow.next; if (fast == slow) { meetNode = fast; break; } } if (meetNode == null) { return meetNode; } while (head !</description>
+    </item>
+    
+    <item>
+      <title>的平方根</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/mySqrt/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/mySqrt/</guid>
+      <description>头条重点
+题目 实现 int sqrt(int x) 函数。
+计算并返回 x 的平方根，其中 x 是非负整数。
+由于返回类型是整数，结果只保留整数的部分，小数部分将被舍去。
+示例 1: 输入: 4 输出: 2 示例 2: 输入: 8 输出: 2 说明: 8 的平方根是 2.82842...,由于返回类型是整数，小数部分将被舍去。 解题思路  牛顿迭代法：$$a_{i}=(x/a_{i-1}+a_{i-1})/2$$  public int mySqrt(int x) { double a = 1, diff = 0; do { a = (x / a + a) / 2.0; diff = Math.abs(a * a - x); } while (diff &amp;gt; 0.1); return (int) a; } </description>
+    </item>
+    
+    <item>
+      <title>相交链表</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/getIntersectionNode/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/getIntersectionNode/</guid>
+      <description>题目 编写一个程序，找到两个单链表相交的起始节点。
+解题思路  首先将两个链表中长的一个向前遍历，直到两个链表长度一致 两个链表同时向前遍历，便可找到交点  public ListNode getIntersectionNode(ListNode headA, ListNode headB) { if (headA == null || headB == null) { return null; } if (headA == headB) { return headA; } int lenA = 1; int lenB = 1; ListNode temp = headA; while (temp.next != null) { temp = temp.next; lenA++; } ListNode tailA = temp; temp = headB; while (temp.next != null) { temp = temp.</description>
+    </item>
+    
+    <item>
+      <title>第二高的薪水</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/salary/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/salary/</guid>
+      <description>头条重点
+题目 编写一个 SQL 查询，获取 Employee 表中第二高的薪水（Salary） 。
++----+--------+ | Id | Salary | +----+--------+ | 1 | 100 | | 2 | 200 | | 3 | 300 | +----+--------+ 例如上述 Employee 表，SQL查询应该返回 200 作为第二高的薪水。如果不存在第二高的薪水，那么查询应返回 null。
++---------------------+ | SecondHighestSalary | +---------------------+ | 200 | +---------------------+ 解题思路  子查询  select IFNULL((select Distinct Salary from Employee order by Salary DESC limit 1,1),null) as SecondHighestSalary </description>
+    </item>
+    
+    <item>
+      <title>简化路径</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/simplifyPath/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/simplifyPath/</guid>
+      <description>头条重点
+题目 以 Unix 风格给出一个文件的绝对路径，你需要简化它。或者换句话说，将其转换为规范路径。
+在 Unix 风格的文件系统中，一个点（.）表示当前目录本身；此外，两个点 （..） 表示将目录切换到上一级（指向父目录）；两者都可以是复杂相对路径的组成部分。
+请注意，返回的规范路径必须始终以斜杠 / 开头，并且两个目录名之间必须只有一个斜杠 /。最后一个目录名（如果存在）不能以 / 结尾。此外，规范路径必须是表示绝对路径的最短字符串。
+示例 1： 输入：&amp;quot;/home/&amp;quot; 输出：&amp;quot;/home&amp;quot; 解释：注意，最后一个目录名后面没有斜杠。 示例 2： 输入：&amp;quot;/../&amp;quot; 输出：&amp;quot;/&amp;quot; 解释：从根目录向上一级是不可行的，因为根是你可以到达的最高级。 示例 3： 输入：&amp;quot;/home//foo/&amp;quot; 输出：&amp;quot;/home/foo&amp;quot; 解释：在规范路径中，多个连续斜杠需要用一个斜杠替换。 示例 4： 输入：&amp;quot;/a/./b/../../c/&amp;quot; 输出：&amp;quot;/c&amp;quot; 示例 5： 输入：&amp;quot;/a/../../b/../c//.//&amp;quot; 输出：&amp;quot;/c&amp;quot; 示例 6： 输入：&amp;quot;/a//b////c/d//././/..&amp;quot; 输出：&amp;quot;/a/b/c&amp;quot; 解题思路  利用栈的特性，将有效路径名压入 当遇到 .. 时 pop 栈 最后按顺序 pop 组成最终路径  public static String simplifyPath(String path) { ArrayDeque&amp;lt;String&amp;gt; stack = new ArrayDeque&amp;lt;&amp;gt;(); String[] split = path.split(&amp;quot;/&amp;quot;); for (String s : split) { if (s.</description>
+    </item>
+    
+    <item>
+      <title>缓存机制</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/LRUCache/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/LRUCache/</guid>
+      <description>头条重点
+题目 运用你所掌握的数据结构，设计和实现一个 LRU (最近最少使用) 缓存机制。它应该支持以下操作： 获取数据 get 和 写入数据 put 。
+获取数据 get(key) - 如果密钥 (key) 存在于缓存中，则获取密钥的值（总是正数），否则返回 -1。 写入数据 put(key, value) - 如果密钥不存在，则写入其数据值。当缓存容量达到上限时，它应该在写入新数据之前删除最近最少使用的数据值，从而为新的数据值留出空间。
+进阶:
+你是否可以在 O(1) 时间复杂度内完成这两种操作？
+示例: LRUCache cache = new LRUCache( 2 /* 缓存容量 */ ); cache.put(1, 1); cache.put(2, 2); cache.get(1); // 返回 1 cache.put(3, 3); // 该操作会使得密钥 2 作废 cache.get(2); // 返回 -1 (未找到) cache.put(4, 4); // 该操作会使得密钥 1 作废 cache.get(1); // 返回 -1 (未找到) cache.get(3); // 返回 3 cache.</description>
+    </item>
+    
+    <item>
+      <title>编码验证</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/validUtf8/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/validUtf8/</guid>
+      <description>头条重点
+题目 UTF-8 中的一个字符可能的长度为 1 到 4 字节，遵循以下的规则：
+ 对于 1 字节的字符，字节的第一位设为0，后面7位为这个符号的unicode码。 对于 n 字节的字符 (n &amp;gt; 1)，第一个字节的前 n 位都设为1，第 n+1 位设为0，后面字节的前两位一律设为10。剩下的没有提及的二进制位，全部为这个符号的unicode码。  这是 UTF-8 编码的工作方式：
+ Char. number range | UTF-8 octet sequence (hexadecimal) | (binary) --------------------+--------------------------------------------- 0000 0000-0000 007F | 0xxxxxxx 0000 0080-0000 07FF | 110xxxxx 10xxxxxx 0000 0800-0000 FFFF | 1110xxxx 10xxxxxx 10xxxxxx 0001 0000-0010 FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx 给定一个表示数据的整数数组，返回它是否为有效的 utf-8 编码。
+注意：输入是整数数组。只有每个整数的最低 8 个有效位用来存储数据。这意味着每个整数只表示 1 字节的数据。</description>
+    </item>
+    
+    <item>
+      <title>翻转字符串里的单词</title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/reverseWords/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/reverseWords/</guid>
+      <description>题目 给定一个字符串，逐个翻转字符串中的每个单词。
+示例 1： 输入: &amp;quot;the sky is blue&amp;quot; 输出: &amp;quot;blue is sky the&amp;quot; 说明：
+ 无空格字符构成一个单词。 输入字符串可以在前面或者后面包含多余的空格，但是反转后的字符不能包括。 如果两个单词间有多余的空格，将反转后单词间的空格减少到只含一个。  解题思路  按空格拆分字符串为字符串数组 t 逆序遍历字符串数组 t，并组成新的字符串  public String reverseWords(String s) { String trimed = s.trim(); String[] split = trimed.split(&amp;quot; &amp;quot;); StringBuilder builder = new StringBuilder(); for (int i = split.length - 1; i &amp;gt;= 0; i--) { String t = split[i]; if (t.trim().isEmpty()) { continue; } builder.append(t).append(&amp;quot; &amp;quot;); } return builder.</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>https://hadyang.github.io/interview/docs/leetcode/zigzagLevelOrder/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/leetcode/zigzagLevelOrder/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

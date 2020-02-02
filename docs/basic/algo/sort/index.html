@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="排序算法"><meta property="og:title" content="排序算法" />
+<meta property="og:description" content="排序算法 常见排序算法 稳定排序：  冒泡排序 — O(n²) 插入排序 — O(n²) 桶排序 — O(n); 需要 O(k) 额外空间 归并排序 — O(nlogn); 需要 O(n) 额外空间 二叉排序树排序 — O(n log n) 期望时间; O(n²)最坏时间; 需要 O(n) 额外空间 基数排序 — O(n·k); 需要 O(n) 额外空间  不稳定排序  选择排序 — O(n²) 希尔排序 — O(nlogn) 堆排序 — O(nlogn) 快速排序 — O(nlogn) 期望时间, O(n²) 最坏情况; 对于大的、乱数串行一般相信是最快的已知排序  交换排序 冒泡排序 它重复地走访过要排序的数列，一次比较两个元素，如果他们的顺序错误就把他们交换过来。走访数列的工作是重复地进行直到没有再需要交换，也就是说该数列已经排序完成。冒泡排序总的平均时间复杂度为O(n^2)。冒泡排序是一种稳定排序算法。
+ 比较相邻的元素。如果第一个比第二个大，就交换他们两个。 对每一对相邻元素作同样的工作，从开始第一对到结尾的最后一对。在这一点，最后的元素应该会是最大的数。 针对所有的元素重复以上的步骤，除了最后一个。 持续每次对越来越少的元素重复上面的步骤，直到没有任何一对数字需要比较。  void bubble_sort(int a[], int n) { int i, j, temp; for (j = 0; j &lt; n - 1; j&#43;&#43;) for (i = 0; i &lt; n - 1 - j; i&#43;&#43;) { if(a[i] &gt; a[i &#43; 1]) { temp = a[i]; a[i] = a[i &#43; 1]; a[i &#43; 1] = temp; } } } 快速排序 快速排序-百度百科 快速排序是一种 不稳定 的排序算法，平均时间复杂度为 O(nlogn)。快速排序使用分治法（Divide and conquer）策略来把一个序列（list）分为两个子序列（sub-lists）。 步骤为：" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/algo/sort/" />
+<meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
+<meta property="article:modified_time" content="2019-08-21T11:00:41+08:00" />
+<title>排序算法 | Interview</title>
+<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/interview/book.min.b7fe34b8a4c4da05b2690b4aacfa71ddce0668cc6da3abb67dd3946844125444.css" integrity="sha256-t/40uKTE2gWyaQtKrPpx3c4GaMxto6u2fdOUaEQSVEQ=">
+
+
+<script defer src="/interview/en.search.min.4daab1eda22baec10d130347f095a8463b951038b7e98060a59bcdc484ada980.js" integrity="sha256-Taqx7aIrrsENEwNH8JWoRjuVEDi36YBgpZvNxIStqYA="></script>
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/interview"><span>Interview</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+  <ul>
+<li><a href="/interview/docs/basic/">计算机基础</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/">算法</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
+<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
+<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
+<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
+<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
+<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
+<li><a href="/interview/docs/basic/algo/sort/"class=active>排序算法</a></li>
+<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/os/">操作系统</a>
+<ul>
+<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
+<li><a href="/interview/docs/basic/os/concurrency/">并发</a></li>
+<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
+<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
+<li><a href="/interview/docs/basic/os/linux/">Linux系统</a></li>
+<li><a href="/interview/docs/basic/os/interrupt/">中断</a></li>
+<li><a href="/interview/docs/basic/os/device/">设备管理</a></li>
+<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
+<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/net/">计算机网络</a>
+<ul>
+<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
+<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
+<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
+<li><a href="/interview/docs/basic/net/http/">HTTP</a></li>
+<li><a href="/interview/docs/basic/net/https/">HTTPS</a></li>
+<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/">数据库</a>
+<ul>
+<li><a href="/interview/docs/basic/database/transaction/">事务</a></li>
+<li><a href="/interview/docs/basic/database/index/">索引</a></li>
+<li><a href="/interview/docs/basic/database/sql/">SQL</a></li>
+<li><a href="/interview/docs/basic/database/join/">连接</a></li>
+<li><a href="/interview/docs/basic/database/mysql/">MySQL</a></li>
+<li><a href="/interview/docs/basic/database/concurrent/">并发控制</a></li>
+<li><a href="/interview/docs/basic/database/innodb/">Innodb</a></li>
+<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/">Java</a>
+<ul>
+<li><a href="/interview/docs/java/oop/">OOP</a></li>
+<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
+<li><a href="/interview/docs/java/operator/">运算符</a></li>
+<li><a href="/interview/docs/java/exception/">异常</a></li>
+<li><a href="/interview/docs/java/generics/">泛型</a></li>
+<li><a href="/interview/docs/java/object/">Object</a></li>
+<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
+<li><a href="/interview/docs/java/proxy/">代理</a></li>
+<li><a href="/interview/docs/java/annotation/">注解</a></li>
+<li><a href="/interview/docs/java/questions/">面试题</a></li>
+<li><a href="/interview/docs/java/nio/">NIO</a></li>
+<li><a href="/interview/docs/java/">集合</a>
+<ul>
+<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
+<li><a href="/interview/docs/java/collection/Concurrenthashmap/">Concurrenthashmap</a></li>
+<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/concurrent/">并发</a>
+<ul>
+<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
+<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
+<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
+<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
+<li><a href="/interview/docs/java/concurrent/AQS/">AQS</a></li>
+<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
+<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
+<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<ul>
+<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
+<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/gc/">GC</a>
+<ul>
+<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
+<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/">框架</a>
+<ul>
+<li><a href="/interview/docs/fromwork/netty/">Netty</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
+<ul>
+<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/spring/">Spring</a>
+<ul>
+<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
+<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
+<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/">系统架构</a>
+<ul>
+<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
+<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
+<ul>
+<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/design/">系统设计</a>
+<ul>
+<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/distributed/">分布式</a>
+<ul>
+<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
+<li><a href="/interview/docs/architecture/distributed/session/">分布式Session</a></li>
+<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
+<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
+<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
+<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
+<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
+<li><a href="/interview/docs/architecture/distributed/kafka/">Kafka</a></li>
+<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
+<li><a href="/interview/docs/architecture/distributed/dubbo/">Dubbo</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
+<ul>
+<li><a href="/interview/docs/architecture/bigdata/algo/">基础算法</a></li>
+<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/offer/">剑指offer</a>
+<ul>
+<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
+<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
+<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
+<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
+<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
+<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
+<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
+<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
+<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
+<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
+<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
+<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
+<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
+<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
+<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
+<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
+<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
+<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
+<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
+<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
+<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
+<li><a href="/interview/docs/offer/VerifySquenceOfBST/">二叉搜索树的后序遍历序列</a></li>
+<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
+<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
+<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
+<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
+<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
+<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
+<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
+<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
+<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
+<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
+<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
+<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
+<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
+<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
+<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
+<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
+<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
+<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
+<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
+<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
+<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
+<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
+<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
+<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
+<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
+<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
+<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
+<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
+<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
+<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
+<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
+<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
+<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
+<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
+<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
+<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
+<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
+<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
+<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
+<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
+<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
+<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
+<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
+<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
+<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/leetcode/">LeetCode</a>
+<ul>
+<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
+<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
+<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
+<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
+<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
+<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
+<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
+<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
+<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
+<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
+<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
+<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
+<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
+<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
+<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
+<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
+<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
+<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
+<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
+<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
+<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
+<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
+<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
+<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
+<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
+<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
+<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
+<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
+<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
+<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
+<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
+<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+<script>
+(function() {
+  var menu = document.querySelector("aside.book-menu nav");
+  addEventListener("beforeunload", function(event) {
+    localStorage.setItem("menu.scrollTop", menu.scrollTop);
+  });
+  menu.scrollTop = localStorage.getItem("menu.scrollTop");
+})();
+</script>
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>排序算法</strong>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#常见排序算法">常见排序算法</a>
+      <ul>
+        <li><a href="#稳定排序">稳定排序：</a></li>
+        <li><a href="#不稳定排序">不稳定排序</a></li>
+      </ul>
+    </li>
+    <li><a href="#交换排序">交换排序</a>
+      <ul>
+        <li><a href="#冒泡排序">冒泡排序</a></li>
+        <li><a href="#快速排序-快速排序-百度百科httpbaikebaiducomlinkurlhyqpclbjy1syy4esoze9kandidxorkxisfq0hzl8c5eut40dzs-fd1v0jubijsv7raogwy6haq-b1hbrghf1hq">快速排序 快速排序-百度百科</a></li>
+      </ul>
+    </li>
+    <li><a href="#插入排序">插入排序</a>
+      <ul>
+        <li><a href="#直接插入排序">直接插入排序</a></li>
+        <li><a href="#希尔排序httpszhwikipediaorgwikie5b88ce5b094e68e92e5ba8f">希尔排序</a></li>
+      </ul>
+    </li>
+    <li><a href="#选择排序">选择排序</a>
+      <ul>
+        <li><a href="#直接选择排序">直接选择排序</a></li>
+        <li><a href="#堆排序">堆排序</a></li>
+      </ul>
+    </li>
+    <li><a href="#归并排序">归并排序</a></li>
+    <li><a href="#基数排序">基数排序</a></li>
+    <li><a href="#拓扑排序">拓扑排序</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+<article class="markdown"><h1 id="排序算法">排序算法</h1>
+<h2 id="常见排序算法">常见排序算法</h2>
+<h3 id="稳定排序">稳定排序：</h3>
+<ul>
+<li><code>冒泡排序</code> — O(n²)</li>
+<li><code>插入排序</code> — O(n²)</li>
+<li><code>桶排序</code> — O(n); 需要 O(k) 额外空间</li>
+<li><code>归并排序</code> — O(nlogn); 需要 O(n) 额外空间</li>
+<li><code>二叉排序树排序</code>  — O(n log n) 期望时间; O(n²)最坏时间; 需要 O(n) 额外空间</li>
+<li><code>基数排序</code> — O(n·k); 需要 O(n) 额外空间</li>
+</ul>
+<h3 id="不稳定排序">不稳定排序</h3>
+<ul>
+<li><code>选择排序</code> — O(n²)</li>
+<li><code>希尔排序</code> — O(nlogn)</li>
+<li><code>堆排序</code> — O(nlogn)</li>
+<li><code>快速排序</code> — O(nlogn) 期望时间, O(n²) 最坏情况; 对于大的、乱数串行一般相信是最快的已知排序</li>
+</ul>
+<h2 id="交换排序">交换排序</h2>
+<h3 id="冒泡排序">冒泡排序</h3>
+<p>它重复地走访过要排序的数列，一次比较两个元素，如果他们的顺序错误就把他们交换过来。走访数列的工作是重复地进行直到没有再需要交换，也就是说该数列已经排序完成。<strong>冒泡排序总的平均时间复杂度为O(n^2)。冒泡排序是一种稳定排序算法。</strong></p>
+<ul>
+<li>比较相邻的元素。如果第一个比第二个大，就交换他们两个。</li>
+<li>对每一对相邻元素作同样的工作，从开始第一对到结尾的最后一对。在这一点，最后的元素应该会是最大的数。</li>
+<li>针对所有的元素重复以上的步骤，除了最后一个。</li>
+<li>持续每次对越来越少的元素重复上面的步骤，直到没有任何一对数字需要比较。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">bubble_sort</span>(<span style="color:#66d9ef">int</span> a[], <span style="color:#66d9ef">int</span> n)
+{
+    <span style="color:#66d9ef">int</span> i, j, temp;
+    <span style="color:#66d9ef">for</span> (j <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; j <span style="color:#f92672">&lt;</span> n <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>; j<span style="color:#f92672">+</span><span style="color:#f92672">+</span>)
+        <span style="color:#66d9ef">for</span> (i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> n <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> j; i<span style="color:#f92672">+</span><span style="color:#f92672">+</span>)
+        {
+            <span style="color:#66d9ef">if</span>(a[i] <span style="color:#f92672">&gt;</span> a[i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>])
+            {
+                temp <span style="color:#f92672">=</span> a[i];
+                a[i] <span style="color:#f92672">=</span> a[i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>];
+                a[i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> temp;
+            }
+        }
+}
+</code></pre></div><h3 id="快速排序-快速排序-百度百科httpbaikebaiducomlinkurlhyqpclbjy1syy4esoze9kandidxorkxisfq0hzl8c5eut40dzs-fd1v0jubijsv7raogwy6haq-b1hbrghf1hq">快速排序 <a href="http://baike.baidu.com/link?url=hyQPClbJy1SYY4esOZe9kANDIDxOrKxiSfq0HZl8c5eut40dZS-fd1V0jubijSv7RAogwy6HaQ-B1HbRgHf1hq">快速排序-百度百科</a></h3>
+<p>快速排序是一种 <strong>不稳定</strong> 的排序算法，平均时间复杂度为 <strong>O(nlogn)</strong>。<strong>快速排序使用分治法（Divide and conquer）策略来把一个序列（list）分为两个子序列（sub-lists）。</strong> 步骤为：</p>
+<ul>
+<li>从数列中挑出一个元素，称为&quot;基准&rdquo;（pivot），</li>
+<li>重新排序数列，所有元素比基准值小的摆放在基准前面，所有元素比基准值大的摆在基准的后面（相同的数可以到任一边）。在这个分区结束之后，该基准就处于数列的中间位置。这个称为分区（partition）操作。</li>
+<li>递归地（recursive）把小于基准值元素的子数列和大于基准值元素的子数列排序。</li>
+</ul>
+<blockquote>
+<p>快排的时间花费主要在划分上，所以</p>
+<ul>
+<li>最坏情况：时间复杂度为<code>O(n^2)</code>。因为最坏情况发生在每次划分过程产生的两个区间分别包含<code>n-1</code>个元素和<code>1</code>个元素的时候。</li>
+<li>最好情况：每次划分选取的基准都是当前无序区的中值。如果每次划分过程产生的区间大小都为n/2，则快速排序法运行就快得多了。</li>
+</ul>
+</blockquote>
+<pre><code>    public void sort(int[] arr, int low, int high) {
+        int l = low;
+        int h = high;
+        int povit = arr[low];
+
+        while (l &lt; h) {
+            while (l &lt; h &amp;&amp; arr[h] &gt;= povit)
+                h--;
+            if (l &lt; h) {
+                arr[l] = arr[h];
+                l++;
+            }
+
+            while (l &lt; h &amp;&amp; arr[l] &lt;= povit)
+                l++;
+
+            if (l &lt; h) {
+                arr[h] = arr[l];
+                h--;
+            }
+        }
+
+        arr[l] = povit;
+
+        System.out.print(&quot;l=&quot; + (l + 1) + &quot;;h=&quot; + (h + 1) + &quot;;povit=&quot; + povit + &quot;\n&quot;);
+        System.out.println(Arrays.toString(arr));
+        if (l - 1 &gt; low) sort(arr, low, l - 1);
+        if (h + 1 &lt; high) sort(arr, h + 1, high);
+    }
+</code></pre><h4 id="快排的优化">快排的优化</h4>
+<ol>
+<li>当待排序序列的长度分割到一定大小后，使用插入排序。</li>
+<li>快排函数在函数尾部有两次递归操作，我们可以对其使用尾递归优化。优化后，可以缩减堆栈深度，由原来的O(n)缩减为O(logn)，将会提高性能。</li>
+<li>从左、中、右三个数中取中间值。</li>
+</ol>
+<h2 id="插入排序">插入排序</h2>
+<h3 id="直接插入排序">直接插入排序</h3>
+<p>插入排序的基本操作就是将一个数据插入到已经排好序的有序数据中，从而得到一个新的、个数加一的有序数据，算法适用于少量数据的排序，<strong>时间复杂度为O(n^2)。是稳定的排序方法。</strong> <strong>插入算法把要排序的数组分成两部分</strong>：第一部分包含了这个数组的所有元素，但将最后一个元素除外（让数组多一个空间才有插入的位置），而第二部分就只包含这一个元素（即待插入元素）。在第一部分排序完成后，再将这个最后元素插入到已排好序的第一部分中。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C">
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">insert_sort</span>(<span style="color:#66d9ef">int</span><span style="color:#f92672">*</span> a, <span style="color:#66d9ef">int</span> len) {
+    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>; i <span style="color:#f92672">&lt;</span> len; <span style="color:#f92672">+</span><span style="color:#f92672">+</span>i) {
+        <span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> i <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>;
+        <span style="color:#66d9ef">int</span> temp <span style="color:#f92672">=</span> a[i];
+        <span style="color:#66d9ef">while</span> (j <span style="color:#f92672">&gt;</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;</span><span style="color:#f92672">&amp;</span> temp <span style="color:#f92672">&lt;</span> a[j]) {
+            a[j <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> a[j];
+            j<span style="color:#f92672">-</span><span style="color:#f92672">-</span>;
+        }
+        a[j <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> temp;
+    }
+}
+</code></pre></div><h3 id="希尔排序httpszhwikipediaorgwikie5b88ce5b094e68e92e5ba8f"><a href="https://zh.wikipedia.org/wiki/%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F">希尔排序</a></h3>
+<p>也称缩小增量排序，是直接插入排序算法的一种更高效的改进版本。<strong>希尔排序是非稳定排序算法。</strong></p>
+<p>希尔排序是把记录按下标的一定增量分组，对每组使用直接插入排序算法排序；随着增量逐渐减少，每组包含的关键词越来越多，当增量减至1时，整个文件恰被分成一组，算法便终止。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">shell_sort</span>(<span style="color:#66d9ef">int</span><span style="color:#f92672">*</span> a, <span style="color:#66d9ef">int</span> len) {
+    <span style="color:#66d9ef">int</span> step <span style="color:#f92672">=</span> len <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>;
+    <span style="color:#66d9ef">int</span> temp;
+
+    <span style="color:#66d9ef">while</span> (step <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> step; i <span style="color:#f92672">&lt;</span> len; <span style="color:#f92672">+</span><span style="color:#f92672">+</span>i) {
+            temp <span style="color:#f92672">=</span> a[i];
+            <span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> i <span style="color:#f92672">-</span> step;
+            <span style="color:#66d9ef">while</span> (j <span style="color:#f92672">&gt;</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;</span><span style="color:#f92672">&amp;</span> temp <span style="color:#f92672">&lt;</span> a[j]) {
+                a[j <span style="color:#f92672">+</span> step] <span style="color:#f92672">=</span> a[j];
+                j <span style="color:#f92672">-</span><span style="color:#f92672">=</span> step;
+            }
+            a[j <span style="color:#f92672">+</span> step] <span style="color:#f92672">=</span> temp;
+        }
+        step <span style="color:#f92672">/</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>;
+    }
+}
+</code></pre></div><h2 id="选择排序">选择排序</h2>
+<h3 id="直接选择排序">直接选择排序</h3>
+<p>首先在未排序序列中找到最小（大）元素，存放到排序序列的起始位置，然后，再从剩余未排序元素中继续寻找最小（大）元素，然后放到已排序序列的末尾。<strong>实际适用的场合非常罕见。</strong></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">selection_sort</span>(<span style="color:#66d9ef">int</span> arr[], <span style="color:#66d9ef">int</span> len) {
+	<span style="color:#66d9ef">int</span> i, j, min, temp;
+	<span style="color:#66d9ef">for</span> (i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> len <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>; i<span style="color:#f92672">+</span><span style="color:#f92672">+</span>) {
+		min <span style="color:#f92672">=</span> i;
+		<span style="color:#66d9ef">for</span> (j <span style="color:#f92672">=</span> i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>; j <span style="color:#f92672">&lt;</span> len; j<span style="color:#f92672">+</span><span style="color:#f92672">+</span>)
+			<span style="color:#66d9ef">if</span> (arr[min] <span style="color:#f92672">&gt;</span> arr[j])
+				min <span style="color:#f92672">=</span> j;
+	   	temp <span style="color:#f92672">=</span> arr[min];
+		arr[min] <span style="color:#f92672">=</span> arr[i];
+		arr[i] <span style="color:#f92672">=</span> temp;
+	}
+}
+</code></pre></div><h3 id="堆排序">堆排序</h3>
+<p>堆排序利用了大根堆（或小根堆）堆顶记录的关键字最大（或最小）这一特征，使得在当前无序区中选取最大（或最小）关键字的记录变得简单。</p>
+<ol>
+<li>将数组分为有序区和无序区，在无序区中建立最大堆</li>
+<li>将堆顶的数据与无序区末尾的数据交换</li>
+<li>从后往前，直到所有数据排序完成</li>
+</ol>
+<pre><code>public void heapSort(int[] nums) {
+    for (int i = nums.length - 1; i &gt;= 0; i--) {
+        maxHeap(nums, 0, i);
+
+        swap(nums, 0, i);
+    }
+}
+
+public void maxHeap(int[] heap, int start, int end) {
+    if (start == end) {
+        return;
+    }
+
+    int parent = start;
+    int childLeft = start * 2 + 1;
+    int childRight = childLeft + 1;
+
+    if (childLeft &lt;= end) {
+        maxHeap(heap, childLeft, end);
+
+        if (heap[childLeft] &gt; heap[parent]) {
+            swap(heap, parent, childLeft);
+        }
+    }
+
+    if (childRight &lt;= end) {
+        maxHeap(heap, childRight, end);
+
+        if (heap[childRight] &gt; heap[parent]) {
+            swap(heap, parent, childRight);
+        }
+    }
+}
+
+private void swap(int[] nums, int a, int b) {
+    int t = nums[a];
+    nums[a] = nums[b];
+    nums[b] = t;
+}
+</code></pre><h2 id="归并排序">归并排序</h2>
+<p>归并排序采用分治的思想：</p>
+<ul>
+<li>Divide：将n个元素平均划分为各含n/2个元素的子序列；</li>
+<li>Conquer：递归的解决俩个规模为n/2的子问题；</li>
+<li>Combine：合并俩个已排序的子序列。</li>
+</ul>
+<p>性能：时间复杂度总是为O(NlogN)，空间复杂度也总为为O(N)，算法与初始序列无关，排序是稳定的。</p>
+<pre><code>public void mergeSort(int[] array, int start, int end, int[] temp) {
+    if (start &gt;= end) {
+        return;
+    }
+
+    int mid = (start + end) / 2;
+
+    mergeSort(array, start, mid, temp);
+    mergeSort(array, mid + 1, end, temp);
+
+    int f = start, s = mid + 1;
+    int t = 0;
+    while (f &lt;= mid &amp;&amp; s &lt;= end) {
+        if (array[f] &lt; array[s]) {
+            temp[t++] = array[f++];
+        } else {
+            temp[t++] = array[s++];
+        }
+    }
+
+    while (f &lt;= mid) {
+        temp[t++] = array[f++];
+    }
+
+    while (s &lt;= end) {
+        temp[t++] = array[s++];
+    }
+
+    for (int i = 0, j = start; i &lt; t; i++) {
+        array[j++] = temp[i];
+    }
+}
+</code></pre><h2 id="基数排序">基数排序</h2>
+<p>对于有d个关键字时，可以分别按关键字进行排序。有俩种方法：</p>
+<ul>
+<li>MSD：先从高位开始进行排序，在每个关键字上，可采用基数排序</li>
+<li>LSD：先从低位开始进行排序，在每个关键字上，可采用桶排序</li>
+</ul>
+<blockquote>
+<p>即通过每个数的每位数字的大小来比较</p>
+</blockquote>
+<pre><code>//找出最大数字的位数
+int maxNum(int arr[], int len) {
+    int _max = 0;
+
+    for (int i = 0; i &lt; len; ++i) {
+        int d = 0;
+        int a = arr[i];
+
+        while (a) {
+            a /= 10;
+            d++;
+        }
+
+        if (_max &lt; d) {
+            _max = d;
+        }
+    }
+    return _max;
+}
+
+
+void radixSort(int *arr, int len) {
+    int d = maxNum(arr, len);
+    int *temp = new int[len];
+    int count[10];
+    int radix = 1;
+
+    for (int i = 0; i &lt; d; ++i) {
+        for (int j = 0; j &lt; 10; ++j) {
+            count[j] = 0;
+        }
+
+        for (int k = 0; k &lt; len; ++k) {
+            count[(arr[k] / radix) % 10]++;
+        }
+
+        for (int l = 1; l &lt; 10; ++l) {
+            count[l] += count[l - 1];
+        }
+
+        for (int m = 0; m &lt; len; ++m) {
+            int index = (arr[m] / radix) % 10;
+            temp[count[index] - 1] = arr[m];
+            count[index]--;
+        }
+
+        for (int n = 0; n &lt; len; ++n) {
+            arr[n] = temp[n];
+        }
+        radix *= 10;
+
+    }
+
+    delete (temp);
+}
+
+</code></pre><h2 id="拓扑排序">拓扑排序</h2>
+<p>在有向图中找拓扑序列的过程，就是拓扑排序。<strong>拓扑序列常常用于判定图是否有环</strong>。</p>
+<ul>
+<li>从有向图中选择一个入度为0的结点，输出它。</li>
+<li>将这个结点以及该结点出发的所有边从图中删除。</li>
+<li>重复前两步，直到没有入度为0的点。</li>
+</ul>
+<blockquote>
+<p>如果所有点都被输出，即存在一个拓扑序列，则图没有环。</p>
+</blockquote>
+</article>
+ 
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/basic/algo/sort/index.md" target="_blank" rel="noopener">
+      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
+      
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#常见排序算法">常见排序算法</a>
+      <ul>
+        <li><a href="#稳定排序">稳定排序：</a></li>
+        <li><a href="#不稳定排序">不稳定排序</a></li>
+      </ul>
+    </li>
+    <li><a href="#交换排序">交换排序</a>
+      <ul>
+        <li><a href="#冒泡排序">冒泡排序</a></li>
+        <li><a href="#快速排序-快速排序-百度百科httpbaikebaiducomlinkurlhyqpclbjy1syy4esoze9kandidxorkxisfq0hzl8c5eut40dzs-fd1v0jubijsv7raogwy6haq-b1hbrghf1hq">快速排序 快速排序-百度百科</a></li>
+      </ul>
+    </li>
+    <li><a href="#插入排序">插入排序</a>
+      <ul>
+        <li><a href="#直接插入排序">直接插入排序</a></li>
+        <li><a href="#希尔排序httpszhwikipediaorgwikie5b88ce5b094e68e92e5ba8f">希尔排序</a></li>
+      </ul>
+    </li>
+    <li><a href="#选择排序">选择排序</a>
+      <ul>
+        <li><a href="#直接选择排序">直接选择排序</a></li>
+        <li><a href="#堆排序">堆排序</a></li>
+      </ul>
+    </li>
+    <li><a href="#归并排序">归并排序</a></li>
+    <li><a href="#基数排序">基数排序</a></li>
+    <li><a href="#拓扑排序">拓扑排序</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

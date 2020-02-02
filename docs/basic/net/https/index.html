@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="HTTPS"><meta property="og:title" content="HTTPS" />
+<meta property="og:description" content="HTTPS HTTPS 是一种通过计算机网络进行安全通信的传输协议。HTTPS经由HTTP进行通信，但利用 SSL/TLS 来加密数据包。 HTTPS 开发的主要目的，是提供对网站服务器的身份认证，保护交换数据的隐私与完整性。
+HTTPS 的主要思想是在不安全的网络上创建一安全信道，并可在使用适当的加密包和服务器证书可被验证且可被信任时，对窃听和中间人攻击提供合理的防护。HTTPS的信任继承基于预先安装在浏览器中的证书颁发机构（如Symantec、Comodo、GoDaddy和GlobalSign等）（意即“我信任证书颁发机构告诉我应该信任的”）
+HTTP 为什么不安全 http 协议属于 明文传输协议 ，交互过程以及数据传输都没有进行加密，通信双方也没有进行任何认证，通信过程非常容易遭遇劫持、监听、篡改，严重情况下，会造成恶意的流量劫持等问题，甚至造成个人隐私泄露（比如银行卡卡号和密码泄露）等严重的安全问题。
+比如常见的，在 http 通信过程中，“中间人”将广告链接嵌入到服务器发给用户的 http 报文里，导致用户界面出现很多不良链接； 或者是修改用户的请求头 URL ，导致用户的请求被劫持到另外一个网站，用户的请求永远到不了真正的服务器。这些都会导致用户得不到正确的服务，甚至是损失惨重。
+HTTPS 如何保证安全 数字证书 TLS 握手的作用之一是 身份认证（authentication） ，被验证的一方需要提供一个身份证明，在 HTTPS 的世界里，这个身份证明就是 TLS 证书 ，或者称为 HTTPS 证书。
+世界上的 CA 机构会遵守 X.509 规范来签发公钥证书（Public Key Certificate），证书内容的语法格式遵守 ASN.1，证书大致包含如下内容：
+Certificate: Data: Version: 3 (0x2) //版本号 Serial Number: //证书序列号 0e:3c:c1:49:94:b3:e1:74:a6:34:54:d9:90:64:66:d7 Signature Algorithm: sha256WithRSAEncryption //签名算法 Issuer: C=US, O=DigiCert Inc, OU=www.digicert.com, CN=GeoTrust RSA CA 2018 //签发机构 Validity //有效期 Not Before: Dec 25 00:00:00 2017 GMT Not After : Dec 24 12:00:00 2020 GMT Subject: C=CN, L=北京市, O=智者四海（北京）技术有限公司, OU=IT, CN=*." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/net/https/" />
+<meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
+<meta property="article:modified_time" content="2019-08-21T11:00:41+08:00" />
+<title>HTTPS | Interview</title>
+<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/interview/book.min.b7fe34b8a4c4da05b2690b4aacfa71ddce0668cc6da3abb67dd3946844125444.css" integrity="sha256-t/40uKTE2gWyaQtKrPpx3c4GaMxto6u2fdOUaEQSVEQ=">
+
+
+<script defer src="/interview/en.search.min.4daab1eda22baec10d130347f095a8463b951038b7e98060a59bcdc484ada980.js" integrity="sha256-Taqx7aIrrsENEwNH8JWoRjuVEDi36YBgpZvNxIStqYA="></script>
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/interview"><span>Interview</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+  <ul>
+<li><a href="/interview/docs/basic/">计算机基础</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/">算法</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
+<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
+<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
+<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
+<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
+<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
+<li><a href="/interview/docs/basic/algo/sort/">排序算法</a></li>
+<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/os/">操作系统</a>
+<ul>
+<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
+<li><a href="/interview/docs/basic/os/concurrency/">并发</a></li>
+<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
+<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
+<li><a href="/interview/docs/basic/os/linux/">Linux系统</a></li>
+<li><a href="/interview/docs/basic/os/interrupt/">中断</a></li>
+<li><a href="/interview/docs/basic/os/device/">设备管理</a></li>
+<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
+<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/net/">计算机网络</a>
+<ul>
+<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
+<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
+<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
+<li><a href="/interview/docs/basic/net/http/">HTTP</a></li>
+<li><a href="/interview/docs/basic/net/https/"class=active>HTTPS</a></li>
+<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/">数据库</a>
+<ul>
+<li><a href="/interview/docs/basic/database/transaction/">事务</a></li>
+<li><a href="/interview/docs/basic/database/index/">索引</a></li>
+<li><a href="/interview/docs/basic/database/sql/">SQL</a></li>
+<li><a href="/interview/docs/basic/database/join/">连接</a></li>
+<li><a href="/interview/docs/basic/database/mysql/">MySQL</a></li>
+<li><a href="/interview/docs/basic/database/concurrent/">并发控制</a></li>
+<li><a href="/interview/docs/basic/database/innodb/">Innodb</a></li>
+<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/">Java</a>
+<ul>
+<li><a href="/interview/docs/java/oop/">OOP</a></li>
+<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
+<li><a href="/interview/docs/java/operator/">运算符</a></li>
+<li><a href="/interview/docs/java/exception/">异常</a></li>
+<li><a href="/interview/docs/java/generics/">泛型</a></li>
+<li><a href="/interview/docs/java/object/">Object</a></li>
+<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
+<li><a href="/interview/docs/java/proxy/">代理</a></li>
+<li><a href="/interview/docs/java/annotation/">注解</a></li>
+<li><a href="/interview/docs/java/questions/">面试题</a></li>
+<li><a href="/interview/docs/java/nio/">NIO</a></li>
+<li><a href="/interview/docs/java/">集合</a>
+<ul>
+<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
+<li><a href="/interview/docs/java/collection/Concurrenthashmap/">Concurrenthashmap</a></li>
+<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/concurrent/">并发</a>
+<ul>
+<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
+<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
+<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
+<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
+<li><a href="/interview/docs/java/concurrent/AQS/">AQS</a></li>
+<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
+<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
+<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<ul>
+<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
+<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/gc/">GC</a>
+<ul>
+<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
+<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/">框架</a>
+<ul>
+<li><a href="/interview/docs/fromwork/netty/">Netty</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
+<ul>
+<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/spring/">Spring</a>
+<ul>
+<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
+<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
+<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/">系统架构</a>
+<ul>
+<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
+<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
+<ul>
+<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/design/">系统设计</a>
+<ul>
+<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/distributed/">分布式</a>
+<ul>
+<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
+<li><a href="/interview/docs/architecture/distributed/session/">分布式Session</a></li>
+<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
+<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
+<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
+<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
+<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
+<li><a href="/interview/docs/architecture/distributed/kafka/">Kafka</a></li>
+<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
+<li><a href="/interview/docs/architecture/distributed/dubbo/">Dubbo</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
+<ul>
+<li><a href="/interview/docs/architecture/bigdata/algo/">基础算法</a></li>
+<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/offer/">剑指offer</a>
+<ul>
+<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
+<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
+<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
+<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
+<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
+<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
+<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
+<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
+<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
+<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
+<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
+<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
+<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
+<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
+<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
+<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
+<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
+<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
+<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
+<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
+<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
+<li><a href="/interview/docs/offer/VerifySquenceOfBST/">二叉搜索树的后序遍历序列</a></li>
+<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
+<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
+<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
+<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
+<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
+<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
+<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
+<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
+<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
+<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
+<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
+<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
+<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
+<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
+<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
+<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
+<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
+<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
+<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
+<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
+<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
+<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
+<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
+<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
+<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
+<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
+<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
+<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
+<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
+<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
+<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
+<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
+<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
+<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
+<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
+<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
+<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
+<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
+<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
+<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
+<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
+<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
+<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
+<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
+<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/leetcode/">LeetCode</a>
+<ul>
+<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
+<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
+<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
+<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
+<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
+<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
+<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
+<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
+<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
+<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
+<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
+<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
+<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
+<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
+<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
+<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
+<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
+<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
+<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
+<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
+<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
+<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
+<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
+<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
+<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
+<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
+<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
+<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
+<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
+<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
+<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
+<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+<script>
+(function() {
+  var menu = document.querySelector("aside.book-menu nav");
+  addEventListener("beforeunload", function(event) {
+    localStorage.setItem("menu.scrollTop", menu.scrollTop);
+  });
+  menu.scrollTop = localStorage.getItem("menu.scrollTop");
+})();
+</script>
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>HTTPS</strong>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#http-为什么不安全">HTTP 为什么不安全</a></li>
+    <li><a href="#https-如何保证安全">HTTPS 如何保证安全</a>
+      <ul>
+        <li><a href="#数字证书">数字证书</a></li>
+        <li><a href="#证书链">证书链</a></li>
+        <li><a href="#证书认证">证书认证</a></li>
+        <li><a href="#无-sni-支持问题">无 SNI 支持问题</a></li>
+        <li><a href="#证书选择">证书选择</a></li>
+        <li><a href="#证书的吊销">证书的吊销</a></li>
+        <li><a href="#ssltls协议httpwwwruanyifengcomblog201402ssl_tlshtml">SSL/TLS协议</a></li>
+        <li><a href="#tls-运行过程">TLS 运行过程</a></li>
+      </ul>
+    </li>
+    <li><a href="#https-的七个误解httpwwwruanyifengcomblog201102seven_myths_about_httpshtml">HTTPS 的七个误解</a></li>
+    <li><a href="#中间人攻击mitm">中间人攻击（MITM）</a>
+      <ul>
+        <li><a href="#tls对中间人攻击的抵御">TLS对中间人攻击的抵御</a></li>
+        <li><a href="#无法抵御中间人攻击的实例">无法抵御中间人攻击的实例</a></li>
+      </ul>
+    </li>
+    <li><a href="#参考链接">参考链接</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+<article class="markdown"><h1 id="httpshttpszhwikipediaorgwikie8b685e69687e69cace4bca0e8be93e5ae89e585a8e58d8fe8aeae"><a href="https://zh.wikipedia.org/wiki/%E8%B6%85%E6%96%87%E6%9C%AC%E4%BC%A0%E8%BE%93%E5%AE%89%E5%85%A8%E5%8D%8F%E8%AE%AE">HTTPS</a></h1>
+<p><code>HTTPS</code> 是一种通过计算机网络进行安全通信的传输协议。HTTPS经由HTTP进行通信，但利用 <code>SSL/TLS</code> 来加密数据包。 <code>HTTPS</code> 开发的主要目的，是提供对网站服务器的身份认证，保护交换数据的隐私与完整性。</p>
+<p><code>HTTPS</code> 的主要思想是在不安全的网络上创建一安全信道，并可在使用适当的加密包和服务器证书可被验证且可被信任时，对窃听和中间人攻击提供合理的防护。HTTPS的信任继承基于预先安装在浏览器中的证书颁发机构（如<code>Symantec、Comodo、GoDaddy和GlobalSign</code>等）（意即“我信任证书颁发机构告诉我应该信任的”）</p>
+<h2 id="http-为什么不安全">HTTP 为什么不安全</h2>
+<p><code>http</code> 协议属于 <strong>明文传输协议</strong> ，交互过程以及数据传输都没有进行加密，通信双方也没有进行任何认证，通信过程非常容易遭遇劫持、监听、篡改，严重情况下，会造成恶意的流量劫持等问题，甚至造成个人隐私泄露（比如银行卡卡号和密码泄露）等严重的安全问题。</p>
+<p>比如常见的，在 <code>http</code> 通信过程中，“中间人”将广告链接嵌入到服务器发给用户的 <code>http</code> 报文里，导致用户界面出现很多不良链接； 或者是修改用户的请求头 <code>URL</code> ，导致用户的请求被劫持到另外一个网站，用户的请求永远到不了真正的服务器。这些都会导致用户得不到正确的服务，甚至是损失惨重。</p>
+<h2 id="https-如何保证安全">HTTPS 如何保证安全</h2>
+<h3 id="数字证书">数字证书</h3>
+<p>TLS 握手的作用之一是 身份认证（authentication） ，被验证的一方需要提供一个身份证明，在 HTTPS 的世界里，这个身份证明就是 <code>TLS 证书</code> ，或者称为 <code>HTTPS 证书</code>。</p>
+<p>世界上的 CA 机构会遵守 <code>X.509</code> 规范来签发公钥证书（Public Key Certificate），证书内容的语法格式遵守 <code>ASN.1</code>，证书大致包含如下内容：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Certificate:
+    Data:
+        Version: 3 (0x2)                                                              //版本号
+        Serial Number:                                                                //证书序列号
+            0e:3c:c1:49:94:b3:e1:74:a6:34:54:d9:90:64:66:d7
+    Signature Algorithm: sha256WithRSAEncryption                                      //签名算法
+        Issuer: C=US, O=DigiCert Inc, OU=www.digicert.com, CN=GeoTrust RSA CA 2018    //签发机构
+        Validity                                                                      //有效期
+            Not Before: Dec 25 00:00:00 2017 GMT
+            Not After : Dec 24 12:00:00 2020 GMT
+        Subject: C=CN, L=北京市, O=智者四海（北京）技术有限公司, OU=IT, CN=*.zhihu.com      //证书主体
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption                                       //公钥算法
+                Public-Key: (2048 bit)
+                Modulus:
+                    00:a0:a8:71:...                                                   //公钥
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:                                                            //扩展信息
+            X509v3 Authority Key Identifier: 
+                keyid:90:58:FF:B0:9C:75:A8:51:54:77:B1:ED:F2:A3:43:16:38:9E:6C:C5     //授权密钥标识
+            X509v3 Subject Key Identifier: 
+                31:63:1F:A1:0B:43:D7:A5:8C:3D:F6:2E:85:69:D4:E1:E3:56:91:46           //主体密钥标识
+            X509v3 Subject Alternative Name: 
+                DNS:*.zhihu.com, DNS:zhihu.com
+            X509v3 Key Usage: critical
+                Digital Signature, Key Encipherment
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication, TLS Web Client Authentication
+            X509v3 CRL Distribution Points: 
+                Full Name:
+                  URI:http://cdp.geotrust.com/GeoTrustRSACA2018.crl
+
+            X509v3 Certificate Policies: 
+                Policy: 2.16.840.1.114412.1.1
+                  CPS: https://www.digicert.com/CPS
+                Policy: 2.23.140.1.2.2
+
+            Authority Information Access: 
+                OCSP - URI:http://status.geotrust.com
+                CA Issuers - URI:http://cacerts.geotrust.com/GeoTrustRSACA2018.crt
+
+            X509v3 Basic Constraints: 
+                CA:FALSE
+    Signature Algorithm: sha256WithRSAEncryption                                      //签名算法
+         54:73:e6:02:...                                                              //数字签名
+</code></pre></div><p>同一个CA颁发的证书序列号都必须是唯一的。</p>
+<h3 id="证书链">证书链</h3>
+<p>证书链是从终端用户证书后跟着一系列的 CA 证书，例如：<code>CA_ZHIHU</code> -&gt; <code>CA_GEO</code> -&gt; <code>CA_ROOT</code>，而通常 <strong>最后一个是自签名证书（根证书）</strong>，并且有如下关系：</p>
+<blockquote>
+<p>A -&gt; B 表示 &ldquo;A是由B签发的&rdquo; （更确切地说，A是由B中所载公钥对应的私钥签署的）</p>
+</blockquote>
+<ul>
+<li>在证书链上除根证书外，证书颁发者等于其后一个证书的主题。即：<code>CA_ZHIHU</code>.<code>Authority Key Identifier</code>=<code>CA_GEO</code>.<code>Subject Key Identifier</code></li>
+<li>除了最后一个证书，每个证书都是由其后的一个证书签名的。即：<code>CA_ZHIHU</code> 由 <code>CA_GEO</code> 签名，<code>CA_GEO</code> 由 <code>CA_ROOT</code> 签名</li>
+<li>最后的证书是信任主题，由于是通过可信过程得到的，你可以信任它，一般为系统内置。</li>
+</ul>
+<p>证书链用于检查目标证书（证书链里的第一个证书）里的公钥及其它数据是否属于其主题。检查是这么做的，用证书链中的下一个证书的公钥来验证它的签名，一直检查到证书链的尾端，<strong>如果所有验证都成功通过，那个这个证书就是可信的</strong>。</p>
+<h3 id="证书认证">证书认证</h3>
+<p>数字签名其实就是把 <strong>散列值</strong> 经过非对称加密算法加密得到的一个 <strong>加密的散列值</strong> 。数字签名一般用于身份认证和防止抵赖。</p>
+<h4 id="根认证机构的构建">根认证机构的构建</h4>
+<ol>
+<li>根认证机构 CA 生成公钥 <code>ca_KeyPub</code> 和私钥 <code>ca_KeyPri</code> ，以及基本信息表 <code>ca_Info</code> （CSR）。<code>ca_Info</code> 中一般包含了 CA 的名称、证书的有效期等信息。</li>
+<li>根认证机构 CA 对 <code>ca_KeyPub + ca_Info</code> 进行散列运算，得到散列值 <code>ca_Hash</code> 。</li>
+<li>根认证机构 CA 使用其私钥 <code>ca_KeyPri</code> 对 <code>ca_Hash</code> 进行非对称加密，得到加密的散列值 <code>enc_ca_Hash</code> 。</li>
+<li>根认证机构 CA 将 <code>ca_KeyPub + ca_Info + enc_ca_Hash</code> 组合生成自签名的数字证书 <code>ca_Cert</code> 。这张证书称之为根证书。</li>
+</ol>
+<p><code>ca_Cert</code> 可用于签署下一级的证书。</p>
+<h4 id="二级或以上认证机构的构建">二级（或以上）认证机构的构建</h4>
+<ol>
+<li>二级认证机构 CA2 生成公钥 <code>ca2_KeyPub</code> 和私钥 <code>ca2_KeyPri</code> ，以及基本信息表 <code>ca2_Info</code> 。 <code>ca2_Info</code> 中一般包含了 CA2 的名称、证书要求的有效期等信息。</li>
+<li>二级认证机构 CA2 将 <code>ca2_KeyPub</code> <code>、ca2_Info</code> 送给根认证机构 CA 。</li>
+<li>根认证机构 CA 通过某种方式验证 CA2 的身份之后，再加上根认证机构自己的一些信息 <code>ca_Info</code> ，然后对它们 <code>ca2_KeyPub + ca2_Info + ca_Info</code> 进行散列运算，得到散列值 <code>ca2_Hash</code> 。</li>
+<li>根认证机构 CA 使用其私钥 <code>ca_KeyPri</code> 对 <code>ca2_Hash</code> 进行非对称加密，得到加密的散列值 <code>enc_ca2_Hash</code> 。</li>
+<li>根认证机构 CA 将 <code>ca2_KeyPub + ca2_Info + ca_Info + enc_ca2_Hash</code> 组合签署成数字证书 <code>ca2_Cert</code> 并回送给 CA2 。</li>
+</ol>
+<p><code>ca2_Cert</code> 可用于签署下一级的证书。</p>
+<h4 id="二级或以上认证机构的证书签署">二级（或以上）认证机构的证书签署</h4>
+<ol>
+<li>服务器 S2 生成公钥 <code>s2_KeyPub</code> 和私钥 <code>s2_KeyPri</code> ，以及基本信息表 <code>s2_Info</code> 。 <code>s2_Info</code> 中一般包含了 S2 的名称、证书要求的有效期等信息。</li>
+<li>服务器 S2 将 <code>s2_KeyPub</code> 、 <code>s2_Info</code> 送给二级认证机构 CA2。</li>
+<li>二级认证机构 CA2 通过某种方式验证 S2 的身份之后，再加上根认证机构自己的一些信息 <code>ca2_Info</code> ，然后对它们 <code>s2_KeyPub + s2_Info + ca2_Info</code> 进行散列运算，得到散列值 <code>s2_Hash</code> 。</li>
+<li>二级认证机构 CA2 使用其私钥 <code>ca2_KeyPri</code> 对 <code>s2_Hash</code> 进行非对称加密，得到加密的散列值 <code>enc_s2_Hash</code> 。</li>
+<li>二级认证机构 CA2 将 <code>s2_KeyPub + s2_Info + ca2_Info + enc_s2_Hash</code> 组合签署成数字证书 <code>s2_Cert</code> 并回送给 S2 。</li>
+</ol>
+<p><code>s2_Cert</code> 不可用于签署下一级的证书。</p>
+<blockquote>
+<p>openssl ca 的 <code>-extensions</code> 参数控制，生成 <code>s2_Cert</code> 时是使用参数 <code>server_cert</code> 生成，所以不具备签署的能力</p>
+</blockquote>
+<p>从上面可以看出，证书签署的流程是： <code>ca_Cert -&gt;  ca2_Cert -&gt; s2_Cert</code> 。它是一条完整的链条，我们把它称之为 <strong>证书链</strong> 。</p>
+<h4 id="二级或以上认证机构的验证">二级（或以上）认证机构的验证</h4>
+<ol>
+<li>服务器 S2 下发证书 <code>s2_Cert</code> 、 <code>ca2_Cert</code> （证书链）给客户端 C 。</li>
+<li>客户端 C 检查到 <code>s2_Cert</code> 中的 <code>ca2_Info</code> ，发现它是由 CA2 签署的。</li>
+<li>客户端 C 取出 <code>ca2_Cert</code> 中的 <code>ca2_KeyPub</code> ，对 <code>s2_Cert</code> 中的 <code>enc_s2_Hash</code> 进行解密得到 <code>s2_Hash</code> 。</li>
+<li>客户端 C 对 <code>s2_Cert</code> 中的 <code>s2_KeyPub + s2_Info + ca2_Info</code> 进行散列运算，得到散列值 <code>s2_Hash_tmp</code>。</li>
+<li>客户端 C 判断 <code>s2_Hash</code> 和 <code>s2_Hash_tmp</code> 是否相等。如果两者相等，则证明 <code>s2_Cert</code> 是由 <code>ca2_Cert</code> 签署的。</li>
+<li>客户端 C 检查到 <code>ca2_Cert</code> 中的 <code>ca_Info</code> ，发现它是由 CA 签署的。</li>
+<li>客户端 C 取出 <code>ca_Cert</code> 中的 <code>ca_KeyPub</code> ，对 <code>ca2_Cert</code> 中的 <code>enc_ca2_Hash</code> 进行解密得到 <code>ca2_Hash</code> 。</li>
+<li>客户端 C 对 <code>ca2_Cert</code> 中的 <code>ca2_KeyPub + ca2_Info + ca_Info</code> 进行散列运算，得到散列值 <code>ca2_Hash_tmp</code> 。</li>
+<li>客户端 C 判断 <code>ca2_Hash</code> 和 <code>ca2_Hash_tmp</code> 是否相等。如果两者相等，证明 <code>ca2_Cert</code> 是由 <code>ca_Cert</code> 签署的。</li>
+<li>客户端 C 检查 <code>ca_Cert</code> ，发现该证书是根证书，且已经被系统信任，身份验证通过。</li>
+</ol>
+<h3 id="无-sni-支持问题">无 SNI 支持问题</h3>
+<p>很多公司由于业务众多，域名也是相当多的，为了方便运维，会让很多域名指向同样的 ip，然后统一将流量/请求分发到后端，此时就会面临一个问题：由于 <code>TLS/SSL</code> 在 HTTP 层之下，客户端和服务器握手的时候还拿不到 <code>origin</code> 字段，所以服务器不知道这个请求是从哪个域名过来的，而服务器这边每个域名都对应着一个证书，服务器就不知道该返回哪个证书啦。这个问题有两个通用解决方案：</p>
+<ol>
+<li>使用 <strong>VIP 服务器</strong>，每个域名对应一个 VIP，然后 VIP 与统一接入服务对接，通过 ip 来分发证书，不过运维成本很高，可能也需要大量的 VIP 服务器</li>
+<li>采用 <strong>多泛域名</strong>，将多个泛域名证书打包进一个证书。它的缺点是每次添加域名都需要更新证书。</li>
+</ol>
+<h3 id="证书选择">证书选择</h3>
+<p>证书有多张加密方式，不同的加密方式对 CPU 计算的损耗不同，安全级别也不同。TLS 在进行第一次握手的时候，客户端会向服务器端 <code>say hello</code>，这个时候会告诉服务器，它支持哪些算法，此时 <strong>服务器可以将最适合的证书发给客户端</strong>。</p>
+<h3 id="证书的吊销">证书的吊销</h3>
+<p>CA 证书的吊销存在两种机制，一种是 <strong>在线检查（OCSP）</strong>，客户端向 CA 机构发送请求检查公钥的靠谱性；第二种是客户端储存一份 CA 提供的 <strong>证书吊销列表（CRL）</strong>，定期更新。前者要求查询服务器具备良好性能，后者要求每次更新提供下次更新的时间，一般时差在几天。安全性要求高的网站建议采用第一种方案。</p>
+<p>大部分 CA 并不会提供吊销机制（CRL/OCSP），靠谱的方案是 <strong>为根证书提供中间证书</strong>，一旦中间证书的私钥泄漏或者证书过期，可以直接吊销中间证书并给用户颁发新的证书。中间证书还可以产生下一级中间证书，多级证书可以减少根证书的管理负担。</p>
+<h3 id="ssltls协议httpwwwruanyifengcomblog201402ssl_tlshtml"><a href="http://www.ruanyifeng.com/blog/2014/02/ssl_tls.html">SSL/TLS协议</a></h3>
+<p>不使用SSL/TLS的HTTP通信，就是不加密的通信。所有信息明文传播，带来了三大风险。</p>
+<ol>
+<li>窃听风险（eavesdropping）：第三方可以获知通信内容。</li>
+<li>篡改风险（tampering）：第三方可以修改通信内容。</li>
+<li>冒充风险（pretending）：第三方可以冒充他人身份参与通信。</li>
+</ol>
+<p>SSL/TLS协议是为了解决这三大风险而设计的，希望达到：</p>
+<ol>
+<li>所有信息都是加密传播，第三方无法窃听。</li>
+<li>具有校验机制，一旦被篡改，通信双方会立刻发现。</li>
+<li>配备身份证书，防止身份被冒充。</li>
+</ol>
+<p>目前，应用最广泛的是 <code>TLS 1.0</code>，接下来是<code>SSL 3.0</code>。但是，主流浏览器都已经实现了 <code>TLS 1.2</code> 的支持。<code>TLS 1.0</code>通常被标示为<code>SSL 3.1</code>，<code>TLS 1.1</code>为<code>SSL 3.2</code>，<code>TLS 1.2</code>为<code>SSL 3.3</code>。</p>
+<h3 id="tls-运行过程">TLS 运行过程</h3>
+<p><code>SSL/TLS</code>协议的基本思路是采用 <strong>公钥加密法</strong>，也就是说，客户端先向服务器端索要公钥，然后用公钥加密信息，服务器收到密文后，用自己的私钥解密。因此，<code>SSL/TLS</code>协议的基本过程是这样的：</p>
+<ol>
+<li>客户端向服务器端索要并验证公钥。</li>
+<li>双方协商生成&quot;对话密钥&rdquo;。</li>
+<li>双方采用&quot;对话密钥&quot;进行加密通信。</li>
+</ol>
+<p><img src="images/44e2b283e89f3fbe81b280df04d2feeb.png" alt=""></p>
+<p>&ldquo;握手阶段&quot;涉及四次通信，我们一个个来看。需要注意的是，<strong>&ldquo;握手阶段&quot;的所有通信都是明文的</strong>。</p>
+<h4 id="客户端发出请求clienthello">客户端发出请求（ClientHello）</h4>
+<p>首先，客户端（通常是浏览器）先向服务器发出加密通信的请求，这被叫做 <code>ClientHello</code> 请求。</p>
+<p>在这一步，客户端主要向服务器提供以下信息。</p>
+<ol>
+<li>支持的协议版本，比如TLS 1.0版。</li>
+<li>一个客户端生成的<strong>随机数</strong>，稍后用于生成对话密钥。</li>
+<li>支持的加密方法，比如RSA公钥加密。</li>
+<li>支持的压缩方法。</li>
+</ol>
+<p>这里需要注意的是，客户端发送的信息之中不包括服务器的域名。也就是说，理论上服务器只能包含一个网站，否则会分不清应该向客户端提供哪一个网站的数字证书。这就是为什么通常一台服务器只能有一张数字证书的原因。</p>
+<p>对于虚拟主机的用户来说，这当然很不方便。2006年，TLS协议加入了一个 <em>Server Name Indication</em> 扩展，允许客户端向服务器提供它所请求的域名。</p>
+<h4 id="服务器回应severhello">服务器回应（SeverHello）</h4>
+<p>服务器收到客户端请求后，向客户端发出回应，这叫做 <code>SeverHello</code> 。服务器的回应包含以下内容。</p>
+<ol>
+<li>确认使用的加密通信协议版本，比如TLS 1.0版本。如果浏览器与服务器支持的版本不一致，服务器关闭加密通信。</li>
+<li>一个服务器生成的<strong>随机数</strong>，稍后用于生成对话密钥。</li>
+<li>确认使用的加密方法，比如 RSA 公钥加密。</li>
+<li>服务器证书。</li>
+</ol>
+<p>除了上面这些信息，如果服务器需要确认客户端的身份，就会再包含一项请求，要求客户端提供 <strong>&ldquo;客户端证书&rdquo;</strong>。比如，金融机构往往只允许认证客户连入自己的网络，就会向正式客户提供 <strong>USB</strong> 密钥，里面就包含了一张客户端证书。</p>
+<h4 id="客户端回应">客户端回应</h4>
+<p>客户端收到服务器回应以后，首先验证服务器证书。如果证书不是可信机构颁布、或者证书中的域名与实际域名不一致、或者证书已经过期，就会向访问者显示一个警告，由其选择是否还要继续通信。</p>
+<p><strong>如果证书没有问题，客户端就会从证书中取出服务器的公钥</strong>。然后，向服务器发送加密信息，包含下面三项信息。</p>
+<ol>
+<li>一个<strong>随机数</strong>。该随机数用服务器公钥加密，防止被窃听。</li>
+<li>编码改变通知，表示随后的信息都将用双方商定的加密方法和密钥发送。</li>
+<li>客户端握手结束通知，表示客户端的握手阶段已经结束。这一项同时也是前面发送的所有内容的hash值，用来供服务器校验。</li>
+</ol>
+<p>上面第一项的随机数，是整个握手阶段出现的第三个随机数，又称 <code>pre-master key</code> 。有了它以后，客户端和服务器就同时有了三个随机数，接着双方就用事先商定的加密方法，各自生成本次会话所用的同一把&quot;会话密钥&rdquo;。</p>
+<p>至于 <strong>为什么一定要用三个随机数，来生成&quot;会话密钥&rdquo;</strong>：</p>
+<blockquote>
+<p>不管是客户端还是服务器，都需要随机数，这样生成的密钥才不会每次都一样。由于SSL协议中证书是静态的，因此十分有必要引入一种随机因素来保证协商出来的密钥的随机性。</p>
+<p>对于 RSA 密钥交换算法来说，<code>pre-master-key</code>本身就是一个随机数，再加上 hello 消息中的随机，<strong>三个随机数通过一个密钥导出器最终导出一个对称密钥</strong>。</p>
+<p><code>pre master</code> 的存在在于 <code>SSL</code> 协议不信任每个主机都能产生完全随机的随机数，如果随机数不随机，那么 <code>pre master secret</code>（对称密钥） 就有可能被猜出来，那么仅适用 <code>pre master secret</code> 作为密钥就不合适了，因此必须引入新的随机因素，那么客户端和服务器三个随机数一同生成的密钥就不容易被猜出了，<strong>一个伪随机可能完全不随机，可是是三个伪随机就十分接近随机了，每增加一个自由度，随机性增加的可不是一个量级</strong>。</p>
+</blockquote>
+<p>此外，如果前一步，服务器要求客户端证书，客户端会在这一步发送证书及相关信息。</p>
+<h4 id="服务器的最后回应">服务器的最后回应</h4>
+<p>服务器收到客户端的第三个随机数 <code>pre-master key</code> 之后，计算生成本次会话所用的&quot;会话密钥&rdquo;。然后，向客户端最后发送下面信息。</p>
+<ol>
+<li>编码改变通知，表示随后的信息都将用双方商定的加密方法和密钥发送。</li>
+<li>服务器握手结束通知，表示服务器的握手阶段已经结束。这一项同时也是前面发送的所有内容的 hash 值，用来供客户端校验。</li>
+</ol>
+<p>至此，整个握手阶段全部结束。接下来，客户端与服务器进入加密通信，就完全是使用普通的HTTP协议，只不过用&quot;会话密钥&quot;加密内容。</p>
+<h2 id="https-的七个误解httpwwwruanyifengcomblog201102seven_myths_about_httpshtml"><a href="http://www.ruanyifeng.com/blog/2011/02/seven_myths_about_https.html">HTTPS 的七个误解</a></h2>
+<ul>
+<li><code>HTTPS无法缓存？</code>：许多人以为，出于安全考虑，浏览器不会在本地保存HTTPS缓存。实际上，只要在HTTP头中使用特定命令，<strong>HTTPS是可以缓存的</strong>。</li>
+<li><code>SSL证书很贵？</code>：如果你在网上搜一下，就会发现很多便宜的SSL证书，大概10美元一年，这和一个 <code>.com</code> 域名的年费差不多。而且事实上，还能找到免费的 <code>SSL</code> 证书。</li>
+<li><code>HTTPS站点必须有独享的IP地址？</code>使用子域名通配符SSL证书（<code>wildcard SSL certificate</code>，价格大约是每年125美元），就能在一个IP地址上部署多个HTTPS子域名。</li>
+<li><code>转移服务器时要购买新证书？</code></li>
+<li><code>HTTPS太慢？</code>：使用HTTPS不会使你的网站变得更快（实际上有可能，请看下文），但是有一些技巧可以大大减少额外开销。</li>
+<li><code>有了HTTPS，Cookie和查询字符串就安全了？</code>：虽然无法直接从HTTPS数据中读取Cookie和查询字符串，但是你仍然需要使它们的值变得难以预测。</li>
+<li><code>只有注册登录页，才需要HTTPS？</code>：这种想法很普遍。人们觉得，HTTPS可以保护用户的密码，此外就不需要了。Firefox浏览器新插件Firesheep，证明了这种想法是错的。我们可以看到，在Twitter和Facebook上，劫持其他人的session是非常容易的。</li>
+</ul>
+<h2 id="中间人攻击mitm">中间人攻击（MITM）</h2>
+<h3 id="tls对中间人攻击的抵御">TLS对中间人攻击的抵御</h3>
+<p>当然正常情况下，我们的网络安全肯定不会这么脆弱。得利于TLS证书体系，虽然我们能发起中间人攻击，不过浏览器察觉到了证书的异常。这是因为我们冒充了目标网站，但是并没有目标网站的证书，这样浏览器在校验证书时很容易发现证书错误。</p>
+<h3 id="无法抵御中间人攻击的实例">无法抵御中间人攻击的实例</h3>
+<p><strong>部分开发者忽视证书校验</strong>，或对证书异常处理不当，导致本来十分有效LTS失去原本的防御能力。有许多APP存在类似的问题，包括个别金融类应用，还有部分APP部分模块的流量存在被劫持的风险。</p>
+<h2 id="参考链接">参考链接</h2>
+<ul>
+<li><a href="https://zhuanlan.zhihu.com/p/30655259">HTTPS 精读之 TLS 证书校验</a></li>
+<li><a href="https://www.barretlee.com/blog/2016/04/24/detail-about-ca-and-certs/">细说 CA 和证书</a></li>
+<li><a href="https://www.cnblogs.com/lulianqi/p/10558719.html">HTTPS中间人攻击实践（原理·实践）</a></li>
+</ul>
+</article>
+ 
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/basic/net/https/index.md" target="_blank" rel="noopener">
+      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
+      
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#http-为什么不安全">HTTP 为什么不安全</a></li>
+    <li><a href="#https-如何保证安全">HTTPS 如何保证安全</a>
+      <ul>
+        <li><a href="#数字证书">数字证书</a></li>
+        <li><a href="#证书链">证书链</a></li>
+        <li><a href="#证书认证">证书认证</a></li>
+        <li><a href="#无-sni-支持问题">无 SNI 支持问题</a></li>
+        <li><a href="#证书选择">证书选择</a></li>
+        <li><a href="#证书的吊销">证书的吊销</a></li>
+        <li><a href="#ssltls协议httpwwwruanyifengcomblog201402ssl_tlshtml">SSL/TLS协议</a></li>
+        <li><a href="#tls-运行过程">TLS 运行过程</a></li>
+      </ul>
+    </li>
+    <li><a href="#https-的七个误解httpwwwruanyifengcomblog201102seven_myths_about_httpshtml">HTTPS 的七个误解</a></li>
+    <li><a href="#中间人攻击mitm">中间人攻击（MITM）</a>
+      <ul>
+        <li><a href="#tls对中间人攻击的抵御">TLS对中间人攻击的抵御</a></li>
+        <li><a href="#无法抵御中间人攻击的实例">无法抵御中间人攻击的实例</a></li>
+      </ul>
+    </li>
+    <li><a href="#参考链接">参考链接</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

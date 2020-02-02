@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Dubbo"><meta property="og:title" content="Dubbo" />
+<meta property="og:description" content="Dubbo 领域模型 在 Dubbo 的核心领域模型中：
+ Protocol 是服务域，它是 Invoker 暴露和引用的主功能入口，它负责 Invoker 的生命周期管理。 Invoker 是实体域，它是 Dubbo 的核心模型，其它模型都向它靠扰，或转换成它，它代表一个可执行体，可向它发起 invoke 调用，它有可能是一个本地的实现，也可能是一个远程的实现，也可能一个集群实现。 Invocation 是会话域，它持有调用过程中的变量，比如方法名，参数等。  基本设计原则  采用 Microkernel &#43; Plugin 模式，Microkernel 只负责组装 Plugin，Dubbo 自身的功能也是通过扩展点实现的，也就是 Dubbo 的所有功能点都可被用户自定义扩展所替换。 采用 URL 作为配置信息的统一格式，所有扩展点都通过传递 URL 携带配置信息。  Dubbo 服务暴露过程 官方文档&ndash;服务导出
+Dubbo 结构  第一层：service 层，接口层，给服务提供者和消费者来实现的 第二层：config 层，配置层，主要是对 dubbo 进行各种配置的 第三层：proxy 层，服务代理层，无论是 consumer 还是 provider，dubbo 都会给你生成代理，代理之间进行网络通信 第四层：registry 层，服务注册层，负责服务的注册与发现 第五层：cluster 层，集群层，封装多个服务提供者的路由以及负载均衡，将多个实例组合成一个服务 第六层：monitor 层，监控层，对 rpc 接口的调用次数和调用时间进行监控 第七层：protocal 层，远程调用层，封装 rpc 调用 第八层：exchange 层，信息交换层，封装请求响应模式，同步转异步 第九层：transport 层，网络传输层，抽象 mina 和 netty 为统一接口 第十层：serialize 层，数据序列化层  工作流程  第一步：provider 向注册中心去注册 第二步：consumer 从注册中心订阅服务，注册中心会通知 consumer 注册好的服务 第三步：consumer 调用 provider 第四步：consumer 和 provider 都异步通知监控中心  注册中心挂了可以继续通信吗？ 可以，因为刚开始初始化的时候，消费者会将提供者的地址等信息拉取到 本地缓存，所以注册中心挂了可以继续通信。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hadyang.github.io/interview/docs/architecture/distributed/dubbo/" />
+<meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
+<meta property="article:modified_time" content="2019-08-21T11:00:41+08:00" />
+<title>Dubbo | Interview</title>
+<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/interview/book.min.b7fe34b8a4c4da05b2690b4aacfa71ddce0668cc6da3abb67dd3946844125444.css" integrity="sha256-t/40uKTE2gWyaQtKrPpx3c4GaMxto6u2fdOUaEQSVEQ=">
+
+
+<script defer src="/interview/en.search.min.4daab1eda22baec10d130347f095a8463b951038b7e98060a59bcdc484ada980.js" integrity="sha256-Taqx7aIrrsENEwNH8JWoRjuVEDi36YBgpZvNxIStqYA="></script>
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/interview"><span>Interview</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+  <ul>
+<li><a href="/interview/docs/basic/">计算机基础</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/">算法</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
+<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
+<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
+<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
+<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
+<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
+<li><a href="/interview/docs/basic/algo/sort/">排序算法</a></li>
+<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/os/">操作系统</a>
+<ul>
+<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
+<li><a href="/interview/docs/basic/os/concurrency/">并发</a></li>
+<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
+<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
+<li><a href="/interview/docs/basic/os/linux/">Linux系统</a></li>
+<li><a href="/interview/docs/basic/os/interrupt/">中断</a></li>
+<li><a href="/interview/docs/basic/os/device/">设备管理</a></li>
+<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
+<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/net/">计算机网络</a>
+<ul>
+<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
+<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
+<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
+<li><a href="/interview/docs/basic/net/http/">HTTP</a></li>
+<li><a href="/interview/docs/basic/net/https/">HTTPS</a></li>
+<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/">数据库</a>
+<ul>
+<li><a href="/interview/docs/basic/database/transaction/">事务</a></li>
+<li><a href="/interview/docs/basic/database/index/">索引</a></li>
+<li><a href="/interview/docs/basic/database/sql/">SQL</a></li>
+<li><a href="/interview/docs/basic/database/join/">连接</a></li>
+<li><a href="/interview/docs/basic/database/mysql/">MySQL</a></li>
+<li><a href="/interview/docs/basic/database/concurrent/">并发控制</a></li>
+<li><a href="/interview/docs/basic/database/innodb/">Innodb</a></li>
+<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/">Java</a>
+<ul>
+<li><a href="/interview/docs/java/oop/">OOP</a></li>
+<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
+<li><a href="/interview/docs/java/operator/">运算符</a></li>
+<li><a href="/interview/docs/java/exception/">异常</a></li>
+<li><a href="/interview/docs/java/generics/">泛型</a></li>
+<li><a href="/interview/docs/java/object/">Object</a></li>
+<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
+<li><a href="/interview/docs/java/proxy/">代理</a></li>
+<li><a href="/interview/docs/java/annotation/">注解</a></li>
+<li><a href="/interview/docs/java/questions/">面试题</a></li>
+<li><a href="/interview/docs/java/nio/">NIO</a></li>
+<li><a href="/interview/docs/java/">集合</a>
+<ul>
+<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
+<li><a href="/interview/docs/java/collection/Concurrenthashmap/">Concurrenthashmap</a></li>
+<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/concurrent/">并发</a>
+<ul>
+<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
+<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
+<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
+<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
+<li><a href="/interview/docs/java/concurrent/AQS/">AQS</a></li>
+<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
+<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
+<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<ul>
+<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
+<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/gc/">GC</a>
+<ul>
+<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
+<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/">框架</a>
+<ul>
+<li><a href="/interview/docs/fromwork/netty/">Netty</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
+<ul>
+<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/spring/">Spring</a>
+<ul>
+<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
+<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
+<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/">系统架构</a>
+<ul>
+<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
+<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
+<ul>
+<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/design/">系统设计</a>
+<ul>
+<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/distributed/">分布式</a>
+<ul>
+<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
+<li><a href="/interview/docs/architecture/distributed/session/">分布式Session</a></li>
+<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
+<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
+<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
+<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
+<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
+<li><a href="/interview/docs/architecture/distributed/kafka/">Kafka</a></li>
+<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
+<li><a href="/interview/docs/architecture/distributed/dubbo/"class=active>Dubbo</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
+<ul>
+<li><a href="/interview/docs/architecture/bigdata/algo/">基础算法</a></li>
+<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/offer/">剑指offer</a>
+<ul>
+<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
+<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
+<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
+<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
+<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
+<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
+<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
+<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
+<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
+<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
+<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
+<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
+<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
+<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
+<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
+<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
+<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
+<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
+<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
+<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
+<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
+<li><a href="/interview/docs/offer/VerifySquenceOfBST/">二叉搜索树的后序遍历序列</a></li>
+<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
+<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
+<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
+<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
+<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
+<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
+<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
+<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
+<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
+<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
+<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
+<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
+<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
+<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
+<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
+<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
+<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
+<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
+<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
+<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
+<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
+<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
+<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
+<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
+<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
+<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
+<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
+<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
+<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
+<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
+<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
+<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
+<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
+<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
+<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
+<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
+<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
+<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
+<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
+<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
+<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
+<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
+<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
+<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
+<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/leetcode/">LeetCode</a>
+<ul>
+<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
+<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
+<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
+<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
+<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
+<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
+<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
+<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
+<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
+<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
+<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
+<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
+<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
+<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
+<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
+<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
+<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
+<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
+<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
+<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
+<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
+<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
+<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
+<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
+<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
+<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
+<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
+<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
+<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
+<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
+<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
+<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+<script>
+(function() {
+  var menu = document.querySelector("aside.book-menu nav");
+  addEventListener("beforeunload", function(event) {
+    localStorage.setItem("menu.scrollTop", menu.scrollTop);
+  });
+  menu.scrollTop = localStorage.getItem("menu.scrollTop");
+})();
+</script>
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>Dubbo</strong>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#领域模型">领域模型</a></li>
+    <li><a href="#基本设计原则">基本设计原则</a></li>
+    <li><a href="#dubbo-服务暴露过程">Dubbo 服务暴露过程</a></li>
+    <li><a href="#dubbo-结构">Dubbo 结构</a></li>
+    <li><a href="#工作流程">工作流程</a></li>
+    <li><a href="#注册中心挂了可以继续通信吗">注册中心挂了可以继续通信吗？</a></li>
+    <li><a href="#dubbo-支持哪些序列化协议说一下-hessian-的数据结构pb-知道吗为什么-pb-的效率是最高的">Dubbo 支持哪些序列化协议？说一下 Hessian 的数据结构？PB 知道吗？为什么 PB 的效率是最高的？</a>
+      <ul>
+        <li><a href="#dubbo-支持不同的通信协议">Dubbo 支持不同的通信协议</a></li>
+        <li><a href="#dubbo-支持的序列化协议">Dubbo 支持的序列化协议</a></li>
+        <li><a href="#为什么-pb-的效率是最高的">为什么 PB 的效率是最高的？</a></li>
+      </ul>
+    </li>
+    <li><a href="#dubbo-负载均衡策略和集群容错策略都有哪些动态代理策略呢">dubbo 负载均衡策略和集群容错策略都有哪些？动态代理策略呢？</a>
+      <ul>
+        <li><a href="#dubbo-负载均衡策略">dubbo 负载均衡策略</a></li>
+        <li><a href="#dubbo-集群容错策略">dubbo 集群容错策略</a></li>
+        <li><a href="#dubbo动态代理策略">dubbo动态代理策略</a></li>
+      </ul>
+    </li>
+    <li><a href="#dubbo-的-spi-思想是什么">dubbo 的 spi 思想是什么？</a>
+      <ul>
+        <li><a href="#与-java-spi-对比">与 Java SPI 对比</a></li>
+      </ul>
+    </li>
+    <li><a href="#如何基于-dubbo-进行服务治理服务降级失败重试以及超时重试">如何基于 Dubbo 进行服务治理、服务降级、失败重试以及超时重试？</a>
+      <ul>
+        <li><a href="#服务治理">服务治理</a></li>
+        <li><a href="#服务降级">服务降级</a></li>
+        <li><a href="#失败重试和超时重试">失败重试和超时重试</a></li>
+      </ul>
+    </li>
+    <li><a href="#参考链接">参考链接</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+<article class="markdown"><h1 id="dubbohttpszhuanlanzhihucomp45846108"><a href="https://zhuanlan.zhihu.com/p/45846108">Dubbo</a></h1>
+<h2 id="领域模型">领域模型</h2>
+<p>在 Dubbo 的核心领域模型中：</p>
+<ul>
+<li><code>Protocol</code> 是服务域，它是 Invoker 暴露和引用的主功能入口，它负责 Invoker 的生命周期管理。</li>
+<li><code>Invoker</code> 是实体域，它是 Dubbo 的核心模型，其它模型都向它靠扰，或转换成它，它代表一个可执行体，可向它发起 invoke 调用，它有可能是一个本地的实现，也可能是一个远程的实现，也可能一个集群实现。</li>
+<li><code>Invocation</code> 是会话域，它持有调用过程中的变量，比如方法名，参数等。</li>
+</ul>
+<h2 id="基本设计原则">基本设计原则</h2>
+<ul>
+<li>采用 <code>Microkernel + Plugin</code> 模式，Microkernel 只负责组装 Plugin，Dubbo 自身的功能也是通过扩展点实现的，也就是 Dubbo 的所有功能点都可被用户自定义扩展所替换。</li>
+<li>采用 URL 作为配置信息的统一格式，所有扩展点都通过传递 URL 携带配置信息。</li>
+</ul>
+<h2 id="dubbo-服务暴露过程">Dubbo 服务暴露过程</h2>
+<p><a href="https://dubbo.incubator.apache.org/zh-cn/docs/source_code_guide/export-service.html">官方文档&ndash;服务导出</a></p>
+<p><img src="images/fce799af888ea1e2b757476b03d4ded7.png" alt="image"></p>
+<h2 id="dubbo-结构">Dubbo 结构</h2>
+<ul>
+<li>第一层：service 层，接口层，给服务提供者和消费者来实现的</li>
+<li>第二层：config 层，配置层，主要是对 dubbo 进行各种配置的</li>
+<li>第三层：proxy 层，服务代理层，无论是 consumer 还是 provider，dubbo 都会给你生成代理，代理之间进行网络通信</li>
+<li>第四层：registry 层，服务注册层，负责服务的注册与发现</li>
+<li>第五层：cluster 层，集群层，封装多个服务提供者的路由以及负载均衡，将多个实例组合成一个服务</li>
+<li>第六层：monitor 层，监控层，对 rpc 接口的调用次数和调用时间进行监控</li>
+<li>第七层：protocal 层，远程调用层，封装 rpc 调用</li>
+<li>第八层：exchange 层，信息交换层，封装请求响应模式，同步转异步</li>
+<li>第九层：transport 层，网络传输层，抽象 mina 和 netty 为统一接口</li>
+<li>第十层：serialize 层，数据序列化层</li>
+</ul>
+<h2 id="工作流程">工作流程</h2>
+<ul>
+<li>第一步：provider 向注册中心去注册</li>
+<li>第二步：consumer 从注册中心订阅服务，注册中心会通知 consumer 注册好的服务</li>
+<li>第三步：consumer 调用 provider</li>
+<li>第四步：consumer 和 provider 都异步通知监控中心</li>
+</ul>
+<p><img src="images/075a4cbace1c6874c04ae34c6b91c7ad.png" alt="image"></p>
+<h2 id="注册中心挂了可以继续通信吗">注册中心挂了可以继续通信吗？</h2>
+<p>可以，因为刚开始初始化的时候，消费者会将提供者的地址等信息拉取到 <strong>本地缓存</strong>，所以注册中心挂了可以继续通信。</p>
+<h2 id="dubbo-支持哪些序列化协议说一下-hessian-的数据结构pb-知道吗为什么-pb-的效率是最高的">Dubbo 支持哪些序列化协议？说一下 Hessian 的数据结构？PB 知道吗？为什么 PB 的效率是最高的？</h2>
+<h3 id="dubbo-支持不同的通信协议">Dubbo 支持不同的通信协议</h3>
+<ul>
+<li><strong>dubbo 协议</strong>：默认就是走 dubbo 协议，<strong>单一长连接</strong>，进行的是 NIO 异步通信，基于 hessian 作为序列化协议。使用的场景是：传输数据量小（每次请求在 100kb 以内），但是并发量很高。</li>
+<li><strong>rmi 协议</strong>：走 Java 二进制序列化，<strong>多个短连接</strong>，适合消费者和提供者数量差不多的情况，适用于文件的传输，一般较少用。</li>
+<li><strong>hessian 协议</strong>：走 hessian 序列化协议，<strong>多个短连接</strong>，适用于提供者数量比消费者数量还多的情况，适用于文件的传输，一般较少用。</li>
+<li><strong>http 协议</strong>：走 json 序列化</li>
+<li><strong>webservice</strong>：走 SOAP 文本序列化</li>
+</ul>
+<h3 id="dubbo-支持的序列化协议">Dubbo 支持的序列化协议</h3>
+<p><code>dubbo</code> 支持 <code>hession</code> 、 Java 二进制序列化、<code>json</code>、<code>SOAP</code> 文本序列化多种序列化协议。但是 <strong><code>hessian</code> 是其默认的序列化协议</strong>。</p>
+<h3 id="为什么-pb-的效率是最高的">为什么 PB 的效率是最高的？</h3>
+<p>其实 PB 之所以性能如此好，主要得益于两个：</p>
+<ul>
+<li>它使用 <code>proto</code> 编译器，自动进行序列化和反序列化，速度非常快，应该比 XML 和 JSON 快上了 <code>20~100</code> 倍；</li>
+<li>它的数据压缩效果好，就是说它序列化后的数据量体积小。因为体积小，传输起来带宽和速度上会有优化。</li>
+</ul>
+<h2 id="dubbo-负载均衡策略和集群容错策略都有哪些动态代理策略呢">dubbo 负载均衡策略和集群容错策略都有哪些？动态代理策略呢？</h2>
+<h3 id="dubbo-负载均衡策略">dubbo 负载均衡策略</h3>
+<h4 id="random-loadbalance">random loadbalance</h4>
+<p>默认情况下，dubbo 是 <code>random load balance</code> ，即 <strong>随机</strong> 调用实现负载均衡，可以对 <code>provider</code> 不同实例 <strong>设置不同的权重</strong>，会按照权重来负载均衡，权重越大分配流量越高，一般就用这个默认的就可以了。</p>
+<h4 id="roundrobin-loadbalance">roundrobin loadbalance</h4>
+<p>这个的话默认就是均匀地将流量打到各个机器上去，但是如果各个机器的性能不一样，容易导致性能差的机器负载过高。所以此时需要调整权重，让性能差的机器承载权重小一些，流量少一些。</p>
+<h4 id="leastactive-loadbalance">leastactive loadbalance</h4>
+<p>这个就是自动感知一下，如果某个机器性能越差，那么接收的请求越少，越不活跃，此时就会给 <strong>不活跃的性能差的机器更少的请求</strong>。</p>
+<h4 id="consistanthash-loadbalance">consistanthash loadbalance</h4>
+<p>一致性 Hash 算法，相同参数的请求一定分发到一个 <code>provider</code> 上去， <code>provider</code> 挂掉的时候，会基于虚拟节点均匀分配剩余的流量，抖动不会太大。<strong>如果你需要的不是随机负载均衡</strong>，是要一类请求都到一个节点，那就走这个一致性 <code>Hash</code> 策略。</p>
+<h3 id="dubbo-集群容错策略">dubbo 集群容错策略</h3>
+<h4 id="failover-cluster-模式">failover cluster 模式</h4>
+<p>失败自动切换，自动重试其他机器，默认就是这个，常见于读操作。（失败重试其它机器）</p>
+<h4 id="failfast-cluster模式">failfast cluster模式</h4>
+<p>一次调用失败就立即失败，常见于写操作。（调用失败就立即失败）</p>
+<h4 id="failsafe-cluster-模式">failsafe cluster 模式</h4>
+<p>出现异常时忽略掉，常用于不重要的接口调用，比如记录日志。</p>
+<h4 id="failback-cluster-模式">failback cluster 模式</h4>
+<p>失败了后台自动记录请求，然后定时重发，比较适合于写消息队列这种。</p>
+<h4 id="forking-cluster-模式">forking cluster 模式</h4>
+<p><strong>并行调用</strong> 多个 <code>provider</code> ，只要一个成功就立即返回。</p>
+<h4 id="broadcacst-cluster">broadcacst cluster</h4>
+<p>逐个调用所有的 <code>provider。</code></p>
+<h3 id="dubbo动态代理策略">dubbo动态代理策略</h3>
+<p>默认使用 <code>javassist</code> 动态字节码生成，创建代理类。但是可以通过 spi 扩展机制配置自己的动态代理策略。</p>
+<h2 id="dubbo-的-spi-思想是什么">dubbo 的 spi 思想是什么？</h2>
+<p><code>spi</code> ，简单来说，就是 <code>service provider interface</code>，说白了是什么意思呢，比如你有个接口，现在这个接口有 3 个实现类，那么在系统运行的时候对这个接口到底选择哪个实现类呢？这就需要 <code>spi</code> 了，需要根据指定的配置或者是默认的配置，去找到对应的实现类加载进来，然后用这个实现类的实例对象。</p>
+<p><code>dubbo</code> 也用了 <code>spi</code> 思想，不过没有用 <code>jdk</code> 的 <code>spi</code> 机制，是自己实现的一套 <code>spi</code> 机制。</p>
+<pre><code>Protocol protocol = ExtensionLoader.getExtensionLoader(Protocol.class).getAdaptiveExtension();
+</code></pre><p><code>Protocol</code> 接口，在系统运行的时候， <code>dubbo</code> 会判断一下应该选用这个 <code>Protocol</code> 接口的哪个实现类来实例化对象来使用。</p>
+<p>它会去找一个你配置的 <code>Protocol</code> ，将你配置的 <code>Protocol</code> 实现类，加载到 <code>jvm</code> 中来，然后实例化对象，就用你的那个 <code>Protocol</code> 实现类就可以了。</p>
+<h3 id="与-java-spi-对比">与 Java SPI 对比</h3>
+<ol>
+<li>JDK 标准的 SPI 会一次性实例化扩展点所有实现，如果有扩展实现初始化很耗时，但如果没用上也加载，会很浪费资源。</li>
+<li>增加了对扩展点 IoC 和 AOP 的支持，一个扩展点可以直接 setter 注入其它扩展点。</li>
+<li>如果扩展点加载失败，连扩展点的名称都拿不到了。比如：JDK 标准的 ScriptEngine，通过 getName() 获取脚本类型的名称，但如果 RubyScriptEngine 因为所依赖的 jruby.jar 不存在，导致 RubyScriptEngine 类加载失败，这个失败原因被吃掉了，和 ruby 对应不起来，当用户执行 ruby 脚本时，会报不支持 ruby，而不是真正失败的原因。</li>
+</ol>
+<h2 id="如何基于-dubbo-进行服务治理服务降级失败重试以及超时重试">如何基于 Dubbo 进行服务治理、服务降级、失败重试以及超时重试？</h2>
+<h3 id="服务治理">服务治理</h3>
+<h4 id="1-调用链路自动生成">1. 调用链路自动生成</h4>
+<p>一个大型的分布式系统，或者说是用现在流行的微服务架构来说吧，<strong>分布式系统由大量的服务组成</strong>。那么这些服务之间互相是如何调用的？调用链路是啥？说实话，几乎到后面没人搞的清楚了，因为服务实在太多了，可能几百个甚至几千个服务。</p>
+<p>那就需要基于 dubbo 做的分布式系统中，对各个服务之间的调用自动记录下来，然后自动将 <strong>各个服务之间的依赖关系和调用链路生成出来</strong>，做成一张图，显示出来，大家才可以看到对吧。</p>
+<p><img src="images/c48a88cbce65d737293a41250ea58d72.png" alt="image"></p>
+<h4 id="2-服务访问压力以及时长统计">2. 服务访问压力以及时长统计</h4>
+<p>需要自动统计 <strong>各个接口和服务之间的调用次数以及访问延时</strong>，而且要分成两个级别。</p>
+<ul>
+<li>一个级别是接口粒度，就是每个服务的每个接口每天被调用多少次，<code>TP50/TP90/TP99</code>，三个档次的请求延时分别是多少；</li>
+<li>第二个级别是从源头入口开始，一个完整的请求链路经过几十个服务之后，完成一次请求，每天全链路走多少次，全链路请求延时的 <code>TP50/TP90/TP99</code>，分别是多少。</li>
+</ul>
+<p>这些东西都搞定了之后，后面才可以来看当前系统的压力主要在哪里，如何来扩容和优化啊。</p>
+<h4 id="3-其它">3. 其它</h4>
+<ul>
+<li>服务分层（避免循环依赖）</li>
+<li>调用链路失败监控和报警</li>
+<li>服务鉴权</li>
+<li>每个服务的可用性的监控（接口调用成功率？几个 9？99.99%，99.9%，99%）</li>
+</ul>
+<h3 id="服务降级">服务降级</h3>
+<p>比如说服务 A 调用服务 B，结果服务 B 挂掉了，服务 A 重试几次调用服务 B，还是不行，那么直接降级，走一个备用的逻辑，给用户返回响应。</p>
+<p>举个栗子，我们有接口 <code>HelloService</code>。<code>HelloServiceImpl</code> 有该接口的具体实现。</p>
+<pre><code>public interface HelloService {
+   void sayHello();
+}
+
+public class HelloServiceImpl implements HelloService {
+    public void sayHello() {
+        System.out.println(&quot;hello world......&quot;);
+    }
+}
+</code></pre><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-xml" data-lang="xml"><span style="color:#75715e">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;</span>
+<span style="color:#f92672">&lt;beans</span> <span style="color:#a6e22e">xmlns=</span><span style="color:#e6db74">&#34;http://www.springframework.org/schema/beans&#34;</span>
+    <span style="color:#a6e22e">xmlns:xsi=</span><span style="color:#e6db74">&#34;http://www.w3.org/2001/XMLSchema-instance&#34;</span> <span style="color:#a6e22e">xmlns:dubbo=</span><span style="color:#e6db74">&#34;http://code.alibabatech.com/schema/dubbo&#34;</span>
+    <span style="color:#a6e22e">xsi:schemaLocation=</span><span style="color:#e6db74">&#34;http://www.springframework.org/schema/beans        http://www.springframework.org/schema/beans/spring-beans.xsd        http://code.alibabatech.com/schema/dubbo        http://code.alibabatech.com/schema/dubbo/dubbo.xsd&#34;</span><span style="color:#f92672">&gt;</span>
+
+    <span style="color:#f92672">&lt;dubbo:application</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;dubbo-provider&#34;</span> <span style="color:#f92672">/&gt;</span>
+    <span style="color:#f92672">&lt;dubbo:registry</span> <span style="color:#a6e22e">address=</span><span style="color:#e6db74">&#34;zookeeper://127.0.0.1:2181&#34;</span> <span style="color:#f92672">/&gt;</span>
+    <span style="color:#f92672">&lt;dubbo:protocol</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;dubbo&#34;</span> <span style="color:#a6e22e">port=</span><span style="color:#e6db74">&#34;20880&#34;</span> <span style="color:#f92672">/&gt;</span>
+    <span style="color:#f92672">&lt;dubbo:service</span> <span style="color:#a6e22e">interface=</span><span style="color:#e6db74">&#34;com.zhss.service.HelloService&#34;</span> <span style="color:#a6e22e">ref=</span><span style="color:#e6db74">&#34;helloServiceImpl&#34;</span> <span style="color:#a6e22e">timeout=</span><span style="color:#e6db74">&#34;10000&#34;</span> <span style="color:#f92672">/&gt;</span>
+    <span style="color:#f92672">&lt;bean</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#34;helloServiceImpl&#34;</span> <span style="color:#a6e22e">class=</span><span style="color:#e6db74">&#34;com.zhss.service.HelloServiceImpl&#34;</span> <span style="color:#f92672">/&gt;</span>
+
+<span style="color:#f92672">&lt;/beans&gt;</span>
+
+<span style="color:#75715e">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;</span>
+<span style="color:#f92672">&lt;beans</span> <span style="color:#a6e22e">xmlns=</span><span style="color:#e6db74">&#34;http://www.springframework.org/schema/beans&#34;</span>
+    <span style="color:#a6e22e">xmlns:xsi=</span><span style="color:#e6db74">&#34;http://www.w3.org/2001/XMLSchema-instance&#34;</span>
+    <span style="color:#a6e22e">xmlns:dubbo=</span><span style="color:#e6db74">&#34;http://code.alibabatech.com/schema/dubbo&#34;</span>
+    <span style="color:#a6e22e">xsi:schemaLocation=</span><span style="color:#e6db74">&#34;http://www.springframework.org/schema/beans        http://www.springframework.org/schema/beans/spring-beans.xsd        http://code.alibabatech.com/schema/dubbo        http://code.alibabatech.com/schema/dubbo/dubbo.xsd&#34;</span><span style="color:#f92672">&gt;</span>
+
+    <span style="color:#f92672">&lt;dubbo:application</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;dubbo-consumer&#34;</span>  <span style="color:#f92672">/&gt;</span>
+
+    <span style="color:#f92672">&lt;dubbo:registry</span> <span style="color:#a6e22e">address=</span><span style="color:#e6db74">&#34;zookeeper://127.0.0.1:2181&#34;</span> <span style="color:#f92672">/&gt;</span>
+
+    <span style="color:#f92672">&lt;dubbo:reference</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#34;fooService&#34;</span> <span style="color:#a6e22e">interface=</span><span style="color:#e6db74">&#34;com.test.service.FooService&#34;</span>  <span style="color:#a6e22e">timeout=</span><span style="color:#e6db74">&#34;10000&#34;</span> <span style="color:#a6e22e">check=</span><span style="color:#e6db74">&#34;false&#34;</span> <span style="color:#a6e22e">mock=</span><span style="color:#e6db74">&#34;return null&#34;</span><span style="color:#f92672">&gt;</span>
+    <span style="color:#f92672">&lt;/dubbo:reference&gt;</span>
+
+<span style="color:#f92672">&lt;/beans&gt;</span>
+
+</code></pre></div><p>我们调用接口失败的时候，可以通过 <code>mock</code> 统一返回 <code>null</code> 。</p>
+<p>mock 的值也可以修改为 true，然后再跟接口同一个路径下实现一个 Mock 类，命名规则是 “接口名称+<code>Mock</code>” 后缀。然后在 Mock 类里实现自己的降级逻辑。</p>
+<pre><code>public class HelloServiceMock implements HelloService {
+    public void sayHello() {
+        // 降级逻辑
+    }
+}
+</code></pre><h3 id="失败重试和超时重试">失败重试和超时重试</h3>
+<p>所谓失败重试，就是 <code>consumer</code> 调用 <code>provider</code> 要是失败了，比如抛异常了，此时应该是可以重试的，或者调用超时了也可以重试。配置如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-xml" data-lang="xml"><span style="color:#f92672">&lt;dubbo:reference</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#34;xxxx&#34;</span> <span style="color:#a6e22e">interface=</span><span style="color:#e6db74">&#34;xx&#34;</span> <span style="color:#a6e22e">check=</span><span style="color:#e6db74">&#34;true&#34;</span> <span style="color:#a6e22e">async=</span><span style="color:#e6db74">&#34;false&#34;</span> <span style="color:#a6e22e">retries=</span><span style="color:#e6db74">&#34;3&#34;</span> <span style="color:#a6e22e">timeout=</span><span style="color:#e6db74">&#34;2000&#34;</span><span style="color:#f92672">/&gt;</span>
+</code></pre></div><h2 id="参考链接">参考链接</h2>
+<p><a href="https://github.com/doocs/advanced-java">advanced-java</a></p>
+</article>
+ 
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/architecture/distributed/dubbo/index.md" target="_blank" rel="noopener">
+      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
+      
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#领域模型">领域模型</a></li>
+    <li><a href="#基本设计原则">基本设计原则</a></li>
+    <li><a href="#dubbo-服务暴露过程">Dubbo 服务暴露过程</a></li>
+    <li><a href="#dubbo-结构">Dubbo 结构</a></li>
+    <li><a href="#工作流程">工作流程</a></li>
+    <li><a href="#注册中心挂了可以继续通信吗">注册中心挂了可以继续通信吗？</a></li>
+    <li><a href="#dubbo-支持哪些序列化协议说一下-hessian-的数据结构pb-知道吗为什么-pb-的效率是最高的">Dubbo 支持哪些序列化协议？说一下 Hessian 的数据结构？PB 知道吗？为什么 PB 的效率是最高的？</a>
+      <ul>
+        <li><a href="#dubbo-支持不同的通信协议">Dubbo 支持不同的通信协议</a></li>
+        <li><a href="#dubbo-支持的序列化协议">Dubbo 支持的序列化协议</a></li>
+        <li><a href="#为什么-pb-的效率是最高的">为什么 PB 的效率是最高的？</a></li>
+      </ul>
+    </li>
+    <li><a href="#dubbo-负载均衡策略和集群容错策略都有哪些动态代理策略呢">dubbo 负载均衡策略和集群容错策略都有哪些？动态代理策略呢？</a>
+      <ul>
+        <li><a href="#dubbo-负载均衡策略">dubbo 负载均衡策略</a></li>
+        <li><a href="#dubbo-集群容错策略">dubbo 集群容错策略</a></li>
+        <li><a href="#dubbo动态代理策略">dubbo动态代理策略</a></li>
+      </ul>
+    </li>
+    <li><a href="#dubbo-的-spi-思想是什么">dubbo 的 spi 思想是什么？</a>
+      <ul>
+        <li><a href="#与-java-spi-对比">与 Java SPI 对比</a></li>
+      </ul>
+    </li>
+    <li><a href="#如何基于-dubbo-进行服务治理服务降级失败重试以及超时重试">如何基于 Dubbo 进行服务治理、服务降级、失败重试以及超时重试？</a>
+      <ul>
+        <li><a href="#服务治理">服务治理</a></li>
+        <li><a href="#服务降级">服务降级</a></li>
+        <li><a href="#失败重试和超时重试">失败重试和超时重试</a></li>
+      </ul>
+    </li>
+    <li><a href="#参考链接">参考链接</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

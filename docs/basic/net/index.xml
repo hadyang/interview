@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>网络分层 on Interview</title>
+    <link>https://hadyang.github.io/interview/docs/basic/net/</link>
+    <description>Recent content in 网络分层 on Interview</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Wed, 21 Aug 2019 11:00:41 +0800</lastBuildDate>
+    
+	<atom:link href="https://hadyang.github.io/interview/docs/basic/net/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Websocket</title>
+      <link>https://hadyang.github.io/interview/docs/basic/net/websocket/</link>
+      <pubDate>Sun, 19 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/basic/net/websocket/</guid>
+      <description>Websocket 简介 WebSocket 是一种与 HTTP 不同的协议。两者都位于 OSI 模型的应用层，并且都依赖于传输层的 TCP 协议。 虽然它们不同，但 RFC 6455 规定：WebSocket设计为通过 80 和 443 端口工作，以及支持HTTP代理和中介，从而使其与HTTP协议兼容。为了实现兼容性， WebSocket 握手使用 HTTP Upgrade 头从 HTTP 协议更改为 WebSocket 协议。
+与HTTP不同，WebSocket 提供全双工通信。此外，WebSocket 还可以在 TCP 之上启用消息流。 TCP 单独处理字节流，没有固有的消息概念。
+WebSocket协议规范将 ws（WebSocket）和 wss （WebSocket Secure）定义为两个新的统一资源标识符（URI）方案，分别对应明文和加密连接。
+优点  较少的控制开销。在连接创建后，服务器和客户端之间交换数据时，用于协议控制的数据包头部相对较小。在不包含扩展的情况下，对于服务器到客户端的内容，此头部大小只有2至10字节（和数据包长度有关）；对于客户端到服务器的内容，此头部还需要加上额外的4字节的掩码。相对于HTTP请求每次都要携带完整的头部，此项开销显著减少了。 更强的实时性。由于协议是全双工的，所以服务器可以随时主动给客户端下发数据。相对于HTTP请求需要等待客户端发起请求服务端才能响应，延迟明显更少； 保持连接状态。与 HTTP 不同的是，Websocket需要先创建连接，这就使得其成为一种有状态的协议，之后通信时可以省略部分状态信息。而HTTP请求可能需要在每个请求都携带状态信息（如身份认证等）。 更好的二进制支持。 Websocket 定义了二进制帧，相对HTTP，可以更轻松地处理二进制内容。 可以支持扩展。Websocket 定义了扩展，用户可以扩展协议、实现部分自定义的子协议。如部分浏览器支持压缩等。 更好的压缩效果。相对于HTTP压缩，Websocket 在适当的扩展支持下，可以沿用之前内容的上下文，在传递类似的数据时，可以显著地提高压缩率  连接过程 WebSocket 是独立的、创建在 TCP 上的协议。Websocket 通过 HTTP/1.1 协议的101状态码进行握手。为了创建Websocket连接，需要通过浏览器发出请求，之后服务器进行回应，这个过程通常称为 握手（handshaking）。
+客户端请求
+GET / HTTP/1.1 Upgrade: websocket Connection: Upgrade Host: example.</description>
+    </item>
+    
+    <item>
+      <title>HTTP</title>
+      <link>https://hadyang.github.io/interview/docs/basic/net/http/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/basic/net/http/</guid>
+      <description>HTTP  HTTP构建于TCP/IP协议之上，默认端口号是80。 HTTP是 无连接无状态 的。  无连接的含义是 限制每次连接只处理一个请求。服务器处理完客户的请求，并收到客户的应答后，即断开连接。后来使用了Keep-Alive技术。
+无状态是指 协议对于事务处理没有记忆能力，服务器不知道客户端是什么状态。即我们给服务器发送 HTTP 请求之后，服务器根据请求，会给我们发送数据过来，但是，发送完，不会记录任何信息。
+HTTP 协议这种特性有优点也有缺点，优点在于解放了服务器，每一次请求“点到为止”不会造成不必要连接占用，缺点在于每次请求会传输大量重复的内容信息。
+为了解决HTTP无状态的缺点，两种用于保持 HTTP 连接状态的技术就应运而生了，一个是 Cookie，而另一个则是 Session。Cookie在客户端记录状态，比如登录状态。Session在服务器记录状态。
+Http的报文结构 HTTP 请求报文头部  User-Agent：产生请求的浏览器类型。 Accept：客户端可识别的响应内容类型列表; Accept-Language：客户端可接受的自然语言; Accept-Encoding：客户端可接受的编码压缩格式; Accept-Charset：可接受的应答的字符集; Host：请求的主机名，允许多个域名同处一个IP 地址，即虚拟主机;（必选） Connection：连接方式(close 或 keep-alive); Cookie：存储于客户端扩展字段，向同一域名的服务端发送属于该域的cookie; 请求包体：在POST方法中使用。 Referer：包含一个URL，用户从该URL代表的页面出发访问当前请求的页面。 If-Modified-Since：文档的最后改动时间  HTTP 响应头  Allow	服务器支持哪些请求方法（如GET、POST等）。 Content-Encoding	文档的编码（Encode）方法。 Content-Length	表示内容长度。只有当浏览器使用持久HTTP连接时才需要这个数据。 Content-Type	表示后面的文档属于什么MIME类型。 Date	当前的GMT时间。你可以用setDateHeader来设置这个头以避免转换时间格式的麻烦。 Expires	应该在什么时候认为文档已经过期，从而不再缓存它。 Last-Modified	文档的最后改动时间。 Refresh	表示浏览器应该在多少时间之后刷新文档，以秒计。 Server	服务器名字。 Set-Cookie	设置和页面关联的Cookie。 ETag：被请求变量的实体值。ETag是一个可以与Web资源关联的记号（MD5值）。 Cache-Control：这个字段用于指定所有缓存机制在整个请求/响应链中必须服从的指令。   max-age：表示当访问此网页后的 x 秒内再次访问不会去服务器；no-cache，实际上Cache-Control: no-cache是会被缓存的，只不过每次在向客户端（浏览器）提供响应数据时，缓存都要向服务器评估缓存响应的有效性；no-store，这个才是响应不被缓存的意思；</description>
+    </item>
+    
+    <item>
+      <title>HTTPS</title>
+      <link>https://hadyang.github.io/interview/docs/basic/net/https/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/basic/net/https/</guid>
+      <description>HTTPS HTTPS 是一种通过计算机网络进行安全通信的传输协议。HTTPS经由HTTP进行通信，但利用 SSL/TLS 来加密数据包。 HTTPS 开发的主要目的，是提供对网站服务器的身份认证，保护交换数据的隐私与完整性。
+HTTPS 的主要思想是在不安全的网络上创建一安全信道，并可在使用适当的加密包和服务器证书可被验证且可被信任时，对窃听和中间人攻击提供合理的防护。HTTPS的信任继承基于预先安装在浏览器中的证书颁发机构（如Symantec、Comodo、GoDaddy和GlobalSign等）（意即“我信任证书颁发机构告诉我应该信任的”）
+HTTP 为什么不安全 http 协议属于 明文传输协议 ，交互过程以及数据传输都没有进行加密，通信双方也没有进行任何认证，通信过程非常容易遭遇劫持、监听、篡改，严重情况下，会造成恶意的流量劫持等问题，甚至造成个人隐私泄露（比如银行卡卡号和密码泄露）等严重的安全问题。
+比如常见的，在 http 通信过程中，“中间人”将广告链接嵌入到服务器发给用户的 http 报文里，导致用户界面出现很多不良链接； 或者是修改用户的请求头 URL ，导致用户的请求被劫持到另外一个网站，用户的请求永远到不了真正的服务器。这些都会导致用户得不到正确的服务，甚至是损失惨重。
+HTTPS 如何保证安全 数字证书 TLS 握手的作用之一是 身份认证（authentication） ，被验证的一方需要提供一个身份证明，在 HTTPS 的世界里，这个身份证明就是 TLS 证书 ，或者称为 HTTPS 证书。
+世界上的 CA 机构会遵守 X.509 规范来签发公钥证书（Public Key Certificate），证书内容的语法格式遵守 ASN.1，证书大致包含如下内容：
+Certificate: Data: Version: 3 (0x2) //版本号 Serial Number: //证书序列号 0e:3c:c1:49:94:b3:e1:74:a6:34:54:d9:90:64:66:d7 Signature Algorithm: sha256WithRSAEncryption //签名算法 Issuer: C=US, O=DigiCert Inc, OU=www.digicert.com, CN=GeoTrust RSA CA 2018 //签发机构 Validity //有效期 Not Before: Dec 25 00:00:00 2017 GMT Not After : Dec 24 12:00:00 2020 GMT Subject: C=CN, L=北京市, O=智者四海（北京）技术有限公司, OU=IT, CN=*.</description>
+    </item>
+    
+    <item>
+      <title>IP</title>
+      <link>https://hadyang.github.io/interview/docs/basic/net/ip/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/basic/net/ip/</guid>
+      <description>IP 地址分类  A类：8位网络号，0_ _ _ _ _ _ _，1.0.0.0 ~ 126.0.0.0 B类：16位网络号，10 _ _ ...，128.0.0.0 ~ 191.255.255.255 C类：24位网络号，110_ _ _...，192.0.0.0 ~ 223.255.255.255 D类：多播地址，1110_ _ _... E类：保留地址，1111_ _ _ ...  私有地址  A类:10.0.0.0 ~ 10.255.255.255(长度相当于1个A类IP地址) B类:172.16.0.0 ~ 172.31.255.255(长度相当于16个连续的B类IP地址) C类:192.168.0.0 ~ 192.168.255.255(长度相当于256个连续的C类IP地址)  特殊的IP地址   0.0.0.0：已经不是一个真正意义上的IP地址。它表示的是这样一个集合：所有不清楚的主机和目的网络。这里的“不清楚”是指在本机的路由表里没有特定条目指明如何到达。如果在网络设置中设置了缺省网关,那么系统会自动产生一个目的地址为0.0.0.0的缺省路由.对本机来说,它就是一个“收容所”,所有不认识的“三无”人员,一 律送进去。
+  255.255.255.255： 限制广播地址，对本机来说,这个地址指本网段内(同一广播域)的所有主机。这个地址不能被路由器转发。
+  127.0.0.1：本机地址主要用于测试。这样一个地址,是不能把它发到网络接口的。
+  </description>
+    </item>
+    
+    <item>
+      <title>TCP</title>
+      <link>https://hadyang.github.io/interview/docs/basic/net/tcp/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/basic/net/tcp/</guid>
+      <description>TCP TCP概述 TCP的特点  TCP是面向连接的传输层协议。 TCP连接是点对点的（套接字&amp;ndash;IP:Port到套接字）。 TCP提供可靠交付的服务。 TCP提供全双工通信。 面向字节流。  TCP与UDP的区别。 ||TCP |UDP | |&amp;mdash;| |是否连接| 面向连接 |面向非连接| |传输可靠性| 可靠| 不可靠| |应用场合| 传输大量数据| 少量数据| |速度| 慢| 快|
+基本概念：   发送缓存和接受缓存：用来临时保存双向通信的数据。在发送时，应用程序将数据传送给TCP发送缓存后，就可以做自己的事情，TCP在合适的时候发送数据；在接受数据时，TCP把发送的数据放入缓存，上层应用在合适的时候读取缓存即可。
+  滑动窗口：TCP的滑动窗口以字节为单位，用3个指针进行表示。当窗口内连续报文段被确认收到后，可以将窗口向前滑动。窗口大小应小于等于缓存区的大小。
+  滑动窗口协议：只有在接收窗口向前滑动时（与此同时也发送了确认），发送窗口才有可能向前滑动。收发两端的窗口按照以上规律不断地向前滑动，因此这种协议又称为滑动窗口协议。
+   当发送窗口和接收窗口的大小都等于 1时，就是停止等待协议。
+  当发送窗口大于1，接收窗口等于1时，就是回退N步协议。
+  当发送窗口和接收窗口的大小均大于1时，就是选择重发协议。
+ TCP报文结构。  源端口、目的端口：16位长。标识出远端和本地的端口号。 序列号：32位长。表明了发送的数据报的顺序，不一定从0开始。 确认号：32位长。希望收到的下一个数据报的序列号，表明到序列号N-1为止的所有数据已经正确收到。 TCP协议数据报头长：4位长。表明TCP头中包含多少个32位字。 接下来的6位未用。 ACK：ACK位置1表明确认号是合法的。如果ACK为0，那么数据报不包含确认信息，确认字段被省略。 PSH：表示是带有PUSH标志的数据。接收方因此请求数据报一到便可送往应用程序而不必等到缓冲区装满时才传送。 RST：用于复位由于主机崩溃或其它原因而出现的错误的连接。还可以用于拒绝非法的数据报或拒绝连接请求。 SYN：用于建立连接。 FIN：用于释放连接。 窗口大小：16位长。窗口大小字段表示在确认了字节之后还可以发送多少个字节。 校验和：16位长。是为了确保高可靠性而设置的。它校验头部、数据和伪TCP头部之和。 紧急指针：URG=1时才有意义。 可选项：长度可变，最长40个字节。  MMS SACK：选择确认。 时间戳：计算往返时间；用于处理TCP序号超过2^32的情况，又称为防止序号回绕（PAWS）。     TCP最小长度为20个字节。</description>
+    </item>
+    
+    <item>
+      <title>网络协议</title>
+      <link>https://hadyang.github.io/interview/docs/basic/net/protocol/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/basic/net/protocol/</guid>
+      <description>底层网络协议 ARP（地址解析协议） 基本功能为透过目标设备的IP地址，查询目标设备的MAC地址，以保证通信的顺利进行。在每台安装有TCP/IP协议的电脑或路由器里都有一个ARP缓存表，表里的IP地址与MAC地址是一对应的。
+当发送数据时，主机A会在自己的ARP缓存表中寻找是否有目标IP地址。如果找到就知道目标MAC地址为（00-BB-00-62-C2-02），直接把目标MAC地址写入帧里面发送就可；如果在ARP缓存表中没有找到相对应的IP地址，主机A就会在网络上发送一个 广播（ARP request），目标MAC地址是“FF.FF.FF.FF.FF.FF”，这表示向同一网段内的所有主机发出这样的询问：“192.168.38.11的MAC地址是什么？”网络上其他主机并不响应ARP询问，只有主机B接收到这个帧时，才向主机A做出这样的回应（ARP response）：“192.168.38.11的MAC地址是（00-BB-00-62-C2-02）”。这样，主机A就知道主机B的MAC地址，它就可以向主机B发送信息。同时它还更新自己的ARP缓存表，下次再向主机B发送信息时，直接从ARP缓存表里查找就可。ARP缓存表采用老化机制，在一段时间内如果表中的某一行没有使用，就会被删除，这样可以大大减少ARP缓存表的长度，加快查询速度。
+ 当发送主机和目的主机不在同一个局域网中时，即便知道目的主机的MAC地址，两者也不能直接通信，必须经过路由转发才可以。所以此时，发送主机通过ARP协议获得的将不是目的主机的真实MAC地址，而是一台可以通往局域网外的路由器的MAC地址。于是此后发送主机发往目的主机的所有帧，都将发往该路由器，通过它向外发送。这种情况称为ARP代理（ARP Proxy）。
+ ICMP（互联网控制消息协议） 它 用于TCP/IP网络中发送控制消息，提供可能发生在通信环境中的各种问题反馈，通过这些信息，令管理者可以对所发生的问题作出诊断，然后采取适当的措施解决。它与传输协议最大的不同：它一般不用于在两点间传输数据，而常常 用于返回的错误信息或是分析路由。
+ICMP控制的内容包括但不仅限于：echo响应（ping）、目标网络不可达、目标端口不可达、禁止访问的网络、拥塞控制、重定向、TTL超时&amp;hellip;
+路由选择协议 路由选择协议分为：静态的和动态的。Internet中使用的是动态路由选择协议，在Internet的概念中，将整个互联网划分为许多个小的自治系统（AS）。AS的最主要的特征：一个AS对其他AS表现出的是一个单一 和一致的路由选择策略。
+由于AS的存在，路由选择协议又分为两种：
+ 内部网关协议（IGP）：即在一个AS内部使用的路由选择协议，而这与互联网中其他AS选用什么路由协议无关。比如：OSPF 外部网关协议（EGP）：若源主机和目的主机不再同一个AS中，就需要使用一种协议将路由选择信息传递到另一个AS中，这就是EGP。比如：BGP。  OSPF（开放式最短路径优先） OSPF属于内部网关协议（IGP）的一种，使用Dijkstra提出的最短路径算法。
+OSPF提出了“区域（Area）”的概念，一个网络可以由单一区域或者多个区域组成。其中，一个特别的区域被称为骨干区域（Backbone Area），该区域是整个OSPF网络的核心区域，并且所有其他的区域都与之直接连接。所有的内部路由都通过骨干区域传递到其他非骨干区域。所有的区域都必须直接连接到骨干区域，如果不能创建直接连接，那么可以通过虚拟链路（Virtual-link）和骨干区域创建虚拟连接。
+划分区域的优点：
+  将洪泛法的范围限制在一个区域中。
+  减少每个区域内部路由信息交换的通信量。
+  OSPF使用的是分布式链路状态协议，使用 洪泛法向该路由器所有的相邻路由器发送信息。最终整个区域的所有路由器都得到一个这个信息的副本。这个副本就是 链路状态数据库（LSDB）用来保存当前网络拓扑结构，路由器上属于同一区域的链路状态数据库是相同的（属于多个区域的路由器会为每个区域维护一份链路状态数据库）。
+  OSPF使用 **“代价（Cost）”**作为路由度量。
+  只有当链路发生变化时才会更新信息。
+   如果同一个目的网络有多条路径，OSPF协议可以进行 负载均衡。
+ BGP（边界网关协议） 由于BGP是工作在AS之间的协议，并且各个AS的情况复杂，所以 BGP只是力求找到一个可以到达目的网络且比较好的路由，而并不是寻找一条最佳路由。每一个AS都应该有一个**“BGP发言人“**，一般来说，两个BGP发言人是通过一个共享网络连接在一起的，BGP发言人往往是**BGP边界路由**，但也可以不是。
+一个BGP发言人与其他AS的BGP发言人要交换路由信息，首先要建立TCP连接，然后在此连接上交换BGP报文以建立BGP会话。当BGP发言人交换了路由信息后，就构造自治系统连通图，最后通过该图来进行路由选择。
+DHCP（动态主机设置协议） DHCP是一个局域网的网络协议，使用UDP协议工作，主要有两个用途：
+ 用于内部网络或网络服务供应商自动分配IP地址给用户 用于内部网络管理员作为对所有电脑作中央管理的手段  动态主机设置协议（DHCP）是一种使网络管理员能够集中管理和自动分配IP网络地址的通信协议。在IP网络中，每个连接Internet的设备都需要分配唯一的IP地址。DHCP使网络管理员能从中心结点监控和分配IP地址。当某台计算机移到网络中的其它位置时，能自动收到新的IP地址。
+DHCP使用了 租约 的概念，或称为计算机IP地址的有效期。租用时间是不定的，主要取决于用户在某地连接Internet需要多久，这对于教育行业和其它用户频繁改变的环境是很实用的。通过较短的租期，DHCP能够在一个计算机比可用IP地址多的环境中动态地重新配置网络。DHCP支持为计算机分配静态地址，如需要永久性IP地址的Web服务器。
+NAT（地址转换协议） NAT是一种 在IP封包通过路由器或防火墙时重写来源IP地址或目的IP地址的技术。这种技术被普遍使用在有多台主机但只通过一个公有IP地址访问因特网的私有网络中。</description>
+    </item>
+    
+  </channel>
+</rss>

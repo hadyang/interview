@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Object"><meta property="og:title" content="Object" />
+<meta property="og:description" content="Object getClass 返回该对象运行时的 class 对象，返回的 Class 对象是由所表示的类的静态同步方法锁定的对象。
+hashCode 返回该对象的 hashcode，该方法对hash表提供支持，例如 HashMap。 对于该方法有几点需要注意：
+ 在运行中的Java应用，如果用在 equals 中进行比较的信息没有改变，那么不论何时调用都需要返回一致的int值。这个hash值在应用的两次执行中不需要保持一致。 如果两个对象根据 equals 方法认为是相等的，那么这两个对象也应该返回相等的 hashcode。 不要求两个不相等的对象，在调用 hashCode 方法返回的结果是必须是不同的。然而，程序员应该了解不同的对象产生不同的 hashcode 能够提升哈希表的效率。 Object的hashcode对不同的对象，尽可能返回不同的 hashcode 。这通常通过将对象的内部地址转换为整数来实现，但Java编程语言不需要此实现技术。  Arrays.hashCode Arrays.hashCode 是一个数组的浅哈希码实现，深哈希可以使用 deepHashCode。并且当数组长度为1时，Arrays.hashCode(object) = object.hashCode 不一定成立
+31 不论是String、Arrays在计算多个元素的哈希值的时候，都会有31这个数字。主要有以下两个原因：
+  31是一个不大不小的质数，是作为 hashCode 乘子的优选质数之一。
+ 另外一些相近的质数，比如37、41、43等等，也都是不错的选择。那么为啥偏偏选中了31呢？请看第二个原因。
+   31可以被 JVM 优化，$$31 * i = (i &laquo; 5) - i$$。
+  上面两个原因中，第一个需要解释一下，第二个比较简单，就不说了。一般在设计哈希算法时，会选择一个特殊的质数。至于为啥选择质数，我想应该是可以降低哈希算法的冲突率。
+在 Effective Java 中有一段相关的解释：
+ 选择数字31是因为它是一个奇质数，如果选择一个偶数会在乘法运算中产生溢出，导致数值信息丢失，因为乘二相当于移位运算。选择质数的优势并不是特别的明显，但这是一个传统。同时，数字31有一个很好的特性，即乘法运算可以被移位和减法运算取代，来获取更好的性能：$$31 * i == (i &laquo; 5) - i$$，现代的 Java 虚拟机可以自动的完成这个优化。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hadyang.github.io/interview/docs/java/object/" />
+<meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
+<meta property="article:modified_time" content="2019-08-21T11:00:41+08:00" />
+<title>Object | Interview</title>
+<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/interview/book.min.b7fe34b8a4c4da05b2690b4aacfa71ddce0668cc6da3abb67dd3946844125444.css" integrity="sha256-t/40uKTE2gWyaQtKrPpx3c4GaMxto6u2fdOUaEQSVEQ=">
+
+
+<script defer src="/interview/en.search.min.4daab1eda22baec10d130347f095a8463b951038b7e98060a59bcdc484ada980.js" integrity="sha256-Taqx7aIrrsENEwNH8JWoRjuVEDi36YBgpZvNxIStqYA="></script>
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/interview"><span>Interview</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+  <ul>
+<li><a href="/interview/docs/basic/">计算机基础</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/">算法</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
+<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
+<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
+<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
+<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
+<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
+<li><a href="/interview/docs/basic/algo/sort/">排序算法</a></li>
+<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/os/">操作系统</a>
+<ul>
+<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
+<li><a href="/interview/docs/basic/os/concurrency/">并发</a></li>
+<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
+<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
+<li><a href="/interview/docs/basic/os/linux/">Linux系统</a></li>
+<li><a href="/interview/docs/basic/os/interrupt/">中断</a></li>
+<li><a href="/interview/docs/basic/os/device/">设备管理</a></li>
+<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
+<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/net/">计算机网络</a>
+<ul>
+<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
+<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
+<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
+<li><a href="/interview/docs/basic/net/http/">HTTP</a></li>
+<li><a href="/interview/docs/basic/net/https/">HTTPS</a></li>
+<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/">数据库</a>
+<ul>
+<li><a href="/interview/docs/basic/database/transaction/">事务</a></li>
+<li><a href="/interview/docs/basic/database/index/">索引</a></li>
+<li><a href="/interview/docs/basic/database/sql/">SQL</a></li>
+<li><a href="/interview/docs/basic/database/join/">连接</a></li>
+<li><a href="/interview/docs/basic/database/mysql/">MySQL</a></li>
+<li><a href="/interview/docs/basic/database/concurrent/">并发控制</a></li>
+<li><a href="/interview/docs/basic/database/innodb/">Innodb</a></li>
+<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/">Java</a>
+<ul>
+<li><a href="/interview/docs/java/oop/">OOP</a></li>
+<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
+<li><a href="/interview/docs/java/operator/">运算符</a></li>
+<li><a href="/interview/docs/java/exception/">异常</a></li>
+<li><a href="/interview/docs/java/generics/">泛型</a></li>
+<li><a href="/interview/docs/java/object/"class=active>Object</a></li>
+<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
+<li><a href="/interview/docs/java/proxy/">代理</a></li>
+<li><a href="/interview/docs/java/annotation/">注解</a></li>
+<li><a href="/interview/docs/java/questions/">面试题</a></li>
+<li><a href="/interview/docs/java/nio/">NIO</a></li>
+<li><a href="/interview/docs/java/">集合</a>
+<ul>
+<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
+<li><a href="/interview/docs/java/collection/Concurrenthashmap/">Concurrenthashmap</a></li>
+<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/concurrent/">并发</a>
+<ul>
+<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
+<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
+<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
+<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
+<li><a href="/interview/docs/java/concurrent/AQS/">AQS</a></li>
+<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
+<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
+<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<ul>
+<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
+<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/gc/">GC</a>
+<ul>
+<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
+<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/">框架</a>
+<ul>
+<li><a href="/interview/docs/fromwork/netty/">Netty</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
+<ul>
+<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/spring/">Spring</a>
+<ul>
+<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
+<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
+<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/">系统架构</a>
+<ul>
+<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
+<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
+<ul>
+<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/design/">系统设计</a>
+<ul>
+<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/distributed/">分布式</a>
+<ul>
+<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
+<li><a href="/interview/docs/architecture/distributed/session/">分布式Session</a></li>
+<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
+<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
+<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
+<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
+<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
+<li><a href="/interview/docs/architecture/distributed/kafka/">Kafka</a></li>
+<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
+<li><a href="/interview/docs/architecture/distributed/dubbo/">Dubbo</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
+<ul>
+<li><a href="/interview/docs/architecture/bigdata/algo/">基础算法</a></li>
+<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/offer/">剑指offer</a>
+<ul>
+<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
+<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
+<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
+<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
+<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
+<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
+<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
+<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
+<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
+<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
+<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
+<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
+<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
+<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
+<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
+<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
+<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
+<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
+<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
+<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
+<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
+<li><a href="/interview/docs/offer/VerifySquenceOfBST/">二叉搜索树的后序遍历序列</a></li>
+<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
+<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
+<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
+<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
+<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
+<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
+<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
+<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
+<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
+<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
+<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
+<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
+<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
+<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
+<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
+<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
+<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
+<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
+<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
+<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
+<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
+<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
+<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
+<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
+<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
+<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
+<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
+<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
+<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
+<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
+<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
+<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
+<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
+<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
+<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
+<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
+<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
+<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
+<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
+<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
+<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
+<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
+<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
+<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
+<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/leetcode/">LeetCode</a>
+<ul>
+<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
+<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
+<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
+<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
+<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
+<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
+<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
+<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
+<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
+<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
+<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
+<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
+<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
+<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
+<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
+<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
+<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
+<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
+<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
+<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
+<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
+<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
+<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
+<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
+<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
+<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
+<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
+<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
+<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
+<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
+<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
+<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+<script>
+(function() {
+  var menu = document.querySelector("aside.book-menu nav");
+  addEventListener("beforeunload", function(event) {
+    localStorage.setItem("menu.scrollTop", menu.scrollTop);
+  });
+  menu.scrollTop = localStorage.getItem("menu.scrollTop");
+})();
+</script>
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>Object</strong>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#getclass">getClass</a></li>
+    <li><a href="#hashcode">hashCode</a>
+      <ul>
+        <li><a href="#arrayshashcode">Arrays.hashCode</a></li>
+        <li><a href="#31">31</a></li>
+      </ul>
+    </li>
+    <li><a href="#equals">equals</a></li>
+    <li><a href="#clone">clone</a></li>
+    <li><a href="#tostring">toString</a></li>
+    <li><a href="#wait">wait</a>
+      <ul>
+        <li><a href="#虚假唤醒spurious-wakeup">虚假唤醒（spurious wakeup）</a></li>
+      </ul>
+    </li>
+    <li><a href="#notify">notify</a></li>
+    <li><a href="#finalize">finalize</a>
+      <ul>
+        <li><a href="#缺陷">缺陷</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+<article class="markdown"><h1 id="object">Object</h1>
+<h2 id="getclass">getClass</h2>
+<p>返回该对象运行时的 <code>class</code> 对象，返回的 <code>Class</code> 对象是由所表示的类的静态同步方法锁定的对象。</p>
+<h2 id="hashcode">hashCode</h2>
+<p>返回该对象的 <code>hashcode</code>，该方法对hash表提供支持，例如 <code>HashMap</code>。
+对于该方法有几点需要注意：</p>
+<ul>
+<li>在运行中的Java应用，如果用在 <code>equals</code> 中进行比较的信息没有改变，那么不论何时调用都需要返回一致的int值。这个hash值在应用的两次执行中不需要保持一致。</li>
+<li>如果两个对象根据 <code>equals</code> 方法认为是相等的，那么这两个对象也应该返回相等的 <code>hashcode</code>。</li>
+<li>不要求两个不相等的对象，在调用 <code>hashCode</code> 方法返回的结果是必须是不同的。然而，程序员应该了解不同的对象产生不同的 <code>hashcode</code> 能够提升哈希表的效率。
+Object的<code>hashcode</code>对不同的对象，尽可能返回不同的 <code>hashcode</code> 。这通常通过将对象的内部地址转换为整数来实现，但Java编程语言不需要此实现技术。</li>
+</ul>
+<h3 id="arrayshashcode">Arrays.hashCode</h3>
+<p>Arrays.hashCode 是一个数组的浅哈希码实现，深哈希可以使用 <code>deepHashCode</code>。并且当数组长度为1时，<code>Arrays.hashCode(object) = object.hashCode</code> 不一定成立</p>
+<h3 id="31">31</h3>
+<p>不论是String、Arrays在计算多个元素的哈希值的时候，都会有31这个数字。主要有以下两个原因：</p>
+<ul>
+<li>
+<p>31是一个不大不小的质数，是作为 hashCode 乘子的优选质数之一。</p>
+<blockquote>
+<p>另外一些相近的质数，比如37、41、43等等，也都是不错的选择。那么为啥偏偏选中了31呢？请看第二个原因。</p>
+</blockquote>
+</li>
+<li>
+<p>31可以被 JVM 优化，$$31 * i = (i &laquo; 5) - i$$。</p>
+</li>
+</ul>
+<p>上面两个原因中，第一个需要解释一下，第二个比较简单，就不说了。一般在设计哈希算法时，会选择一个特殊的质数。至于为啥选择质数，我想应该是可以降低哈希算法的冲突率。</p>
+<p>在 Effective Java 中有一段相关的解释：</p>
+<blockquote>
+<p>选择数字31是因为它是一个奇质数，如果选择一个偶数会在乘法运算中产生溢出，导致数值信息丢失，因为乘二相当于移位运算。选择质数的优势并不是特别的明显，但这是一个传统。同时，数字31有一个很好的特性，即乘法运算可以被移位和减法运算取代，来获取更好的性能：$$31 * i == (i &laquo; 5) - i$$，现代的 Java 虚拟机可以自动的完成这个优化。</p>
+</blockquote>
+<h2 id="equals">equals</h2>
+<p>判定两个对象是否相等。<code>equals</code>和<code>hashCode</code>需要同时被<code>overwrite</code></p>
+<h2 id="clone">clone</h2>
+<p>创建一个该对象的副本，并且对于对象 x 应当满足以下表达式：</p>
+<pre><code>x.clone() != x
+x.clone().getClass() == x.getClass()
+x.clone().equals(x)
+</code></pre><h2 id="tostring">toString</h2>
+<h2 id="wait">wait</h2>
+<p>当前线程等待知道其他线程调用该对象的 <code>notify</code> 或者 <code>notifyAll</code>方法。当前线程必须拥有该对象的 <code>monitor</code>。线程释放该对象<code>monitor</code>的拥有权，并且等待到别的线程通知等待在该对象<code>monitor</code>上的线程苏醒。然后线程重新拥有<code>monitor</code>并继续执行。在某些jdk版本中，中断和虚假唤醒是存在的，所以<code>wait</code>方法需要放在循环中。</p>
+<pre><code>synchronized (obj) {
+    while (&lt;condition does not hold&gt;)
+        obj.wait();
+    ... // Perform action appropriate to condition
+}
+</code></pre><p>该方法只能被拥有该对象<code>monitor</code>的线程调用。</p>
+<h3 id="虚假唤醒spurious-wakeup">虚假唤醒（spurious wakeup）</h3>
+<p>虚假唤醒就是一些<code>obj.wait()</code>会在除了<code>obj.notify()</code>和<code>obj.notifyAll()</code>的其他情况被唤醒，而此时是不应该唤醒的。</p>
+<blockquote>
+<p>注意 Lock 的 Conditon.await 也有虚假唤醒的问题</p>
+</blockquote>
+<p>解决的办法是基于while来反复判断进入正常操作的临界条件是否满足</p>
+<blockquote>
+<p>同时也可以使用同步数据结构：BlokingQueue</p>
+</blockquote>
+<h4 id="解释">解释</h4>
+<p>虚假唤醒（<code>spurious wakeup</code>）是一个表象，即在多处理器的系统下发出 wait 的程序有可能在没有 notify 唤醒的情形下苏醒继续执行。</p>
+<p>以运行在 Linux 的 hotspot 虚拟机上的 java 程序为例， <code>wait</code> 方法在 jvm 执行时实质是调用了底层 <code>pthread_cond_wait/pthread_cond_timedwait</code> 函数，挂起等待条件变量来达到线程间同步通信的效果，而底层 <code>wait</code> 函数在设计之初为了不减慢条件变量操作的效率并没有去保证每次唤醒都是由 <code>notify</code> 触发，而是把这个任务交由上层应用去实现，即使用者需要定义一个循环去判断是否条件真能满足程序继续运行的需求，当然这样的实现也可以避免因为设计缺陷导致程序异常唤醒的问题。</p>
+<h2 id="notify">notify</h2>
+<p>唤醒一个等待在该对象<code>monitor</code>上的线程。如果有多个线程等待，则会随机选择一个线程唤醒。线程等待是通过调用<code>wait</code>方法。</p>
+<p>唤醒的线程不会立即执行，直到当前线程放弃对象上的锁。唤醒的线程也会以通常的方式和竞争该对象锁的线程进行竞争。也就是说，唤醒的线程在对该对象的加锁中没有任何优先级。</p>
+<p>该方法只能被拥有该对象<code>monitor</code>的线程调用。线程拥有<code>monitor</code>有下面三种方式：</p>
+<ul>
+<li>执行该对象的 <code>synchronized</code> 方法</li>
+<li>执行以该对象作为同步语句的<code>synchronized</code>方法体</li>
+<li>对于class对象，可以执行该对象的<code>static synchronized</code>方法</li>
+</ul>
+<p>在同一时间只能有一个线程能够拥有该对象<code>monitor</code></p>
+<h2 id="finalize">finalize</h2>
+<p>当 GC 认为该对象已经没有任何引用的时候，该方法被GC收集器调用。子类可以 <code>overwrite</code> 该方法来关闭系统资源或者其他清理任务。</p>
+<p><code>finalize</code> 的一般契约是，如果 Java 虚拟机确定不再有任何方法可以通过任何尚未死亡的线程访问此对象，除非由于某个操作，它将被调用通过最终确定准备完成的其他一些对象或类来完成。 <code>finalize</code> 方法可以采取任何操作，包括使该对象再次可用于其他线程；但是，<code>finalize</code> 的通常目的是在对象被不可撤销地丢弃之前执行清理操作。例如，表示输入/输出连接的对象的 <code>finalize</code> 方法可能会执行显式 <code>I/O</code> 事务，以在永久丢弃对象之前断开连接。</p>
+<p>类 Object 的 finalize 方法不执行任何特殊操作;它只是正常返回。 Object 的子类可以覆盖此定义。</p>
+<p>Java 编程语言不保证哪个线程将为任何给定对象调用 <code>finalize</code> 方法。但是，可以保证，调用 finalize 时，调用 finalize 的线程不会持有任何用户可见的同步锁。如果 <code>finalize</code> 方法抛出未捕获的异常，则忽略该异常并终止该对象的终止。在为对象调用 <code>finalize</code> 方法之后，在 Java 虚拟机再次确定不再有任何方法可以通过任何尚未死亡的线程访问此对象之前，不会采取进一步操作，包括可能的操作通过准备完成的其他对象或类，此时可以丢弃该对象。</p>
+<p>对于任何给定对象，Java 虚拟机永远不会多次调用 <code>finalize</code> 方法。 <code>finalize</code> 方法抛出的任何异常都会导致暂停此对象的终结，但会被忽略。</p>
+<h3 id="缺陷">缺陷</h3>
+<ul>
+<li>一些与 <code>finalize</code> 相关的方法，由于一些致命的缺陷，已经被废弃了，如 <code>System.runFinalizersOnExit()</code> 方法、<code>Runtime.runFinalizersOnExit()</code>方法。</li>
+<li><code>System.gc()</code> 与 <code>System.runFinalization()</code> 方法增加了finalize方法执行的机会，但不可盲目依赖它们。</li>
+<li>Java 语言规范并不保证 <code>finalize</code> 方法会被及时地执行、而且根本不会保证它们会被执行。</li>
+<li><code>finalize</code> 方法可能会带来性能问题。因为JVM通常在单独的低优先级线程中完成finalize的执行。</li>
+<li>对象再生问题： <code>finalize</code> 方法中，可将待回收对象赋值给GC Roots可达的对象引用，从而达到对象再生的目的。</li>
+<li><code>finalize</code> 方法至多由GC执行一次(用户当然可以手动调用对象的 <code>finalize</code> 方法，但并不影响GC对 <code>finalize</code> 的行为)。</li>
+</ul>
+</article>
+ 
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/java/object/index.md" target="_blank" rel="noopener">
+      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
+      
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#getclass">getClass</a></li>
+    <li><a href="#hashcode">hashCode</a>
+      <ul>
+        <li><a href="#arrayshashcode">Arrays.hashCode</a></li>
+        <li><a href="#31">31</a></li>
+      </ul>
+    </li>
+    <li><a href="#equals">equals</a></li>
+    <li><a href="#clone">clone</a></li>
+    <li><a href="#tostring">toString</a></li>
+    <li><a href="#wait">wait</a>
+      <ul>
+        <li><a href="#虚假唤醒spurious-wakeup">虚假唤醒（spurious wakeup）</a></li>
+      </ul>
+    </li>
+    <li><a href="#notify">notify</a></li>
+    <li><a href="#finalize">finalize</a>
+      <ul>
+        <li><a href="#缺陷">缺陷</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Interview</title>
+    <link>https://hadyang.github.io/interview/docs/java/concurrent/</link>
+    <description>Recent content on Interview</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Wed, 22 Jan 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://hadyang.github.io/interview/docs/java/concurrent/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>AtomicInteger</title>
+      <link>https://hadyang.github.io/interview/docs/java/concurrent/atomic/</link>
+      <pubDate>Wed, 22 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/concurrent/atomic/</guid>
+      <description>AtomicInteger AtomicInteger 是 Java 中常见的原子类，每种基础类型都对应 Atomic***。AtomicInteger 中最重要的就属于原子更新操作，这里我们来分析下 getAndAdd 的实现。
+private static final Unsafe unsafe = Unsafe.getUnsafe(); private static final long valueOffset; static { try { //获取 value 的偏移量  valueOffset = unsafe.objectFieldOffset (AtomicInteger.class.getDeclaredField(&amp;#34;value&amp;#34;)); } catch (Exception ex) { throw new Error(ex); } } private volatile int value; public final int getAndAdd(int delta) { //调用 unsafe.getAndAddInt  return unsafe.getAndAddInt(this, valueOffset, delta); } getAndAdd 中直接调用 unsafe.getAndAddInt，原子更新的逻辑都在 UnSafe 类中：
+public final int getAndAddInt(Object var1, long var2, int var4) { int var5; //循环 CAS  do { //获取 volatile 字段值  var5 = this.</description>
+    </item>
+    
+    <item>
+      <title>AQS</title>
+      <link>https://hadyang.github.io/interview/docs/java/concurrent/AQS/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/concurrent/AQS/</guid>
+      <description>AQS AQS 提供一个框架，用于实现依赖于先进先出（FIFO）等待队列 的阻塞锁和相关同步器（信号量，事件等）。对于大多数依赖单个原子 int 值表示状态的同步器，该类可以作为十分有用的基类。子类必须定义所有的protected方法（包括tryAcquire、tryRelease），来改变这个状态，并且定义哪些状态代表来对象被使用和被释放。鉴于这些，该类中其他的方法用来实现队列和阻塞的机制。子类可以维护其他状态字段，但是只有使用 getState 、setState以及 compareAndSetState 来原子的操作状态值。
+子类需要定义非 public 的内部工具类用于实现其内部类的同步属性。AbstractQueuedSynchronizer 类不实现任何同步接口，相反，它定义了诸如acquireInterruptibly之类的方法，可以被具体的锁和相关的同步器适当地调用，以实现它们的公共方法。
+该类支持默认的独占模式和共享模式。当一个线程处在独占模式下，其他试图 acquire 的线程都无法成功。共享模式可以同时被多个线程 acquire成功。在具体的应用场景中该类无法理解这些区别，当共享模式 acquire 成功之后，下一个线程（如果有一个存在）必须判定是否能够acquire。线程等待在不同的模式里但是会共享同一个FIFO队列。通常来说，子类只需要支持其中一种模式，但是如果都支持，可以参照ReadWriteLock。子类不需要定义不支持模式的方法。
+该类定义AbstractQueuedSynchronizer.ConditionObject内部类，可以被子类使用的 Condition 实现，来支持独占模式 isHeldExclusively 判定当前线程的同步是否是独占模式，可用通过release方法与 getState 方法来完全释放当前对象，在将保存的状态值调用acquire，最终将此对象恢复到其先前获取的状态。AbstractQueuedSynchronizer没有方法来创建 Condition，所以如果无法满足这个约束，则不要使用它。AbstractQueuedSynchronizer.ConditionObject 的行为与具体的同步器实现有关。
+该类为内部队列提供检查，检测和监视方法，以及 在condition objects上的类似方法。 这些方法可以根据需要使用 AbstractQueuedSynchronizer 用于它们的同步机制。该类的序列化仅存储 atomic int 的状态值，因此反序列化对象的线程队列为空。
+使用 为了使用该类去创建一个同步器，需要重新定义以下方法，并使用 getState, setState, compareAndSetState 方法来改变同步状态。
+ tryAcquire tryRelease tryAcquireShared tryReleaseShared isHeldExclusively  上述所有方法默认实现都会抛出 UnsupportedOperationException。这个方法的具体实现必须保证内部的线程安全，并且应该快速并且不会阻塞。所有其他方法均为 final，因为他们不能独立变化。
+也许你发现一些继承自 AbstractOwnableSynchronizer 的方法非常有助于线程保持拥有其独占同步器。同时我们也鼓励使用他们，有助于监控和诊断工具判定哪些线程持有来锁。
+ReentrantLock  公平锁相比与非公平锁在 tryAcquire中会多判定一个 hasQueuedPredecessors，如果为 false（队列头为当前线程&amp;ndash;已获取锁 or 队列为空）并且成功修改状态值，则可以认为获取锁成功，这样才是重入，不然加到队尾就会有麻烦。
+ ReentrantLock 中通过两个子类 FairSync 和 NoFairSync 继承 AQS 来实现锁。在Lock方法中，直接调用 AQS 的 acquire，acquire会调用 NoFairSync 中的tryAcquire来尝试让当前线程直接获取锁。如果失败则会创建链表节点，将当前线程加入队列，并park。当release方法被调用后，会寻找队列下一个节点进行 unpark，这样他就有机会在acquireQueued中获取锁。</description>
+    </item>
+    
+    <item>
+      <title>CountDownLatch</title>
+      <link>https://hadyang.github.io/interview/docs/java/concurrent/count-down-latch/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/concurrent/count-down-latch/</guid>
+      <description>CountDownLatch CountDownLatch 是可以使一个或者多个线程等待其他线程完成某些操作的同步器。CountDownLatch 通过一个给定的数字 count 进行初始化。调用 await 方法的线程会一直阻塞到其他线程调用 countDown 将 count 变为0，这时所有的线程都将释放，并且后续的 await 方法调用都会立即返回。count 值不能重置。如果你需要重置 count 请考虑使用 CyclicBarrier。
+CountDownLatch 是一个能力很强的同步工具，可以用在多种途径。CountDownLatch 最重要的属性是其不要求 调用 countDown 的线程等待到 count 为0，只是要求所有 await 调用线程等待。
+CountDownLatch 内部使用的是 AQS，AQS 里面的 state 是一个整数值，这边用一个 int count 参数其实初始化就是设置了这个值，所有调用了 await 方法的等待线程会挂起，然后有其他一些线程会做 state = state - 1 操作，当 state 减到 0 的同时，那个将 state 减为 0 的线程会负责唤醒 所有调用了 await 方法的线程。
+ countDown() 方法每次调用都会将 state 减 1，直到 state 的值为 0；而 await 是一个阻塞方法，当 state 减为 0 的时候，await 方法才会返回。await 可以被多个线程调用，读者这个时候脑子里要有个图：所有调用了 await 方法的线程阻塞在 AQS 的阻塞队列中，等待条件满足（state == 0），将线程从队列中一个个唤醒过来。 await() 方法，它代表线程阻塞，等待 state 的值减为 0。  </description>
+    </item>
+    
+    <item>
+      <title>Java线程</title>
+      <link>https://hadyang.github.io/interview/docs/java/concurrent/thread/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/concurrent/thread/</guid>
+      <description>Java线程 线程定义 线程（英语：thread）是操作系统能够进行运算调度的最小单位。它被包含在进程之中，是进程中的实际运作单位。一条线程指的是进程中一个单一顺序的控制流，一个进程中可以并发多个线程，每条线程并行执行不同的任务。在Unix System V及SunOS中也被称为轻量进程（lightweight processes），但轻量进程更多指内核线程（kernel thread），而把用户线程（user thread）称为线程。
+线程是独立调度和分派的基本单位。线程可以操作系统内核调度的内核线程，如Win32线程；由用户进程自行调度的用户线程，如Linux平台的POSIX Thread；或者由内核与用户进程，如Windows 7的线程，进行混合调度。
+同一进程中的多条线程将共享该进程中的全部系统资源，如虚拟地址空间，文件描述符和信号处理等等。但同一进程中的多个线程有各自的调用栈（call stack），自己的寄存器环境（register context），自己的线程本地存储（thread-local storage）。
+线程实现 Java中的线程都是调用的原生系统的本地函数，Java线程模型是基于操作系统原生线程模型实现的，实现线程有三种方式：内核线程实现、用户线程实现、混合线程实现。
+内核线程实现 直接由操作系统内核支持的线程，通过内核来完成进程切换。每个内核线程就是一个内核的分身，这样操作系统就可以同时处理多件事情，支持多线程的内核被称为多线程内核。
+程序一般不直接使用内核线程，而是使用一种高级接口——轻量级进程，轻量级进程就是我们通常意义上的线程，可以获得内核线程的支持，与内核线程构成1:1的线程模型。
+由于得到内核线程的支持，每个轻量级进程都成为一个独立的调度单元，即时有一个轻量级进程在系统调用中阻塞，也不会影响整个进程，但也有其局限性：由于是基于内核线程实现的，各种操作，如创建、销毁及同步，都需要进行系统调用。而系统调用代价较高，需要在内核态和用户态来回切换。
+用户线程实现 从广义上说，一个线程不是内核线程，就是用户线程，所以轻量级进程也属于用户线程。狭义的用户线程是指完全建立在用户空间上的，系统内核不能感知到其存在。
+用户线程的创建、同步、销毁和调度都是在用户空间实现的，因此相对较快，代价相对较低。这种用户线程和进程是N:1的线程模型。
+由于用户线程没有内核的支持，线程的创建、切换和调度是需要自己实现的，而且由于操作系统只把CPU资源分配到进程，那诸如“阻塞如何处理”、“多处理器系统中如何将线程映射到其他处理器”这类问题解决起来异常复杂。
+混合实现 这种实现模式将内核线程与用户线程一起使用，在这种方式下既存在用户线程，也存在轻量级进程。用户线程还是完全建立在用户空间，因此用户线程的创建、切换等操作依旧低廉。而操作系统提供的轻量级进程则作为用户线程和内核线程的桥梁，这样就可以使用内核提供的线程调度及处理器映射。这种实现下，用户线程和轻量级进程是M:N的模式。
+Java线程调度 线程调度分为协同式和抢占式。
+ 协同式调度：线程的执行时间由线程自己控制，这种的实现很简单，但是很可能造成很严重的后果。 抢占式调度：由操作系统分配线程执行的时间，线程切换的决定权在操作系统。  有时候我们需要为某些线程多分配时间，这时我们就需要用到线程优先级的方法，Java提供了10种优先级。Java优先级是在操作系统的原生线程优先级上实现的，所以对于同一个优先级，不同的操作系统可能有不同的表现，也就是说 Java线程优先级不是可靠的。
+Java线程状态切换 Java线程模型定义了 6 种状态，在任意一个时间点，一个线程有且只有其中一个状态：
+ 新建（New）：新建的Thread，尚未开始。 运行（Runable）：包含操作系统线程状态中的Running、Ready，也就是处于正在执行或正在等待CPU分配时间的状态。 无限期等待（Waiting）：处于这种状态的线程不会被分配CPU时间，等待其他线程唤醒。 限期等待（Timed Waiting）：处于这种状态的线程不会被分配CPU时间，在一定时间后会由系统自动唤醒。 阻塞（Blocked）：在等待获得排他锁。 结束（Terminated）：已终止的线程。  线程安全 多线程访问同一代码，不会产生不确定的结果。
+Java 线程池 </description>
+    </item>
+    
+    <item>
+      <title>Synchronized</title>
+      <link>https://hadyang.github.io/interview/docs/java/concurrent/synchronized/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/concurrent/synchronized/</guid>
+      <description>Synchronized原理 在多线程并发编程中Synchronized一直是元老级角色，很多人都会称呼它为重量级锁，但是随着Java SE1.6对Synchronized进行了各种优化之后，有些情况下它并不那么重了，本文详细介绍了Java SE1.6中为了减少获得锁和释放锁带来的性能消耗而引入的偏向锁和轻量级锁，以及锁的存储结构和升级过程。
+CAS(Compare and Swap)，用于在硬件层面上提供原子性操作。在 Intel 处理器中，比较并交换通过指令cmpxchg实现。比较是否和给定的数值一致，如果一致则修改，不一致则不修改。
+基础 Java中的每一个对象都可以作为锁。
+ 对于同步方法，锁是当前实例对象。 对于静态同步方法，锁是当前对象的Class对象。 对于同步方法块，锁是Synchonized括号里配置的对象。  当一个线程试图访问同步代码块时，它首先必须得到锁，退出或抛出异常时必须释放锁。那么锁存在哪里呢？锁里面会存储什么信息呢？
+同步的原理 JVM规范规定JVM基于进入和退出 Monitor 对象来实现方法同步和代码块同步，但两者的实现细节不一样。代码块同步是使用monitorenter和monitorexit指令实现，而方法同步是使用另外一种方式实现的，细节在JVM规范里并没有详细说明，但是方法的同步同样可以使用这两个指令来实现。
+monitorenter指令是在编译后插入到同步代码块的开始位置，而monitorexit是插入到方法结束处和异常处，JVM要保证每个monitorenter必须有对应的monitorexit与之配对。任何对象都有一个monitor与之关联，当且一个monitor被持有后，它将处于锁定状态。线程执行到 monitorenter 指令时，将会尝试获取对象所对应的 monitor 的所有权，即尝试获得对象的锁。
+Java对象头 锁存在Java对象头里。如果对象是数组类型，则虚拟机用3个Word（字宽）存储对象头，如果对象是非数组类型，则用2字宽存储对象头。在32位虚拟机中，一字宽等于四字节，即32bit。
+   长度 内容 说明     32/64bit Mark Word 存储对象的hashCode或锁信息等   32/64bit Class Metadata Address 存储到对象类型数据的指针   32/64bit Array length 数组的长度（如果当前对象是数组）    Java对象头里的Mark Word里默认存储对象的HashCode，分代年龄和锁标记位。32位JVM的Mark Word的默认存储结构如下：
+    25 bit 4bit 1bit是否是偏向锁 2bit锁标志位     无锁状态 对象的hashCode 对象分代年龄 0 01    在运行期间Mark Word里存储的数据会随着锁标志位的变化而变化。Mark Word可能变化为存储以下4种数据：</description>
+    </item>
+    
+    <item>
+      <title>ThreadLocal</title>
+      <link>https://hadyang.github.io/interview/docs/java/concurrent/threadlocal/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/concurrent/threadlocal/</guid>
+      <description>Threadlocal原理 ThreadLocal 为解决多线程程序的并发问题提供了一种新的思路。使用这个工具类可以很简洁地编写出优美的多线程程序。当使用 ThreadLocal 维护变量时，ThreadLocal 为每个使用该变量的线程提供独立的变量副本，所以每一个线程都可以独立地改变自己的副本，而不会影响其它线程所对应的副本。
+每个线程中都保有一个ThreadLocalMap的成员变量，ThreadLocalMap 内部采用WeakReference数组保存，数组的key即为ThreadLocal 内部的Hash值。
+内存泄漏 ThreadLocalMap 使用 ThreadLocal 的弱引用作为 key ，如果一个 ThreadLocal 没有外部强引用来引用它，那么系统 GC 的时候，这个 ThreadLocal 势必会被回收，这样一来，ThreadLocalMap 中就会出现 key 为 null 的 Entry ，就没有办法访问这些 key 为 null 的 Entry 的 value，如果当前线程再迟迟不结束的话，这些 key 为 null 的 Entry 的 value 就会一直存在一条强引用链：Thread Ref -&amp;gt; Thread -&amp;gt; ThreaLocalMap -&amp;gt; Entry -&amp;gt; value 永远无法回收，造成内存泄漏。
+static class Entry extends WeakReference&amp;lt;ThreadLocal&amp;lt;?&amp;gt;&amp;gt; { /** The value associated with this ThreadLocal. */ Object value; Entry(ThreadLocal&amp;lt;?</description>
+    </item>
+    
+    <item>
+      <title>Volatile</title>
+      <link>https://hadyang.github.io/interview/docs/java/concurrent/volatile/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/concurrent/volatile/</guid>
+      <description>Volatile原理 计算机内存模型 计算机在执行程序时，每条指令都是在CPU中执行的，而执行指令过程中，势必涉及到数据的读取和写入。由于程序运行过程中的临时数据是存放在主存（物理内存）当中的，这时就存在一个问题，由于CPU执行速度很快，而从内存读取数据和向内存写入数据的过程跟CPU执行指令的速度比起来要慢的多，因此如果任何时候对数据的操作都要通过和内存的交互来进行，会大大降低指令执行的速度。因此在CPU里面就有了高速缓存。当程序在运行过程中，会将运算需要的数据从主存复制一份到CPU的高速缓存当中，那么CPU进行计算时就可以直接从它的高速缓存读取数据和向其中写入数据，当运算结束之后，再将高速缓存中的数据刷新到主存当中。举个简单的例子，比如下面的这段代码：
+i = i + 1;  当线程执行这个语句时，会先从主存当中读取i的值，然后复制一份到高速缓存当中，然后 CPU 执行指令对i进行加1操作，然后将数据写入高速缓存，最后将高速缓存中i最新的值刷新到主存当中。
+ 这个代码在单线程中运行是没有任何问题的，但是在多线程中运行就会有问题了。在多核 CPU 中，每条线程可能运行于不同的 CPU 中，因此 每个线程运行时有自己的高速缓存（对单核CPU来说，其实也会出现这种问题，只不过是以线程调度的形式来分别执行的）。比如同时有两个线程执行这段代码，假如初始时i的值为0，那么我们希望两个线程执行完之后i的值变为2。但是事实会是这样吗？
+可能出现这种情况：初始时，两个线程分别读取i的值存入各自所在的 CPU 的高速缓存当中，然后 线程1 进行加1操作，然后把i的最新值1写入到内存。此时线程2的高速缓存当中i的值还是0，进行加1操作之后，i的值为1，然后线程2把i的值写入内存。最终结果i的值是1，而不是2。这就是著名的缓存一致性问题。通常称这种被多个线程访问的变量为共享变量。
+为了解决缓存不一致性问题，通常来说有以下两种解决方法：
+ 通过在总线加LOCK#锁的方式 通过 缓存一致性协议   这两种方式都是硬件层面上提供的方式。
+ 在早期的 CPU 当中，是通过在总线上加LOCK#锁的形式来解决缓存不一致的问题。因为 CPU 和其他部件进行通信都是通过总线来进行的，如果对总线加LOCK#锁的话，也就是说阻塞了其他 CPU 对其他部件访问（如内存），从而使得只能有一个 CPU 能使用这个变量的内存。比如上面例子中 如果一个线程在执行 i = i +1，如果在执行这段代码的过程中，在总线上发出了LCOK#锁的信号，那么只有等待这段代码完全执行完毕之后，其他CPU才能从变量i所在的内存读取变量，然后进行相应的操作。这样就解决了缓存不一致的问题。但是上面的方式会有一个问题，由于在锁住总线期间，其他CPU无法访问内存，导致效率低下。
+所以就出现了缓存一致性协议。最出名的就是 Intel 的MESI协议，MESI协议保证了每个缓存中使用的共享变量的副本是一致的。它核心的思想是：当CPU写数据时，如果发现操作的变量是共享变量，即在其他CPU中也存在该变量的副本，会发出信号通知其他CPU将该变量的缓存行置为无效状态，因此当其他CPU需要读取这个变量时，发现自己缓存中缓存该变量的缓存行是无效的，那么它就会从内存重新读取。
+##　Java内存模型
+在Java虚拟机规范中试图定义一种Java内存模型（Java Memory Model，JMM）来屏蔽各个硬件平台和操作系统的内存访问差异，以实现让Java程序在各种平台下都能达到一致的内存访问效果。那么Java内存模型规定了程序中变量的访问规则，往大一点说是定义了程序执行的次序。注意，为了获得较好的执行性能，Java内存模型并没有限制执行引擎使用处理器的寄存器或者高速缓存来提升指令执行速度，也没有限制编译器对指令进行重排序。也就是说，在java内存模型中，也会存在缓存一致性问题和指令重排序的问题。
+Java内存模型规定所有的变量都是存在主存当中（类似于前面说的物理内存），每个线程都有自己的工作内存（类似于前面的高速缓存）。线程对变量的所有操作都必须在工作内存中进行，而不能直接对主存进行操作。并且每个线程不能访问其他线程的工作内存。
+在Java中，执行下面这个语句：
+i = 10; 执行线程必须先在自己的工作线程中对变量i所在的缓存行进行赋值操作，然后再写入主存当中。而不是直接将数值10写入主存当中。那么Java语言本身对 原子性、可见性以及有序性提供了哪些保证呢？
+原子性  即一个操作或者多个操作 要么全部执行并且执行的过程不会被任何因素打断，要么就都不执行。
+ 在Java中，对基本数据类型的变量的读取和赋值操作是原子性操作，即这些操作是不可被中断的，要么执行，要么不执行。上面一句话虽然看起来简单，但是理解起来并不是那么容易。看下面一个例子i：请分析以下哪些操作是原子性操作：
+x = 10; //语句1 y = x; //语句2 x++; //语句3 x = x + 1; //语句4 咋一看，有些朋友可能会说上面的4个语句中的操作都是原子性操作。其实只有语句1是原子性操作，其他三个语句都不是原子性操作。</description>
+    </item>
+    
+    <item>
+      <title>线程中断</title>
+      <link>https://hadyang.github.io/interview/docs/java/concurrent/interrupt/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/concurrent/interrupt/</guid>
+      <description>线程中断 中断不是类似 linux 里面的命令 kill -9 pid，不是说我们中断某个线程，这个线程就停止运行了。中断代表线程状态，每个线程都关联了一个中断状态，是一个 true 或 false 的 boolean 值，初始值为 false。
+关于中断状态，我们需要重点关注 Thread 类中的以下几个方法：
+// Thread 类中的实例方法，持有线程实例引用即可检测线程中断状态 public boolean isInterrupted() {} // Thread 中的静态方法，检测调用这个方法的线程是否已经中断 // 注意：这个方法返回中断状态的同时，会将此线程的中断状态重置为 false // 所以，如果我们连续调用两次这个方法的话，第二次的返回值肯定就是 false 了 public static boolean interrupted() {} // Thread 类中的实例方法，用于设置一个线程的中断状态为 true public void interrupt() {} 我们说 中断一个线程，其实就是设置了线程的 interrupted status 为 true，至于说被中断的线程怎么处理这个状态，那是那个线程自己的事。如以下代码：
+while (!Thread.interrupted()) { doWork(); System.out.println(&amp;quot;我做完一件事了，准备做下一件，如果没有其他线程中断我的话&amp;quot;); }  这种代码就是会响应中断的，它会在干活的时候先判断下中断状态，不过，除了 JDK 源码外，其他用中断的场景还是比较少的，毕竟 JDK 源码非常讲究。
+ 当然，中断除了是线程状态外，还有其他含义，否则也不需要专门搞一个这个概念出来了。如果线程处于以下三种情况，那么当线程被中断的时候，能自动感知到：
+  来自 Object 类的 wait()、wait(long)、wait(long, int)，来自 Thread 类的 join()、join(long)、join(long, int)、sleep(long)、sleep(long, int)</description>
+    </item>
+    
+  </channel>
+</rss>

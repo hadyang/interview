@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Interview</title>
+    <link>https://hadyang.github.io/interview/docs/java/jvm/</link>
+    <description>Recent content on Interview</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Wed, 21 Aug 2019 11:00:41 +0800</lastBuildDate>
+    
+	<atom:link href="https://hadyang.github.io/interview/docs/java/jvm/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Java 分派机制</title>
+      <link>https://hadyang.github.io/interview/docs/java/jvm/dispatcher/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/jvm/dispatcher/</guid>
+      <description>Java分派机制 在Java中，符合“编译时可知，运行时不可变”这个要求的方法主要是静态方法和私有方法。这两种方法都不能通过继承或别的方法重写，因此它们适合在类加载时进行解析。
+Java虚拟机中有四种方法调用指令：
+ invokestatic：调用静态方法。 invokespecial：调用实例构造器方法，私有方法和super。 invokeinterface：调用接口方法。 invokevirtual：调用以上指令不能调用的方法（虚方法）。  只要能被invokestatic和invokespecial指令调用的方法，都可以在解析阶段确定唯一的调用版本，符合这个条件的有：静态方法、私有方法、实例构造器、父类方法，他们在类加载的时候就会把符号引用解析为改方法的直接引用。这些方法被称为非虚方法，反之其他方法称为虚方法（final方法除外）。
+ 虽然final方法是使用invokevirtual 指令来调用的，但是由于它无法被覆盖，多态的选择是唯一的，所以是一种非虚方法。
+ 静态分派  对于类字段的访问也是采用静态分派
+ People man = new Man()
+静态分派主要针对重载，方法调用时如何选择。在上面的代码中，People被称为变量的引用类型，Man被称为变量的实际类型。静态类型是在编译时可知的，而动态类型是在运行时可知的，编译器不能知道一个变量的实际类型是什么。
+编译器在重载时候通过参数的静态类型而不是实际类型作为判断依据。并且静态类型在编译时是可知的，所以编译器根据重载的参数的静态类型进行方法选择。
+ 在某些情况下有多个重载，那编译器如何选择呢？ 编译器会选择&amp;quot;最合适&amp;quot;的函数版本，那么怎么判断&amp;quot;最合适“呢？越接近传入参数的类型，越容易被调用。
+ 动态分派 动态分派主要针对重写，使用invokevirtual指令调用。invokevirtual指令多态查找过程：
+ 找到操作数栈顶的第一个元素所指向的对象的实际类型，记为C。 如果在类型C中找到与常量中的描述符合简单名称都相符的方法，则进行访问权限校验，如果通过则返回这个方法的直接引用，查找过程结束；如果权限校验不通过，返回java.lang.IllegalAccessError异常。 否则，按照继承关系从下往上一次对C的各个父类进行第2步的搜索和验证过程。 如果始终没有找到合适的方法，则抛出 java.lang.AbstractMethodError异常。  虚拟机动态分派的实现 由于动态分派是非常繁琐的动作，而且动态分派的方法版本选择需要考虑运行时在类的方法元数据中搜索合适的目标方法，因此在虚拟机的实现中基于性能的考虑，在方法区中建立一个虚方法表（invokeinterface 有接口方法表），来提高性能。
+虚方法表中存放各个方法的实际入口地址。如果某个方法在子类没有重写，那么子类的虚方法表里的入口和父类入口一致，如果子类重写了这个方法，那么子类方法表中的地址会被替换为子类实现版本的入口地址。</description>
+    </item>
+    
+    <item>
+      <title>JVM 内存模型</title>
+      <link>https://hadyang.github.io/interview/docs/java/jvm/memory-model/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/jvm/memory-model/</guid>
+      <description>JVM 内存模型 HotSpot 内存模型 &amp;ndash; JDK8
+ Heap: Java 堆是可供各线程共享的运行时内存区域，是 Java 虚拟机所管理的内存区域中最大的一块。此区域非常重要，几乎所有的对象实例和数组实例都要在 Java 堆上分配，但随着 JIT 编译器及逃逸分析技术的发展，也可能会被优化为栈上分配 Internd String: 字符串字面量常量池 Calss Meta Data: 每一个类的结构信息，比如 字段 和 方法数据、构造函数和普通方法的字节码内容，还包括一些初始化的时候用到的特殊方法。 Runtime Constant Pool: 运行时常量池是 class 文件中每一个类或接口的 常量池表(Constant Pool)的运行时表示形式，是方法区的一部分。它包括了若干种不同的常量。常量池表存放编译器生成的 各种字面量和符号引用，这部分内容将在类加载后进入方法区的运行时常量池中存放。运行时常量池具有动态性，运行期间也可以将新的量放到运行时常量池中，典型的应用是 String 类的 intern 方法 Code Cache: JIT 编译缓存的本地代码 PC Register: CPU内部的寄存器中就包含一个程序计数器，存放程序执行的下一条指令地址。 JVM Stacks: Java 虚拟机栈也是线程私有的，每一条线程都拥有自己私有的Java 虚拟机栈，它与线程同时创建。它描述了 Java 方法执行的内存模型：每个方法在执行的同时都会创建一个栈帧，用于存储局部变量表、操作数栈、动态链接、方法出口等信息。 Native Stacks: 本地方法栈和 Java 虚拟机栈的作用相似，Java 虚拟机栈执行的是字节码，而本地方法栈执行的是 native 方法。本地方法栈使用传统的栈（C Stack）来支持 native 方法。   JDK 1.7开始，字符串常量和符号引用等就被移出永久代：
+ 符号引用迁移至系统堆内存(Native Heap) 字符串字面量迁移至Java堆(Java Heap)   在 JVM 规范中，并不存在这么多分区，只包含 5 大分区：</description>
+    </item>
+    
+    <item>
+      <title>JVM 架构</title>
+      <link>https://hadyang.github.io/interview/docs/java/jvm/jvm-architecture/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/jvm/jvm-architecture/</guid>
+      <description>JVM架构 Java虚拟机简介 “Java虚拟机”可能指如下三个不同的东西
+ 抽象规范 一个具体的实现 一个运行中的虚拟机实例  每个Java程序都运行在某个具体的Java虚拟机实现的实例上。一个Java虚拟机的实例负责运行一个Java程序。当启动一个Java程序的时候，一个虚拟机的实例也就诞生了。当该程序关闭退出时，这个虚拟机实例也就随之消亡。
+线程介绍 在Java虚拟机内部有两种线程：
+  守护线程：通常是由虚拟机自己使用，比如GC线程。但是，Java程序也可以把它自己创建的任何线程标记为守护线程（public final void setDaemon(boolean on)来设置，但必须在start()方法之前调用）。
+  非守护线程：main方法执行的线程，我们通常也称为用户线程。
+   只要有任何的非守护线程在运行，Java程序也会继续运行。当该程序中所有的非守护线程都终止时，虚拟机实例将自动退出（守护线程随JVM一同结束工作）。
+ 守护线程中不适合进行IO、计算等操作，因为守护线程是在所有的非守护线程退出后结束，这样并不能判断守护线程是否完成了相应的操作，如果非守护线程退出后，还有大量的数据没来得及读写，这将造成很严重的后果。
+ web服务器中的Servlet，容器启动时后台初始化一个服务线程，即调度线程，负责处理http请求，然后每个请求过来调度线程从线程池中取出一个工作者线程来处理该请求，从而实现并发控制的目的。
+ Java虚拟机体系结构 每个Java虚拟机都有一个类装载器子系统，他根据给定的全限定名来装在类型。同样，每个Java虚拟机都有一个执行引擎，它负责执行那些包含在被装载类的方法中的指令。当Java虚拟机运行一个程序时，它需要内存来存储很多东西，例如：字节码，从已装载的class文件中得到的其他信息，程序创建的对象，传递给方法的参数，返回值，局部变量，以及运算的中间结果等等，Java虚拟机把这些东西都组织到几个“运行时数据区”中，以便管理。
+每个Java虚拟机实例都有一个方法区以及一个堆， 他们是由 该虚拟机实例中所有线程共享的。 当虚拟机装载一个class文件时，它会从这个class文件包含的二进制数据中解析类型信息。然后把这些类型信息放到方法区中。 当程序运行的时候，虚拟机会把所有该程序在运行时创建的对象都放到堆中。
+每个新线程都会得到它自己的PC寄存器(程序计数器)以及一个Java栈。
+  如果线程正在执行的是一个Java方法(非Native方法)。那么PC寄存器的值将总指向下一条将被执行的指令，而 它的Java栈则总是存储该线程中Java方法调用的转台&amp;ndash;包括它的局部变量、被调用时传进来的参数、返回值以及运算的中间结果等等。
+  Native方法调用的状态，则是以某种依赖于具体实现的方式存储在本地方法栈中，也可能是在寄存器或者其他某些与特定实现相关的内存区中。
+  Java栈是由很多的栈帧(stack frame)或者说帧(frame)组成的，一个栈帧包含一个Java方法调用状态。 当现场调用一个Java方法的时候，虚拟机压入一个新的栈帧到该线程的Java栈中：当该方法返回时，这个栈帧被从Java栈中弹出并抛弃
+Java虚拟机没有指令寄存器，其指令集使用Java栈来存储中间数据。这样设计的原因是为了保持Java虚拟机的指令集尽量紧凑、同时也便于Java虚拟机在那些只有很少通用寄存器的平台上实现。另外，Java虚拟机这种基于栈的体系结构，也有助于运行时某些虚拟机实现的动态编译器和即时编译器的代码优化。
+  这些内存区域是私有的，任何线程都不能访问另外一个线程的PC寄存器或Java栈。 图中是一个虚拟机实例的快照，它有三个线程正在执行。线程1和线程2都正在执行Java方法，而线程3在执行Native方法。   数据类型 数据类型分为两种：
+ 基本类型：基本类型的变量持有原始值。 引用类型：引用类型的变量持有引用值。引用值是指对某个对象的引用，而不是该对象本身。    基本类型:
+ Java语言中的所有基本类型都是Java虚拟机中的基本类型。但boolean有点特别，虽然Java虚拟机也把boolean看做基本类型，但指令集对boolean只有很有限的支持。 当编译器把Java源码编译成字节码时，它会用int或byte来表示boolean。在Java虚拟机中false是由整数&#39;0&#39;表示，所有的非零整数都表示true，涉及boolean值的操作则会用int。另外boolean数组是当做byte数组来访问的， 但是在“堆”区，它也可以被表示为位域。 Java虚拟机的基本类型的值域在任何地方都是一致的， 比如：不管底层主机平台是什么，一个long在任何虚拟机中总是一个64位二进制补码表示的又复活整数。 Java虚拟机中有一个值在内部使用的基本类型returnAddress，Java程序员不能使用这个类型。这个基本类型是用来实现Java程序中的finally子句。    引用类型：</description>
+    </item>
+    
+    <item>
+      <title>JVM 类加载</title>
+      <link>https://hadyang.github.io/interview/docs/java/jvm/jvm-class-load-init/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/jvm/jvm-class-load-init/</guid>
+      <description>JVM类加载三步走 简介 Java虚拟机通过装载、连接和初始化一个类型，使该类型可以被正在运行的Java程序使用。
+ 装载：把二进制形式的Java类型读入Java虚拟机中。 连接：把装载的二进制形式的类型数据合并到虚拟机的运行时状态中去。 1. 验证：确保Java类型数据格式正确并且适合于Java虚拟机使用。 2. 准备：负责为该类型分配它所需内存。 3. 解析：把常量池中的符号引用转换为直接引用。(可推迟到运行中的程序真正使用某个符号引用时再解析) 初始化：为类变量赋适当的初始值  所有Java虚拟机实现必须在每个类或接口首次主动使用时初始化。以下六种情况符合主动使用的要求：
+ 当创建某个类的新实例时(new、反射、克隆、序列化) 调用某个类的静态方法 使用某个类或接口的静态字段，或对该字段赋值(用final修饰的静态字段除外，它被初始化为一个编译时常量表达式) 当调用Java API的某些反射方法时。 初始化某个类的子类时。 当虚拟机启动时被标明为启动类的类。  除以上六种情况，所有其他使用Java类型的方式都是被动的，它们不会导致Java类型的初始化。
+ 对于接口来说，只有在某个接口声明的非常量字段被使用时，该接口才会初始化，而不会因为事先这个接口的子接口或类要初始化而被初始化。
+ 父类需要在子类初始化之前被初始化，所以这些类应该被装载了。当实现了接口的类被初始化的时候，不需要初始化父接口。然而，当实现了父接口的子类(或者是扩展了父接口的子接口)被装载时，父接口也要被装载。(只是被装载，没有初始化)
+装载  通过该类型的全限定名，产生一个代表该类型的二进制数据流。 解析这个二进制数据流为方法去内的内部数据结构。 创建一个表示该类型的java.lang.Class类的实例。  Java虚拟机在识别Java class文件，产生了类型的二进制数据后，Java虚拟机必须把这些二进制数据解析为与实现相关的内部数据结构。装载的最终产品就是Class实例，它称为Java程序与内部数据结构之间的接口。要访问关于该类型的信息(存储在内部数据结构中)，程序就要调用该类型对应的Class实例的方法。这样一个过程，就是把一个类型的二进制数据解析为方法区中的内部数据结构，并在堆上建立一个Class对象的过程，这被称为&amp;quot;创建&amp;quot;类型。
+验证 确认装载后的类型符合Java语言的语义，并且不会危及虚拟机的完整性。
+ 装载时验证：检查二进制数据以确保数据全部是预期格式、确保除Object之外的每个类都有父类、确保该类的所有父类都已经被装载。 正式验证阶段：检查final类不能有子类、确保final方法不被覆盖、确保在类型和超类型之间没有不兼容的方法声明(比如拥有两个名字相同的方法，参数在数量、顺序、类型上都相同，但返回类型不同)。 符号引用的验证：当虚拟机搜寻一个被符号引用的元素(类型、字段或方法)时，必须首先确认该元素存在。如果虚拟机发现元素存在，则必须进一步检查引用类型有访问该元素的权限。  准备 当Java虚拟机装载一个类，并执行了一些验证之后，类就可以进入准备阶段。在准备阶段，Java虚拟机为类变量分配内存，设置默认初始值。但在到到初始化阶段之前，类变量都没有被初始化为真正的初始值。
+ boolean在内部常常被实现为一个int，会被默认初始化为0。
+ 解析 类型经过连接的前两个阶段&amp;ndash;验证和准备&amp;ndash;之后，就可以进入第三个阶段&amp;ndash;解析。解析的过程就是在类型的常量池总寻找类、接口、字段和方法的符号引用，把这些符号引用替换为直接引用的过程。
+  类或接口的解析：判断所要转化成的直接引用是数组类型，还是普通的对象类型的引用，从而进行不同的解析。
+  字段解析：对字段进行解析时，会先在本类中查找是否包含有简单名称和字段描述符都与目标相匹配的字段，如果有，则查找结束；如果没有，则会按照继承关系从上往下递归搜索该类所实现的各个接口和它们的父接口，还没有，则按照继承关系从上往下递归搜索其父类，直至查找结束，
+  初始化 为类变量赋予“正确”的初始值。这里的“正确”的初始值是指程序员希望这个类变量所具备的初始值。所有的类变量(即静态量)初始化语句和类型的静态初始化器都被Java编译器收集在一起，放到一个特殊的方法中。 对于类来说，这个方法被称作类初始化方法；对于接口来说，它被称为接口初始化方法。在类和接口的class文件中，这个方法被称为&amp;lt;clinit&amp;gt;。
+初始化类的步骤：  如果存在直接父类，且直接父类没有被初始化，先初始化直接父类。 如果类存在一个类初始化方法，执行此方法。  这个步骤是递归执行的，即第一个初始化的类一定是Object。初始化接口并不需要初始化它的父接口。
+Java虚拟机必须确保初始化过程被正确地同步。 如果多个线程需要初始化一个类，仅仅允许一个线程来进行初始化，其他线程需等待。</description>
+    </item>
+    
+    <item>
+      <title>JVM 类加载器</title>
+      <link>https://hadyang.github.io/interview/docs/java/jvm/jvm-class-loader/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/jvm/jvm-class-loader/</guid>
+      <description>类加载器 简介 Java类加载器是Java运行时环境（Java Runtime Environment）的一部分，负责动态加载Java类到Java虚拟机的内存空间中。类通常是按需加载，即第一次使用该类时才加载。 由于有了类加载器，Java运行时系统不需要知道文件与文件系统。每个Java类必须由某个类加载器装入到内存。
+类装载器子系统涉及Java虚拟机的其他几个组成部分，以及几个来自java.lang库的类。比如，用户自定义的类装载器只是普通的Java对象，它的类必须派生自java.lang.ClassLoader。ClassLoader中定义的方法为程序提供了访问类装载器机制的接口。此外，对于每个被装载的类型，Java虚拟机都会为他创建一个java.lang.Class类的实例来代表该类型。和所有其他对象一样，用户自定义的类装载器以及Class类的实例都放在内存中的堆区，而装载的类型信息都位于方法区。
+类装载器子系统除了要定位和导入二进制class文件外，还必须负责验证被导入类的正确性，为变量分配初始化内存，以及帮助解析符号引用。这些动作必须严格按一下顺序完成：
+ 装载&amp;ndash;查找并装载类型的二进制数据。 链接&amp;ndash;执行验证、准备以及解析(可选) - 验证：确保被导入类型的正确性 - 准备：为类变量分配内存，并将其初始化为默认值。 - 解析：把类型中的符号引用转换为直接引用。 初始化&amp;ndash;把类变量初始化为正确的初始值。 使用 卸载：类加载器加载的每个类和类加载器本身都被没有引用  分类 在Java虚拟机中存在多个类装载器，Java应用程序可以使用两种类装载器：
+  启动(bootstrap)类装载器：此装载器是Java虚拟机实现的一部分。由原生代码（如C语言）编写，不继承自java.lang.ClassLoader。负责加载核心Java库，存储在&amp;lt;JAVA_HOME&amp;gt;/jre/lib目录中。（如果Java虚拟机在已有操作系统中实现为C程序，那么启动类加载器就是此C程序的一部分） 启动类装载器通常使用某种默认的方式从本地磁盘中加载类，包括Java API。
+  用户自定义类装载器：（包含但不止，扩展类加载器以及系统类加载器） ，继承自Java中的java.lang.ClassLoader类，Java应用程序能在运行时安装用户自定义类装载器，这种累装载器使用自定义的方式来装载类。用户定义的类装载器能用Java编写，能够被编译为Class文件，能被虚拟机装载，还能像其他对象一样实例化。它们实际上只是运行中的Java程序可执行代码的一部分。一般JVM都会提供一些基本实现。应用程序的开发人员也可以根据需要编写自己的类加载器。JVM中最常使用的是系统类加载器（system），它用来启动Java应用程序的加载。 通过java.lang.ClassLoader.getSystemClassLoader() 可以获取到该类加载器对象。该类由sun.misc.Launcher$AppClassLoader实现。
+  全盘负责双亲委托机制 全盘负责是指当一个ClassLoader装载一个类的时，除非显式地使用另一个ClassLoader，该类所依赖及引用的类也由这个ClassLoader载入；“双亲委托机制”是指先委托父装载器寻找目标类，只有在找不到的情况下才从自己的类路径中查找并装载目标类。这一点是从安全角度考虑的，试想如果有人编写了一个恶意的基础类（如java.lang.String）并装载到JVM中将会引起多么可怕的后果。但是由于有了“全盘负责委托机制”，java.lang.String永远是由根装载器来装载的，这样就避免了上述事件的发生。
+类加载器需要完成的最终功能是定义一个Java类，即把Java字节代码转换成JVM中的java.lang.Class类的对象。但是类加载的过程并不是这么简单。Java类加载器有两个比较重要的特征：
+  层次组织结构指的是每个类加载器都有一个父类加载器，通过getParent()方法可以获取到。类加载器通过这种父亲-后代的方式组织在一起，形成树状层次结构。
+  代理模式则指的是一个类加载器既可以自己完成Java类的定义工作，也可以代理给其它的类加载器来完成。由于代理模式的存在，启动一个类的加载过程的类加载器和最终定义这个类的类加载器可能并不是一个。前者称为初始类加载器，而后者称为定义类加载器。
+  两者的关联在于：在每个类被装载的时候，Java虚拟机都会监视这个类，看它到底是被启动类装载器还是被用户自定义类装载器装载。当被装载的类引用了另外一个类的时候，虚拟机就会使用装载第一个类的类装载器装载被引用的类。
+ 注意：JVM加载类A，并使用A的ClassLoader去加载B，但B的类加载器并不一定和A的类加载器一致，这是因为有双亲委托机制的存在。
+ 一般的类加载器在尝试自己去加载某个Java类之前，会 首先代理给其父类加载器。当父类加载器找不到的时候，才会尝试自己加载。这个逻辑是封装在java.lang.ClassLoader类的loadClass()方法中的。一般来说，父类优先的策略就足够好了。在某些情况下，可能需要采取相反的策略，即先尝试自己加载，找不到的时候再代理给父类加载器。这种做法在Java的Web容器中比较常见，也是Servlet规范推荐的做法。 比如，Apache Tomcat为每个Web应用都提供一个独立的类加载器，使用的就是自己优先加载的策略。IBM WebSphere Application Server则允许Web应用选择类加载器使用的策略。
+ 假设 类加载器B2被要求装载类MyClass，在parent delegation模型下，类加载器B2首先请求类加载器B代为装载，类加载器B再请求系统类装载器去装载MyClass，系统类装载器也会继续请求它的Parent扩展类加载器去装载MyClass，以此类推直到引导类装载器。若引导类装载器能成功装载，则将MyClass所对应的Class对象的reference逐层返回到类加载器B2，若引导类装载器不能成功装载，下层的扩展类装载器将尝试装载，并以此类推直到类装载器B2如果也不能成功装载，则装载失败。
+  需要指出的是，Class Loader是对象，它的父子关系和类的父子关系没有任何关系。一对父子loader可能实例化自同一个 Class，也可能不是，甚至父loader实例化自子类，子loader实例化自父类。
+ defineClass vs findClass vs loadClass  loadclass：判断是否已加载，使用双亲委派模型，请求父加载器，都为空，使用 findclass findclass：根据名称或位置加载 .</description>
+    </item>
+    
+    <item>
+      <title>String 常量池</title>
+      <link>https://hadyang.github.io/interview/docs/java/jvm/string-constant-pool/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/jvm/string-constant-pool/</guid>
+      <description>String 常量池 在 JAVA 语言中有 8 中基本类型和一种比较特殊的类型 String 。这些类型为了使他们在运行过程中速度更快，更节省内存，都提供了一种常量池的概念。常量池就类似一个 JAVA 系统级别提供的缓存。
+String 类型的常量池比较特殊。它的主要使用方法有两种：
+ 直接使用双引号声明出来的 String 对象会直接存储在常量池中 如果不是用双引号声明的 String 对象，可以使用 String 提供的 intern 方法。 intern 方法会从字符串常量池中查询当前字符串是否存在，若不存在就会将当前字符串放入常量池中  intern  /** * Returns a canonical representation for the string object. * &amp;lt;p&amp;gt; * A pool of strings, initially empty, is maintained privately by the * class {@code String}. * &amp;lt;p&amp;gt; * When the intern method is invoked, if the pool already contains a * string equal to this {@code String} object as determined by * the {@link #equals(Object)} method, then the string from the pool is * returned.</description>
+    </item>
+    
+  </channel>
+</rss>

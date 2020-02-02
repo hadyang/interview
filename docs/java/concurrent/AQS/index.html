@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AQS"><meta property="og:title" content="AQS" />
+<meta property="og:description" content="AQS AQS 提供一个框架，用于实现依赖于先进先出（FIFO）等待队列 的阻塞锁和相关同步器（信号量，事件等）。对于大多数依赖单个原子 int 值表示状态的同步器，该类可以作为十分有用的基类。子类必须定义所有的protected方法（包括tryAcquire、tryRelease），来改变这个状态，并且定义哪些状态代表来对象被使用和被释放。鉴于这些，该类中其他的方法用来实现队列和阻塞的机制。子类可以维护其他状态字段，但是只有使用 getState 、setState以及 compareAndSetState 来原子的操作状态值。
+子类需要定义非 public 的内部工具类用于实现其内部类的同步属性。AbstractQueuedSynchronizer 类不实现任何同步接口，相反，它定义了诸如acquireInterruptibly之类的方法，可以被具体的锁和相关的同步器适当地调用，以实现它们的公共方法。
+该类支持默认的独占模式和共享模式。当一个线程处在独占模式下，其他试图 acquire 的线程都无法成功。共享模式可以同时被多个线程 acquire成功。在具体的应用场景中该类无法理解这些区别，当共享模式 acquire 成功之后，下一个线程（如果有一个存在）必须判定是否能够acquire。线程等待在不同的模式里但是会共享同一个FIFO队列。通常来说，子类只需要支持其中一种模式，但是如果都支持，可以参照ReadWriteLock。子类不需要定义不支持模式的方法。
+该类定义AbstractQueuedSynchronizer.ConditionObject内部类，可以被子类使用的 Condition 实现，来支持独占模式 isHeldExclusively 判定当前线程的同步是否是独占模式，可用通过release方法与 getState 方法来完全释放当前对象，在将保存的状态值调用acquire，最终将此对象恢复到其先前获取的状态。AbstractQueuedSynchronizer没有方法来创建 Condition，所以如果无法满足这个约束，则不要使用它。AbstractQueuedSynchronizer.ConditionObject 的行为与具体的同步器实现有关。
+该类为内部队列提供检查，检测和监视方法，以及 在condition objects上的类似方法。 这些方法可以根据需要使用 AbstractQueuedSynchronizer 用于它们的同步机制。该类的序列化仅存储 atomic int 的状态值，因此反序列化对象的线程队列为空。
+使用 为了使用该类去创建一个同步器，需要重新定义以下方法，并使用 getState, setState, compareAndSetState 方法来改变同步状态。
+ tryAcquire tryRelease tryAcquireShared tryReleaseShared isHeldExclusively  上述所有方法默认实现都会抛出 UnsupportedOperationException。这个方法的具体实现必须保证内部的线程安全，并且应该快速并且不会阻塞。所有其他方法均为 final，因为他们不能独立变化。
+也许你发现一些继承自 AbstractOwnableSynchronizer 的方法非常有助于线程保持拥有其独占同步器。同时我们也鼓励使用他们，有助于监控和诊断工具判定哪些线程持有来锁。
+ReentrantLock  公平锁相比与非公平锁在 tryAcquire中会多判定一个 hasQueuedPredecessors，如果为 false（队列头为当前线程&ndash;已获取锁 or 队列为空）并且成功修改状态值，则可以认为获取锁成功，这样才是重入，不然加到队尾就会有麻烦。
+ ReentrantLock 中通过两个子类 FairSync 和 NoFairSync 继承 AQS 来实现锁。在Lock方法中，直接调用 AQS 的 acquire，acquire会调用 NoFairSync 中的tryAcquire来尝试让当前线程直接获取锁。如果失败则会创建链表节点，将当前线程加入队列，并park。当release方法被调用后，会寻找队列下一个节点进行 unpark，这样他就有机会在acquireQueued中获取锁。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hadyang.github.io/interview/docs/java/concurrent/AQS/" />
+<meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
+<meta property="article:modified_time" content="2019-08-21T11:00:41+08:00" />
+<title>AQS | Interview</title>
+<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/interview/book.min.b7fe34b8a4c4da05b2690b4aacfa71ddce0668cc6da3abb67dd3946844125444.css" integrity="sha256-t/40uKTE2gWyaQtKrPpx3c4GaMxto6u2fdOUaEQSVEQ=">
+
+
+<script defer src="/interview/en.search.min.4daab1eda22baec10d130347f095a8463b951038b7e98060a59bcdc484ada980.js" integrity="sha256-Taqx7aIrrsENEwNH8JWoRjuVEDi36YBgpZvNxIStqYA="></script>
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/interview"><span>Interview</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+  <ul>
+<li><a href="/interview/docs/basic/">计算机基础</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/">算法</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
+<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
+<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
+<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
+<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
+<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
+<li><a href="/interview/docs/basic/algo/sort/">排序算法</a></li>
+<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/os/">操作系统</a>
+<ul>
+<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
+<li><a href="/interview/docs/basic/os/concurrency/">并发</a></li>
+<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
+<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
+<li><a href="/interview/docs/basic/os/linux/">Linux系统</a></li>
+<li><a href="/interview/docs/basic/os/interrupt/">中断</a></li>
+<li><a href="/interview/docs/basic/os/device/">设备管理</a></li>
+<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
+<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/net/">计算机网络</a>
+<ul>
+<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
+<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
+<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
+<li><a href="/interview/docs/basic/net/http/">HTTP</a></li>
+<li><a href="/interview/docs/basic/net/https/">HTTPS</a></li>
+<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/">数据库</a>
+<ul>
+<li><a href="/interview/docs/basic/database/transaction/">事务</a></li>
+<li><a href="/interview/docs/basic/database/index/">索引</a></li>
+<li><a href="/interview/docs/basic/database/sql/">SQL</a></li>
+<li><a href="/interview/docs/basic/database/join/">连接</a></li>
+<li><a href="/interview/docs/basic/database/mysql/">MySQL</a></li>
+<li><a href="/interview/docs/basic/database/concurrent/">并发控制</a></li>
+<li><a href="/interview/docs/basic/database/innodb/">Innodb</a></li>
+<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/">Java</a>
+<ul>
+<li><a href="/interview/docs/java/oop/">OOP</a></li>
+<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
+<li><a href="/interview/docs/java/operator/">运算符</a></li>
+<li><a href="/interview/docs/java/exception/">异常</a></li>
+<li><a href="/interview/docs/java/generics/">泛型</a></li>
+<li><a href="/interview/docs/java/object/">Object</a></li>
+<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
+<li><a href="/interview/docs/java/proxy/">代理</a></li>
+<li><a href="/interview/docs/java/annotation/">注解</a></li>
+<li><a href="/interview/docs/java/questions/">面试题</a></li>
+<li><a href="/interview/docs/java/nio/">NIO</a></li>
+<li><a href="/interview/docs/java/">集合</a>
+<ul>
+<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
+<li><a href="/interview/docs/java/collection/Concurrenthashmap/">Concurrenthashmap</a></li>
+<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/concurrent/">并发</a>
+<ul>
+<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
+<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
+<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
+<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
+<li><a href="/interview/docs/java/concurrent/AQS/"class=active>AQS</a></li>
+<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
+<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
+<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<ul>
+<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
+<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/gc/">GC</a>
+<ul>
+<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
+<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/">框架</a>
+<ul>
+<li><a href="/interview/docs/fromwork/netty/">Netty</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
+<ul>
+<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/spring/">Spring</a>
+<ul>
+<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
+<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
+<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/">系统架构</a>
+<ul>
+<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
+<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
+<ul>
+<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/design/">系统设计</a>
+<ul>
+<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/distributed/">分布式</a>
+<ul>
+<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
+<li><a href="/interview/docs/architecture/distributed/session/">分布式Session</a></li>
+<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
+<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
+<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
+<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
+<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
+<li><a href="/interview/docs/architecture/distributed/kafka/">Kafka</a></li>
+<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
+<li><a href="/interview/docs/architecture/distributed/dubbo/">Dubbo</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
+<ul>
+<li><a href="/interview/docs/architecture/bigdata/algo/">基础算法</a></li>
+<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/offer/">剑指offer</a>
+<ul>
+<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
+<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
+<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
+<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
+<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
+<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
+<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
+<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
+<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
+<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
+<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
+<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
+<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
+<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
+<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
+<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
+<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
+<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
+<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
+<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
+<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
+<li><a href="/interview/docs/offer/VerifySquenceOfBST/">二叉搜索树的后序遍历序列</a></li>
+<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
+<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
+<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
+<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
+<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
+<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
+<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
+<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
+<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
+<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
+<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
+<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
+<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
+<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
+<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
+<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
+<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
+<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
+<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
+<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
+<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
+<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
+<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
+<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
+<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
+<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
+<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
+<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
+<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
+<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
+<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
+<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
+<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
+<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
+<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
+<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
+<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
+<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
+<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
+<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
+<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
+<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
+<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
+<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
+<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/leetcode/">LeetCode</a>
+<ul>
+<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
+<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
+<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
+<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
+<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
+<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
+<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
+<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
+<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
+<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
+<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
+<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
+<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
+<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
+<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
+<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
+<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
+<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
+<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
+<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
+<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
+<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
+<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
+<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
+<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
+<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
+<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
+<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
+<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
+<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
+<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
+<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+<script>
+(function() {
+  var menu = document.querySelector("aside.book-menu nav");
+  addEventListener("beforeunload", function(event) {
+    localStorage.setItem("menu.scrollTop", menu.scrollTop);
+  });
+  menu.scrollTop = localStorage.getItem("menu.scrollTop");
+})();
+</script>
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>AQS</strong>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#使用">使用</a></li>
+    <li><a href="#reentrantlockhttpifevecomjava-special-troops-aqs">ReentrantLock</a></li>
+    <li><a href="#conditionhttpsjavadoopcompostabstractqueuedsynchronizer-2">Condition</a>
+      <ul>
+        <li><a href="#实现类需要注意">实现类需要注意</a></li>
+        <li><a href="#abstractqueuedsynchronizerconditionobject">AbstractQueuedSynchronizer.ConditionObject</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+<article class="markdown"><h1 id="aqs">AQS</h1>
+<p>AQS 提供一个框架，用于实现依赖于先进先出（FIFO）<code>等待队列</code> 的阻塞锁和相关同步器（信号量，事件等）。对于大多数依赖单个原子 int 值表示状态的同步器，该类可以作为十分有用的基类。子类必须定义所有的<code>protected</code>方法（包括<code>tryAcquire</code>、<code>tryRelease</code>），来改变这个状态，并且定义哪些状态代表来对象被使用和被释放。鉴于这些，该类中其他的方法用来实现队列和阻塞的机制。子类可以维护其他状态字段，但是只有使用 <code>getState</code> 、<code>setState</code>以及 <code>compareAndSetState</code> 来原子的操作状态值。</p>
+<p>子类需要定义非 <code>public</code> 的内部工具类用于实现其内部类的同步属性。<code>AbstractQueuedSynchronizer</code> 类不实现任何同步接口，相反，它定义了诸如<code>acquireInterruptibly</code>之类的方法，可以被具体的锁和相关的同步器适当地调用，以实现它们的公共方法。</p>
+<p>该类支持默认的独占模式和共享模式。当一个线程处在独占模式下，其他试图 <code>acquire</code> 的线程都无法成功。共享模式可以同时被多个线程 <code>acquire</code>成功。在具体的应用场景中该类无法理解这些区别，当共享模式 <code>acquire</code> 成功之后，下一个线程（如果有一个存在）必须判定是否能够<code>acquire</code>。线程等待在不同的模式里但是会共享同一个FIFO队列。通常来说，子类只需要支持其中一种模式，但是如果都支持，可以参照<code>ReadWriteLock</code>。子类不需要定义不支持模式的方法。</p>
+<p>该类定义<code>AbstractQueuedSynchronizer.ConditionObject</code>内部类，可以被子类使用的 <code>Condition</code> 实现，来支持独占模式 <code>isHeldExclusively</code> 判定当前线程的同步是否是独占模式，可用通过<code>release</code>方法与 <code>getState</code> 方法来完全释放当前对象，在将保存的状态值调用<code>acquire</code>，最终将此对象恢复到其先前获取的状态。<code>AbstractQueuedSynchronizer</code>没有方法来创建 <code>Condition</code>，所以如果无法满足这个约束，则不要使用它。<code>AbstractQueuedSynchronizer.ConditionObject</code> 的行为与具体的同步器实现有关。</p>
+<p>该类为内部队列提供检查，检测和监视方法，以及 在<code>condition objects</code>上的类似方法。 这些方法可以根据需要使用 <code>AbstractQueuedSynchronizer</code> 用于它们的同步机制。该类的序列化仅存储 <code>atomic int</code> 的状态值，因此反序列化对象的线程队列为空。</p>
+<h2 id="使用">使用</h2>
+<p>为了使用该类去创建一个同步器，需要重新定义以下方法，并使用 <code>getState</code>, <code>setState</code>, <code>compareAndSetState</code> 方法来改变同步状态。</p>
+<ul>
+<li>tryAcquire</li>
+<li>tryRelease</li>
+<li>tryAcquireShared</li>
+<li>tryReleaseShared</li>
+<li>isHeldExclusively</li>
+</ul>
+<p>上述所有方法默认实现都会抛出 <code>UnsupportedOperationException</code>。这个方法的具体实现必须保证内部的线程安全，并且应该快速并且不会阻塞。所有其他方法均为 <code>final</code>，因为他们不能独立变化。</p>
+<p>也许你发现一些继承自 <code>AbstractOwnableSynchronizer</code> 的方法非常有助于线程保持拥有其独占同步器。同时我们也鼓励使用他们，有助于监控和诊断工具判定哪些线程持有来锁。</p>
+<h2 id="reentrantlockhttpifevecomjava-special-troops-aqs"><a href="http://ifeve.com/java-special-troops-aqs/">ReentrantLock</a></h2>
+<blockquote>
+<p>公平锁相比与非公平锁在 <code>tryAcquire</code>中会多判定一个 <code>hasQueuedPredecessors</code>，如果为 <code>false</code>（队列头为当前线程&ndash;已获取锁 or 队列为空）并且成功修改状态值，则可以认为获取锁成功，这样才是重入，不然加到队尾就会有麻烦。</p>
+</blockquote>
+<p>ReentrantLock 中通过两个子类 <code>FairSync</code> 和 <code>NoFairSync</code> 继承 AQS 来实现锁。在<code>Lock</code>方法中，直接调用 AQS 的 <code>acquire</code>，<code>acquire</code>会调用 <code>NoFairSync</code> 中的<code>tryAcquire</code>来尝试让当前线程直接获取锁。如果失败则会创建链表节点，将当前线程加入队列，并<code>park</code>。当<code>release</code>方法被调用后，会寻找队列下一个节点进行 <code>unpark</code>，这样他就有机会在<code>acquireQueued</code>中获取锁。</p>
+<blockquote>
+<p>公平和非公平就体现在 <code>tryAcquire</code> 方法中，<code>FairSync</code>会判定当前线程是否已获取锁 or 队列为空，在这样的情况下才会尝试获取锁。而<code>NoFairSync</code>会直接来获取锁。</p>
+</blockquote>
+<h2 id="conditionhttpsjavadoopcompostabstractqueuedsynchronizer-2"><a href="https://javadoop.com/post/AbstractQueuedSynchronizer-2/">Condition</a></h2>
+<p><code>Condition</code> 因子将 <code>Object monitor</code> 方法（<code>wait, notify and notifyAll</code>）拆分为不同的对象，通过将它们与 <code>Lock</code> 相结合来实现每个对象具有多个等待集的效果。任何 <code>Lock</code> 可以替代 <code>synchronized</code> 关键字的地方，都可以用<code>Condition</code> 来替换<code>Object monitor</code> 方法。</p>
+<p><code>Conditions</code>（也称为 条件队列 或者 条件变量）提供了一种方法 &ndash; 让线程暂停执行，直到其他线程基于某种条件唤醒。在多个线程中访问一些共享的状态信息，是需要进行保护的，所以 <code>Lock</code> 与 <code>Condition</code> 有某种形式的关联。<code>Condition</code>提供的关键属性是它以原子方式释放关联的锁并挂起当前线程，就像<code>Object.wait</code>一样。</p>
+<p><code>Condition</code> 本质上是绑定到 <code>Lock</code>。可以通过 <code>Lock.newCondition()</code> 来获取一个 <code>Condition</code> 实例。</p>
+<p><code>Condition</code> 的实现可以提供相比于 <code>Object monitor</code>方法不一样的行为和语义，比如：被通知调起的顺序、在通知时不需要持有锁。如果实现类提供了不一样的语义，必须在文档中进行说明。</p>
+<p><code>Condition</code> 实例只是普通的对象，可以用在同步语句中，并且有他们自己的 <code>Object monitor</code>的<code>wait</code>和 <code>notification</code> 方法。获取 <code>Condition</code> 对象的 <code>Object monitor</code> 或者使用其 <code>monitor</code> 方法，与<code>Lock</code> 中使用 <code>Condition</code> 的 <code>wait</code> 或者 <code>signal</code> 方法没有任何关系。为了避免混淆，不建议使用 <code>Condition</code> 的 <code>Object monitor</code> 方法，除非在它自己的实现里。</p>
+<h3 id="实现类需要注意">实现类需要注意</h3>
+<ul>
+<li>虚假唤醒（<code>spurious wakeup</code>）：开发者最好将条件 <code>wait</code> 方法放在循环中</li>
+<li><code>Condition</code> 有3中 <code>wait</code> 形式（<code>interruptible, non-interruptible, and timed</code>），在不同平台的底层实现可能不同。因此，不需要对三种 <code>wait</code> 定义一致的语义，也不需要支持中断形式的线程暂停。</li>
+</ul>
+<h3 id="abstractqueuedsynchronizerconditionobject">AbstractQueuedSynchronizer.ConditionObject</h3>
+<pre><code>/** First node of condition queue. */
+private transient Node firstWaiter;
+/** Last node of condition queue. */
+private transient Node lastWaiter;
+</code></pre><p>在 <code>ConditionObject</code> 的内部维护了一个队列：<code>条件队列</code>，与 <code>AbstractQueuedSynchronizer</code> 里的 <code>等待队列</code> 不同。</p>
+<p><img src="images/4-AQS-cef7a.png" alt=""></p>
+<p>基本上，把这张图看懂，你也就知道 condition 的处理流程了。</p>
+<ol>
+<li>条件队列和等待队列的节点，都是 Node 的实例，因为条件队列的节点是需要转移到等待队列中去的；</li>
+<li>我们知道一个 <code>ReentrantLock</code> 实例可以通过多次调用 <code>newCondition()</code> 来产生多个 <code>Condition</code> 实例，这里对应 <code>condition1</code> 和 <code>condition2</code>。注意，<code>ConditionObject</code> 只有两个属性 <code>firstWaiter</code> 和 <code>lastWaiter；</code></li>
+<li>每个 <code>condition</code> 有一个关联的条件队列，如线程 1 调用 <code>condition1.await()</code> 方法即可将当前<code>线程 1</code> 包装成 <code>Node</code> 后加入到<code>条件队列</code>中，然后阻塞在这里，不继续往下执行，条件队列是一个单向链表；</li>
+<li>调用<code>condition1.signal()</code> 触发一次唤醒，此时唤醒的是队头，会将<code>condition1</code> 对应的条件队列的 <code>firstWaiter</code>（队头） 移到<code>等待队列</code>的队尾，等待获取锁，获取锁后 <code>await</code> 方法才能返回，继续往下执行。</li>
+</ol>
+<p>上面的 <code>2-&gt;3-&gt;4</code> 描述了一个最简单的流程，没有考虑中断、signalAll、还有带有超时参数的 await 方法等，不过把这里弄懂是这节的主要目的。</p>
+</article>
+ 
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/java/concurrent/AQS/index.md" target="_blank" rel="noopener">
+      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
+      
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#使用">使用</a></li>
+    <li><a href="#reentrantlockhttpifevecomjava-special-troops-aqs">ReentrantLock</a></li>
+    <li><a href="#conditionhttpsjavadoopcompostabstractqueuedsynchronizer-2">Condition</a>
+      <ul>
+        <li><a href="#实现类需要注意">实现类需要注意</a></li>
+        <li><a href="#abstractqueuedsynchronizerconditionobject">AbstractQueuedSynchronizer.ConditionObject</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

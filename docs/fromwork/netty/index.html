@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Netty"><meta property="og:title" content="Netty" />
+<meta property="og:description" content="Netty Netty 是一个 异步 事件驱动 的网络应用框架，用于快速开发高性能、可扩展协议的服务器和客户端
+Reactor 无论是 C&#43;&#43; 还是 Java 编写的网络框架，大多数都是基于 Reactor 模式进行设计和开发，Reactor 模式基于事件驱动，特别适合处理海量的 I/O 事件。
+反应器设计模式-维基百科 &ndash; 反应器设计模式(Reactor pattern)是一种为处理服务请求并发 提交到一个或者多个服务处理程序的事件设计模式。当请求抵达后，服务处理程序使用解多路分配策略，然后同步地派发这些请求至相关的请求处理程序。
+单线程模型 Reactor 单线程模型，指的是所有的 IO 操作都在同一个 NIO 线程上面完成，NIO 线程的职责如下：
+ 作为 NIO 服务端，接收客户端的 TCP 连接； 作为 NIO 客户端，向服务端发起 TCP 连接； 读取通信对端的请求或者应答消息； 向通信对端发送消息请求或者应答消息。  由于 Reactor 模式使用的是异步非阻塞 IO，所有的 IO 操作都不会导致阻塞，理论上一个线程可以独立处理所有 IO 相关的操作。从架构层面看，一个 NIO 线程确实可以完成其承担的职责。例如，通过 Acceptor 类接收客户端的 TCP 连接请求消息，链路建立成功之后，通过 Dispatch 将对应的 ByteBuffer 派发到指定的 Handler 上进行消息解码。用户线程可以通过消息编码通过 NIO 线程将消息发送给客户端。
+对于一些小容量应用场景，可以使用单线程模型。但是 对于高负载、大并发的应用场景却不合适。
+多线程模型 Rector 多线程模型与单线程模型最大的区别就是有一组 NIO 线程处理 IO 操作，它的原理图如下：" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hadyang.github.io/interview/docs/fromwork/netty/" />
+<meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
+<meta property="article:modified_time" content="2019-08-21T11:00:41+08:00" />
+<title>Netty | Interview</title>
+<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/interview/book.min.b7fe34b8a4c4da05b2690b4aacfa71ddce0668cc6da3abb67dd3946844125444.css" integrity="sha256-t/40uKTE2gWyaQtKrPpx3c4GaMxto6u2fdOUaEQSVEQ=">
+
+
+<script defer src="/interview/en.search.min.4daab1eda22baec10d130347f095a8463b951038b7e98060a59bcdc484ada980.js" integrity="sha256-Taqx7aIrrsENEwNH8JWoRjuVEDi36YBgpZvNxIStqYA="></script>
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/interview"><span>Interview</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+  <ul>
+<li><a href="/interview/docs/basic/">计算机基础</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/">算法</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
+<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
+<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
+<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
+<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
+<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
+<li><a href="/interview/docs/basic/algo/sort/">排序算法</a></li>
+<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/os/">操作系统</a>
+<ul>
+<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
+<li><a href="/interview/docs/basic/os/concurrency/">并发</a></li>
+<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
+<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
+<li><a href="/interview/docs/basic/os/linux/">Linux系统</a></li>
+<li><a href="/interview/docs/basic/os/interrupt/">中断</a></li>
+<li><a href="/interview/docs/basic/os/device/">设备管理</a></li>
+<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
+<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/net/">计算机网络</a>
+<ul>
+<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
+<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
+<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
+<li><a href="/interview/docs/basic/net/http/">HTTP</a></li>
+<li><a href="/interview/docs/basic/net/https/">HTTPS</a></li>
+<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/">数据库</a>
+<ul>
+<li><a href="/interview/docs/basic/database/transaction/">事务</a></li>
+<li><a href="/interview/docs/basic/database/index/">索引</a></li>
+<li><a href="/interview/docs/basic/database/sql/">SQL</a></li>
+<li><a href="/interview/docs/basic/database/join/">连接</a></li>
+<li><a href="/interview/docs/basic/database/mysql/">MySQL</a></li>
+<li><a href="/interview/docs/basic/database/concurrent/">并发控制</a></li>
+<li><a href="/interview/docs/basic/database/innodb/">Innodb</a></li>
+<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/">Java</a>
+<ul>
+<li><a href="/interview/docs/java/oop/">OOP</a></li>
+<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
+<li><a href="/interview/docs/java/operator/">运算符</a></li>
+<li><a href="/interview/docs/java/exception/">异常</a></li>
+<li><a href="/interview/docs/java/generics/">泛型</a></li>
+<li><a href="/interview/docs/java/object/">Object</a></li>
+<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
+<li><a href="/interview/docs/java/proxy/">代理</a></li>
+<li><a href="/interview/docs/java/annotation/">注解</a></li>
+<li><a href="/interview/docs/java/questions/">面试题</a></li>
+<li><a href="/interview/docs/java/nio/">NIO</a></li>
+<li><a href="/interview/docs/java/">集合</a>
+<ul>
+<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
+<li><a href="/interview/docs/java/collection/Concurrenthashmap/">Concurrenthashmap</a></li>
+<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/concurrent/">并发</a>
+<ul>
+<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
+<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
+<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
+<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
+<li><a href="/interview/docs/java/concurrent/AQS/">AQS</a></li>
+<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
+<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
+<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<ul>
+<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
+<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/gc/">GC</a>
+<ul>
+<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
+<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/">框架</a>
+<ul>
+<li><a href="/interview/docs/fromwork/netty/"class=active>Netty</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
+<ul>
+<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/spring/">Spring</a>
+<ul>
+<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
+<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
+<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/">系统架构</a>
+<ul>
+<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
+<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
+<ul>
+<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/design/">系统设计</a>
+<ul>
+<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/distributed/">分布式</a>
+<ul>
+<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
+<li><a href="/interview/docs/architecture/distributed/session/">分布式Session</a></li>
+<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
+<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
+<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
+<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
+<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
+<li><a href="/interview/docs/architecture/distributed/kafka/">Kafka</a></li>
+<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
+<li><a href="/interview/docs/architecture/distributed/dubbo/">Dubbo</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
+<ul>
+<li><a href="/interview/docs/architecture/bigdata/algo/">基础算法</a></li>
+<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/offer/">剑指offer</a>
+<ul>
+<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
+<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
+<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
+<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
+<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
+<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
+<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
+<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
+<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
+<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
+<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
+<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
+<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
+<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
+<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
+<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
+<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
+<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
+<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
+<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
+<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
+<li><a href="/interview/docs/offer/VerifySquenceOfBST/">二叉搜索树的后序遍历序列</a></li>
+<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
+<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
+<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
+<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
+<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
+<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
+<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
+<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
+<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
+<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
+<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
+<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
+<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
+<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
+<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
+<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
+<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
+<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
+<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
+<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
+<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
+<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
+<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
+<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
+<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
+<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
+<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
+<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
+<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
+<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
+<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
+<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
+<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
+<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
+<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
+<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
+<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
+<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
+<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
+<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
+<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
+<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
+<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
+<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
+<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/leetcode/">LeetCode</a>
+<ul>
+<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
+<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
+<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
+<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
+<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
+<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
+<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
+<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
+<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
+<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
+<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
+<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
+<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
+<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
+<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
+<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
+<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
+<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
+<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
+<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
+<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
+<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
+<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
+<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
+<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
+<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
+<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
+<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
+<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
+<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
+<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
+<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+<script>
+(function() {
+  var menu = document.querySelector("aside.book-menu nav");
+  addEventListener("beforeunload", function(event) {
+    localStorage.setItem("menu.scrollTop", menu.scrollTop);
+  });
+  menu.scrollTop = localStorage.getItem("menu.scrollTop");
+})();
+</script>
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>Netty</strong>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#reactorhttpswwwinfoqcnarticlenetty-threading-model">Reactor</a>
+      <ul>
+        <li><a href="#单线程模型">单线程模型</a></li>
+        <li><a href="#多线程模型">多线程模型</a></li>
+        <li><a href="#主从多线程模型">主从多线程模型</a></li>
+      </ul>
+    </li>
+    <li><a href="#netty-的优势">Netty 的优势</a>
+      <ul>
+        <li><a href="#netty-为什么性能好">Netty 为什么性能好？</a></li>
+        <li><a href="#zero-copy">Zero Copy</a></li>
+        <li><a href="#垃圾回收">垃圾回收</a></li>
+      </ul>
+    </li>
+    <li><a href="#源码">源码</a>
+      <ul>
+        <li><a href="#bytebuf">ByteBuf</a></li>
+        <li><a href="#netty-启动以及链接建立过程">Netty 启动以及链接建立过程</a></li>
+      </ul>
+    </li>
+    <li><a href="#epoll-触发">Epoll 触发</a></li>
+    <li><a href="#jdk-nio-bughttpsbugsjavacombugdatabaseview_bugdobug_id6403933">JDK NIO BUG</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+<article class="markdown"><h1 id="netty">Netty</h1>
+<p>Netty 是一个 异步 事件驱动 的网络应用框架，用于快速开发高性能、可扩展协议的服务器和客户端</p>
+<h2 id="reactorhttpswwwinfoqcnarticlenetty-threading-model"><a href="https://www.infoq.cn/article/netty-threading-model">Reactor</a></h2>
+<p>无论是 C++ 还是 Java 编写的网络框架，大多数都是基于 Reactor 模式进行设计和开发，Reactor 模式基于事件驱动，特别适合处理海量的 I/O 事件。</p>
+<p><a href="https://zh.wikipedia.org/wiki/%E5%8F%8D%E5%BA%94%E5%99%A8%E6%A8%A1%E5%BC%8F">反应器设计模式-维基百科</a> &ndash; 反应器设计模式(<code>Reactor pattern</code>)是一种为处理服务请求并发 提交到一个或者多个服务处理程序的事件设计模式。当请求抵达后，服务处理程序使用解多路分配策略，然后同步地派发这些请求至相关的请求处理程序。</p>
+<h3 id="单线程模型">单线程模型</h3>
+<p>Reactor 单线程模型，指的是所有的 IO 操作都在同一个 NIO 线程上面完成，NIO 线程的职责如下：</p>
+<ol>
+<li>作为 NIO 服务端，接收客户端的 TCP 连接；</li>
+<li>作为 NIO 客户端，向服务端发起 TCP 连接；</li>
+<li>读取通信对端的请求或者应答消息；</li>
+<li>向通信对端发送消息请求或者应答消息。</li>
+</ol>
+<p><img src="images/dc7ff89d78fc63558bd02d4515e42f38.png" alt="image"></p>
+<p>由于 <code>Reactor</code> 模式使用的是<code>异步非阻塞 IO</code>，所有的 <code>IO</code> 操作都不会导致阻塞，理论上一个线程可以独立处理所有 <code>IO</code> 相关的操作。从架构层面看，一个 <code>NIO</code> 线程确实可以完成其承担的职责。例如，通过 <code>Acceptor</code> 类接收客户端的 TCP 连接请求消息，链路建立成功之后，通过 <code>Dispatch</code> 将对应的 <code>ByteBuffer</code> 派发到指定的 <code>Handler</code> 上进行消息解码。用户线程可以通过消息编码通过 <code>NIO</code> 线程将消息发送给客户端。</p>
+<p>对于一些小容量应用场景，可以使用单线程模型。但是 <strong>对于高负载、大并发的应用场景却不合适</strong>。</p>
+<h3 id="多线程模型">多线程模型</h3>
+<p>Rector 多线程模型与单线程模型最大的区别就是有一组 NIO 线程处理 IO 操作，它的原理图如下：</p>
+<p><img src="images/2882a43ae27016cc885444b46a735801.png" alt="image"></p>
+<p>Reactor 多线程模型的特点：</p>
+<ol>
+<li>有专门一个 <code>NIO</code> 线程 <code>Acceptor</code> 线程用于监听服务端，接收客户端的 <code>TCP</code> 连接请求；</li>
+<li>网络 <code>IO</code> 操作 - 读、写等由一个 <code>NIO</code> 线程池负责，线程池可以采用标准的 <code>JDK</code> 线程池实现，它包含一个任务队列和 <code>N</code> 个可用的线程，由这些 <code>NIO</code> 线程负责消息的读取、解码、编码和发送；</li>
+<li>1 个 <code>NIO</code> 线程可以同时处理 N 条链路，但是 1 个链路只对应 1 个 <code>NIO</code> 线程，防止发生并发操作问题。</li>
+</ol>
+<h3 id="主从多线程模型">主从多线程模型</h3>
+<p>主从 <code>Reactor</code> 线程模型的特点是：服务端用于接收客户端连接的不再是个 <code>1</code> 个单独的 <code>NIO</code> 线程，而是一个独立的 <code>NIO</code> 线程池。 <code>Acceptor</code> 接收到客户端 <code>TCP</code> 连接请求处理完成后（可能包含接入认证等），将新创建的 <code>SocketChannel</code> 注册到 IO 线程池（<code>sub reactor</code> 线程池）的某个 IO 线程上，由它负责 <code>SocketChannel</code> 的读写和编解码工作。 <code>Acceptor</code> 线程池仅仅只用于客户端的登陆、握手和安全认证，一旦链路建立成功，就将链路注册到后端 <code>subReactor</code> 线程池的 <code>IO</code> 线程上，由 <code>IO</code> 线程负责后续的 <code>IO</code> 操作。</p>
+<p><img src="images/8674352e3cb3638da5807ef88b8f225d.png" alt="image"></p>
+<p>它的工作流程总结如下：</p>
+<ol>
+<li>从主线程池中随机选择一个 <code>Reactor</code> 线程作为 <code>Acceptor</code> 线程，用于绑定监听端口，接收客户端连接；</li>
+<li>Acceptor 线程接收客户端连接请求之后创建新的 <code>SocketChannel</code> ，将其注册到主线程池的其它 Reactor 线程上，由其负责接入认证、IP 黑白名单过滤、握手等操作；</li>
+<li>步骤 2 完成之后，业务层的链路正式建立，将 <code>SocketChannel</code> 从主线程池的 <code>Reactor</code> 线程的多路复用器上摘除，重新注册到 <code>Sub</code> 线程池的线程上，用于处理 I/O 的读写操作。</li>
+</ol>
+<h2 id="netty-的优势">Netty 的优势</h2>
+<ul>
+<li>多路复用，并在 NIO 的基础上进行更高层次的抽象</li>
+<li>事件机制</li>
+<li>功能强大，预置了多种编解码功能，支持多种主流协议</li>
+<li>定制能力强，可以通过ChannelHandler对通信框架进行灵活的扩展</li>
+</ul>
+<h3 id="netty-为什么性能好">Netty 为什么性能好？</h3>
+<ol>
+<li>纯异步：<code>Reactor</code> 线程模型</li>
+<li>IO 多路复用</li>
+<li>GC 优化：更少的分配内存、池化（Pooling）、复用、选择性的使用 <code>sun.misc.Unsafe</code></li>
+<li>更多的硬件相关优化（mechanical sympathy）</li>
+<li>内存泄漏检测</li>
+<li>&ldquo;Zero Copy&rdquo;</li>
+</ol>
+<h3 id="zero-copy">Zero Copy</h3>
+<p>Netty 的 Zero-copy 体现在如下几个个方面:</p>
+<ul>
+<li><code>Netty</code> 提供了 <code>CompositeByteBuf</code> 类, 它可以将多个 <code>ByteBuf</code> 合并为一个逻辑上的 <code>ByteBuf</code> , 避免了各个 <code>ByteBuf</code> 之间的拷贝.</li>
+<li>通过 <code>wrap</code> 操作, 我们可以将 <code>byte[]</code> <code>数组、ByteBuf</code> 、 <code>ByteBuffer</code> 等包装成一个 <code>Netty ByteBuf</code> 对象, 进而避免了拷贝操作.</li>
+<li><code>ByteBuf</code> 支持 <code>slice</code> 操作, 因此可以将 <code>ByteBuf</code> 分解为多个共享同一个存储区域的 <code>ByteBuf</code>, 避免了内存的拷贝.</li>
+<li>通过 <code>FileRegion</code> 包装的 <code>FileChannel.tranferTo</code> 实现文件传输, 可以直接将文件缓冲区的数据发送到目标 <code>Channel</code> , 避免了传统通过循环 <code>write</code> 方式导致的内存拷贝问题.</li>
+</ul>
+<h3 id="垃圾回收">垃圾回收</h3>
+<p>Netty 里 <code>HeapByteBuffer</code> 底下的 <code>byte[]</code> 能够依赖JVM GC自然回收；而 DirectByteBuffer 底下是 Java 堆外内存，除了等JVM GC，最好也能主动进行回收；所以，Netty ByteBuf需要在 JVM 的 GC 机制之外，有自己的引用计数器和回收过程。</p>
+<blockquote>
+<p>原生的 JVM GC 很难回收掉 DirectByteBuffer 所占用的 Native Memory</p>
+</blockquote>
+<p>Netty 中采用引用计数对 DirectByteBuffer 进行对象可达性检测，当 DirectByteBuffer 上的引用计数为 0 时将对象释放。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#a6e22e">@Override</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">boolean</span> <span style="color:#a6e22e">release</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#f92672">;</span><span style="color:#f92672">;</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">int</span> refCnt <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">refCnt</span><span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>refCnt <span style="color:#f92672">=</span><span style="color:#f92672">=</span> 0<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> IllegalReferenceCountException<span style="color:#f92672">(</span>0<span style="color:#f92672">,</span> <span style="color:#f92672">-</span>1<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>refCntUpdater<span style="color:#f92672">.</span><span style="color:#a6e22e">compareAndSet</span><span style="color:#f92672">(</span><span style="color:#66d9ef">this</span><span style="color:#f92672">,</span> refCnt<span style="color:#f92672">,</span> refCnt <span style="color:#f92672">-</span> 1<span style="color:#f92672">)</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>refCnt <span style="color:#f92672">=</span><span style="color:#f92672">=</span> 1<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+                deallocate<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+                <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span><span style="color:#f92672">;</span>
+            <span style="color:#f92672">}</span>
+            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>Netty 内存泄漏，主要是针对池化的 ByteBuf 。 ByteBuf 对象被 JVM GC 掉之前，没有调用 <code>release()</code> 把底下的 <code>DirectByteBuffer</code> 或<code>byte[]</code> 归还，会导致池越来越大。而非池化的 ByteBuf ，即使像 <code>DirectByteBuf</code> 那样可能会用到 <code>System.gc()</code> ，但终归会被 release 掉的，不会出大事。因此 Netty 默认会从分配的 ByteBuf 里抽样出大约 1% 的来进行跟踪。</p>
+<h2 id="源码">源码</h2>
+<h3 id="bytebuf">ByteBuf</h3>
+<ol>
+<li>ByteBuf 扩容采用先倍增后步进的方式</li>
+</ol>
+<h4 id="directbuffer-vs-heapbuffer">DirectBuffer vs HeapBuffer</h4>
+<p>在执行网络IO或者文件IO时，如果是使用 <code>DirectBuffer</code> 就会少一次内存拷贝。<strong>如果是非 <code>DirectBuffer</code> ，JDK 会先创建一个 <code>DirectBuffer</code> ，再去执行真正的写操作</strong>。这是因为，当我们把一个地址通过 <code>JNI</code> 传递给底层的C库的时候，有一个基本的要求，就是这个地址上的内容不能失效。然而，在 <code>GC</code> 管理下的对象是会在 <code>Java</code> 堆中移动的。也就是说，有可能我把一个地址传给底层的 <code>write</code> ，但是这段内存却因为 <code>GC</code> 整理内存而失效了。所以我必须要把待发送的数据放到一个 <code>GC</code> 管不着的地方。这就是调用 <code>native</code> 方法之前，数据一定要在堆外内存的原因。</p>
+<h3 id="netty-启动以及链接建立过程">Netty 启动以及链接建立过程</h3>
+<p><img src="images/922e67970b6ac7bf78cd43ac61f7aec0.png" alt="image"></p>
+<h2 id="epoll-触发">Epoll 触发</h2>
+<p>有两种模式，一是水平触发（LT），二是边缘触发（ET）。</p>
+<p>在LT模式下，只要某个fd还有数据没读完，那么下次轮询还会被选出。而在ET模式下，只有fd状态发生改变后，该fd才会被再次选出。ET模式的特殊性，使在ET模式下的一次轮询必须处理完本次轮询出的fd的所有数据，否则该fd将不会在下次轮询中被选出。</p>
+<ul>
+<li><code>NioChannel</code>：是水平触发</li>
+<li><code>EpollChannel</code>：是边缘触发，Netty 为保证数据完整会在特定条件下自己触发 Epoll Event，来读取数据</li>
+</ul>
+<h2 id="jdk-nio-bughttpsbugsjavacombugdatabaseview_bugdobug_id6403933"><a href="https://bugs.java.com/bugdatabase/view_bug.do?bug_id=6403933">JDK NIO BUG</a></h2>
+<ul>
+<li>正常情况下，<code>selector.select()</code> 操作是阻塞的，只有被监听的 <code>fd</code> 有读写操作时，才被唤醒</li>
+<li>但是，在这个 <code>bug</code> 中，没有任何 <code>fd</code> 有读写请求，但是 <code>select()</code> 操作依旧被唤醒</li>
+<li>很显然，这种情况下，<code>selectedKeys()</code> 返回的是个空数组</li>
+<li>然后按照逻辑执行到 <code>while(true)</code> 处，循环执行，导致死循环。</li>
+</ul>
+<p>Netty 解决方案：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">long</span> currentTimeNanos <span style="color:#f92672">=</span> System<span style="color:#f92672">.</span><span style="color:#a6e22e">nanoTime</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#f92672">;</span><span style="color:#f92672">;</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#75715e">// 1.定时任务截止事时间快到了，中断本次轮询
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//...
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// 2.轮询过程中发现有任务加入，中断本次轮询
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//...
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// 3.阻塞式select操作
+</span><span style="color:#75715e"></span>    selector<span style="color:#f92672">.</span><span style="color:#a6e22e">select</span><span style="color:#f92672">(</span>timeoutMillis<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#75715e">// 4.解决jdk的nio bug
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">long</span> time <span style="color:#f92672">=</span> System<span style="color:#f92672">.</span><span style="color:#a6e22e">nanoTime</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>time <span style="color:#f92672">-</span> TimeUnit<span style="color:#f92672">.</span><span style="color:#a6e22e">MILLISECONDS</span><span style="color:#f92672">.</span><span style="color:#a6e22e">toNanos</span><span style="color:#f92672">(</span>timeoutMillis<span style="color:#f92672">)</span> <span style="color:#f92672">&gt;</span><span style="color:#f92672">=</span> currentTimeNanos<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        selectCnt <span style="color:#f92672">=</span> 1<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span> <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>SELECTOR_AUTO_REBUILD_THRESHOLD <span style="color:#f92672">&gt;</span> 0 <span style="color:#f92672">&amp;</span><span style="color:#f92672">&amp;</span>
+            selectCnt <span style="color:#f92672">&gt;</span><span style="color:#f92672">=</span> SELECTOR_AUTO_REBUILD_THRESHOLD<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+
+        rebuildSelector<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        selector <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">selector</span><span style="color:#f92672">;</span>
+        selector<span style="color:#f92672">.</span><span style="color:#a6e22e">selectNow</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        selectCnt <span style="color:#f92672">=</span> 1<span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">break</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+    currentTimeNanos <span style="color:#f92672">=</span> time<span style="color:#f92672">;</span>
+    <span style="color:#75715e">//...
+</span><span style="color:#75715e"></span> <span style="color:#f92672">}</span>
+</code></pre></div><p><code>netty</code> 会在每次进行 <code>selector.select(timeoutMillis)</code> 之前记录一下开始时间 <code>currentTimeNanos</code> ，在 <code>select</code> 之后记录一下结束时间，<strong>判断 <code>select</code> 操作是否至少持续了 <code>timeoutMillis</code> 秒</strong>。如果持续的时间大于等于 <code>timeoutMillis</code> ，说明就是一次有效的轮询，重置 <code>selectCnt</code> 标志，否则，表明该阻塞方法并没有阻塞这么长时间，可能触发了 <code>jdk</code> 的空轮询 <code>bug</code> ，当空轮询的次数超过一个阀值的时候，默认是 <code>512</code> ，就开始重建 <code>selector</code></p>
+</article>
+ 
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/fromwork/netty/index.md" target="_blank" rel="noopener">
+      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
+      
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#reactorhttpswwwinfoqcnarticlenetty-threading-model">Reactor</a>
+      <ul>
+        <li><a href="#单线程模型">单线程模型</a></li>
+        <li><a href="#多线程模型">多线程模型</a></li>
+        <li><a href="#主从多线程模型">主从多线程模型</a></li>
+      </ul>
+    </li>
+    <li><a href="#netty-的优势">Netty 的优势</a>
+      <ul>
+        <li><a href="#netty-为什么性能好">Netty 为什么性能好？</a></li>
+        <li><a href="#zero-copy">Zero Copy</a></li>
+        <li><a href="#垃圾回收">垃圾回收</a></li>
+      </ul>
+    </li>
+    <li><a href="#源码">源码</a>
+      <ul>
+        <li><a href="#bytebuf">ByteBuf</a></li>
+        <li><a href="#netty-启动以及链接建立过程">Netty 启动以及链接建立过程</a></li>
+      </ul>
+    </li>
+    <li><a href="#epoll-触发">Epoll 触发</a></li>
+    <li><a href="#jdk-nio-bughttpsbugsjavacombugdatabaseview_bugdobug_id6403933">JDK NIO BUG</a></li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

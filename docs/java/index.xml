@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Interview</title>
+    <link>https://hadyang.github.io/interview/docs/java/</link>
+    <description>Recent content on Interview</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Wed, 08 Jan 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://hadyang.github.io/interview/docs/java/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>NIO</title>
+      <link>https://hadyang.github.io/interview/docs/java/nio/</link>
+      <pubDate>Wed, 08 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/nio/</guid>
+      <description>Channel Java NIO的通道类似流，但又有些不同：
+ 既可以从通道中读取数据，又可以写数据到通道。但流的读写通常是单向的。 通道可以异步地读写。 通道中的数据总是要先读到一个Buffer，或者总是要从一个Buffer中写入。  Selector Selector（选择器）是Java NIO中能够检测一到多个NIO通道，并能够知晓通道是否为诸如读写事件做好准备的组件。这样，一个单独的线程可以管理多个channel，从而管理多个网络连接。 Channel 可以向 Selector 注册监听四种不同类型的事件：
+ Connect Accept Read Write  一旦向 Selector 注册了一或多个通道，就可以调用几个重载的 select() 方法。这些方法返回你所感兴趣的事件（如连接、接受、读或写）已经准备就绪的那些通道。换句话说，如果你对“读就绪”的通道感兴趣， select() 方法会返回读事件已经就绪的那些通道。
+select 方法空转 若 Selector 的轮询结果为空，也没有 wakeup 或新消息处理，则发生空轮询，CPU使用率 100%，Netty的解决办法：对 Selector 的 select 操作周期进行统计，每完成一次空的 select 操作进行一次计数。若在某个周期内连续发生N次空轮询，则触发了 epoll 死循环 bug 。重建 Selector 判断是否是其他线程发起的重建请求，若不是则将原 SocketChannel 从旧的 Selector 上去除注册，重新注册到新的 Selector 上，并将原来的 Selector 关闭。
+SelectionKey 当向 Selector 注册 Channel 时，Channel.register() 方法会返回一个 SelectionKey 对象，这个对象代表了注册到该 Selector 和 Channel 的关联关系，并提供了一组方法来操作。当 Channel 注册的事件来到时，这个对象会在 Selector.</description>
+    </item>
+    
+    <item>
+      <title>Java 代理</title>
+      <link>https://hadyang.github.io/interview/docs/java/proxy/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/proxy/</guid>
+      <description>代理 Java动态代理与CGLIB
+我们常说的代理分为静态代理和动态代理。
+ 静态代理：代码中显式指定代理 动态代理：类比静态代理，可以发现，代理类不需要实现原接口了，而是实现InvocationHandler。  静态代理 因为需要对一些函数进行二次处理，或是某些函数不让外界知道时，可以使用代理模式，通过访问第三方，间接访问原函数的方式，达到以上目的。
+弊端 如果要想为多个类进行代理，则需要建立多个代理类，维护难度加大。
+仔细想想，为什么静态代理会有这些问题，是因为代理在编译期就已经决定，如果代理发生在运行期，这些问题解决起来就比较简单，所以动态代理的存在就很有必要了。
+动态代理 当动态生成的代理类调用方法时，会触发 invoke 方法，在 invoke 方法中可以对被代理类的方法进行增强。
+// 1. 首先实现一个InvocationHandler，方法调用会被转发到该类的invoke()方法。 class LogInvocationHandler implements InvocationHandler{ ... private Hello hello; public LogInvocationHandler(Hello hello) { this.hello = hello; } @Override public Object invoke(Object proxy, Method method, Object[] args) throws Throwable { if(&amp;quot;sayHello&amp;quot;.equals(method.getName())) { logger.info(&amp;quot;You said: &amp;quot; + Arrays.toString(args)); } return method.invoke(hello, args); } } // 2. 然后在需要使用Hello的时候，通过JDK动态代理获取Hello的代理对象。 Hello hello = (Hello)Proxy.newProxyInstance( getClass().getClassLoader(), // 1.</description>
+    </item>
+    
+    <item>
+      <title>Java 异常</title>
+      <link>https://hadyang.github.io/interview/docs/java/exception/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/exception/</guid>
+      <description>Java异常 Java中有Error和Exception，它们都是继承自Throwable类。
+二者的不同之处 Exception：
+  可以是可被控制(checked) 或不可控制的(unchecked)。
+  表示一个由程序员导致的错误。
+  应该在应用程序级被处理。
+  Error：
+  总是不可控制的(unchecked)。
+  经常用来用于表示系统错误或低层资源的错误。
+  如何可能的话，应该在系统级被捕捉。
+  异常的分类   Checked exception: 这类异常都是Exception的子类。异常的向上抛出机制进行处理，假如子类可能产生A异常，那么在父类中也必须throws A异常。可能导致的问题：代码效率低，耦合度过高。
+  Unchecked exception: 这类异常都是RuntimeException的子类，虽然RuntimeException同样也是Exception的子类，但是它们是非凡的，它们不能通过client code来试图解决，所以称为Unchecked exception 。
+  </description>
+    </item>
+    
+    <item>
+      <title>Java 泛型</title>
+      <link>https://hadyang.github.io/interview/docs/java/generics/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/generics/</guid>
+      <description>Java泛型 开发人员在使用泛型的时候，很容易根据自己的直觉而犯一些错误。比如一个方法如果接收List&amp;lt;Object&amp;gt;作为形式参数，那么如果尝试将一个List&amp;lt;String&amp;gt;的对象作为实际参数传进去，却发现无法通过编译。虽然从直觉上来说，Object是String的父类，这种类型转换应该是合理的。但是实际上这会产生隐含的类型转换问题，因此编译器直接就禁止这样的行为。
+类型擦除 Java中的泛型基本上都是在编译器这个层次来实现的，在生成的Java字节代码中是不包含泛型中的类型信息的。使用泛型的时候加上的类型参数，会被编译器在编译的时候去掉，这个过程就称为类型擦除。如在代码中定义的List&amp;lt;Object&amp;gt;和List&amp;lt;String&amp;gt;等类型，在编译之后都会变成List。JVM看到的只是List，而由泛型附加的类型信息对JVM来说是不可见的。Java编译器会在编译时尽可能的发现可能出错的地方，但是仍然无法避免在运行时刻出现类型转换异常的情况。
+很多泛型的奇怪特性都与这个类型擦除的存在有关，包括：
+  泛型类并没有自己独有的Class类对象。比如并不存在List&amp;lt;String&amp;gt;.class或是List&amp;lt;Integer&amp;gt;.class，而只有List.class。
+  静态变量是被泛型类的所有实例所共享的。对于声明为MyClass&amp;lt;T&amp;gt;的类，访问其中的静态变量的方法仍然是 MyClass.myStaticVar。不管是通过new MyClass&amp;lt;String&amp;gt;还是new MyClass&amp;lt;Integer&amp;gt;创建的对象，都是共享一个静态变量。
+  泛型的类型参数不能用在Java异常处理的catch语句中。因为异常处理是由JVM在运行时刻来进行的。由于类型信息被擦除，JVM是无法区分两个异常类型MyException&amp;lt;String&amp;gt;和MyException&amp;lt;Integer&amp;gt;的。对于JVM来说，它们都是 MyException类型的。也就无法执行与异常对应的catch语句。
+  类型擦除的基本过程也比较简单，首先是找到用来替换类型参数的具体类。这个具体类一般是Object。如果指定了类型参数的上界的话，则使用这个上界。把代码中的类型参数都替换成具体的类。同时去掉出现的类型声明，即去掉&amp;lt;&amp;gt;的内容。比如T get()方法声明就变成了Object get()；List&amp;lt;String&amp;gt;就变成了List。接下来就可能需要生成一些桥接方法（bridge method）。这是由于擦除了类型之后的类可能缺少某些必须的方法。比如考虑下面的代码：
+class MyString implements Comparable&amp;lt;String&amp;gt; { public int compareTo(String str) { return 0; } } 当类型信息被擦除之后，上述类的声明变成了class MyString implements Comparable。但是这样的话，类MyString就会有编译错误，因为没有实现接口Comparable声明的int compareTo(Object)方法。这个时候就由编译器来动态生成这个方法。
+通配符 在使用泛型类的时候，既可以指定一个具体的类型，如List&amp;lt;String&amp;gt;就声明了具体的类型是String；也可以用通配符?来表示未知类型，如List&amp;lt;?&amp;gt;就声明了List中包含的元素类型是未知的。 通配符所代表的其实是一组类型，但具体的类型是未知的。List&amp;lt;?&amp;gt;所声明的就是所有类型都是可以的。但是List&amp;lt;?&amp;gt;并不等同于List&amp;lt;Object&amp;gt;。List&amp;lt;Object&amp;gt;实际上确定了List中包含的是Object及其子类，在使用的时候都可以通过Object来进行引用。而List&amp;lt;?&amp;gt;则其中所包含的元素类型是不确定。其中可能包含的是String，也可能是 Integer。如果它包含了String的话，往里面添加Integer类型的元素就是错误的。正因为类型未知，就不能通过new ArrayList中的元素确总是可以用Object来引用的，因为虽然类型未知，但肯定是Object及其子类。考虑下面的代码：
+public void wildcard(List&amp;lt;?&amp;gt; list) { list.add(1);//编译错误 }  如上所示，试图对一个带通配符的泛型类进行操作的时候，总是会出现编译错误。其原因在于通配符所表示的类型是未知的。
+ 因为对于List&amp;lt;?&amp;gt;中的元素只能用Object来引用，在有些情况下不是很方便。在这些情况下，可以使用上下界来限制未知类型的范围。 如 List&amp;lt;? extends Number&amp;gt;说明List中可能包含的元素类型是Number及其子类。而List&amp;lt;? super Number&amp;gt;则说明List中包含的是Number及其父类。当引入了上界之后，在使用类型的时候就可以使用上界类中定义的方法。
+类型系统 在Java中，大家比较熟悉的是通过继承机制而产生的类型体系结构。比如String继承自Object。根据Liskov替换原则，子类是可以替换父类的。当需要Object类的引用的时候，如果传入一个String对象是没有任何问题的。但是反过来的话，即用父类的引用替换子类引用的时候，就需要进行强制类型转换。编译器并不能保证运行时刻这种转换一定是合法的。这种自动的子类替换父类的类型转换机制，对于数组也是适用的。 String[]可以替换Object[]。但是泛型的引入，对于这个类型系统产生了一定的影响。正如前面提到的List是不能替换掉List的。
+引入泛型之后的类型系统增加了两个维度：一个是类型参数自身的继承体系结构，另外一个是泛型类或接口自身的继承体系结构。第一个指的是对于 List&amp;lt;String&amp;gt;和List&amp;lt;Object&amp;gt;这样的情况，类型参数String是继承自Object的。而第二种指的是 List接口继承自Collection接口。对于这个类型系统，有如下的一些规则：</description>
+    </item>
+    
+    <item>
+      <title>Object</title>
+      <link>https://hadyang.github.io/interview/docs/java/object/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/object/</guid>
+      <description>Object getClass 返回该对象运行时的 class 对象，返回的 Class 对象是由所表示的类的静态同步方法锁定的对象。
+hashCode 返回该对象的 hashcode，该方法对hash表提供支持，例如 HashMap。 对于该方法有几点需要注意：
+ 在运行中的Java应用，如果用在 equals 中进行比较的信息没有改变，那么不论何时调用都需要返回一致的int值。这个hash值在应用的两次执行中不需要保持一致。 如果两个对象根据 equals 方法认为是相等的，那么这两个对象也应该返回相等的 hashcode。 不要求两个不相等的对象，在调用 hashCode 方法返回的结果是必须是不同的。然而，程序员应该了解不同的对象产生不同的 hashcode 能够提升哈希表的效率。 Object的hashcode对不同的对象，尽可能返回不同的 hashcode 。这通常通过将对象的内部地址转换为整数来实现，但Java编程语言不需要此实现技术。  Arrays.hashCode Arrays.hashCode 是一个数组的浅哈希码实现，深哈希可以使用 deepHashCode。并且当数组长度为1时，Arrays.hashCode(object) = object.hashCode 不一定成立
+31 不论是String、Arrays在计算多个元素的哈希值的时候，都会有31这个数字。主要有以下两个原因：
+  31是一个不大不小的质数，是作为 hashCode 乘子的优选质数之一。
+ 另外一些相近的质数，比如37、41、43等等，也都是不错的选择。那么为啥偏偏选中了31呢？请看第二个原因。
+   31可以被 JVM 优化，$$31 * i = (i &amp;laquo; 5) - i$$。
+  上面两个原因中，第一个需要解释一下，第二个比较简单，就不说了。一般在设计哈希算法时，会选择一个特殊的质数。至于为啥选择质数，我想应该是可以降低哈希算法的冲突率。
+在 Effective Java 中有一段相关的解释：
+ 选择数字31是因为它是一个奇质数，如果选择一个偶数会在乘法运算中产生溢出，导致数值信息丢失，因为乘二相当于移位运算。选择质数的优势并不是特别的明显，但这是一个传统。同时，数字31有一个很好的特性，即乘法运算可以被移位和减法运算取代，来获取更好的性能：$$31 * i == (i &amp;laquo; 5) - i$$，现代的 Java 虚拟机可以自动的完成这个优化。</description>
+    </item>
+    
+    <item>
+      <title>StringBuilder</title>
+      <link>https://hadyang.github.io/interview/docs/java/string-builder/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/string-builder/</guid>
+      <description>StringBuilder StringBuilder类也封装了一个字符数组，定义如下：
+ char[] value; 与String不同，它不是final的，可以修改。另外，与String不同，字符数组中不一定所有位置都已经被使用，它有一个实例变量，表示数组中已经使用的字符个数，定义如下：
+ int count; StringBuilder继承自AbstractStringBuilder，它的默认构造方法是：
+ public StringBuilder() { super(16); } 调用父类的构造方法，父类对应的构造方法是：
+ AbstractStringBuilder(int capacity) { value = new char[capacity]; } 也就是说，new StringBuilder()这句代码，内部会创建一个长度为16的字符数组，count的默认值为0。
+append的实现  public AbstractStringBuilder append(String str) { if (str == null) str = &amp;quot;null&amp;quot;; int len = str.length(); ensureCapacityInternal(count + len); str.getChars(0, len, value, count); count += len; return this; } append会直接拷贝字符到内部的字符数组中，如果字符数组长度不够，会进行扩展，实际使用的长度用count体现。具体来说，ensureCapacityInternal(count+len)会确保数组的长度足以容纳新添加的字符，str.getChars会拷贝新添加的字符到字符数组中，count+=len会增加实际使用的长度。
+ensureCapacityInternal的代码如下：
+ private void ensureCapacityInternal(int minimumCapacity) { if (minimumCapacity - value.</description>
+    </item>
+    
+    <item>
+      <title>序列化</title>
+      <link>https://hadyang.github.io/interview/docs/java/serilaser/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/serilaser/</guid>
+      <description>序列化 ProtoBuffer Protocol Buffers 是一种轻便高效的结构化数据存储格式，可以用于结构化数据串行化，或者说序列化。它很适合做数据存储或 RPC 数据交换格式。可用于通讯协议、数据存储等领域的语言无关、平台无关、可扩展的序列化结构数据格式。
+Protobuf 的优点  Protobuf 更小、更快、也更简单。你可以定义自己的数据结构，然后使用代码生成器生成的代码来读写这个数据结构。你甚至可以在无需重新部署程序的情况下更新数据结构。只需使用 Protobuf 对数据结构进行一次描述，即可利用各种不同语言或从各种不同数据流中对你的结构化数据轻松读写。 “向后”兼容性好，人们不必破坏已部署的、依靠“老”数据格式的程序就可以对数据结构进行升级。这样您的程序就可以不必担心因为消息结构的改变而造成的大规模的代码重构或者迁移的问题。因为添加新的消息中的 field 并不会引起已经发布的程序的任何改变。 Protobuf 语义更清晰，无需类似 XML 解析器的东西（因为 Protobuf 编译器会将 .proto 文件编译生成对应的数据访问类以对 Protobuf 数据进行序列化、反序列化操作）。 Protobuf 的编程模式比较友好，简单易学，同时它拥有良好的文档和示例，对于喜欢简单事物的人们而言，Protobuf 比其他的技术更加有吸引力。  Protobuf 的不足 由于文本并不适合用来描述数据结构，所以 Protobuf 也不适合用来对基于文本的标记文档（如 HTML）建模。另外，由于 XML 具有某种程度上的自解释性，它可以被人直接读取编辑，在这一点上 Protobuf 不行，它以二进制的方式存储，除非你有 .proto 定义，否则你没法直接读出 Protobuf 的任何内容。</description>
+    </item>
+    
+    <item>
+      <title>注解</title>
+      <link>https://hadyang.github.io/interview/docs/java/annotation/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/annotation/</guid>
+      <description>注解 注解(Annotation)是 Java1.5 中引入的一个重大修改之一，为我们在代码中添加信息提供了一种形式化的方法，使我们可以在稍后某个时刻非常方便的使用这些数据。注解在一定程度上是把元数据与源代码结合在一起，而不是保存在外部文档中。注解的含义可以理解为 java 中的元数据。元数据是描述数据的数据。
+注解是一个继承自java.lang.annotation.Annotation的接口
+可见性 根据注解在程序不同时期的可见性，可以把注解区分为：
+ source：注解会在编译期间被丢弃，不会编译到 class 文件 class：注解会被编译到 class 文件中，但是在运行时不能获取 runtime：注解会被编译到 class 文件中，并且能够在运行时通过反射获取  继承     有@Inherited 没有@Inherited     子类的类上能否继承到父类的类上的注解？ 否 能   子类实现了父类上的抽象方法 否 否   子类继承了父类上的方法 能 能   子类覆盖了父类上的方法 否 否    @Inherited 只是可控制对类名上注解是否可以被继承。不能控制方法上的注解是否可以被继承。
+注解的实现机制  注解是继承自：java.lang.annotation.Annotation 的接口  ... Compiled from &amp;quot;TestAnnotation.java&amp;quot; public interface TestAnnotation extends java.lang.annotation.Annotation ... 注解内部的属性是在编译期间确定的  .</description>
+    </item>
+    
+    <item>
+      <title>运算符</title>
+      <link>https://hadyang.github.io/interview/docs/java/operator/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/operator/</guid>
+      <description>运算符优先级 优先级从上到下依次递减，最上面具有最高的优先级，逗号操作符具有最低的优先级。
+相同优先级中，按结合顺序计算。大多数运算是从左至右计算，只有三个优先级是从右至左结合的，它们是单目运算符、条件运算符、赋值运算符。
+基本的优先级需要记住：
+ 指针最优，单目运算优于双目运算。如正负号。 先乘除（模），后加减。 先算术运算，后移位运算，最后位运算。请特别注意：1 &amp;lt;&amp;lt; 3 + 2 &amp;amp; 7等价于 (1 &amp;lt;&amp;lt; (3 + 2)) &amp;amp; 7. 逻辑运算最后计算。  优先级表    运算符 结合性     [ ] . ( ) (方法调用) 从左向右   ! ~ ++ -- +(一元运算) -(一元运算) 从右向左   * / % 从左向右   + -　 从左向右   &amp;lt;&amp;lt; &amp;gt;&amp;gt; &amp;gt;&amp;gt;&amp;gt; 从左向右   &amp;lt; &amp;lt;= &amp;gt; &amp;gt;= instanceof 从左向右   == !</description>
+    </item>
+    
+    <item>
+      <title>面向对象基础</title>
+      <link>https://hadyang.github.io/interview/docs/java/oop/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/oop/</guid>
+      <description>面向对象基础 面向对象三要素：封装、继承、多态
+ 封装：封装的意义，在于明确标识出允许外部使用的所有成员函数和数据项，或者叫接口。 继承：  继承基类的方法，并做出自己的扩展； 声明某个子类兼容于某基类（或者说，接口上完全兼容于基类），外部调用者可无需关注其差别（内部机制会自动把请求派发dispatch到合适的逻辑）。   多态：基于对象所属类的不同，外部对同一个方法的调用，实际执行的逻辑不同。很显然，多态实际上是依附于继承的第二种含义的。  多态 方法签名：方法名 + 参数列表(参数类型、个数、顺序)
+重写 子类重写父类方法，只有实例方法可以被重写，重写后的方法必须仍为实例方法。成员变量和静态方法都不能被重写，只能被隐藏。
+重写实例方法：超类Parent中有实例方法A，子类child定义了与A 相同签名和子集返回类型 的实例方法B，子类对象ChildObj只能调用自己的实例方法B。
+ 方法的重写（override）两同两小一大原则：
+   方法名相同，参数类型相同    子类返回类型小于等于父类方法返回类型    子类抛出异常小于等于父类方法抛出异常    子类访问权限大于等于父类方法访问权限   注意：
+  不能重写static静态方法。(形式上可以写，但本质上不是重写，属于下面要讲的隐藏)
+  重写方法可以改变其它的方法修饰符，如final,synchronized,native。不管被重写方法中有无final修饰的参数，重写方法都可以增加、保留、去掉这个参数的 final 修饰符(参数修饰符不属于方法签名)。
+  重载 在同一个类中，有多个方法名相同，参数列表不同（参数个数不同，参数类型不同），与方法的返回值无关，与权限修饰符无关。编译器通过对方法签名的识别即可静态编译出不同的方法。这也是java中重载与重写的区别之一。
+ 重载只是一种语言特性，与多态无关，与面向对象也无关。多态是为了实现接口重用。
+ Java中方法是可以和类名同名的，和构造方法唯一的区别就是，构造方法没有返回值。
+隐藏 隐藏与覆盖在形式上极其类似(语法规则)，但有着本质的区别：只有成员变量(不管是不是静态)和静态方法可以被隐藏。
+成员变量 超类 Parent 中有成员变量 A ，子类 Child 定义了与 A 同名的成员变量 B ，子类对象 ChildObj 调用的是自己的成员变量 B。如果把子类对象 ChildObj 转换为超类对象 ParentObj ，ParentObj 调用的是超类的成员变量 A ！</description>
+    </item>
+    
+    <item>
+      <title>面试题</title>
+      <link>https://hadyang.github.io/interview/docs/java/questions/</link>
+      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/questions/</guid>
+      <description>面试题 如何用数组实现队列？ 用数组实现队列时要注意 溢出 现象，这时我们可以采用循环数组的方式来解决，即将数组收尾相接。使用front指针指向队列首位，tail指针指向队列末位。
+ 内部类访问局部变量的时候，为什么变量必须加上final修饰？ 因为生命周期不同。局部变量在方法结束后就会被销毁，但内部类对象并不一定，这样就会导致内部类引用了一个不存在的变量。
+所以编译器会在内部类中生成一个局部变量的拷贝，这个拷贝的生命周期和内部类对象相同，就不会出现上述问题。
+但这样就导致了其中一个变量被修改，两个变量值可能不同的问题。为了解决这个问题，编译器就要求局部变量需要被final修饰，以保证两个变量值相同。
+在JDK8之后，编译器不要求内部类访问的局部变量必须被final修饰，但局部变量值不能被修改（无论是方法中还是内部类中），否则会报编译错误。利用javap查看编译后的字节码可以发现，编译器已经加上了final。
+ long s = 499999999 * 499999999 在上面的代码中，s的值是多少？ 根据代码的计算结果，s的值应该是-1371654655，这是由于Java中右侧值的计算默认是int类型。
+ NIO相关，Channels、Buffers、Selectors NIO(Non-blocking IO)为所有的原始类型提供(Buffer)缓存支持，字符集编码解码解决方案。 Channel ：一个新的原始I/O 抽象。 支持锁和内存映射文件的文件访问接口。提供多路(non-bloking) 非阻塞式的高伸缩性网络I/O 。
+   IO NIO     面向流 面向缓冲   阻塞IO 非阻塞IO   无 选择器    流与缓冲 Java NIO和IO之间第一个最大的区别是，IO是面向流的，NIO是面向缓冲区的。 Java IO面向流意味着每次从流中读一个或多个字节，直至读取所有字节，它们没有被缓存在任何地方。此外，它不能前后移动流中的数据。如果需要前后移动从流中读取的数据，需要先将它缓存到一个缓冲区。
+Java NIO的缓冲导向方法略有不同。数据读取到一个它稍后处理的缓冲区，需要时可在缓冲区中前后移动。这就增加了处理过程中的灵活性。但是，还需要检查是否该缓冲区中包含所有您需要处理的数据。而且，需确保当更多的数据读入缓冲区时，不要覆盖缓冲区里尚未处理的数据。
+阻塞与非阻塞IO Java IO的各种流是阻塞的。这意味着，当一个线程调用read() 或 write()时，该线程被阻塞，直到有一些数据被读取，或数据完全写入。该线程在此期间不能再干任何事情了。 Java NIO的非阻塞模式，是线程向某通道发送请求读取数据，仅能得到目前可用的数据，如果目前没有数据可用时，就什么都不会获取，当然它不会保持线程阻塞。所以直至数据变的可以读取之前，该线程可以继续做其他的事情。 非阻塞写也是如此。所以一个单独的线程现在可以管理多个输入和输出通道。
+选择器（Selectors） Java NIO 的 选择器允许一个单独的线程来监视多个输入通道，你可以注册多个通道使用一个选择器，然后使用一个单独的线程来“选择”通道：这些通道里已经有可以处理的输入，或者选择已准备写入的通道。这种选择机制，使得一个单独的线程很容易来管理多个通道。</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Redis"><meta property="og:title" content="Redis" />
+<meta property="og:description" content="Redis 线程模型 Redis 在处理网络请求是使用单线程模型，并通过 IO 多路复用来提高并发。但是在其他模块，比如：持久化，会使用多个线程。
+Redis 内部使用文件事件处理器 file event handler，这个文件事件处理器是单线程的，所以 redis 才叫做单线程的模型。它采用 IO 多路复用机制同时监听多个 socket ，将产生事件的 socket 压入内存队列中，事件分派器根据 socket 上的事件类型来选择对应的事件处理器进行处理。
+文件事件处理器的结构包含 4 个部分：
+ 多个 socket IO 多路复用程序 文件事件分派器 事件处理器（连接应答处理器、命令请求处理器、命令回复处理器）  多个 socket 可能会并发产生不同的操作，每个操作对应不同的文件事件，但是 IO 多路复用程序会监听多个 socket ，会将产生事件的 socket 放入队列中排队，事件分派器每次从队列中取出一个 socket ，根据 socket 的事件类型交给对应的事件处理器进行处理。
+客户端与 redis 的一次通信过程：
+为啥 redis 单线程模型也能效率这么高？  纯内存操作 核心是基于非阻塞的 IO 多路复用机制 单线程反而避免了多线程的频繁上下文切换问题  数据结构 Redis的外围由一个键、值映射的字典构成。与其他非关系型数据库主要不同在于：Redis中值的类型不仅限于 字符串，还支持如下抽象数据类型：
+ List：字符串列表 Set：无序不重复的字符串集合 Soret Set：有序不重复的字符串集合 HashTable：键、值都为字符串的哈希表  值的类型决定了值本身支持的操作。Redis支持不同无序、有序的列表，无序、有序的集合间的交集、并集等高级服务器端原子操作。
+持久化：  使用快照，一种半持久耐用模式。不时的将数据集以异步方式从内存以RDB格式写入硬盘。 1." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/database/redis/" />
+<meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
+<meta property="article:modified_time" content="2019-08-21T11:00:41+08:00" />
+<title>Redis | Interview</title>
+<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/interview/book.min.b7fe34b8a4c4da05b2690b4aacfa71ddce0668cc6da3abb67dd3946844125444.css" integrity="sha256-t/40uKTE2gWyaQtKrPpx3c4GaMxto6u2fdOUaEQSVEQ=">
+
+
+<script defer src="/interview/en.search.min.4daab1eda22baec10d130347f095a8463b951038b7e98060a59bcdc484ada980.js" integrity="sha256-Taqx7aIrrsENEwNH8JWoRjuVEDi36YBgpZvNxIStqYA="></script>
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/interview"><span>Interview</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+  <ul>
+<li><a href="/interview/docs/basic/">计算机基础</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/">算法</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
+<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
+<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
+<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
+<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
+<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
+<li><a href="/interview/docs/basic/algo/sort/">排序算法</a></li>
+<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/os/">操作系统</a>
+<ul>
+<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
+<li><a href="/interview/docs/basic/os/concurrency/">并发</a></li>
+<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
+<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
+<li><a href="/interview/docs/basic/os/linux/">Linux系统</a></li>
+<li><a href="/interview/docs/basic/os/interrupt/">中断</a></li>
+<li><a href="/interview/docs/basic/os/device/">设备管理</a></li>
+<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
+<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/net/">计算机网络</a>
+<ul>
+<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
+<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
+<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
+<li><a href="/interview/docs/basic/net/http/">HTTP</a></li>
+<li><a href="/interview/docs/basic/net/https/">HTTPS</a></li>
+<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/">数据库</a>
+<ul>
+<li><a href="/interview/docs/basic/database/transaction/">事务</a></li>
+<li><a href="/interview/docs/basic/database/index/">索引</a></li>
+<li><a href="/interview/docs/basic/database/sql/">SQL</a></li>
+<li><a href="/interview/docs/basic/database/join/">连接</a></li>
+<li><a href="/interview/docs/basic/database/mysql/">MySQL</a></li>
+<li><a href="/interview/docs/basic/database/concurrent/">并发控制</a></li>
+<li><a href="/interview/docs/basic/database/innodb/">Innodb</a></li>
+<li><a href="/interview/docs/basic/database/redis/"class=active>Redis</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/">Java</a>
+<ul>
+<li><a href="/interview/docs/java/oop/">OOP</a></li>
+<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
+<li><a href="/interview/docs/java/operator/">运算符</a></li>
+<li><a href="/interview/docs/java/exception/">异常</a></li>
+<li><a href="/interview/docs/java/generics/">泛型</a></li>
+<li><a href="/interview/docs/java/object/">Object</a></li>
+<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
+<li><a href="/interview/docs/java/proxy/">代理</a></li>
+<li><a href="/interview/docs/java/annotation/">注解</a></li>
+<li><a href="/interview/docs/java/questions/">面试题</a></li>
+<li><a href="/interview/docs/java/nio/">NIO</a></li>
+<li><a href="/interview/docs/java/">集合</a>
+<ul>
+<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
+<li><a href="/interview/docs/java/collection/Concurrenthashmap/">Concurrenthashmap</a></li>
+<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/concurrent/">并发</a>
+<ul>
+<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
+<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
+<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
+<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
+<li><a href="/interview/docs/java/concurrent/AQS/">AQS</a></li>
+<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
+<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
+<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<ul>
+<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
+<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/gc/">GC</a>
+<ul>
+<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
+<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/">框架</a>
+<ul>
+<li><a href="/interview/docs/fromwork/netty/">Netty</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
+<ul>
+<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/spring/">Spring</a>
+<ul>
+<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
+<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
+<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/">系统架构</a>
+<ul>
+<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
+<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
+<ul>
+<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/design/">系统设计</a>
+<ul>
+<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/distributed/">分布式</a>
+<ul>
+<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
+<li><a href="/interview/docs/architecture/distributed/session/">分布式Session</a></li>
+<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
+<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
+<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
+<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
+<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
+<li><a href="/interview/docs/architecture/distributed/kafka/">Kafka</a></li>
+<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
+<li><a href="/interview/docs/architecture/distributed/dubbo/">Dubbo</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
+<ul>
+<li><a href="/interview/docs/architecture/bigdata/algo/">基础算法</a></li>
+<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/offer/">剑指offer</a>
+<ul>
+<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
+<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
+<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
+<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
+<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
+<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
+<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
+<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
+<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
+<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
+<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
+<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
+<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
+<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
+<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
+<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
+<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
+<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
+<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
+<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
+<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
+<li><a href="/interview/docs/offer/VerifySquenceOfBST/">二叉搜索树的后序遍历序列</a></li>
+<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
+<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
+<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
+<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
+<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
+<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
+<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
+<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
+<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
+<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
+<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
+<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
+<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
+<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
+<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
+<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
+<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
+<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
+<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
+<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
+<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
+<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
+<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
+<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
+<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
+<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
+<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
+<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
+<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
+<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
+<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
+<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
+<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
+<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
+<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
+<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
+<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
+<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
+<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
+<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
+<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
+<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
+<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
+<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
+<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/leetcode/">LeetCode</a>
+<ul>
+<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
+<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
+<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
+<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
+<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
+<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
+<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
+<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
+<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
+<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
+<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
+<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
+<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
+<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
+<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
+<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
+<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
+<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
+<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
+<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
+<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
+<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
+<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
+<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
+<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
+<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
+<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
+<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
+<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
+<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
+<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
+<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+</nav>
+
+
+<script>
+(function() {
+  var menu = document.querySelector("aside.book-menu nav");
+  addEventListener("beforeunload", function(event) {
+    localStorage.setItem("menu.scrollTop", menu.scrollTop);
+  });
+  menu.scrollTop = localStorage.getItem("menu.scrollTop");
+})();
+</script>
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>Redis</strong>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#线程模型">线程模型</a>
+      <ul>
+        <li><a href="#为啥-redis-单线程模型也能效率这么高">为啥 redis 单线程模型也能效率这么高？</a></li>
+      </ul>
+    </li>
+    <li><a href="#数据结构">数据结构</a></li>
+    <li><a href="#持久化">持久化：</a></li>
+    <li><a href="#一致性哈希算法">一致性哈希算法</a>
+      <ul>
+        <li><a href="#需求">需求</a></li>
+        <li><a href="#实现">实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#实践httpsyikungithubio20160609e4b880e887b4e680a7e59388e5b88ce7ae97e6b395e79a84e79086e8a7a3e4b88ee5ae9ee8b7b5">实践</a>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+    <li><a href="#集群">集群</a>
+      <ul>
+        <li><a href="#哨兵----sentinel">哨兵 &ndash; Sentinel</a></li>
+        <li><a href="#redis-clusterhttpsredisiotopicscluster-tutorial">Redis Cluster</a></li>
+        <li><a href="#redis-sharding-集群">Redis Sharding 集群</a></li>
+      </ul>
+    </li>
+    <li><a href="#string">string</a>
+      <ul>
+        <li><a href="#缓冲区溢出">缓冲区溢出</a></li>
+        <li><a href="#减少修改字符串时带来的内存重分配次数">减少修改字符串时带来的内存重分配次数</a></li>
+        <li><a href="#二进制安全">二进制安全</a></li>
+      </ul>
+    </li>
+    <li><a href="#zset底层实现">zset底层实现</a></li>
+    <li><a href="#bitmap-实现">BitMap 实现</a></li>
+    <li><a href="#缓存穿透缓存击穿缓存雪崩">缓存穿透、缓存击穿、缓存雪崩</a>
+      <ul>
+        <li><a href="#缓存穿透">缓存穿透</a></li>
+        <li><a href="#缓存雪崩">缓存雪崩</a></li>
+        <li><a href="#缓存击穿">缓存击穿</a></li>
+      </ul>
+    </li>
+    <li><a href="#redis分布式锁">Redis分布式锁</a></li>
+    <li><a href="#数据淘汰机制">数据淘汰机制</a>
+      <ul>
+        <li><a href="#对象过期">对象过期</a></li>
+        <li><a href="#内存淘汰">内存淘汰</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+<article class="markdown"><h1 id="redis">Redis</h1>
+<h2 id="线程模型">线程模型</h2>
+<p>Redis 在处理网络请求是使用单线程模型，并通过 IO 多路复用来提高并发。但是在其他模块，比如：持久化，会使用多个线程。</p>
+<p>Redis 内部使用文件事件处理器 <code>file event handler</code>，<strong>这个文件事件处理器是单线程的，所以 <code>redis</code> 才叫做单线程的模型</strong>。它采用 IO 多路复用机制同时监听多个 <code>socket</code> ，将产生事件的 <code>socket</code> 压入内存队列中，事件分派器根据 <code>socket</code> 上的事件类型来选择对应的事件处理器进行处理。</p>
+<p>文件事件处理器的结构包含 4 个部分：</p>
+<ul>
+<li>多个 socket</li>
+<li>IO 多路复用程序</li>
+<li>文件事件分派器</li>
+<li>事件处理器（连接应答处理器、命令请求处理器、命令回复处理器）</li>
+</ul>
+<p>多个 <code>socket</code> 可能会并发产生不同的操作，每个操作对应不同的文件事件，但是 <code>IO</code> 多路复用程序会监听多个 <code>socket</code> ，会将产生事件的 <code>socket</code> 放入队列中排队，事件分派器每次从队列中取出一个 <code>socket</code> ，根据 <code>socket</code> 的事件类型交给对应的事件处理器进行处理。</p>
+<p>客户端与 redis 的一次通信过程：</p>
+<p><img src="images/f0dacdd3779b836ad75fe6b886af1fff.png" alt="image"></p>
+<h3 id="为啥-redis-单线程模型也能效率这么高">为啥 redis 单线程模型也能效率这么高？</h3>
+<ul>
+<li>纯内存操作</li>
+<li>核心是基于非阻塞的 IO 多路复用机制</li>
+<li>单线程反而避免了多线程的频繁上下文切换问题</li>
+</ul>
+<h2 id="数据结构">数据结构</h2>
+<p>Redis的外围由一个键、值映射的字典构成。与其他非关系型数据库主要不同在于：Redis中值的类型不仅限于 <strong>字符串</strong>，还支持如下抽象数据类型：</p>
+<ul>
+<li><strong>List</strong>：字符串列表</li>
+<li><strong>Set</strong>：无序不重复的字符串集合</li>
+<li><strong>Soret Set</strong>：有序不重复的字符串集合</li>
+<li><strong>HashTable</strong>：键、值都为字符串的哈希表</li>
+</ul>
+<p>值的类型决定了值本身支持的操作。Redis支持不同无序、有序的列表，无序、有序的集合间的交集、并集等高级服务器端原子操作。</p>
+<h2 id="持久化">持久化：</h2>
+<ul>
+<li>使用快照，一种半持久耐用模式。不时的将数据集以异步方式从内存以RDB格式写入硬盘。</li>
+<li>1.1版本开始使用更安全的 <code>AOF</code> 格式替代，一种只能追加的日志类型。将数据集修改操作记录起来。Redis 能够在后台对只可追加的记录作修改来避免无限增长的日志。</li>
+</ul>
+<pre><code>  1. aof文件比rdb更新频率高，优先使用aof还原数据。
+  2. aof比rdb更安全也更大
+  3. rdb性能比aof好
+  4. 如果两个都配了优先加载AOF
+</code></pre><h2 id="一致性哈希算法">一致性哈希算法</h2>
+<p>一致哈希 是一种特殊的哈希算法。在使用一致哈希算法后，哈希表槽位数（大小）的改变平均只需要对 <code>K/n</code> 个关键字重新映射，其中 <code>K</code> 是关键字的数量，<code>n</code> 是槽位数量。然而在传统的哈希表中，添加或删除一个槽位的几乎需要对所有关键字进行重新映射。</p>
+<blockquote>
+<p>一致哈希也可用于实现健壮缓存来减少大型 Web 应用中系统部分失效带来的负面影响</p>
+</blockquote>
+<h3 id="需求">需求</h3>
+<p>在使用 <code>n</code> 台缓存服务器时，一种常用的负载均衡方式是，对资源 <code>o</code> 的请求使用 <code>hash(o)= o mod n</code> 来映射到某一台缓存服务器。当增加或减少一台缓存服务器时这种方式可能会改变所有资源对应的 <code>hash</code> 值，也就是所有的缓存都失效了，这会使得缓存服务器大量集中地向原始内容服务器更新缓存。</p>
+<p>因此需要一致哈希算法来避免这样的问题。 一致哈希尽可能使同一个资源映射到同一台缓存服务器。这种方式要求增加一台缓存服务器时，新的服务器尽量分担存储其他所有服务器的缓存资源。减少一台缓存服务器时，其他所有服务器也可以尽量分担存储它的缓存资源。</p>
+<p>一致哈希算法的主要思想是将每个缓存服务器与一个或多个哈希值域区间关联起来，其中区间边界通过计算缓存服务器对应的哈希值来决定。如果一个缓存服务器被移除，则它所对应的区间会被并入到邻近的区间，其他的缓存服务器不需要任何改变。</p>
+<h3 id="实现">实现</h3>
+<p>一致哈希将每个对象映射到圆环边上的一个点，系统再将可用的节点机器映射到圆环的不同位置。查找某个对象对应的机器时，需要用一致哈希算法计算得到对象对应圆环边上位置，沿着圆环边上查找直到遇到某个节点机器，这台机器即为对象应该保存的位置。</p>
+<p>当删除一台节点机器时，这台机器上保存的所有对象都要移动到下一台机器。添加一台机器到圆环边上某个点时，这个点的下一台机器需要将这个节点前对应的对象移动到新机器上。更改对象在节点机器上的分布可以通过调整节点机器的位置来实现。</p>
+<h2 id="实践httpsyikungithubio20160609e4b880e887b4e680a7e59388e5b88ce7ae97e6b395e79a84e79086e8a7a3e4b88ee5ae9ee8b7b5"><a href="https://yikun.github.io/2016/06/09/%E4%B8%80%E8%87%B4%E6%80%A7%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95%E7%9A%84%E7%90%86%E8%A7%A3%E4%B8%8E%E5%AE%9E%E8%B7%B5/">实践</a></h2>
+<blockquote>
+<p>假设有1000w个数据项，100个存储节点，请设计一种算法合理地将他们存储在这些节点上。</p>
+</blockquote>
+<p>看一看普通Hash算法的原理：</p>
+<p><img src="images/1c5e07626a9cadd5f1ea8acd85838067.png" alt=""></p>
+<pre><code>for item in range(ITEMS):
+    k = md5(str(item)).digest()
+    h = unpack_from(&quot;&gt;I&quot;, k)[0]
+    # 通过取余的方式进行映射
+    n = h % NODES
+    node_stat[n] += 1
+</code></pre><p>普通的Hash算法均匀地将这些数据项打散到了这些节点上，并且分布最少和最多的存储节点数据项数目小于 <code>1%</code>。之所以分布均匀，主要是依赖 Hash 算法（实现使用的MD5算法）能够比较随机的分布。</p>
+<p>然而，我们看看存在一个问题，由于 <strong>该算法使用节点数取余的方法，强依赖 <code>node</code> 的数目</strong>，因此，当是 <code>node</code> 数发生变化的时候，<code>item</code> 所对应的 <code>node</code> 发生剧烈变化，而发生变化的成本就是我们需要在 <code>node</code> 数发生变化的时候，数据需要迁移，这对存储产品来说显然是不能忍的。</p>
+<h4 id="一致性哈希">一致性哈希</h4>
+<p>普通 <code>Hash</code> 算法的劣势，即当 <code>node</code> 数发生变化（增加、移除）后，数据项会被重新“打散”，导致大部分数据项不能落到原来的节点上，从而导致大量数据需要迁移。</p>
+<p>那么，一个亟待解决的问题就变成了：当 <code>node</code> 数发生变化时，如何保证尽量少引起迁移呢？即当增加或者删除节点时，对于大多数 item ，保证原来分配到的某个 node ，现在仍然应该分配到那个 node ，将数据迁移量的降到最低。</p>
+<p><img src="images/3de376ea57386b890483b27cf131f24d.png" alt=""></p>
+<pre><code>for n in range(NODES):
+    h = _hash(n)
+    ring.append(h)
+    ring.sort()
+    hash2node[h] = n
+for item in range(ITEMS):
+    h = _hash(item)
+    n = bisect_left(ring, h) % NODES
+    node_stat[hash2node[ring[n]]] += 1
+</code></pre><p><strong>虽然一致性Hash算法解决了节点变化导致的数据迁移问题，但是，数据项分布的均匀性很差</strong>。</p>
+<p><img src="images/5e6b9afd23ff44415b434d05ed0449ce.png" alt=""></p>
+<p>主要是因为这 100 个节点 Hash 后，在环上分布不均匀，导致了每个节点实际占据环上的区间大小不一造成的。</p>
+<h4 id="改进----虚节点">改进 &ndash; 虚节点</h4>
+<p>当我们将 node 进行哈希后，这些值并没有均匀地落在环上，因此，最终会导致，这些节点所管辖的范围并不均匀，最终导致了数据分布的不均匀。</p>
+<p><img src="images/c807b7a0af060a874fdb27abf5caf289.png" alt=""></p>
+<pre><code>for n in range(NODES):
+    for v in range(VNODES):
+        h = _hash(str(n) + str(v))
+        # 构造ring
+        ring.append(h)
+        # 记录hash所对应节点
+        hash2node[h] = n
+ring.sort()
+for item in range(ITEMS):
+    h = _hash(str(item))
+    # 搜索ring上最近的hash
+    n = bisect_left(ring, h) % (NODES*VNODES)
+    node_stat[hash2node[ring[n]]] += 1
+</code></pre><p>通过增加虚节点的方法，使得每个节点在环上所“管辖”更加均匀。这样就既保证了在节点变化时，尽可能小的影响数据分布的变化，而同时又保证了数据分布的均匀。也就是靠增加“节点数量”加强管辖区间的均匀。</p>
+<h2 id="集群">集群</h2>
+<h3 id="哨兵----sentinel">哨兵 &ndash; Sentinel</h3>
+<p><code>Redis-Sentinel</code> 是 Redis 官方推荐的 <strong>高可用性( <code>HA</code> )解决方案</strong>，当用 Redis 做 <code>Master-slave</code> 的高可用方案时，假如 <code>master</code> 宕机了， Redis 本身(包括它的很多客户端)都没有实现自动进行主备切换，而 <code>Redis-sentinel</code> 本身也是一个独立运行的进程，它能监控多个 <code>master-slave</code> 集群，发现 <code>master</code> 宕机后能进行自懂切换。</p>
+<p>它的主要功能有以下几点</p>
+<ul>
+<li>不时地监控 redis 是否按照预期良好地运行;</li>
+<li>如果发现某个 redis 节点运行出现状况，能够通知另外一个进程(例如它的客户端);</li>
+<li>能够进行自动切换。当一个 master 节点不可用时，能够选举出 master 的多个slave (如果有超过一个 slave 的话)中的一个来作为新的 master ,其它的 slave 节点会将它所追随的 master 的地址改为被提升为 master 的 slave 的新地址。</li>
+</ul>
+<p>很显然，<strong>只使用单个 sentinel 进程来监控 redis 集群是不可靠的</strong>，当 sentinel 进程宕掉后( sentinel 本身也有单点问题，single-point-of-failure)整个集群系统将无法按照预期的方式运行。所以有必要将sentinel集群，这样有几个好处：</p>
+<ul>
+<li>即使有一些sentinel进程宕掉了，依然可以进行redis集群的主备切换；</li>
+<li>如果只有一个sentinel进程，如果这个进程运行出错，或者是网络堵塞，那么将无法实现redis集群的主备切换;</li>
+<li>如果有多个sentinel，redis的客户端可以随意地连接任意一个sentinel来获得关于redis集群中的信息。</li>
+</ul>
+<h3 id="redis-clusterhttpsredisiotopicscluster-tutorial"><a href="https://redis.io/topics/cluster-tutorial">Redis Cluster</a></h3>
+<p>Redis Cluster 是一种服务器 <code>Sharding</code> 技术，3.0版本开始正式提供。</p>
+<p>Redis Cluster中，Sharding 采用 <em>slot(槽)</em> 的概念，一共分成 <code>16384</code> 个槽，这有点儿类 <code>pre sharding</code> 思路。对于每个进入 Redis 的键值对，根据 key 进行散列，分配到这 <code>16384</code> 个 slot 中的某一个中。使用的hash算法也比较简单，就是 <code>CRC16</code> 后 <code>16384</code> 取模。要保证 <code>16384</code> 个槽对应的 node 都正常工作，<strong>如果某个 node 发生故障，那它负责的 slots 也就失效，整个集群将不能工作</strong>。</p>
+<blockquote>
+<p>16384 = 2048 * 8 bit，2k 大小的 bit 数</p>
+</blockquote>
+<p>为了增加集群的可访问性，官方推荐的方案是将 node 配置成 <strong>主从结构</strong>，即一个 master 主节点，挂 <code>n</code> 个 slave 从节点。这时，如果主节点失效，Redis Cluster 会根据选举算法从 slave 节点中选择一个上升为主节点，整个集群继续对外提供服务。</p>
+<p>对客户端来说，<strong>整个 cluster 被看做是一个整体</strong>，客户端可以连接任意一个 node 进行操作，就像操作单一 Redis 实例一样，当客户端操作的 key 没有分配到该 node 上时，Redis 会返回<strong>转向指令</strong>，指向正确的 node ，这有点儿像浏览器页面的 <code>302  redirect</code> 跳转。</p>
+<h3 id="redis-sharding-集群">Redis Sharding 集群</h3>
+<p>Redis Sharding 是客户端 Sharding 的方案，其主要思想是采用哈希算法 <strong>将 Redis 数据的 key 进行散列</strong>，通过 hash 函数，特定的 key 会映射到特定的 Redis 节点上。这样，客户端就知道该向哪个 Redis 节点操作数据。</p>
+<p>Jedis 的 Redis Sharding 实现具有如下特点：</p>
+<ul>
+<li><strong>采用一致性哈希算法(consistent hashing)</strong>，将key和节点name同时hashing，然后进行映射匹配，采用的算法是MURMUR_HASH。采用一致性哈希而不是采用简单类似哈希求模映射的主要原因是当增加或减少节点时，不会产生由于重新匹配造成的rehashing。一致性哈希只影响相邻节点key分配，影响量小。</li>
+<li>为了避免一致性哈希只影响相邻节点造成节点分配压力， <code>ShardedJedis</code> 会对每个Redis 节点根据名字(没有，Jedis会赋予缺省名字)会 <strong>虚拟化出160个虚拟节点</strong> 进行散列。根据权重 <code>weight</code> ，也可虚拟化出160倍数的虚拟节点。用虚拟节点做映射匹配，可以在增加或减少 <code>Redis</code> 节点时，key 在各 <code>Redis</code> 节点移动再分配更均匀，而不是只有相邻节点受影响。</li>
+<li><strong>ShardedJedis 支持 keyTagPattern 模式</strong>，即抽取 key 的一部分 <code>keyTag</code> 做 <code>sharding</code> ，这样通过合理命名 key ，可以将一组相关联的key放入同一个 Redis 节点，这在避免跨节点访问相关数据时很重要。</li>
+</ul>
+<h2 id="string">string</h2>
+<p>Redis 没有直接使用 C 语言传统的字符串表示（以空字符结尾的字符数组，以下简称 C 字符串）， 而是自己构建了一种名为简单动态字符串（simple dynamic string，SDS）的抽象类型， 并将 SDS 用作 Redis 的默认字符串表示。</p>
+<p>在 Redis 里面， C 字符串只会作为字符串字面量（string literal）， 用在一些无须对字符串值进行修改的地方， 比如打印日志。</p>
+<p>当 Redis 需要的不仅仅是一个字符串字面量， 而是一个可以被修改的字符串值时， Redis 就会使用 SDS 来表示字符串值： 比如在 Redis 的数据库里面， 包含字符串值的键值对在底层都是由 SDS 实现的。</p>
+<table>
+<thead>
+<tr>
+<th align="left">C字符串</th>
+<th align="left">SDS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">获取字符串长度的复杂度为 O(N) 。</td>
+<td align="left">获取字符串长度的复杂度为 O(1) 。</td>
+</tr>
+<tr>
+<td align="left">API 是不安全的，可能会造成缓冲区溢出。</td>
+<td align="left">API 是安全的，不会造成缓冲区溢出。</td>
+</tr>
+<tr>
+<td align="left">修改字符串长度 N 次必然需要执行 N 次内存重分配。</td>
+<td align="left">修改字符串长度 N 次最多需要执行 N 次内存重分配。</td>
+</tr>
+<tr>
+<td align="left">只能保存文本数据。</td>
+<td align="left">可以保存文本或者二进制数据。</td>
+</tr>
+<tr>
+<td align="left">可以使用所有 &lt;string.h&gt; 库中的函数。</td>
+<td align="left">可以使用一部分 &lt;string.h&gt; 库中的函数。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="缓冲区溢出">缓冲区溢出</h3>
+<p>因为 C 字符串不记录自身的长度， 所以 <code>strcat</code> 假定用户在执行这个函数时， 已经为 <code>dest</code> 分配了足够多的内存， 可以容纳 <code>src</code> 字符串中的所有内容， 而一旦这个假定不成立时， 就会产生缓冲区溢出。</p>
+<p>举个例子， 假设程序里有两个在内存中紧邻着的 C 字符串 <code>s1</code> 和 <code>s2</code> ， 其中 s1 保存了字符串 <code>&quot;Redis&quot;</code> ， 而 s2 则保存了字符串 <code>&quot;MongoDB&quot;</code> ， 如图所示。</p>
+<p><img src="images/a9832e14ba184a4049f979e521ef050b.png" alt=""></p>
+<p>如果一个程序员决定通过执行：</p>
+<pre><code>strcat(s1, &quot; Cluster&quot;);
+</code></pre><p>将 <code>s1</code> 的内容修改为 <code>&quot;Redis Cluster&quot;</code> ， 但粗心的他却忘了在执行 <code>strcat</code> 之前为 <code>s1</code> 分配足够的空间， 那么在 <code>strcat</code> 函数执行之后， <code>s1</code> 的数据将溢出到 <code>s2</code> 所在的空间中， 导致 <code>s2</code> 保存的内容被意外地修改， 如图所示。</p>
+<p><img src="images/cc9ac0419ae3f5059076c2d66f867931.png" alt=""></p>
+<p>与 <code>C</code> 字符串不同， <code>SDS</code> 的空间分配策略完全杜绝了发生缓冲区溢出的可能性： <strong>当 SDS API 需要对 SDS 进行修改时， API 会先检查 SDS 的空间是否满足修改所需的要求</strong>， 如果不满足的话， API 会自动将 <code>SDS</code> 的空间扩展至执行修改所需的大小， 然后才执行实际的修改操作， 所以使用 <code>SDS</code> 既不需要手动修改 <code>SDS</code> 的空间大小， 也不会出现前面所说的缓冲区溢出问题。</p>
+<h3 id="减少修改字符串时带来的内存重分配次数">减少修改字符串时带来的内存重分配次数</h3>
+<ul>
+<li>空间预分配：解决 append 问题</li>
+<li>惰性空间释放：解决 strim 问题</li>
+</ul>
+<h3 id="二进制安全">二进制安全</h3>
+<p>C 字符串中的字符必须符合某种编码（比如 <code>ASCII</code>）， 并且 <strong>除了字符串的末尾之外， 字符串里面不能包含空字符</strong>， 否则最先被程序读入的空字符将被误认为是字符串结尾 —— 这些限制使得 C 字符串只能保存文本数据， 而不能保存像图片、音频、视频、压缩文件这样的二进制数据。</p>
+<h2 id="zset底层实现">zset底层实现</h2>
+<p>跳跃表（skiplist）是一种有序数据结构， 它通过在每个节点中维持多个指向其他节点的指针， 从而达到快速访问节点的目的。</p>
+<p><code>Redis</code> 使用跳跃表作为有序集合键的底层实现之一：</p>
+<ul>
+<li>如果一个有序集合包含的元素数量比较多，</li>
+<li>有序集合中元素的成员（<code>member</code>）是比较长的字符串时</li>
+</ul>
+<p>Redis 就会使用跳跃表来作为有序集合键的底层实现。</p>
+<p>和链表、字典等数据结构被广泛地应用在 Redis 内部不同， <strong>Redis 只在两个地方用到了跳跃表， 一个是实现有序集合键， 另一个是在集群节点中用作内部数据结构</strong>， 除此之外， 跳跃表在 Redis 里面没有其他用途。</p>
+<h2 id="bitmap-实现">BitMap 实现</h2>
+<p>Bitmaps 并不是实际的数据类型，而是定义在 String 类型上的一个面向字节操作的集合。因为字符串是二进制安全的，最大长度是 512M ，所以最长拥有 $2^32$ 个不同字节。</p>
+<p>Redis 提供以下 BitMap 操作接口：<code>setBit</code>、<code>getBit</code>、<code>bitCount</code>、<code>bitop</code>、<code>bitpos</code>。其中 <code>setBit</code>、<code>getBit</code>都是 $O(1)$ 复杂度的操作。</p>
+<p>优势：</p>
+<ol>
+<li>基于最小的单位bit进行存储，所以非常省空间。</li>
+<li>设置时候时间复杂度O(1)、读取时候时间复杂度O(n)，操作是非常快的。</li>
+<li>二进制数据的存储，进行相关计算的时候非常快。</li>
+<li>方便扩容</li>
+</ol>
+<p>限制：redis中bit映射被限制在512MB之内，所以最大是 $2^32$ 位。</p>
+<h2 id="缓存穿透缓存击穿缓存雪崩">缓存穿透、缓存击穿、缓存雪崩</h2>
+<h3 id="缓存穿透">缓存穿透</h3>
+<p>访问一个不存在的key，缓存不起作用，请求会穿透到 DB，流量大时 DB 会挂掉。</p>
+<h4 id="解决方案">解决方案</h4>
+<ul>
+<li>
+<p>采用布隆过滤器，使用一个足够大的<code>bitmap</code>，用于存储可能访问的 <code>key</code>，不存在的key直接被过滤；</p>
+</li>
+<li>
+<p>访问key未在DB查询到值，也将空值写进缓存，但可以设置较短过期时间。</p>
+</li>
+</ul>
+<h3 id="缓存雪崩">缓存雪崩</h3>
+<p>大量的 key 设置了相同的过期时间，导致在缓存在同一时刻全部失效，造成瞬时DB请求量大、压力骤增，引起雪崩。</p>
+<h4 id="解决方案-1">解决方案</h4>
+<p>可以给缓存设置过期时间时加上一个随机值时间，使得每个 key 的过期时间分布开来，不会集中在同一时刻失效。</p>
+<h3 id="缓存击穿">缓存击穿</h3>
+<p>对于一些设置了过期时间的key，如果这些key可能会在某些时间点被超高并发地访问，是一种非常“热点”的数据。这个时候，需要考虑一个问题：缓存被“击穿”的问题，这个和缓存雪崩的区别在于这里针对某一 key 缓存，前者则是很多key。</p>
+<p>缓存在某个时间点过期的时候，恰好在这个时间点对这个Key有大量的并发请求过来，这些请求发现缓存过期一般都会从后端DB加载数据并回设到缓存，这个时候大并发的请求可能会瞬间把后端 DB 压垮。</p>
+<h4 id="解决方案-2">解决方案</h4>
+<p>在缓存失效的时候（判断拿出来的值为空），不是立即去 <code>load db</code> ，而是先使用缓存工具的某些带成功操作返回值的操作（比如Redis的 <code>SETNX</code>）去 <code>set</code> 一个 <code>mutex key</code> ，当操作返回成功时，再进行 <code>load db</code> 的操作并回设缓存；否则，就重试整个 <code>get</code> 缓存的方法。</p>
+<h2 id="redis分布式锁">Redis分布式锁</h2>
+<ul>
+<li>加锁：<code>redis.set(String key, String value, String nxxx, String expx, int time)</code></li>
+<li>解锁：通过 Lua 脚本执行 <code>if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end</code></li>
+</ul>
+<h2 id="数据淘汰机制">数据淘汰机制</h2>
+<h3 id="对象过期">对象过期</h3>
+<p>Redis回收过期对象的策略：定期删除+惰性删除</p>
+<ul>
+<li><strong>惰性删除</strong>：当读/写一个已经过期的key时，会触发惰性删除策略，直接删除掉这个过期key</li>
+<li><strong>定期删除</strong>：由于惰性删除策略无法保证冷数据被及时删掉，所以Redis会定期主动淘汰一批已过期的key</li>
+</ul>
+<h3 id="内存淘汰">内存淘汰</h3>
+<p>Redis提供了下面几种淘汰策略供用户选择，其中默认的策略为noeviction策略：</p>
+<ul>
+<li><code>noeviction</code>：当内存使用达到阈值的时候，所有引起申请内存的命令会报错。</li>
+<li><code>allkeys-lru</code>：在主键空间中，优先移除最近未使用的key。</li>
+<li><code>volatile-lru</code>：在设置了过期时间的键空间中，优先移除最近未使用的key。</li>
+<li><code>allkeys-random</code>：在主键空间中，随机移除某个key。</li>
+<li><code>volatile-random</code>：在设置了过期时间的键空间中，随机移除某个key。</li>
+<li><code>volatile-ttl</code>：在设置了过期时间的键空间中，具有更早过期时间的key优先移除。</li>
+</ul>
+<blockquote>
+<p>这里补充一下主键空间和设置了过期时间的键空间，举个例子，假设我们有一批键存储在Redis中，则有那么一个哈希表用于存储这批键及其值，如果这批键中有一部分设置了过期时间，那么这批键还会被存储到另外一个哈希表中，这个哈希表中的值对应的是键被设置的过期时间。设置了过期时间的键空间为主键空间的子集。</p>
+</blockquote>
+<h4 id="非精准的lru">非精准的LRU</h4>
+<p>上面提到的LRU（Least Recently Used）策略，实际上 <strong>Redis 实现的 LRU 并不是可靠的 LRU</strong>，也就是名义上我们使用LRU算法淘汰键，但是实际上被淘汰的键并不一定是真正的最久没用的，这里涉及到一个权衡的问题，如果需要在全部键空间内搜索最优解，则必然会增加系统的开销，Redis是单线程的，也就是同一个实例在每一个时刻只能服务于一个客户端，所以耗时的操作一定要谨慎。</p>
+<p>为了在一定成本内实现相对的LRU，早期的 Redis 版本是 <strong>基于采样的 LRU</strong> ，也就是放弃全部键空间内搜索解改为采样空间搜索最优解。自从 Redis3.0 版本之后，Redis 作者对于基于采样的 LRU 进行了一些优化，目的是在一定的成本内让结果更靠近真实的 LRU。</p>
+</article>
+ 
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/basic/database/redis/index.md" target="_blank" rel="noopener">
+      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
+      
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#线程模型">线程模型</a>
+      <ul>
+        <li><a href="#为啥-redis-单线程模型也能效率这么高">为啥 redis 单线程模型也能效率这么高？</a></li>
+      </ul>
+    </li>
+    <li><a href="#数据结构">数据结构</a></li>
+    <li><a href="#持久化">持久化：</a></li>
+    <li><a href="#一致性哈希算法">一致性哈希算法</a>
+      <ul>
+        <li><a href="#需求">需求</a></li>
+        <li><a href="#实现">实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#实践httpsyikungithubio20160609e4b880e887b4e680a7e59388e5b88ce7ae97e6b395e79a84e79086e8a7a3e4b88ee5ae9ee8b7b5">实践</a>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+    <li><a href="#集群">集群</a>
+      <ul>
+        <li><a href="#哨兵----sentinel">哨兵 &ndash; Sentinel</a></li>
+        <li><a href="#redis-clusterhttpsredisiotopicscluster-tutorial">Redis Cluster</a></li>
+        <li><a href="#redis-sharding-集群">Redis Sharding 集群</a></li>
+      </ul>
+    </li>
+    <li><a href="#string">string</a>
+      <ul>
+        <li><a href="#缓冲区溢出">缓冲区溢出</a></li>
+        <li><a href="#减少修改字符串时带来的内存重分配次数">减少修改字符串时带来的内存重分配次数</a></li>
+        <li><a href="#二进制安全">二进制安全</a></li>
+      </ul>
+    </li>
+    <li><a href="#zset底层实现">zset底层实现</a></li>
+    <li><a href="#bitmap-实现">BitMap 实现</a></li>
+    <li><a href="#缓存穿透缓存击穿缓存雪崩">缓存穿透、缓存击穿、缓存雪崩</a>
+      <ul>
+        <li><a href="#缓存穿透">缓存穿透</a></li>
+        <li><a href="#缓存雪崩">缓存雪崩</a></li>
+        <li><a href="#缓存击穿">缓存击穿</a></li>
+      </ul>
+    </li>
+    <li><a href="#redis分布式锁">Redis分布式锁</a></li>
+    <li><a href="#数据淘汰机制">数据淘汰机制</a>
+      <ul>
+        <li><a href="#对象过期">对象过期</a></li>
+        <li><a href="#内存淘汰">内存淘汰</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
