@@ -3,13 +3,14 @@ language: go
 go:
 - 1.x
 
-sudo: required
-dist: bionic
+branches:
+  only:
+  - master
 
 notifications:
   email:
     recipients:
-      - shihaoyang129@gmail.com # 设置通知邮件
+      - $EMAIL # 设置通知邮件
     on_success: change
     on_failure: always
 
@@ -18,28 +19,22 @@ before_install:
   - sudo dpkg -i hugo_extended_0.62.2_Linux-64bit.deb
 
 before_script:
-  - hugo new site interview_book
-  - cp -r content interview_book/
-  - cp config.yaml interview_book/
-  - cd interview_book/
-  - rm config.toml
   - git submodule add -f https://github.com/alex-shpak/hugo-book themes/hugo-book
 
 
 script:
   - hugo
 
-after_script:
-  - cd public
-  - git init
-  - git remote add origin https://$REF
-  - git add .
-  - git commit -m "Updated By Travis-CI With Build $TRAVIS_BUILD_NUMBER For Github Pages"
-  - git push --force --quiet "https://$TOKEN@$REF" master:gh-pages
-
-branches:
-  only:
-    - master
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $TOKEN  # Set in travis-ci.org dashboard, marked secure
+  verbose: true
+  keep-history: true
+  local-dir: public
+  target_branch: gh-pages  # branch contains blog content
+  on:
+    branch: master
 
 env:
   global:
