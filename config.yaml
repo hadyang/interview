@@ -7,6 +7,8 @@ theme: hugo-book
 disablePathToLower: true
 enableGitInfo: true
 
+googleAnalytics: UA-157595781-1
+
 # Code highlight
 # pygmentsStyle: monokailight
 pygmentsCodeFences: true
