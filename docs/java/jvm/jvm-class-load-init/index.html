@@ -23,7 +23,7 @@ Java虚拟机必须确保初始化过程被正确地同步。 如果多个线程
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/java/jvm/jvm-class-load-init/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-01-09T10:37:21+08:00" />
+<meta property="article:modified_time" content="2020-02-04T11:06:01+08:00" />
 <title>JVM 类加载 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -31,7 +31,7 @@ Java虚拟机必须确保初始化过程被正确地同步。 如果多个线程
 <link rel="stylesheet" href="/interview/book.min.68d45956421753cdf6bcfc865ede445c56afc5bcaaebfe02961f44fe77d8f45a.css" integrity="sha256-aNRZVkIXU832vPyGXt5EXFavxbyq6/4Clh9E/nfY9Fo=">
 
 
-<script defer src="/interview/en.search.min.4a44e4fc3cc862db20d80ddb87c8a0a76de1767929ed93d3103d784771c8a8ba.js" integrity="sha256-SkTk/DzIYtsg2A3bh8igp23hdnkp7ZPTED14R3HIqLo="></script>
+<script defer src="/interview/en.search.min.0c763d6740c757ff1b8663318cd51dc40febd6d8e6f309a1320955ec2af87dc3.js" integrity="sha256-DHY9Z0DHV/8bhmMxjNUdxA/r1tjm8wmhMglV7Cr4fcM="></script>
 
 <!--
 Made with Book Theme
@@ -426,7 +426,7 @@ https://github.com/alex-shpak/hugo-book
 <blockquote>
 <p>这个特性可以用来写单例模式。</p>
 </blockquote>
-<h3 id="cinit-方法">CInit 方法</h3>
+<h3 id="clinit-方法">Clinit 方法</h3>
 <ul>
 <li>对于静态变量和静态初始化语句来说：执行的顺序和它们在类或接口中出现的顺序有关。</li>
 <li><strong>并非所有的类都需要在它们的<code>class</code>文件中拥有<code>&lt;clinit&gt;()</code>方法，</strong> 如果类没有声明任何类变量，也没有静态初始化语句，那么它就不会有<code>&lt;clinit&gt;()</code>方法。如果类声明了类变量，但没有明确的使用类变量初始化语句或者静态代码块来初始化它们，也不会有<code>&lt;clinit&gt;()</code>方法。如果类仅包含静态<code>final</code>常量的类变量初始化语句，而且这些类变量初始化语句采用编译时常量表达式，类也不会有<code>&lt;clinit&gt;()</code>方法。<strong>只有那些需要执行Java代码来赋值的类才会有<code>&lt;clinit&gt;()</code></strong></li>
@@ -444,9 +444,9 @@ https://github.com/alex-shpak/hugo-book
   
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/b27a988bdcb211d0e1403948f2e82bc0e1bf31b2" title='Last modified by haoyang.shi | 2020-01-09' target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/977c9f15a2d7d6fca13b6d64e607f8d2f81971bb" title='Last modified by 靳阳 | 2020-02-04' target="_blank">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-01-09</span>
+      <span>2020-02-04</span>
     </a>
   </div>
   
@@ -480,7 +480,7 @@ https://github.com/alex-shpak/hugo-book
     <li><a href="#初始化">初始化</a>
       <ul>
         <li></li>
-        <li><a href="#cinit-方法">CInit 方法</a></li>
+        <li><a href="#clinit-方法">Clinit 方法</a></li>
       </ul>
     </li>
     <li><a href="#主动使用和被动使用">主动使用和被动使用</a></li>
