@@ -14,7 +14,7 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/algo/tree/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2019-09-28T09:50:48+08:00" />
+<meta property="article:modified_time" content="2020-02-07T14:24:19+08:00" />
 <title>树 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -22,7 +22,7 @@
 <link rel="stylesheet" href="/interview/book.min.68d45956421753cdf6bcfc865ede445c56afc5bcaaebfe02961f44fe77d8f45a.css" integrity="sha256-aNRZVkIXU832vPyGXt5EXFavxbyq6/4Clh9E/nfY9Fo=">
 
 
-<script defer src="/interview/en.search.min.0c763d6740c757ff1b8663318cd51dc40febd6d8e6f309a1320955ec2af87dc3.js" integrity="sha256-DHY9Z0DHV/8bhmMxjNUdxA/r1tjm8wmhMglV7Cr4fcM="></script>
+<script defer src="/interview/en.search.min.65cab4ba3e9facc6bed1810087ab9ac092c1e57b178db14c68a190592f4f9065.js" integrity="sha256-Zcq0uj6frMa&#43;0YEAh6uawJLB5XsXjbFMaKGQWS9PkGU="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -534,9 +534,9 @@ https://github.com/alex-shpak/hugo-book
 <p><img src="images/b+.png" alt=""></p>
 <p>B+树是B-树的变体，也是一种多路搜索树：</p>
 <ol>
-<li>每个分支节点最多m个子树</li>
+<li>每个分支节点 <strong>最多m个子树</strong></li>
 <li>根节点没有子树或至少两个子树</li>
-<li>除根节点外，其他每个分支节点至少[m/2]个子树</li>
+<li>除根节点外，其他 <strong>每个分支节点至少[m/2]个子树</strong></li>
 <li>有n个子树的节点有n个关键字</li>
 <li>所有叶子节点包含全部关键字及指向相应记录的指针，而且叶子节点按关键字大小顺序链接(可以把每个叶子及诶单看成一个基本索引块，它的指针不再指向另一级索引块，而是直接指向数据文件中的记录)</li>
 <li>所有分支节点中仅仅包含它的哥哥子节点(即下级索引块)中最大关键字及指向子节点的指针。</li>
@@ -567,8 +567,11 @@ https://github.com/alex-shpak/hugo-book
 <li>首先，查找要删除的值。接着从包含它的节点中删除这个值。</li>
 <li>如果没有节点处于违规状态则处理结束。</li>
 <li>如果节点处于违规状态则有两种可能情况：
-- 它的兄弟节点，就是同一个父节点的子节点，可以把一个或多个它的子节点转移到当前节点，而把它返回为合法状态。如果是这样，在更改父节点和两个兄弟节点的分离值之后处理结束。
-- 它的兄弟节点由于处在低边界上而没有额外的子节点。在这种情况下把两个兄弟节点合并到一个单一的节点中，而且我们递归到父节点上，因为它被删除了一个子节点。持续这个处理直到当前节点是合法状态或者到达根节点，在其上根节点的子节点被合并而且合并后的节点成为新的根节点。</li>
+<ul>
+<li>它的兄弟节点，可以把一个或多个它的子节点转移到当前节点，而把它返回为合法状态。如果是这样，在更改父节点和两个兄弟节点的分离值之后处理结束。</li>
+<li>它的兄弟节点由于处在低边界上而没有额外的子节点。在这种情况下把两个兄弟节点合并到一个单一的节点中，而且我们递归到父节点上，因为它被删除了一个子节点。持续这个处理直到当前节点是合法状态或者到达根节点，在其上根节点的子节点被合并而且合并后的节点成为新的根节点。</li>
+</ul>
+</li>
 </ol>
 <blockquote>
 <p>B-树和B+树 主要用于外部查找，即数据在外存中。</p>
@@ -600,9 +603,9 @@ https://github.com/alex-shpak/hugo-book
   
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/4aa999772f091bbec6654909c2d32614aede803b" title='Last modified by haoyang.shi | 2019-09-28' target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/d38df7bca097258a1d31d4b8ab3398c446935806" title='Last modified by haoyang.shi | 2020-02-07' target="_blank">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2019-09-28</span>
+      <span>2020-02-07</span>
     </a>
   </div>
   
