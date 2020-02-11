@@ -5,7 +5,11 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="磁盘与文件"><meta property="og:title" content="磁盘与文件" />
-<meta property="og:description" content="磁盘与文件 磁盘调度 磁盘访问延迟 = 队列时间 &#43; 控制器时间 &#43; 寻道时间 &#43; 旋转时间 &#43; 传输时间
+<meta property="og:description" content="磁盘与文件 磁盘 磁盘是可以持久存储的设备，根据存储介质的不同，常见磁盘可以分为两类：机械磁盘和固态磁盘
+机械磁盘，也称为硬盘驱动器，通常缩写为HDD。机械磁盘主要有盘片和读写磁头组成，数据就存储在盘片的环状磁道中。在读写数据前，需要移动读写磁头，定位到数据所在的磁道，然后才能访问数据。最小读写单位是 扇区 ，一般大小为512字节。
+固态磁盘，通常缩写为SSD，有固态电子元器件组成。固态磁盘不需要磁道寻址，所以，不管是连续I/O还是随机I/O的性能，都比机械磁盘要好得多。
+连续 I/O 还可以通过预读的方式，来减少I/O请求的次数，这也是其性能优异的一个原因。很多性能优化的方案，也都会从这个角度出发，来优化I/O性能。最小读写单位是 页，通常大小是 4KB ，8KB 等。
+磁盘调度 磁盘访问延迟 = 队列时间 &#43; 控制器时间 &#43; 寻道时间 &#43; 旋转时间 &#43; 传输时间
 磁盘调度的目的是减小延迟，其中前两项可以忽略，寻道时间是主要矛盾。
 磁盘调度算法   FCFS：先进先出的调度策略，这个策略具有公平的优点，因为每个请求都会得到处理，并且是按照接收到的顺序进行处理。
   SSTF(Shortest-seek-time First 最短寻道时间优先)：选择使磁头从当前位置开始移动最少的磁盘I/O请求，所以 SSTF 总是选择导致最小寻道时间的请求。总是选择最小寻找时间并不能保证平均寻找时间最小，但是能提供比 FCFS 算法更好的性能，会存在饥饿现象（会导致较远的I/O请求不能满足）。
@@ -13,12 +17,11 @@
    SCAN 算法对最近扫描过的区域不公平，因此，它在访问局部性方面不如 FCFS 算法和 SSTF 算法好。
    C-SCAN：SCAN&#43;直接移到另一端，两端请求都能很快处理。把扫描限定在一个方向，当访问到某个方向的最后一个磁道时，磁道返回磁盘相反方向磁道的末端，并再次开始扫描。其中“C”是Circular（环）的意思。
   LOOK(C-LOOK)：釆用SCAN算法和C-SCAN算法时磁头总是严格地遵循从盘面的一端到另一端，显然，在实际使用时还可以改进，即磁头移动只需要到达最远端的一个请求即可返回，不需要到达磁盘端点。这种形式的SCAN算法和C-SCAN算法称为LOOK和C-LOOK调度。这是因为它们在朝一个给定方向移动前会查看是否有请求。
-  文件系统 分区表  MBR：支持最大卷为2 TB（Terabytes）并且每个磁盘最多有4个主分区（或3个主分区，1个扩展分区和无限制的逻辑驱动器） GPT：支持最大卷为18EB（Exabytes）并且每磁盘的分区数没有上限，只受到操作系统限制（由于分区表本身需要占用一定空间，最初规划硬盘分区时，留给分区表的空间决定了最多可以有多少个分区，IA-64版Windows限制最多有128个分区，这也是EFI标准规定的分区表的最小尺寸。另外，GPT分区磁盘有备份分区表来提高分区数据结构的完整性。  RAID 技术 磁盘阵列（Redundant Arrays of Independent Disks，RAID），独立冗余磁盘阵列之。原理是利用数组方式来作磁盘组，配合数据分散排列的设计，提升数据的安全性。
-常见文件系统  Windows: FAT, FAT16, FAT32, NTFS Linux: ext2/3/4, btrfs, ZFS Mac OS X: HFS&#43;  Linux文件权限 Linux文件采用10个标志位来表示文件权限，如下所示：" />
+  文件系统 文件系统是对存储设备上的文件，进行组织管理的一种机制。而 Linux 在各种文件系统实现上，抽象了一层虚拟文件系统 VFS ，它定义了一组，所有文件系统都支持的，数据结构和标准接口。VFS 内部通过目录项，索引节点，逻辑块以及超级块等数据结构，来管理文件。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/os/disk/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2019-09-28T09:50:48+08:00" />
+<meta property="article:modified_time" content="2020-02-11T10:21:05+08:00" />
 <title>磁盘与文件 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -26,7 +29,7 @@
 <link rel="stylesheet" href="/interview/book.min.68d45956421753cdf6bcfc865ede445c56afc5bcaaebfe02961f44fe77d8f45a.css" integrity="sha256-aNRZVkIXU832vPyGXt5EXFavxbyq6/4Clh9E/nfY9Fo=">
 
 
-<script defer src="/interview/en.search.min.65cab4ba3e9facc6bed1810087ab9ac092c1e57b178db14c68a190592f4f9065.js" integrity="sha256-Zcq0uj6frMa&#43;0YEAh6uawJLB5XsXjbFMaKGQWS9PkGU="></script>
+<script defer src="/interview/en.search.min.117604b093157111871f651b83dd21dac37bcfb85e70aef87f166b005577b794.js" integrity="sha256-EXYEsJMVcRGHH2Ubg90h2sN7z7hecK74fxZrAFV3t5Q="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -366,7 +369,12 @@ https://github.com/alex-shpak/hugo-book
 
       
 <article class="markdown"><h1 id="磁盘与文件">磁盘与文件</h1>
-<h2 id="磁盘调度">磁盘调度</h2>
+<h2 id="磁盘">磁盘</h2>
+<p>磁盘是可以持久存储的设备，根据存储介质的不同，常见磁盘可以分为两类：机械磁盘和固态磁盘</p>
+<p><strong>机械磁盘</strong>，也称为硬盘驱动器，通常缩写为HDD。机械磁盘主要有盘片和读写磁头组成，数据就存储在盘片的环状磁道中。在读写数据前，需要移动读写磁头，定位到数据所在的磁道，然后才能访问数据。最小读写单位是 <strong>扇区</strong> ，一般大小为512字节。</p>
+<p><strong>固态磁盘</strong>，通常缩写为SSD，有固态电子元器件组成。固态磁盘不需要磁道寻址，所以，不管是连续I/O还是随机I/O的性能，都比机械磁盘要好得多。</p>
+<p><strong>连续 I/O 还可以通过预读的方式，来减少I/O请求的次数</strong>，这也是其性能优异的一个原因。很多性能优化的方案，也都会从这个角度出发，来优化I/O性能。最小读写单位是 页，通常大小是 4KB ，8KB 等。</p>
+<h3 id="磁盘调度">磁盘调度</h3>
 <p>磁盘访问延迟 = 队列时间 + 控制器时间 + 寻道时间 + 旋转时间 + 传输时间</p>
 <p>磁盘调度的目的是减小延迟，其中前两项可以忽略，寻道时间是主要矛盾。</p>
 <h3 id="磁盘调度算法">磁盘调度算法</h3>
@@ -393,20 +401,30 @@ https://github.com/alex-shpak/hugo-book
 </li>
 </ul>
 <h2 id="文件系统">文件系统</h2>
-<h3 id="分区表">分区表</h3>
+<p>文件系统是对存储设备上的文件，进行组织管理的一种机制。而 Linux 在各种文件系统实现上，抽象了一层虚拟文件系统 VFS ，它定义了一组，所有文件系统都支持的，数据结构和标准接口。VFS 内部通过目录项，索引节点，逻辑块以及超级块等数据结构，来管理文件。</p>
 <ul>
-<li>MBR：支持最大卷为2 TB（Terabytes）并且每个磁盘最多有4个主分区（或3个主分区，1个扩展分区和无限制的逻辑驱动器）</li>
-<li>GPT：支持最大卷为18EB（Exabytes）并且每磁盘的分区数没有上限，只受到操作系统限制（由于分区表本身需要占用一定空间，最初规划硬盘分区时，留给分区表的空间决定了最多可以有多少个分区，IA-64版Windows限制最多有128个分区，这也是EFI标准规定的分区表的最小尺寸。另外，GPT分区磁盘有备份分区表来提高分区数据结构的完整性。</li>
+<li>目录项：记录了文件的名字，以及文件与其他目录项之间的目录关系。</li>
+<li>索引节点：记录了文件的元数据</li>
+<li>逻辑块：是由连续磁盘扇区构成的最小读写单元，用来存储文件系统</li>
+<li>超级块：用来记录文件系统整体的状态，如索引节点和逻辑块的使用情况等。</li>
 </ul>
-<h3 id="raid-技术">RAID 技术</h3>
-<p>磁盘阵列（Redundant Arrays of Independent Disks，RAID），独立冗余磁盘阵列之。原理是利用数组方式来作磁盘组，配合数据分散排列的设计，提升数据的安全性。</p>
-<h3 id="常见文件系统">常见文件系统</h3>
+<p>其中，目录项是一个内存缓存；而超级块，索引节点和逻辑块，都是存储在磁盘中的持久数据。</p>
+<p>如果每次都读写 512 字节这么小的单位的话，效率很低。所以，文件系统会把连续的扇区或页，组成逻辑块，然后以逻辑块作为最小单元来管理数据。常见的逻辑块的大小是 4KB ，也就是连续8个扇区，或者单独的一个页，都可以组成一个逻辑块。</p>
+<h3 id="通用块层">通用块层</h3>
+<p>为了减小不同块设备的差异带来的影响，Linux 通过一个统一的通用块层，来管理各种不同的块设备。 通用块层，其实是处在文件系统和磁盘驱动中间的一个块设备抽象层。它主要有两个功能：</p>
 <ul>
-<li>Windows: FAT, FAT16, FAT32, NTFS</li>
-<li>Linux: ext2/3/4, btrfs, ZFS</li>
-<li>Mac OS X: HFS+</li>
+<li>同虚拟文件系统的功能类似：向上，为文件系统和应用程序，提供访问块设备的标准接口；向下，把各种异构的磁盘设备抽象为统一的块设备，并提供统一框架来管理这些设备的驱动程序。</li>
+<li>I/O调度：对文件系统和应用程序发来的I/O请求排队，并通过重新排序，请求合并等方式，提高磁盘读写的效率。Linux 内核支持四种 I/O 调度算法，分别是 NONE , NOOP , CFQ 以及 DeadLine</li>
 </ul>
-<h3 id="linux文件权限">Linux文件权限</h3>
+<h3 id="io-栈">IO 栈</h3>
+<p>可以把 Linux 存储系统的I/O栈，由上到下分为三个层次，分别是文件系统层，通用块层和设备层。</p>
+<p><img src="assists/linux_disk_io_stack-diagram.png" alt=""></p>
+<ul>
+<li><strong>文件系统层</strong>：包括虚拟文件系统和其他各种文件系统的具体实现。它为上层的应用程序，提供标准的文件访问接口；对下会通过调用块层，来存储和管理磁盘数据。</li>
+<li><strong>调用块层</strong>：包扣块设备I/O队列和I/O调度器。它会对文件系统的I/O请求进行排队，再通过重新排序和请求合并，然后才要发送给下一级的设备层。</li>
+<li><strong>设备层</strong>：包扣存储设备和相应的驱动程序，负责最终物理设备的I/O操作。</li>
+</ul>
+<h2 id="linux文件权限">Linux文件权限</h2>
 <p>Linux文件采用10个标志位来表示文件权限，如下所示：</p>
 <pre><code>-rw-r--r--  1 skyline  staff    20B  1 27 10:34 1.txt
 drwxr-xr-x   5 skyline  staff   170B 12 23 19:01 ABTableViewCell
@@ -431,7 +449,7 @@ drwxr-xr-x   5 skyline  staff   170B 12 23 19:01 ABTableViewCell
 <li>如果可写，权限是二进制的010，十进制是2；</li>
 <li>如果可运行，权限是二进制的001，十进制是1；</li>
 </ul>
-<h4 id="chmod命令">chmod命令</h4>
+<h3 id="chmod命令">chmod命令</h3>
 <p>chmod命令非常重要，用于改变文件或目录的访问权限。用户用它控制文件或目录的访问权限。</p>
 <p>该命令有两种用法。一种是包含字母和操作符表达式的文字设定法；另一种是包含数字的数字设定法。</p>
 <ol>
@@ -479,12 +497,12 @@ drwxr-xr-x   5 skyline  staff   170B 12 23 19:01 ABTableViewCell
 </ol>
 <p>直接使用数字表示的权限来更改：</p>
 <pre><code>例： $ chmod 644 mm.txt
-</code></pre><h4 id="chgrp命令">chgrp命令</h4>
+</code></pre><h3 id="chgrp命令">chgrp命令</h3>
 <p>功能：改变文件或目录所属的组。</p>
 <p>语法：chgrp ［选项］ group filename</p>
 <pre><code>例：$ chgrp - R book /opt/local /book
 </code></pre><p>改变/opt/local /book/及其子目录下的所有文件的属组为book。</p>
-<h4 id="chown命令">chown命令</h4>
+<h3 id="chown命令">chown命令</h3>
 <p>功能：更改某个文件或目录的属主和属组。这个命令也很常用。例如root用户把自己的一个文件拷贝给用户xu，为了让用户xu能够存取这个文件，root用户应该把这个文件的属主设为xu，否则，用户xu无法存取这个文件。</p>
 <p>语法：chown ［选项］ 用户或组 文件</p>
 <p>说明：chown将指定文件的拥有者改为指定的用户或组。用户可以是用户名或用户ID。组可以是组名或组ID。文件是以空格分开的要改变权限的文件列表，支持通配符。</p>
@@ -500,9 +518,9 @@ drwxr-xr-x   5 skyline  staff   170B 12 23 19:01 ABTableViewCell
   
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/4aa999772f091bbec6654909c2d32614aede803b" title='Last modified by haoyang.shi | 2019-09-28' target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/8627764d50601420e420c1ca6399b50237216d28" title='Last modified by haoyang.shi | 2020-02-11' target="_blank">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2019-09-28</span>
+      <span>2020-02-11</span>
     </a>
   </div>
   
@@ -528,17 +546,23 @@ drwxr-xr-x   5 skyline  staff   170B 12 23 19:01 ABTableViewCell
   <aside class="book-toc levels-3 fixed">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#磁盘调度">磁盘调度</a>
+    <li><a href="#磁盘">磁盘</a>
       <ul>
+        <li><a href="#磁盘调度">磁盘调度</a></li>
         <li><a href="#磁盘调度算法">磁盘调度算法</a></li>
       </ul>
     </li>
     <li><a href="#文件系统">文件系统</a>
       <ul>
-        <li><a href="#分区表">分区表</a></li>
-        <li><a href="#raid-技术">RAID 技术</a></li>
-        <li><a href="#常见文件系统">常见文件系统</a></li>
-        <li><a href="#linux文件权限">Linux文件权限</a></li>
+        <li><a href="#通用块层">通用块层</a></li>
+        <li><a href="#io-栈">IO 栈</a></li>
+      </ul>
+    </li>
+    <li><a href="#linux文件权限">Linux文件权限</a>
+      <ul>
+        <li><a href="#chmod命令">chmod命令</a></li>
+        <li><a href="#chgrp命令">chgrp命令</a></li>
+        <li><a href="#chown命令">chown命令</a></li>
       </ul>
     </li>
   </ul>
