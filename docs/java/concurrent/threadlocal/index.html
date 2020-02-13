@@ -12,7 +12,7 @@ static class Entry extends WeakReference&lt;ThreadLocal&lt;?&gt;&gt; { /** The v
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/java/concurrent/threadlocal/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2019-09-28T09:50:48+08:00" />
+<meta property="article:modified_time" content="2020-02-13T19:18:17+08:00" />
 <title>ThreadLocal | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -362,7 +362,7 @@ https://github.com/alex-shpak/hugo-book
 <article class="markdown"><h1 id="threadlocal原理">Threadlocal原理</h1>
 <p><code>ThreadLocal</code> 为解决多线程程序的并发问题提供了一种新的思路。使用这个工具类可以很简洁地编写出优美的多线程程序。当使用 ThreadLocal 维护变量时，ThreadLocal 为每个使用该变量的线程提供独立的变量副本，所以每一个线程都可以独立地改变自己的副本，而不会影响其它线程所对应的副本。</p>
 <p>每个线程中都保有一个<code>ThreadLocalMap</code>的成员变量，<code>ThreadLocalMap </code>内部采用<code>WeakReference</code>数组保存，数组的key即为<code>ThreadLocal </code>内部的Hash值。</p>
-<p><img src="images/b737948133fc0e924cb4981d2132d520.png" alt="image"></p>
+<p><img src="assists/2020-02-13-19-17-12.png" alt=""></p>
 <h2 id="内存泄漏">内存泄漏</h2>
 <p><code>ThreadLocalMap</code> 使用 <code>ThreadLocal</code> 的弱引用作为 key ，如果一个 <code>ThreadLocal</code> 没有外部强引用来引用它，那么系统 GC 的时候，这个 <code>ThreadLocal</code> 势必会被回收，这样一来，<code>ThreadLocalMap</code> 中就会出现 <code>key</code> 为 <code>null</code> 的 <code>Entry</code> ，就没有办法访问这些 <code>key</code> 为 <code>null</code> 的 <code>Entry</code> 的 <code>value</code>，如果当前线程再迟迟不结束的话，这些 <code>key</code> 为 <code>null</code> 的 <code>Entry</code> 的 <code>value</code> 就会一直存在一条强引用链：<code>Thread Ref -&gt; Thread -&gt; ThreaLocalMap -&gt; Entry -&gt; value</code> 永远无法回收，造成内存泄漏。</p>
 <pre><code>static class Entry extends WeakReference&lt;ThreadLocal&lt;?&gt;&gt; {
@@ -384,9 +384,9 @@ https://github.com/alex-shpak/hugo-book
   
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/4aa999772f091bbec6654909c2d32614aede803b" title='Last modified by haoyang.shi | 2019-09-28' target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/93ac6ec61b274416c673a651c53a8f0f51d68337" title='Last modified by haoyang.shi | 2020-02-13' target="_blank">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2019-09-28</span>
+      <span>2020-02-13</span>
     </a>
   </div>
   
