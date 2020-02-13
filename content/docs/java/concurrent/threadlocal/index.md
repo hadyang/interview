@@ -11,7 +11,7 @@ categories: java
 
 每个线程中都保有一个`ThreadLocalMap`的成员变量，`ThreadLocalMap `内部采用`WeakReference`数组保存，数组的key即为`ThreadLocal `内部的Hash值。
 
-![image](images/b737948133fc0e924cb4981d2132d520.png)
+![](assists/2020-02-13-19-17-12.png)
 
 ## 内存泄漏
 
