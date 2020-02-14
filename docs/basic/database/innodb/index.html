@@ -15,7 +15,7 @@ Compact 和 Redundant 格式最大的不同就是记录格式的第一个部分�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/database/innodb/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-02-02T16:31:10+08:00" />
+<meta property="article:modified_time" content="2020-02-14T23:21:58+08:00" />
 <title>InnoDB | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -23,7 +23,7 @@ Compact 和 Redundant 格式最大的不同就是记录格式的第一个部分�
 <link rel="stylesheet" href="/interview/book.min.68d45956421753cdf6bcfc865ede445c56afc5bcaaebfe02961f44fe77d8f45a.css" integrity="sha256-aNRZVkIXU832vPyGXt5EXFavxbyq6/4Clh9E/nfY9Fo=">
 
 
-<script defer src="/interview/en.search.min.5bf2d60b3ca94e31f496269ddbd413773f2c27366f3fd210ebd7da7e377b105e.js" integrity="sha256-W/LWCzypTjH0liad29QTdz8sJzZvP9IQ69fafjd7EF4="></script>
+<script defer src="/interview/en.search.min.b3b2c70afee32e5f8f47d39dd103f314de9204a50c836cb3bd12458767dc3432.js" integrity="sha256-s7LHCv7jLl&#43;PR9Od0QPzFN6SBKUMg2yzvRJFh2fcNDI="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -393,7 +393,7 @@ https://github.com/alex-shpak/hugo-book
 <p><img src="images/85f36113b83bba8aa1ceb1d75bc97271.png" alt="image"></p>
 <p><code>User Records</code> 就是整个页面中真正用于存放行记录的部分，而 <code>Free Space</code> 就是空余空间了，它是一个链表的数据结构，为了保证插入和删除的效率，整个页面并不会按照主键顺序对所有记录进行排序，它会自动从左侧向右寻找空白节点进行插入，行记录在物理存储上并不是按照顺序的，它们之间的顺序是由 <code>next_record</code> 这一指针控制的。</p>
 <p><code>B+</code> 树在查找对应的记录时，并不会直接从树中找出对应的行记录，它只能获取记录所在的页，将整个页加载到内存中，再通过 <code>Page Directory</code> 中存储的稀疏索引和 <code>n_owned、next_record</code> 属性取出对应的记录，不过因为这一操作是在内存中进行的，所以通常会忽略这部分查找的耗时。这样就存在一个命中率的问题，如果一个page中能够相对的存放足够多的行，那么命中率就会相对高一些，性能就会有提升。</p>
-<p>Innodb的 page 大小默认为 <code>16kb</code>，Innodb存储引擎表为索引组织表，<strong>树底层的叶子节点为一双向链表，因此每个页中至少应该有两行记录，这就决定了 Innodb 在存储一行数据的时候不能够超过 <code>8kb</code></strong>，但事实上应该更小，因为还有一些 InnoDB 内部数据结构要存储。</p>
+<p><strong>Innodb的 page 大小默认为 <code>16kb</code></strong>，Innodb存储引擎表为索引组织表，树底层的叶子节点为一双向链表，因此 <strong>每个页中至少应该有两行记录</strong>，这就决定了 Innodb 在存储一行数据的时候不能够超过 <code>8kb</code>，但事实上应该更小，因为还有一些 InnoDB 内部数据结构要存储。</p>
 <p>通常我们认为 <code>blob</code> 这类的大对象的存储会把数据存放在 off-page，其实不然，<strong>关键点还是要看一个 page 中到底能否存放两行数据，blob 可以完全存放在数据页中(单行长度没有超过 <code>8kb</code>)，而 <code>varchar</code> 类型的也有可能存放在溢出页中(单行长度超过 <code>8kb</code>，前 <code>768byte</code> 存放在数据页中)</strong>。</p>
 <h2 id="索引">索引</h2>
 <p>索引是数据库中非常非常重要的概念，它是存储引擎能够快速定位记录的秘密武器，对于提升数据库的性能、减轻数据库服务器的负担有着非常重要的作用；<strong>索引优化是对查询性能优化的最有效手段</strong>，它能够轻松地将查询的性能提高几个数量级。</p>
@@ -403,6 +403,9 @@ https://github.com/alex-shpak/hugo-book
 <blockquote>
 <p><code>B+</code> 树的叶子节点存放所有指向关键字的指针，节点内部关键字记录和节点之间都根据关键字的大小排列。当顺序递增插入的时候，只有最后一个节点会在满掉的时候引起索引分裂，此时无需移动记录，只需创建一个新的节点即可。而当非递增插入的时候，会使得旧的节点分裂，还可能伴随移动记录，以便使得新数据能够插入其中。<strong>一般建议使用一列顺序递增的 ID 来作为主键</strong>，但不必是数据库的 <code>autoincrement</code> 字段，只要满足顺序增加即可，如 <code>twitter</code> 的 <code>snowflake</code> 即为顺序递增的 ID 生成器。</p>
 </blockquote>
+<h3 id="b-树的高度">B+ 树的高度</h3>
+<p>这里我们先假设 B+ 树高为2，即存在一个根节点和若干个叶子节点，那么这棵 B+ 树的存放总记录数为：根节点指针数*单个叶子节点记录行数。这里假设一行记录的大小为1k，那么一个页上的能放 16 行数据。假设主键ID为 bigint 类型，长度为 8 字节，而指针大小在 InnoDB 源码中设置为 6 字节，这样一共14字节，那么可以算出一棵高度为 2 的 B+ 树，能存放 $16\times1024\div 14\times 16=18720$ 条这样的数据记录。</p>
+<p>根据同样的原理我们可以算出一个高度为3的B+树可以存放：$1170\times 1170\times 16=21,902,400$ 条这样的记录。所以在 InnoDB 中 B+ 树高度一般为 1~3 层，它就能满足千万级的数据存储。</p>
 <h3 id="聚集索引和辅助索引">聚集索引和辅助索引</h3>
 <p>数据库中的 B+ 树索引可以分为聚集索引（clustered index）和辅助索引（secondary index），它们之间的最大区别就是，聚集索引中存放着一条行记录的全部信息，而辅助索引中只包含索引列和一个用于查找对应行记录的『书签』。</p>
 <h4 id="聚集索引">聚集索引</h4>
@@ -674,9 +677,9 @@ MySQL Server 此时才会判断返回的记录是否满足<code>id&lt;7</code>�
   
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/13fdd974fea3f9f826b41de089e5219c96eb4318" title='Last modified by haoyang.shi | 2020-02-02' target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/1c7432dfb92a31021597dbb2daa303d6c7156d3a" title='Last modified by haoyang.shi | 2020-02-14' target="_blank">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-02-02</span>
+      <span>2020-02-14</span>
     </a>
   </div>
   
@@ -710,6 +713,7 @@ MySQL Server 此时才会判断返回的记录是否满足<code>id&lt;7</code>�
     </li>
     <li><a href="#索引">索引</a>
       <ul>
+        <li><a href="#b-树的高度">B+ 树的高度</a></li>
         <li><a href="#聚集索引和辅助索引">聚集索引和辅助索引</a></li>
       </ul>
     </li>
