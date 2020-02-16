@@ -14,10 +14,10 @@
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/interview/book.min.68d45956421753cdf6bcfc865ede445c56afc5bcaaebfe02961f44fe77d8f45a.css" integrity="sha256-aNRZVkIXU832vPyGXt5EXFavxbyq6/4Clh9E/nfY9Fo=">
+<link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.b3b2c70afee32e5f8f47d39dd103f314de9204a50c836cb3bd12458767dc3432.js" integrity="sha256-s7LHCv7jLl&#43;PR9Od0QPzFN6SBKUMg2yzvRJFh2fcNDI="></script>
+<script defer src="/interview/en.search.min.6428487c559814b45170a26d7292c7d790a6496210f62ec666f9f4a021518372.js" integrity="sha256-ZChIfFWYFLRRcKJtcpLH15CmSWIQ9i7GZvn0oCFRg3I="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -40,18 +40,18 @@ https://github.com/alex-shpak/hugo-book
 
 <body>
   <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="flex container">
-
-    <aside class="book-menu fixed">
-      <nav>
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
 <h2 class="book-brand">
-  <a href="https://hadyang.github.io/interview/"><span>Interview</span>
+  <a href="/interview"><span>Interview</span>
   </a>
 </h2>
 
 
 <div class="book-search">
-  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" />
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
   <div class="book-search-spinner spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
@@ -60,7 +60,11 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-    <ul>
+
+
+
+
+  <ul>
 <li><a href="/interview/docs/basic/">计算机基础</a>
 <ul>
 <li><a href="/interview/docs/basic/algo/">算法</a>
@@ -145,20 +149,15 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
 </ul>
 </li>
-<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<li><a href="/interview/docs/java/jvm/">Java虚拟机</a>
 <ul>
-<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/architecture/">JVM架构</a></li>
+<li><a href="/interview/docs/java/jvm/classloader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/runtime_area/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/gc/">垃圾收集</a></li>
 <li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
-<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
-<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/java/gc/">GC</a>
-<ul>
-<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
-<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String常量池</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-object-lifecycle/">对象生命周期</a></li>
 </ul>
 </li>
 </ul>
@@ -332,28 +331,53 @@ https://github.com/alex-shpak/hugo-book
 
 
 
+
+
+
 </nav>
 
 
-<script>
-(function() {
-  var menu = document.querySelector("aside.book-menu nav");
-  addEventListener("beforeunload", function(event) {
-    localStorage.setItem("menu.scrollTop", menu.scrollTop);
-  });
-  menu.scrollTop = localStorage.getItem("menu.scrollTop");
-})();
-</script>
 
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
     </aside>
 
     <div class="book-page">
-      <header class="flex align-center justify-between book-header">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
   <label for="menu-control">
     <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
+
   <strong>面试题</strong>
-</header>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#heading"></a></li>
+    <li><a href="#通常一个xml映射文件都会写一个dao接口与之对应请问这个dao接口的工作原理是什么dao接口里的方法参数不同时方法能重载吗">通常一个Xml映射文件，都会写一个Dao接口与之对应，请问，这个Dao接口的工作原理是什么？Dao接口里的方法，参数不同时，方法能重载吗？</a></li>
+    <li><a href="#参考连接">参考连接</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
 
       
 <article class="markdown"><h1 id="面试题">面试题</h1>
@@ -371,54 +395,74 @@ Dao接口的工作原理是JDK动态代理，Mybatis运行时会使用JDK动态�
 </code></pre><h2 id="参考连接">参考连接</h2>
 <p><a href="https://blog.csdn.net/eaphyy/article/details/71190441">Mybatis 的常见面试题</a></p>
 </article>
+ 
 
-      <div class="book-footer justify-between">
-  
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
 
-  
-  
+
+
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/4aa999772f091bbec6654909c2d32614aede803b" title='Last modified by haoyang.shi | 2019-09-28' target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/4aa999772f091bbec6654909c2d32614aede803b" title='Last modified by haoyang.shi | 2019-09-28' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
       <span>2019-09-28</span>
     </a>
   </div>
-  
-  
 
-  
+
+
   <div>
-    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/fromwork/mybatis/question/index.md" target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/fromwork/mybatis/question/index.md" target="_blank" rel="noopener">
       <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
       <span>Edit this page</span>
     </a>
   </div>
-  
 
 </div>
 
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
       
     </div>
 
     
-  
-
-  <aside class="book-toc levels-3 fixed">
-    <nav id="TableOfContents">
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
   <ul>
     <li><a href="#heading"></a></li>
     <li><a href="#通常一个xml映射文件都会写一个dao接口与之对应请问这个dao接口的工作原理是什么dao接口里的方法参数不同时方法能重载吗">通常一个Xml映射文件，都会写一个Dao接口与之对应，请问，这个Dao接口的工作原理是什么？Dao接口里的方法，参数不同时，方法能重载吗？</a></li>
     <li><a href="#参考连接">参考连接</a></li>
   </ul>
 </nav>
-  </aside>
 
-
-
+ 
+    </aside>
+    
   </main>
 
   
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+

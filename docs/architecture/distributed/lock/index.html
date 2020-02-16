@@ -9,21 +9,21 @@
 SET resource_name my_random_value NX PX 30000 锁释放：
 if redis.call(&quot;get&quot;,KEYS[1]) == ARGV[1] then return redis.call(&quot;del&quot;,KEYS[1]) else return 0 end RedLock 为了解决 Redis 单点的问题。 Redis 的作者提出了 RedLock 的解决方案。方案非常的巧妙和简洁。 RedLock 的核心思想就是，同时使用多个 Redis Master 来冗余，且这些节点都是完全的独立的，也不需要对这些节点之间的数据进行同步。
 假设我们有N个Redis节点，N应该是一个大于2的奇数。RedLock的实现步骤:
- 取得当前时间 使用单节点获取锁的方式，依次获取 N 个节点的 Redis 锁。 如果获取到的锁的数量大于 $N/2&#43;1$ 个，且获取的时间小于锁的有效时间(lock validity time)就认为获取到了一个有效的锁，锁自动释放时间就是最初的锁释放时间减去之前获取锁所消耗的时间。 如果获取锁的数量小于 $N/2&#43;1$，或者在锁的有效时间(lock validity time)内没有获取到足够的锁，就认为获取锁失败，这个时候需要向所有节点发送释放锁的消息。  对于释放锁的实现就很简单了，向所有的 Redis 节点发起释放的操作，无论之前是否获取锁成功。
+ 取得当前时间 使用单节点获取锁的方式，依次获取 N 个节点的 Redis 锁。 如果获取到的锁的数量大于   \(N/2&#43;1\)  个，且获取的时间小于锁的有效时间(lock validity time)就认为获取到了一个有效的锁，锁自动释放时间就是最初的锁释放时间减去之前获取锁所消耗的时间。 如果获取锁的数量小于 \(N/2&#43;1\)  ，或者在锁的有效时间(lock validity time)内没有获取到足够的锁，就认为获取锁失败，这个时候需要向所有节点发送释放锁的消息。  对于释放锁的实现就很简单了，向所有的 Redis 节点发起释放的操作，无论之前是否获取锁成功。
 缺陷 RedLock中，为了防止死锁，锁是具有过期时间的。
  如果 Client 1 在持有锁的时候，发生了一次很长时间的 FGC 超过了锁的过期时间。锁就被释放了。 这个时候 Client 2 又获得了一把锁，提交数据。 这个时候 Client 1 从 FGC 中苏醒过来了，又一次提交数据。  这种情况下，数据就发生了错误。RedLock 只是保证了锁的高可用性，并没有保证锁的正确性。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/architecture/distributed/lock/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-01-16T14:29:30+08:00" />
+<meta property="article:modified_time" content="2020-02-16T17:16:32+08:00" />
 <title>分布式锁 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/interview/book.min.68d45956421753cdf6bcfc865ede445c56afc5bcaaebfe02961f44fe77d8f45a.css" integrity="sha256-aNRZVkIXU832vPyGXt5EXFavxbyq6/4Clh9E/nfY9Fo=">
+<link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.b3b2c70afee32e5f8f47d39dd103f314de9204a50c836cb3bd12458767dc3432.js" integrity="sha256-s7LHCv7jLl&#43;PR9Od0QPzFN6SBKUMg2yzvRJFh2fcNDI="></script>
+<script defer src="/interview/en.search.min.6428487c559814b45170a26d7292c7d790a6496210f62ec666f9f4a021518372.js" integrity="sha256-ZChIfFWYFLRRcKJtcpLH15CmSWIQ9i7GZvn0oCFRg3I="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -46,18 +46,18 @@ https://github.com/alex-shpak/hugo-book
 
 <body>
   <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="flex container">
-
-    <aside class="book-menu fixed">
-      <nav>
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
 <h2 class="book-brand">
-  <a href="https://hadyang.github.io/interview/"><span>Interview</span>
+  <a href="/interview"><span>Interview</span>
   </a>
 </h2>
 
 
 <div class="book-search">
-  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" />
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
   <div class="book-search-spinner spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
@@ -66,7 +66,11 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-    <ul>
+
+
+
+
+  <ul>
 <li><a href="/interview/docs/basic/">计算机基础</a>
 <ul>
 <li><a href="/interview/docs/basic/algo/">算法</a>
@@ -151,20 +155,15 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
 </ul>
 </li>
-<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<li><a href="/interview/docs/java/jvm/">Java虚拟机</a>
 <ul>
-<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/architecture/">JVM架构</a></li>
+<li><a href="/interview/docs/java/jvm/classloader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/runtime_area/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/gc/">垃圾收集</a></li>
 <li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
-<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
-<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/java/gc/">GC</a>
-<ul>
-<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
-<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String常量池</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-object-lifecycle/">对象生命周期</a></li>
 </ul>
 </li>
 </ul>
@@ -338,28 +337,64 @@ https://github.com/alex-shpak/hugo-book
 
 
 
+
+
+
 </nav>
 
 
-<script>
-(function() {
-  var menu = document.querySelector("aside.book-menu nav");
-  addEventListener("beforeunload", function(event) {
-    localStorage.setItem("menu.scrollTop", menu.scrollTop);
-  });
-  menu.scrollTop = localStorage.getItem("menu.scrollTop");
-})();
-</script>
 
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
     </aside>
 
     <div class="book-page">
-      <header class="flex align-center justify-between book-header">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
   <label for="menu-control">
     <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
+
   <strong>分布式锁</strong>
-</header>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#redis-锁">Redis 锁</a>
+      <ul>
+        <li><a href="#单节点-redis-锁">单节点 Redis 锁</a></li>
+        <li><a href="#redlock">RedLock</a></li>
+        <li><a href="#缺陷">缺陷</a></li>
+      </ul>
+    </li>
+    <li><a href="#实现基于数据库的乐观锁">实现基于数据库的乐观锁</a></li>
+    <li><a href="#基于-zookeeper-的分布式锁">基于 ZooKeeper 的分布式锁</a>
+      <ul>
+        <li><a href="#缺陷-1">缺陷</a></li>
+      </ul>
+    </li>
+    <li><a href="#参考链接">参考链接</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
 
       
 <article class="markdown"><h1 id="分布式锁">分布式锁</h1>
@@ -379,8 +414,25 @@ end
 <ol>
 <li>取得当前时间</li>
 <li>使用单节点获取锁的方式，依次获取 N 个节点的 Redis 锁。</li>
-<li>如果获取到的锁的数量大于 $N/2+1$ 个，且获取的时间小于锁的有效时间(lock validity time)就认为获取到了一个有效的锁，锁自动释放时间就是最初的锁释放时间减去之前获取锁所消耗的时间。</li>
-<li>如果获取锁的数量小于 $N/2+1$，或者在锁的有效时间(lock validity time)内没有获取到足够的锁，就认为获取锁失败，这个时候需要向所有节点发送释放锁的消息。</li>
+<li>如果获取到的锁的数量大于 
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+
+
+
+<span class="katex">
+  \(N/2+1\)
+</span>
+ 个，且获取的时间小于锁的有效时间(lock validity time)就认为获取到了一个有效的锁，锁自动释放时间就是最初的锁释放时间减去之前获取锁所消耗的时间。</li>
+<li>如果获取锁的数量小于 
+
+<span class="katex">
+  \(N/2+1\)
+</span>
+，或者在锁的有效时间(lock validity time)内没有获取到足够的锁，就认为获取锁失败，这个时候需要向所有节点发送释放锁的消息。</li>
 </ol>
 <p>对于释放锁的实现就很简单了，向所有的 Redis 节点发起释放的操作，无论之前是否获取锁成功。</p>
 <h3 id="缺陷">缺陷</h3>
@@ -443,41 +495,49 @@ if (i &gt; 0) {
 <li><a href="https://www.xilidou.com/2017/10/29/Redis-RedLock-%E5%AE%8C%E7%BE%8E%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E4%B9%88%EF%BC%9F/">Redis RedLock 完美的分布式锁么？</a></li>
 </ul>
 </article>
+ 
 
-      <div class="book-footer justify-between">
-  
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
 
-  
-  
+
+
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/b67a12b22fe0578b4f0dbb386d0995543d7ab146" title='Last modified by haoyang.shi | 2020-01-16' target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/d87c891b02a4575f586779f1dd582e21a44d7541" title='Last modified by haoyang.shi | 2020-02-16' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-01-16</span>
+      <span>2020-02-16</span>
     </a>
   </div>
-  
-  
 
-  
+
+
   <div>
-    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/architecture/distributed/lock/index.md" target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/architecture/distributed/lock/index.md" target="_blank" rel="noopener">
       <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
       <span>Edit this page</span>
     </a>
   </div>
-  
 
 </div>
 
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
       
     </div>
 
     
-  
-
-  <aside class="book-toc levels-3 fixed">
-    <nav id="TableOfContents">
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
   <ul>
     <li><a href="#redis-锁">Redis 锁</a>
       <ul>
@@ -495,13 +555,25 @@ if (i &gt; 0) {
     <li><a href="#参考链接">参考链接</a></li>
   </ul>
 </nav>
-  </aside>
 
-
-
+ 
+    </aside>
+    
   </main>
 
   
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+

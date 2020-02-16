@@ -7,19 +7,19 @@
 <meta name="description" content="整数中"><meta property="og:title" content="整数中" />
 <meta property="og:description" content="题目 牛客网
 求出1~13的整数中 1 出现的次数,并算出 100~1300 的整数中1出现的次数？为此他特别数了一下 1~13 中包含1的数字有 1、10、11、12、13 因此共出现 6 次,但是对于后面问题他就没辙了。ACMer 希望你们帮帮他,并把问题更加普遍化,可以很快的求出任意非负整数区间中1出现的次数（从1 到 n 中1出现的次数）。
-解题思路  假定 $$n=21345$$ 将数字分为首位和非首位两个部分 对于首位为 1 的情况，如果首位 $$&gt;1$$ 那么$$sum=sum&#43;10^{len(n)-1}$$，如果首位 $$=1$$ 那么 $$sum=sum&#43;1$$ 对于非首位 1，指定其中一位为 1，根据排列组合有 $$10^{len(n)-2}\times(len(n)-1)$$ 个。那么非首位 1 总共有 $$2\times10^{len(n)-2}\times(len(n)-1)$$  public int NumberOf1Between1AndN_Solution(int n) { int[] res = {0}; NumberOf1Between1AndN(res, n); return res[0]; } private void NumberOf1Between1AndN(int[] res, int n) { //假设 num=21345 String num = String.valueOf(n); int firstNum = num.charAt(0) - &#39;0&#39;; if (num." />
+解题思路  假定   \(n=21345\)  将数字分为首位和非首位两个部分 对于首位为 1 的情况，如果首位 \(1\)  那么 \(sum=sum&#43;10^{len(n)-1}\)  ，如果首位 \(=1\)  那么 \(sum=sum&#43;1\)   对于非首位 1，指定其中一位为 1，根据排列组合有 \(10^{len(n)-2}\times(len(n)-1)\)  个。那么非首位 1 总共有 \(2\times10^{len(n)-2}\times(len(n)-1)\)    public int NumberOf1Between1AndN_Solution(int n) { int[] res = {0}; NumberOf1Between1AndN(res, n); return res[0]; } private void NumberOf1Between1AndN(int[] res, int n) { //假设 num=21345 String num = String." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/offer/NumberOfOneBetweenOneAndN/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2019-09-28T09:50:48+08:00" />
+<meta property="article:modified_time" content="2020-02-16T17:16:32+08:00" />
 <title>整数中 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/interview/book.min.68d45956421753cdf6bcfc865ede445c56afc5bcaaebfe02961f44fe77d8f45a.css" integrity="sha256-aNRZVkIXU832vPyGXt5EXFavxbyq6/4Clh9E/nfY9Fo=">
+<link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.b3b2c70afee32e5f8f47d39dd103f314de9204a50c836cb3bd12458767dc3432.js" integrity="sha256-s7LHCv7jLl&#43;PR9Od0QPzFN6SBKUMg2yzvRJFh2fcNDI="></script>
+<script defer src="/interview/en.search.min.6428487c559814b45170a26d7292c7d790a6496210f62ec666f9f4a021518372.js" integrity="sha256-ZChIfFWYFLRRcKJtcpLH15CmSWIQ9i7GZvn0oCFRg3I="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -42,18 +42,18 @@ https://github.com/alex-shpak/hugo-book
 
 <body>
   <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="flex container">
-
-    <aside class="book-menu fixed">
-      <nav>
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
 <h2 class="book-brand">
-  <a href="https://hadyang.github.io/interview/"><span>Interview</span>
+  <a href="/interview"><span>Interview</span>
   </a>
 </h2>
 
 
 <div class="book-search">
-  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" />
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
   <div class="book-search-spinner spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
@@ -62,7 +62,11 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-    <ul>
+
+
+
+
+  <ul>
 <li><a href="/interview/docs/basic/">计算机基础</a>
 <ul>
 <li><a href="/interview/docs/basic/algo/">算法</a>
@@ -147,20 +151,15 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
 </ul>
 </li>
-<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<li><a href="/interview/docs/java/jvm/">Java虚拟机</a>
 <ul>
-<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/architecture/">JVM架构</a></li>
+<li><a href="/interview/docs/java/jvm/classloader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/runtime_area/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/gc/">垃圾收集</a></li>
 <li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
-<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
-<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/java/gc/">GC</a>
-<ul>
-<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
-<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String常量池</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-object-lifecycle/">对象生命周期</a></li>
 </ul>
 </li>
 </ul>
@@ -334,28 +333,52 @@ https://github.com/alex-shpak/hugo-book
 
 
 
+
+
+
 </nav>
 
 
-<script>
-(function() {
-  var menu = document.querySelector("aside.book-menu nav");
-  addEventListener("beforeunload", function(event) {
-    localStorage.setItem("menu.scrollTop", menu.scrollTop);
-  });
-  menu.scrollTop = localStorage.getItem("menu.scrollTop");
-})();
-</script>
 
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
     </aside>
 
     <div class="book-page">
-      <header class="flex align-center justify-between book-header">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
   <label for="menu-control">
     <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
+
   <strong>整数中</strong>
-</header>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#题目">题目</a></li>
+    <li><a href="#解题思路">解题思路</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
 
       
 <article class="markdown"><h2 id="题目">题目</h2>
@@ -363,9 +386,51 @@ https://github.com/alex-shpak/hugo-book
 <p>求出<code>1~13</code>的整数中 1 出现的次数,并算出 <code>100~1300</code> 的整数中1出现的次数？为此他特别数了一下 <code>1~13</code> 中包含1的数字有 <code>1、10、11、12、13</code> 因此共出现 6 次,但是对于后面问题他就没辙了。ACMer 希望你们帮帮他,并把问题更加普遍化,可以很快的求出任意非负整数区间中1出现的次数（从1 到 n 中1出现的次数）。</p>
 <h2 id="解题思路">解题思路</h2>
 <ol>
-<li>假定 $$n=21345$$ 将数字分为首位和非首位两个部分</li>
-<li>对于首位为 1 的情况，如果首位 $$&gt;1$$ 那么$$sum=sum+10^{len(n)-1}$$，如果首位 $$=1$$ 那么 $$sum=sum+1$$</li>
-<li>对于非首位 1，指定其中一位为 1，根据排列组合有 $$10^{len(n)-2}\times(len(n)-1)$$ 个。那么非首位 1 总共有 $$2\times10^{len(n)-2}\times(len(n)-1)$$</li>
+<li>假定 
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+
+
+
+<span class="katex">
+  \(n=21345\)
+</span>
+ 将数字分为首位和非首位两个部分</li>
+<li>对于首位为 1 的情况，如果首位 
+
+<span class="katex">
+  \(>1\)
+</span>
+ 那么
+
+<span class="katex">
+  \(sum=sum+10^{len(n)-1}\)
+</span>
+，如果首位 
+
+<span class="katex">
+  \(=1\)
+</span>
+ 那么 
+
+<span class="katex">
+  \(sum=sum+1\)
+</span>
+</li>
+<li>对于非首位 1，指定其中一位为 1，根据排列组合有 
+
+<span class="katex">
+  \(10^{len(n)-2}\times(len(n)-1)\)
+</span>
+ 个。那么非首位 1 总共有 
+
+<span class="katex">
+  \(2\times10^{len(n)-2}\times(len(n)-1)\)
+</span>
+</li>
 </ol>
 <pre><code>public int NumberOf1Between1AndN_Solution(int n) {
     int[] res = {0};
@@ -400,53 +465,73 @@ private void NumberOf1Between1AndN(int[] res, int n) {
     NumberOf1Between1AndN(res, nextN);
 }
 </code></pre></article>
+ 
 
-      <div class="book-footer justify-between">
-  
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
 
-  
-  
+
+
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/4aa999772f091bbec6654909c2d32614aede803b" title='Last modified by haoyang.shi | 2019-09-28' target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/d87c891b02a4575f586779f1dd582e21a44d7541" title='Last modified by haoyang.shi | 2020-02-16' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2019-09-28</span>
+      <span>2020-02-16</span>
     </a>
   </div>
-  
-  
 
-  
+
+
   <div>
-    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/offer/NumberOfOneBetweenOneAndN/index.md" target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/offer/NumberOfOneBetweenOneAndN/index.md" target="_blank" rel="noopener">
       <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
       <span>Edit this page</span>
     </a>
   </div>
-  
 
 </div>
 
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
       
     </div>
 
     
-  
-
-  <aside class="book-toc levels-3 fixed">
-    <nav id="TableOfContents">
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
   <ul>
     <li><a href="#题目">题目</a></li>
     <li><a href="#解题思路">解题思路</a></li>
   </ul>
 </nav>
-  </aside>
 
-
-
+ 
+    </aside>
+    
   </main>
 
   
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+

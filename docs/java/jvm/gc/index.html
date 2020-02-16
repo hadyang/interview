@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="垃圾回收"><meta property="og:title" content="垃圾回收" />
+<meta property="og:description" content="垃圾回收 对象存活检测 Java堆中存放着大量的Java对象实例，在垃圾收集器回收内存前，第一件事情就是确定哪些对象是活着的，哪些是可以回收的。
+引用计数算法 引用计数算法是判断对象是否存活的基本算法：给每个对象添加一个引用计数器，没当一个地方引用它的时候，计数器值加1；当引用失效后，计数器值减1。但是这种方法有一个致命的缺陷，当两个对象相互引用时会导致这两个都无法被回收。
+根搜索算法 引用计数是通过为堆中每个对象保存一个计数来区分活动对象和垃圾。根搜索算法实际上是追踪从根结点开始的 引用图。
+在根搜索算法追踪的过程中，起点即 GC Root，GC Root 根据 JVM 实现不同而不同，但是总会包含以下几个方面：
+ 虚拟机栈（栈帧中的本地变量表）中引用的对象。 方法区中的类静态属性引用的变量。 方法区中的常量引用的变量。 本地方法 JNI 的引用对象。  根搜索算法是从 GC Root 开始的引用图，引用图是一个有向图，其中节点是各个对象，边为引用类型。JVM 中的引用类型分为四种：强引用（StrongReference）、软引用（SoftReference）、弱引用（WeakReference） 和 虚引用（PhantomReference）。
+除强引用外，其他引用在Java 由 Reference 的子类封装了指向其他对象的连接：被指向的对象称为 引用目标。
+若一个对象的引用类型有多个，那到底如何判断它的回收策略呢？其实规则如下：
+ 单条引用链以链上最弱的一个引用类型来决定； 多条引用链以多个单条引用链中最强的一个引用类型来决定；  在引用图中，当一个节点没有任何路径可达时，我们认为它是可回收的对象。
+StrongReference 强引用在Java中是普遍存在的，类似 Object o = new Object(); 。强引用和其他引用的区别在于：强引用禁止引用目标被垃圾收集器收集，而其他引用不禁止。
+SoftReference 对象可以从根节点通过一个或多个(未被清除的)软引用对象触及，垃圾收集器在要发生内存溢出前将这些对象列入回收范围中进行回收，如果该软引用对象和引用队列相关联，它会把该软引用对象加入队列。
+JVM 的实现需要在抛出 OutOfMemoryError 之前清除 SoftReference，但在其他的情况下可以选择清理的时间或者是否清除它们。
+WeakReference 对象可以从 GC Root 开始通过一个或多个(未被清除的)弱引用对象触及， 垃圾收集器在 GC 的时候会回收所有的 WeakReference，如果该弱引用对象和引用队列相关联，它会把该弱引用对象加入队列。
+PhantomReference 垃圾收集器在 GC 不会清除 PhantomReference，所有的虚引用都必须由程序明确的清除。同时也不能通过虚引用来取得一个对象的实例。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hadyang.github.io/interview/docs/java/jvm/gc/" />
+<meta property="article:published_time" content="2020-02-16T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-02-16T17:16:32+08:00" />
+<title>垃圾回收 | Interview</title>
+<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
+
+
+<script defer src="/interview/en.search.min.6428487c559814b45170a26d7292c7d790a6496210f62ec666f9f4a021518372.js" integrity="sha256-ZChIfFWYFLRRcKJtcpLH15CmSWIQ9i7GZvn0oCFRg3I="></script>
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-157595781-3', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/interview"><span>Interview</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+
+
+
+
+  <ul>
+<li><a href="/interview/docs/basic/">计算机基础</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/">算法</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
+<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
+<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
+<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
+<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
+<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
+<li><a href="/interview/docs/basic/algo/sort/">排序算法</a></li>
+<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/os/">操作系统</a>
+<ul>
+<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
+<li><a href="/interview/docs/basic/os/concurrency/">并发</a></li>
+<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
+<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
+<li><a href="/interview/docs/basic/os/linux/">Linux系统</a></li>
+<li><a href="/interview/docs/basic/os/interrupt/">中断</a></li>
+<li><a href="/interview/docs/basic/os/device/">设备管理</a></li>
+<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
+<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/net/">计算机网络</a>
+<ul>
+<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
+<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
+<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
+<li><a href="/interview/docs/basic/net/http/">HTTP</a></li>
+<li><a href="/interview/docs/basic/net/https/">HTTPS</a></li>
+<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/">数据库</a>
+<ul>
+<li><a href="/interview/docs/basic/database/transaction/">事务</a></li>
+<li><a href="/interview/docs/basic/database/index/">索引</a></li>
+<li><a href="/interview/docs/basic/database/sql/">SQL</a></li>
+<li><a href="/interview/docs/basic/database/join/">连接</a></li>
+<li><a href="/interview/docs/basic/database/mysql/">MySQL</a></li>
+<li><a href="/interview/docs/basic/database/concurrent/">并发控制</a></li>
+<li><a href="/interview/docs/basic/database/innodb/">Innodb</a></li>
+<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/">Java</a>
+<ul>
+<li><a href="/interview/docs/java/oop/">OOP</a></li>
+<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
+<li><a href="/interview/docs/java/operator/">运算符</a></li>
+<li><a href="/interview/docs/java/exception/">异常</a></li>
+<li><a href="/interview/docs/java/generics/">泛型</a></li>
+<li><a href="/interview/docs/java/object/">Object</a></li>
+<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
+<li><a href="/interview/docs/java/proxy/">代理</a></li>
+<li><a href="/interview/docs/java/annotation/">注解</a></li>
+<li><a href="/interview/docs/java/questions/">面试题</a></li>
+<li><a href="/interview/docs/java/nio/">NIO</a></li>
+<li><a href="/interview/docs/java/">集合</a>
+<ul>
+<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
+<li><a href="/interview/docs/java/collection/Concurrenthashmap/">Concurrenthashmap</a></li>
+<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/concurrent/">并发</a>
+<ul>
+<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
+<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
+<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
+<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
+<li><a href="/interview/docs/java/concurrent/AQS/">AQS</a></li>
+<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
+<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
+<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/jvm/">Java虚拟机</a>
+<ul>
+<li><a href="/interview/docs/java/jvm/architecture/">JVM架构</a></li>
+<li><a href="/interview/docs/java/jvm/classloader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/runtime_area/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/gc/"class=active>垃圾收集</a></li>
+<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String常量池</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-object-lifecycle/">对象生命周期</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/">框架</a>
+<ul>
+<li><a href="/interview/docs/fromwork/netty/">Netty</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
+<ul>
+<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/spring/">Spring</a>
+<ul>
+<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
+<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
+<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/">系统架构</a>
+<ul>
+<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
+<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
+<ul>
+<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/design/">系统设计</a>
+<ul>
+<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/distributed/">分布式</a>
+<ul>
+<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
+<li><a href="/interview/docs/architecture/distributed/session/">分布式Session</a></li>
+<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
+<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
+<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
+<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
+<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
+<li><a href="/interview/docs/architecture/distributed/kafka/">Kafka</a></li>
+<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
+<li><a href="/interview/docs/architecture/distributed/dubbo/">Dubbo</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
+<ul>
+<li><a href="/interview/docs/architecture/bigdata/algo/">基础算法</a></li>
+<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/offer/">剑指offer</a>
+<ul>
+<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
+<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
+<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
+<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
+<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
+<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
+<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
+<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
+<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
+<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
+<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
+<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
+<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
+<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
+<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
+<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
+<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
+<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
+<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
+<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
+<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
+<li><a href="/interview/docs/offer/VerifySquenceOfBST/">二叉搜索树的后序遍历序列</a></li>
+<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
+<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
+<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
+<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
+<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
+<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
+<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
+<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
+<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
+<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
+<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
+<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
+<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
+<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
+<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
+<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
+<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
+<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
+<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
+<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
+<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
+<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
+<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
+<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
+<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
+<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
+<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
+<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
+<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
+<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
+<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
+<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
+<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
+<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
+<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
+<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
+<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
+<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
+<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
+<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
+<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
+<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
+<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
+<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
+<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/leetcode/">LeetCode</a>
+<ul>
+<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
+<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
+<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
+<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
+<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
+<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
+<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
+<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
+<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
+<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
+<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
+<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
+<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
+<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
+<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
+<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
+<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
+<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
+<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
+<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
+<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
+<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
+<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
+<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
+<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
+<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
+<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
+<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
+<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
+<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
+<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
+<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>垃圾回收</strong>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#对象存活检测">对象存活检测</a>
+      <ul>
+        <li><a href="#引用计数算法">引用计数算法</a></li>
+        <li><a href="#根搜索算法">根搜索算法</a></li>
+      </ul>
+    </li>
+    <li><a href="#垃圾回收算法">垃圾回收算法</a>
+      <ul>
+        <li><a href="#复制回收算法">复制回收算法</a></li>
+        <li><a href="#标记清除算法">标记清除算法</a></li>
+        <li><a href="#标记整理算法">标记整理算法</a></li>
+        <li><a href="#增量回收">增量回收</a></li>
+        <li><a href="#分代回收">分代回收</a></li>
+      </ul>
+    </li>
+    <li><a href="#垃圾回收触发条件">垃圾回收触发条件</a>
+      <ul>
+        <li><a href="#堆内内存">堆内内存</a></li>
+        <li><a href="#堆外内存">堆外内存</a></li>
+      </ul>
+    </li>
+    <li><a href="#垃圾收集器">垃圾收集器</a>
+      <ul>
+        <li><a href="#serial-收集器">Serial 收集器</a></li>
+        <li><a href="#parnew-收集器">ParNew 收集器</a></li>
+        <li><a href="#parallel-scavenge-收集器">Parallel Scavenge 收集器</a></li>
+        <li><a href="#serial-old收集器">Serial Old收集器</a></li>
+        <li><a href="#parallel-old-收集器">Parallel Old 收集器</a></li>
+        <li><a href="#cms-收集器">CMS 收集器</a></li>
+        <li><a href="#g1收集器">G1收集器</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+<article class="markdown"><h1 id="垃圾回收">垃圾回收</h1>
+<h2 id="对象存活检测">对象存活检测</h2>
+<p>Java堆中存放着大量的Java对象实例，在垃圾收集器回收内存前，第一件事情就是确定哪些对象是活着的，哪些是可以回收的。</p>
+<h3 id="引用计数算法">引用计数算法</h3>
+<p>引用计数算法是判断对象是否存活的基本算法：给每个对象添加一个引用计数器，没当一个地方引用它的时候，计数器值加1；当引用失效后，计数器值减1。但是这种方法有一个致命的缺陷，<strong>当两个对象相互引用时会导致这两个都无法被回收</strong>。</p>
+<h3 id="根搜索算法">根搜索算法</h3>
+<p>引用计数是通过为堆中每个对象保存一个计数来区分活动对象和垃圾。根搜索算法实际上是追踪从根结点开始的 <strong>引用图</strong>。</p>
+<p>在根搜索算法追踪的过程中，起点即 <strong>GC Root</strong>，GC Root 根据 JVM 实现不同而不同，但是总会包含以下几个方面：</p>
+<ul>
+<li>虚拟机栈（栈帧中的本地变量表）中引用的对象。</li>
+<li>方法区中的类静态属性引用的变量。</li>
+<li>方法区中的常量引用的变量。</li>
+<li>本地方法 JNI 的引用对象。</li>
+</ul>
+<p>根搜索算法是从 GC Root 开始的引用图，引用图是一个有向图，其中节点是各个对象，边为引用类型。JVM 中的引用类型分为四种：<strong>强引用（StrongReference）</strong>、<strong>软引用（SoftReference）</strong>、<strong>弱引用（WeakReference）</strong> 和 <strong>虚引用（PhantomReference）</strong>。</p>
+<p>除强引用外，其他引用在Java 由 <code>Reference</code> 的子类封装了指向其他对象的连接：被指向的对象称为 <strong>引用目标</strong>。</p>
+<p>若一个对象的引用类型有多个，那到底如何判断它的回收策略呢？其实规则如下：</p>
+<ul>
+<li>单条引用链以链上最弱的一个引用类型来决定；</li>
+<li>多条引用链以多个单条引用链中最强的一个引用类型来决定；</li>
+</ul>
+<p>在引用图中，当一个节点没有任何路径可达时，我们认为它是可回收的对象。</p>
+<h4 id="strongreference">StrongReference</h4>
+<p>强引用在Java中是普遍存在的，类似 <code>Object o = new Object();</code> 。强引用和其他引用的区别在于：<strong>强引用禁止引用目标被垃圾收集器收集，而其他引用不禁止</strong>。</p>
+<h4 id="softreference">SoftReference</h4>
+<p>对象可以从根节点通过一个或多个(未被清除的)软引用对象触及，垃圾收集器在要发生内存溢出前将这些对象列入回收范围中进行回收，如果该软引用对象和引用队列相关联，它会把该软引用对象加入队列。</p>
+<p><strong>JVM 的实现需要在抛出 OutOfMemoryError 之前清除 SoftReference</strong>，但在其他的情况下可以选择清理的时间或者是否清除它们。</p>
+<h4 id="weakreference">WeakReference</h4>
+<p>对象可以从 GC Root 开始通过一个或多个(未被清除的)弱引用对象触及， <strong>垃圾收集器在 GC 的时候会回收所有的 WeakReference</strong>，如果该弱引用对象和引用队列相关联，它会把该弱引用对象加入队列。</p>
+<h4 id="phantomreference">PhantomReference</h4>
+<p><strong>垃圾收集器在 GC 不会清除 PhantomReference，所有的虚引用都必须由程序明确的清除</strong>。同时也不能通过虚引用来取得一个对象的实例。</p>
+<h2 id="垃圾回收算法">垃圾回收算法</h2>
+<h3 id="复制回收算法">复制回收算法</h3>
+<p>将可用内存分为大小相等的两份，在同一时刻只使用其中的一份。当这一份内存使用完了，就将还存活的对象复制到另一份上，然后将这一份上的内存清空。复制算法能有效避免内存碎片，但是算法需要将内存一分为二，导致内存使用率大大降低。</p>
+<h3 id="标记清除算法">标记清除算法</h3>
+<p>先暂停整个程序的全部运行线程，让回收线程以单线程进行扫描标记，并进行直接清除回收，然后回收完成后，恢复运行线程。<strong>标记清除后会产生大量不连续的内存碎片</strong>，造成空间浪费。</p>
+<h3 id="标记整理算法">标记整理算法</h3>
+<p>和 <em>标记清除</em> 相似，不同的是，回收期间同时会将保留的存储对象搬运汇集到连续的内存空间，从而集成空闲空间。</p>
+<h3 id="增量回收">增量回收</h3>
+<p>需要程序将所拥有的内存空间分成若干分区（Region）。程序运行所需的存储对象会分布在这些分区中，每次只对其中一个分区进行回收操作，从而避免程序全部运行线程暂停来进行回收，允许部分线程在不影响回收行为而保持运行，并且降低回收时间，增加程序响应速度。</p>
+<h3 id="分代回收">分代回收</h3>
+<p>在 JVM 中不同的对象拥有不同的生命周期，因此对于不同生命周期的对象也可以采用不同的垃圾回收算法，以提高效率，这就是分代回收算法的核心思想。</p>
+<h2 id="垃圾回收触发条件">垃圾回收触发条件</h2>
+<h3 id="堆内内存">堆内内存</h3>
+<p>针对 HotSpot VM 的实现，它里面的 GC 其实准确分类只有两大种：</p>
+<ol>
+<li><strong>Partial GC</strong>：并不收集整个 GC 堆的模式
+<ol>
+<li><strong>Young GC（Minor GC）</strong>：只收集 Young Gen 的 GC</li>
+<li><strong>Old GC</strong>：只收集 Old Gen 的 GC。只有 CMS的 Concurrent Collection 是这个模式</li>
+<li><strong>Mixed GC</strong>：收集整个 Young Gen 以及部分 Old Gen 的 GC。只有 G1 有这个模式</li>
+</ol>
+</li>
+<li><strong>Full GC（Major GC）</strong>：收集整个堆，包括 Young Gen、Old Gen、Perm Gen（如果存在的话）等所有部分的 GC 模式。</li>
+</ol>
+<p>最简单的分代式GC策略，按 HotSpot VM 的 serial GC 的实现来看，触发条件是</p>
+<ul>
+<li><strong>Young GC</strong>：当 Young Gen 中的 eden 区分配满的时候触发。把 Eden 区存活的对象将被复制到一个 Survivor 区，当这个 Survivor 区满时，此区的存活对象将被复制到另外一个 Survivor 区。</li>
+<li><strong>Full GC</strong>：
+<ul>
+<li>当准备要触发一次 Young GC 时，如果发现之前 Young GC 的平均晋升大小比目前 Old Gen剩余的空间大，则不会触发 Young GC 而是转为触发 Full GC
+<blockquote>
+<p>除了 CMS 的 Concurrent Collection 之外，其它能收集 Old Gen 的GC都会同时收集整个 GC 堆，包括 Young Gen，所以不需要事先触发一次单独的Young GC</p>
+</blockquote>
+</li>
+<li>如果有 Perm Gen 的话，要在 Perm Gen分配空间但已经没有足够空间时</li>
+<li><code>System.gc()</code></li>
+<li>Heap dump</li>
+</ul>
+</li>
+</ul>
+<p>并发 GC 的触发条件就不太一样。以 CMS GC 为例，它主要是定时去检查 Old Gen 的使用量，当使用量超过了触发比例就会启动一次 GC，对 Old Gen做并发收集。</p>
+<h3 id="堆外内存">堆外内存</h3>
+<p><code>DirectByteBuffer</code> 的引用是直接分配在堆得 <code>Old</code> 区的，因此其回收时机是在 <code>FullGC</code> 时。因此，需要避免频繁的分配 <code>DirectByteBuffer</code> ，这样很容易导致 <code>Native Memory</code> 溢出。</p>
+<p><code>DirectByteBuffer</code> 申请的直接内存，不再GC范围之内，无法自动回收。JDK 提供了一种机制，可以为堆内存对象注册一个钩子函数(其实就是实现 <code>Runnable</code> 接口的子类)，当堆内存对象被GC回收的时候，会回调run方法，我们可以在这个方法中执行释放 <code>DirectByteBuffer</code> 引用的直接内存，即在run方法中调用 <code>Unsafe</code> 的 <code>freeMemory</code> 方法。注册是通过<code>sun.misc.Cleaner</code> 类来实现的。</p>
+<h2 id="垃圾收集器">垃圾收集器</h2>
+<p>垃圾收集器是内存回收的具体实现，下图展示了 7 种用于不同分代的收集器，两个收集器之间有连线表示可以搭配使用，每种收集器都有最适合的使用场景。</p>
+<p><img src="./assists/garbage_collector.svg" alt=""></p>
+<h3 id="serial-收集器">Serial 收集器</h3>
+<p>Serial 收集器是最基本的收集器，这是一个单线程收集器，它只用一个线程去完成垃圾收集工作。</p>
+<p>虽然 Serial 收集器的缺点很明显，但是它仍然是 JVM 在 Client 模式下的默认新生代收集器。它有着优于其他收集器的地方：简单而高效（与其他收集器的单线程比较），Serial 收集器由于没有线程交互的开销，专心只做垃圾收集自然也获得最高的效率。在用户桌面场景下，分配给 JVM 的内存不会太多，停顿时间完全可以在几十到一百多毫秒之间，只要收集不频繁，这是完全可以接受的。</p>
+<h3 id="parnew-收集器">ParNew 收集器</h3>
+<p>ParNew 是 Serial 的多线程版本，在回收算法、对象分配原则上都是一致的。ParNew 收集器是许多运行在Server 模式下的默认新生代垃圾收集器，其主要与 CMS 收集器配合工作。</p>
+<h3 id="parallel-scavenge-收集器">Parallel Scavenge 收集器</h3>
+<p>Parallel Scavenge 收集器是一个新生代垃圾收集器，也是并行的多线程收集器。</p>
+<p>Parallel Scavenge 收集器更关注可控制的吞吐量，吞吐量等于运行用户代码的时间/(运行用户代码的时间+垃圾收集时间)。</p>
+<h3 id="serial-old收集器">Serial Old收集器</h3>
+<p>Serial Old 收集器是 Serial 收集器的老年代版本，也是一个单线程收集器，采用“标记-整理算法”进行回收。</p>
+<h3 id="parallel-old-收集器">Parallel Old 收集器</h3>
+<p>Parallel Old 收集器是 Parallel Scavenge 收集器的老年代版本，使用多线程进行垃圾回收，其通常与 Parallel Scavenge 收集器配合使用。</p>
+<h3 id="cms-收集器">CMS 收集器</h3>
+<p>CMS（Concurrent Mark Sweep）收集器是一种以获取最短停顿时间为目标的收集器， CMS 收集器采用 <code>标记--清除</code> 算法，运行在老年代。主要包含以下几个步骤：</p>
+<ul>
+<li>初始标记</li>
+<li>并发标记</li>
+<li>重新标记</li>
+<li>并发清除</li>
+</ul>
+<p>其中初始标记和重新标记仍然需要 <strong>Stop the world</strong>。初始标记仅仅标记 GC Root 能直接关联的对象，并发标记就是进行 GC Root Tracing 过程，而重新标记则是为了修正并发标记期间，因用户程序继续运行而导致标记变动的那部分对象的标记记录。</p>
+<p>由于整个过程中最耗时的并发标记和并发清除，收集线程和用户线程一起工作，所以总体上来说， CMS 收集器回收过程是与用户线程并发执行的。虽然 CMS 优点是并发收集、低停顿，很大程度上已经是一个不错的垃圾收集器，但是还是有三个显著的缺点：</p>
+<ul>
+<li>
+<p><strong>CMS收集器对CPU资源很敏感</strong>：在并发阶段，虽然它不会导致用户线程停顿，但是会因为占用一部分线程（CPU资源）而导致应用程序变慢。</p>
+</li>
+<li>
+<p><strong>CMS收集器不能处理浮动垃圾</strong>：所谓的“浮动垃圾”，就是在并发标记阶段，由于用户程序在运行，那么自然就会有新的垃圾产生，这部分垃圾被标记过后，CMS 无法在当次集中处理它们，只好在下一次 GC 的时候处理，这部分未处理的垃圾就称为“浮动垃圾”。</p>
+</li>
+<li>
+<p><strong>GC 后产生大量内存碎片</strong>：当内存碎片过多时，将会给分配大对象带来困难，这是就会进行 Full GC。</p>
+</li>
+</ul>
+<p>正是由于在垃圾收集阶段程序还需要运行，即还需要预留足够的内存空间供用户使用，因此 CMS 收集器不能像其他收集器那样等到老年代几乎填满才进行收集，需要预留一部分空间提供并发收集时程序运作使用。要是 CMS 预留的内存空间不能满足程序的要求，这是 JVM 就会启动预备方案：<strong>临时启动 Serial Old 收集器来收集老年代</strong>，这样停顿的时间就会很长。</p>
+<h3 id="g1收集器">G1收集器</h3>
+<p>G1收集器与CMS相比有很大的改进：</p>
+<ul>
+<li><strong>标记整理算法</strong>：G1 收集器采用标记整理算法实现</li>
+<li><strong>增量回收模式</strong>：将 Heap 分割为多个 Region，并在后台维护一个优先列表，每次根据允许的时间，优先回收垃圾最多的区域</li>
+</ul>
+<p>因此 G1 收集器可以实现在基本不牺牲吞吐量的情况下完成低停顿的内存回收，这是正是由于它极力的避免全区域的回收。</p>
+<table>
+<thead>
+<tr>
+<th align="left">垃圾收集器</th>
+<th align="left">特性</th>
+<th align="left">算法</th>
+<th align="left">优点</th>
+<th align="left">缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">Serial</td>
+<td align="left">串行</td>
+<td align="left">复制</td>
+<td align="left">高效：无线程切换</td>
+<td align="left">无法利用多核CPU</td>
+</tr>
+<tr>
+<td align="left">ParNew</td>
+<td align="left">并行</td>
+<td align="left">复制</td>
+<td align="left">可利用多核CPU、唯一能与CMS配合的并行收集器</td>
+<td></td>
+</tr>
+<tr>
+<td align="left">Parallel Scavenge</td>
+<td align="left">并行</td>
+<td align="left">复制</td>
+<td align="left">高吞吐量</td>
+<td></td>
+</tr>
+<tr>
+<td align="left">Serial Old</td>
+<td align="left">串行</td>
+<td align="left">标记整理</td>
+<td align="left">高效</td>
+<td align="left">无法利用多核CPU</td>
+</tr>
+<tr>
+<td align="left">Parallel Old</td>
+<td align="left">并行</td>
+<td align="left">标记整理</td>
+<td align="left">高吞吐量</td>
+<td></td>
+</tr>
+<tr>
+<td align="left">CMS</td>
+<td align="left">并行</td>
+<td align="left">标记清除</td>
+<td align="left">低停顿</td>
+<td align="left">CPU敏感、浮动垃圾、内存碎片</td>
+</tr>
+<tr>
+<td align="left">G1</td>
+<td align="left">并行</td>
+<td align="left">增量回收</td>
+<td align="left">低停顿、高吞吐量</td>
+<td align="left">内存使用效率低：分区导致内存不能充分使用</td>
+</tr>
+</tbody>
+</table>
+</article>
+ 
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+  <div>
+    
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/d87c891b02a4575f586779f1dd582e21a44d7541" title='Last modified by haoyang.shi | 2020-02-16' target="_blank" rel="noopener">
+      <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
+      <span>2020-02-16</span>
+    </a>
+  </div>
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/java/jvm/gc/index.md" target="_blank" rel="noopener">
+      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
+      
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#对象存活检测">对象存活检测</a>
+      <ul>
+        <li><a href="#引用计数算法">引用计数算法</a></li>
+        <li><a href="#根搜索算法">根搜索算法</a></li>
+      </ul>
+    </li>
+    <li><a href="#垃圾回收算法">垃圾回收算法</a>
+      <ul>
+        <li><a href="#复制回收算法">复制回收算法</a></li>
+        <li><a href="#标记清除算法">标记清除算法</a></li>
+        <li><a href="#标记整理算法">标记整理算法</a></li>
+        <li><a href="#增量回收">增量回收</a></li>
+        <li><a href="#分代回收">分代回收</a></li>
+      </ul>
+    </li>
+    <li><a href="#垃圾回收触发条件">垃圾回收触发条件</a>
+      <ul>
+        <li><a href="#堆内内存">堆内内存</a></li>
+        <li><a href="#堆外内存">堆外内存</a></li>
+      </ul>
+    </li>
+    <li><a href="#垃圾收集器">垃圾收集器</a>
+      <ul>
+        <li><a href="#serial-收集器">Serial 收集器</a></li>
+        <li><a href="#parnew-收集器">ParNew 收集器</a></li>
+        <li><a href="#parallel-scavenge-收集器">Parallel Scavenge 收集器</a></li>
+        <li><a href="#serial-old收集器">Serial Old收集器</a></li>
+        <li><a href="#parallel-old-收集器">Parallel Old 收集器</a></li>
+        <li><a href="#cms-收集器">CMS 收集器</a></li>
+        <li><a href="#g1收集器">G1收集器</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

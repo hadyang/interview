@@ -6,19 +6,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="个骰子的点数"><meta property="og:title" content="个骰子的点数" />
 <meta property="og:description" content="题目 把 n 个骰子扔在地上，所有骰子朝上一面的和为 s，输入 n，打印 s 所有可能值的概率
-解题思路  首先考虑一个骰子的情况，那么有 1～6 出现的次数均为 1 再增加一个骰子时，由于各个点数出现的概率一致。用 $$f(n,s)=f(n-1,s-1)&#43;f(n-1,s-2)&#43;f(n-1,s-3)&#43;f(n-1,s-4)&#43;f(n-1,s-5)&#43;f(n-1,s-6)$$ 使用两个数组循环求解  public void SumOfNDice(int n) { if (n &lt; 1) { return; } int[][] nums = new int[2][n * 6 &#43; 1]; int flag = 0; //初始化第一个骰子各总和出现的次数 int maxLen = nums[0].length; for (int i = 1; i &lt; maxLen; i&#43;&#43;) { nums[flag][i] = 1; } for (int i = 2; i &lt;= n; i&#43;&#43;) { int newFlag = flag ^ 0x01; Arrays." />
+解题思路  首先考虑一个骰子的情况，那么有 1～6 出现的次数均为 1 再增加一个骰子时，由于各个点数出现的概率一致。用   \(f(n,s)=f(n-1,s-1)&#43;f(n-1,s-2)&#43;f(n-1,s-3)&#43;f(n-1,s-4)&#43;f(n-1,s-5)&#43;f(n-1,s-6)\)   使用两个数组循环求解  public void SumOfNDice(int n) { if (n &lt; 1) { return; } int[][] nums = new int[2][n * 6 &#43; 1]; int flag = 0; //初始化第一个骰子各总和出现的次数 int maxLen = nums[0].length; for (int i = 1; i &lt; maxLen; i&#43;&#43;) { nums[flag][i] = 1; } for (int i = 2; i &lt;= n; i&#43;&#43;) { int newFlag = flag ^ 0x01; Arrays." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/offer/SumOfNDice/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2019-09-28T09:50:48+08:00" />
+<meta property="article:modified_time" content="2020-02-16T17:16:32+08:00" />
 <title>个骰子的点数 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/interview/book.min.68d45956421753cdf6bcfc865ede445c56afc5bcaaebfe02961f44fe77d8f45a.css" integrity="sha256-aNRZVkIXU832vPyGXt5EXFavxbyq6/4Clh9E/nfY9Fo=">
+<link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.b3b2c70afee32e5f8f47d39dd103f314de9204a50c836cb3bd12458767dc3432.js" integrity="sha256-s7LHCv7jLl&#43;PR9Od0QPzFN6SBKUMg2yzvRJFh2fcNDI="></script>
+<script defer src="/interview/en.search.min.6428487c559814b45170a26d7292c7d790a6496210f62ec666f9f4a021518372.js" integrity="sha256-ZChIfFWYFLRRcKJtcpLH15CmSWIQ9i7GZvn0oCFRg3I="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -41,18 +41,18 @@ https://github.com/alex-shpak/hugo-book
 
 <body>
   <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="flex container">
-
-    <aside class="book-menu fixed">
-      <nav>
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
 <h2 class="book-brand">
-  <a href="https://hadyang.github.io/interview/"><span>Interview</span>
+  <a href="/interview"><span>Interview</span>
   </a>
 </h2>
 
 
 <div class="book-search">
-  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" />
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
   <div class="book-search-spinner spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
@@ -61,7 +61,11 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-    <ul>
+
+
+
+
+  <ul>
 <li><a href="/interview/docs/basic/">计算机基础</a>
 <ul>
 <li><a href="/interview/docs/basic/algo/">算法</a>
@@ -146,20 +150,15 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
 </ul>
 </li>
-<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<li><a href="/interview/docs/java/jvm/">Java虚拟机</a>
 <ul>
-<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/architecture/">JVM架构</a></li>
+<li><a href="/interview/docs/java/jvm/classloader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/runtime_area/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/gc/">垃圾收集</a></li>
 <li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
-<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
-<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/java/gc/">GC</a>
-<ul>
-<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
-<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String常量池</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-object-lifecycle/">对象生命周期</a></li>
 </ul>
 </li>
 </ul>
@@ -333,28 +332,52 @@ https://github.com/alex-shpak/hugo-book
 
 
 
+
+
+
 </nav>
 
 
-<script>
-(function() {
-  var menu = document.querySelector("aside.book-menu nav");
-  addEventListener("beforeunload", function(event) {
-    localStorage.setItem("menu.scrollTop", menu.scrollTop);
-  });
-  menu.scrollTop = localStorage.getItem("menu.scrollTop");
-})();
-</script>
 
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
     </aside>
 
     <div class="book-page">
-      <header class="flex align-center justify-between book-header">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
   <label for="menu-control">
     <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
+
   <strong>个骰子的点数</strong>
-</header>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#题目">题目</a></li>
+    <li><a href="#解题思路">解题思路</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
 
       
 <article class="markdown"><h2 id="题目">题目</h2>
@@ -362,7 +385,19 @@ https://github.com/alex-shpak/hugo-book
 <h2 id="解题思路">解题思路</h2>
 <ol>
 <li>首先考虑一个骰子的情况，那么有 1～6 出现的次数均为 1</li>
-<li>再增加一个骰子时，由于各个点数出现的概率一致。用 $$f(n,s)=f(n-1,s-1)+f(n-1,s-2)+f(n-1,s-3)+f(n-1,s-4)+f(n-1,s-5)+f(n-1,s-6)$$</li>
+<li>再增加一个骰子时，由于各个点数出现的概率一致。用 
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+
+
+
+<span class="katex">
+  \(f(n,s)=f(n-1,s-1)+f(n-1,s-2)+f(n-1,s-3)+f(n-1,s-4)+f(n-1,s-5)+f(n-1,s-6)\)
+</span>
+</li>
 <li>使用两个数组循环求解</li>
 </ol>
 <pre><code>public void SumOfNDice(int n) {
@@ -409,53 +444,73 @@ https://github.com/alex-shpak/hugo-book
     }
 }
 </code></pre></article>
+ 
 
-      <div class="book-footer justify-between">
-  
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
 
-  
-  
+
+
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/4aa999772f091bbec6654909c2d32614aede803b" title='Last modified by haoyang.shi | 2019-09-28' target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/d87c891b02a4575f586779f1dd582e21a44d7541" title='Last modified by haoyang.shi | 2020-02-16' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2019-09-28</span>
+      <span>2020-02-16</span>
     </a>
   </div>
-  
-  
 
-  
+
+
   <div>
-    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/offer/SumOfNDice/index.md" target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/offer/SumOfNDice/index.md" target="_blank" rel="noopener">
       <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
       <span>Edit this page</span>
     </a>
   </div>
-  
 
 </div>
 
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
       
     </div>
 
     
-  
-
-  <aside class="book-toc levels-3 fixed">
-    <nav id="TableOfContents">
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
   <ul>
     <li><a href="#题目">题目</a></li>
     <li><a href="#解题思路">解题思路</a></li>
   </ul>
 </nav>
-  </aside>
 
-
-
+ 
+    </aside>
+    
   </main>
 
   
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+

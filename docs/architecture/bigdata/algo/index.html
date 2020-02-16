@@ -7,25 +7,21 @@
 <meta name="description" content="大数据基础算法"><meta property="og:title" content="大数据基础算法" />
 <meta property="og:description" content="Bloom filter 适用范围 实现数据字典，进行数据的判重，或者集合求交集
 基本原理 　对于原理来说很简单，Bit-Map &#43; K个独立 Hash 函数。将 Hash 函数对应的值的位数组置1，查找时如果发现所有 Hash 函数对应位都是1说明存在。很明显这个过程并不保证查找的结果是 100% 正确的。同时也不支持删除一个已经插入的关键字，因为该关键字对应的位会牵动到其他的关键字。所以一个简单的改进就是 Counting Bloom filter，用一个 Counter 数组代替位数组，就可以支持删除了。
-对于元素个数：$n$，错误率（假阳率）：$P$。我们可以计算：
- Bit-Map 大小：$m\ge -\frac{n\times ln^P}{(ln^2)^2}$ Hash 函数个数：$k=log_2^\frac{1}{P}$   参数在线计算工具：https://hur.st/bloomfilter
- 举个例子我们假设 $P=0.01$，$n=4000$，则此时 m 应大概是 $9.5\times n=38000$ bit，$k=7$
-注意这里 m 与 n 的单位不同，m是 bit 为单位，而n则是以元素个数为单位(准确的说是不同元素的个数)。通常单个元素的长度都是有很多 bit 的。所以使用bloom filter内存上通常都是节省的。
-扩展 　Bloom filter 将集合中的元素映射到位数组中，用 k 个映射位是否全1表示元素在不在这个集合中。Counting bloom filter（CBF）将 位数组中的每一位扩展为一个 Counter，从而支持了元素的删除操作。Spectral Bloom Filter（SBF）将其与集合元素的出现次数关联。SBF采用 Counter 中的最小值来近似表示元素的出现频率。
-问题实例 给你A,B两个文件，各存放50亿条URL，每条URL占用64字节，内存限制是4G，让你找出A,B文件共同的URL。如果是三个乃至n个文件呢？
-答：根据这个问题我们来计算下内存的占用，4G=2^32大概是40亿*8大概是 340亿，n=50亿，如果按出错率 0." />
+对于元素个数：   \(n\)  ，错误率（假阳率）： \(P\)  。我们可以计算：
+ Bit-Map 大小： \(m\ge -\frac{n\times ln^P}{(ln^2)^2}\)   Hash 函数个数： \(k=log_2^\frac{1}{P}\)     参数在线计算工具：https://hur.st/bloomfilter
+ 举个例子我们假设 \(P=0.01\)  ， \(n=4000\)  ，则此时 m 应大概是 \(9.5\times n=38000\)  bit， \(k=7\)  注意这里 m 与 n 的单位不同，m是 bit 为单位，而n则是以元素个数为单位(准确的说是不同元素的个数)。通常单个元素的长度都是有很多 bit 的。所以使用bloom filter内存上通常都是节省的。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/architecture/bigdata/algo/" />
 <meta property="article:published_time" content="2020-01-22T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-01-22T19:35:42+08:00" />
+<meta property="article:modified_time" content="2020-02-16T17:16:32+08:00" />
 <title>大数据基础算法 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/interview/book.min.68d45956421753cdf6bcfc865ede445c56afc5bcaaebfe02961f44fe77d8f45a.css" integrity="sha256-aNRZVkIXU832vPyGXt5EXFavxbyq6/4Clh9E/nfY9Fo=">
+<link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.b3b2c70afee32e5f8f47d39dd103f314de9204a50c836cb3bd12458767dc3432.js" integrity="sha256-s7LHCv7jLl&#43;PR9Od0QPzFN6SBKUMg2yzvRJFh2fcNDI="></script>
+<script defer src="/interview/en.search.min.6428487c559814b45170a26d7292c7d790a6496210f62ec666f9f4a021518372.js" integrity="sha256-ZChIfFWYFLRRcKJtcpLH15CmSWIQ9i7GZvn0oCFRg3I="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -48,18 +44,18 @@ https://github.com/alex-shpak/hugo-book
 
 <body>
   <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="flex container">
-
-    <aside class="book-menu fixed">
-      <nav>
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
 <h2 class="book-brand">
-  <a href="https://hadyang.github.io/interview/"><span>Interview</span>
+  <a href="/interview"><span>Interview</span>
   </a>
 </h2>
 
 
 <div class="book-search">
-  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" />
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
   <div class="book-search-spinner spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
@@ -68,7 +64,11 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-    <ul>
+
+
+
+
+  <ul>
 <li><a href="/interview/docs/basic/">计算机基础</a>
 <ul>
 <li><a href="/interview/docs/basic/algo/">算法</a>
@@ -153,20 +153,15 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
 </ul>
 </li>
-<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<li><a href="/interview/docs/java/jvm/">Java虚拟机</a>
 <ul>
-<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/architecture/">JVM架构</a></li>
+<li><a href="/interview/docs/java/jvm/classloader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/runtime_area/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/gc/">垃圾收集</a></li>
 <li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
-<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
-<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/java/gc/">GC</a>
-<ul>
-<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
-<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String常量池</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-object-lifecycle/">对象生命周期</a></li>
 </ul>
 </li>
 </ul>
@@ -340,28 +335,141 @@ https://github.com/alex-shpak/hugo-book
 
 
 
+
+
+
 </nav>
 
 
-<script>
-(function() {
-  var menu = document.querySelector("aside.book-menu nav");
-  addEventListener("beforeunload", function(event) {
-    localStorage.setItem("menu.scrollTop", menu.scrollTop);
-  });
-  menu.scrollTop = localStorage.getItem("menu.scrollTop");
-})();
-</script>
 
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
     </aside>
 
     <div class="book-page">
-      <header class="flex align-center justify-between book-header">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
   <label for="menu-control">
     <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
+
   <strong>大数据基础算法</strong>
-</header>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#bloom-filter">Bloom filter</a>
+      <ul>
+        <li><a href="#适用范围">适用范围</a></li>
+        <li><a href="#基本原理">基本原理</a></li>
+        <li><a href="#扩展">扩展</a></li>
+        <li><a href="#问题实例">问题实例</a></li>
+      </ul>
+    </li>
+    <li><a href="#hashing">Hashing</a>
+      <ul>
+        <li><a href="#适用范围-1">适用范围</a></li>
+        <li><a href="#基本原理-1">基本原理</a></li>
+        <li><a href="#扩展-1">扩展</a></li>
+        <li><a href="#问题实例-1">问题实例：</a></li>
+      </ul>
+    </li>
+    <li><a href="#bit-map">bit-map</a>
+      <ul>
+        <li><a href="#适用范围-2">适用范围</a></li>
+        <li><a href="#基本原理-2">基本原理</a></li>
+        <li><a href="#扩展-2">扩展</a></li>
+        <li><a href="#问题实例-2">问题实例</a></li>
+      </ul>
+    </li>
+    <li><a href="#hyperloglog">HyperLogLog</a>
+      <ul>
+        <li><a href="#原理">原理</a></li>
+      </ul>
+    </li>
+    <li><a href="#simhash">Simhash</a></li>
+    <li><a href="#堆">堆</a>
+      <ul>
+        <li><a href="#适用范围-3">适用范围</a></li>
+        <li><a href="#基本原理-3">基本原理</a></li>
+        <li><a href="#扩展-3">扩展</a></li>
+        <li><a href="#问题实例-3">问题实例：</a></li>
+      </ul>
+    </li>
+    <li><a href="#双层桶划分">双层桶划分</a>
+      <ul>
+        <li><a href="#适用范围-4">适用范围</a></li>
+        <li><a href="#基本原理-4">基本原理</a></li>
+        <li><a href="#扩展-4">扩展</a></li>
+        <li><a href="#问题实例-4">问题实例</a></li>
+      </ul>
+    </li>
+    <li><a href="#数据库索引">数据库索引</a>
+      <ul>
+        <li><a href="#适用范围-5">适用范围</a></li>
+        <li><a href="#基本原理-5">基本原理</a></li>
+      </ul>
+    </li>
+    <li><a href="#倒排索引inverted-index">倒排索引(Inverted index)</a>
+      <ul>
+        <li><a href="#适用范围-6">适用范围</a></li>
+        <li><a href="#基本原理-6">基本原理</a></li>
+        <li><a href="#扩展-5">扩展</a></li>
+        <li><a href="#问题实例-5">问题实例</a></li>
+      </ul>
+    </li>
+    <li><a href="#k-路归并">K 路归并</a>
+      <ul>
+        <li><a href="#适用范围-7">适用范围</a></li>
+        <li><a href="#基本原理-7">基本原理</a></li>
+        <li><a href="#问题实例-6">问题实例</a></li>
+      </ul>
+    </li>
+    <li><a href="#败胜者树">败/胜者树</a>
+      <ul>
+        <li><a href="#基本原理-8">基本原理</a></li>
+      </ul>
+    </li>
+    <li><a href="#置换选择排序">置换选择排序</a></li>
+    <li><a href="#最佳归并树">最佳归并树</a></li>
+    <li><a href="#trie树">Trie树</a>
+      <ul>
+        <li><a href="#适用范围-8">适用范围</a></li>
+        <li><a href="#基本原理-9">基本原理</a></li>
+        <li><a href="#扩展-6">扩展</a></li>
+        <li><a href="#问题实例-7">问题实例</a></li>
+      </ul>
+    </li>
+    <li><a href="#map-reduce">map-reduce</a>
+      <ul>
+        <li><a href="#适用范围-9">适用范围</a></li>
+        <li><a href="#基本原理及要点">基本原理及要点</a></li>
+        <li><a href="#问题实例-8">问题实例</a></li>
+      </ul>
+    </li>
+    <li><a href="#经典问题分析">经典问题分析</a></li>
+    <li><a href="#参考链接">参考链接</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
 
       
 <article class="markdown"><h2 id="bloom-filter">Bloom filter</h2>
@@ -370,15 +478,62 @@ https://github.com/alex-shpak/hugo-book
 <h3 id="基本原理">基本原理</h3>
 <p>　　对于原理来说很简单，<strong>Bit-Map + K个独立 Hash 函数</strong>。将 Hash 函数对应的值的位数组置<code>1</code>，<strong>查找时如果发现所有 Hash 函数对应位都是<code>1</code>说明存在</strong>。很明显这个过程并不保证查找的结果是 100% 正确的。同时也不支持删除一个已经插入的关键字，因为该关键字对应的位会牵动到其他的关键字。所以一个简单的改进就是 <strong>Counting Bloom filter</strong>，用一个 Counter 数组代替位数组，就可以支持删除了。</p>
 <p><img src="./assets/Bloom_Filter.png" alt="Bloom_Filter"></p>
-<p>对于元素个数：$n$，错误率（假阳率）：$P$。我们可以计算：</p>
+<p>对于元素个数：
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+
+
+
+<span class="katex">
+  \(n\)
+</span>
+，错误率（假阳率）：
+
+<span class="katex">
+  \(P\)
+</span>
+。我们可以计算：</p>
 <ul>
-<li>Bit-Map 大小：$m\ge -\frac{n\times ln^P}{(ln^2)^2}$</li>
-<li>Hash 函数个数：$k=log_2^\frac{1}{P}$</li>
+<li>Bit-Map 大小：
+
+<span class="katex">
+  \(m\ge -\frac{n\times ln^P}{(ln^2)^2}\)
+</span>
+</li>
+<li>Hash 函数个数：
+
+<span class="katex">
+  \(k=log_2^\frac{1}{P}\)
+</span>
+</li>
 </ul>
 <blockquote>
 <p>参数在线计算工具：https://hur.st/bloomfilter</p>
 </blockquote>
-<p>举个例子我们假设 $P=0.01$，$n=4000$，则此时 m 应大概是 $9.5\times n=38000$ bit，$k=7$</p>
+<p>举个例子我们假设 
+
+<span class="katex">
+  \(P=0.01\)
+</span>
+，
+
+<span class="katex">
+  \(n=4000\)
+</span>
+，则此时 m 应大概是 
+
+<span class="katex">
+  \(9.5\times n=38000\)
+</span>
+ bit，
+
+<span class="katex">
+  \(k=7\)
+</span>
+</p>
 <p>注意这里 m 与 n 的单位不同，m是 <code>bit</code> 为单位，而n则是以元素个数为单位(准确的说是不同元素的个数)。通常单个元素的长度都是有很多 <code>bit</code> 的。所以使用bloom filter内存上通常都是节省的。</p>
 <h3 id="扩展">扩展</h3>
 <p>　　Bloom filter 将集合中的元素映射到位数组中，用 k 个映射位是否全1表示元素在不在这个集合中。<code>Counting bloom filter（CBF）</code>将 <strong>位数组中的每一位扩展为一个 Counter</strong>，从而支持了元素的删除操作。<code>Spectral Bloom Filter（SBF）</code>将其与集合元素的出现次数关联。<strong><code>SBF</code>采用 Counter 中的最小值来近似表示元素的出现频率</strong>。</p>
@@ -405,8 +560,18 @@ https://github.com/alex-shpak/hugo-book
 <p>可进行数据的快速查找，判重，删除，一般来说数据范围是int的10倍以下</p>
 <h3 id="基本原理-2">基本原理</h3>
 <p>使用bit数组来表示某些元素是否存在，比如8位电话号码。例如bit数组 <code>001101001001101001</code> 代表实际数组 <code>[2,3,5,8]</code> 。新加入一个元素，只需要将已有的bit数组和新加入的数字做按位或 <code>or</code> 计算。bitmap中 <code>1</code> 的数量就是集合的基数值。</p>
-<p>bitmap 有一个很明显的优势是可以轻松合并多个统计结果，只需要对多个结果求异或就可以。也可以大大减少存储内存，可以做个简单的计算，如果要统计1亿个数据的基数值，大约需要内存： $100000000/8/1024/1024 \approx≈ 12$M
-如果用 32bit 的 int 代表每个统计数据，大约需要内存：$32*100000000/8/1024/1024 \approx≈ 381$M</p>
+<p>bitmap 有一个很明显的优势是可以轻松合并多个统计结果，只需要对多个结果求异或就可以。也可以大大减少存储内存，可以做个简单的计算，如果要统计1亿个数据的基数值，大约需要内存： 
+
+<span class="katex">
+  \(100000000/8/1024/1024 \approx≈ 12\)
+</span>
+M
+如果用 32bit 的 int 代表每个统计数据，大约需要内存：
+
+<span class="katex">
+  \(32*100000000/8/1024/1024 \approx≈ 381\)
+</span>
+M</p>
 <p>bitmap 对于内存的节约量是显而易见的，但还是不够。统计一个对象的基数值需要<code>12M</code>，如果统计 <code>10000</code> 个对象，就需要将近 <code>120G</code> 了，同样不能广泛用于大数据场景。</p>
 <h3 id="扩展-2">扩展</h3>
 <p>bloom filter可以看做是对bit-map的扩展</p>
@@ -423,23 +588,82 @@ https://github.com/alex-shpak/hugo-book
 </ul>
 <hr>
 <h2 id="hyperloglog">HyperLogLog</h2>
-<p><a href="http://www.rainybowe.com/blog/2017/07/13/%E7%A5%9E%E5%A5%87%E7%9A%84HyperLogLog%E7%AE%97%E6%B3%95/index.html">基数计数基本概念</a></p>
 <p><a href="http://content.research.neustar.biz/blog/hll.html">算法演示</a></p>
-<p>上面我们计算过用 bitmap 存储 1亿 个统计数据大概需要 <code>12M</code> 内存；而在 HLL 中，只需要不到 <code>1K</code> 内存就能做到；redis中实现的 <code>HyperLogLog</code> ，只需要 <code>12K</code> 内存，在标准误差 <code>0.81%</code> 的前提下，能够统计 $2^{64}$ 个数据。首先容我感叹一下数学的强大和魅力，那么概率算法是怎样做到如此节省内存的，又是怎样控制误差的呢？</p>
+<p>上面我们计算过用 bitmap 存储 1亿 个统计数据大概需要 <code>12M</code> 内存；而在 HLL 中，只需要不到 <code>1K</code> 内存就能做到；redis中实现的 <code>HyperLogLog</code> ，只需要 <code>12K</code> 内存，在标准误差 <code>0.81%</code> 的前提下，能够统计 
+
+<span class="katex">
+  \(2^{64}\)
+</span>
+ 个数据。首先容我感叹一下数学的强大和魅力，那么概率算法是怎样做到如此节省内存的，又是怎样控制误差的呢？</p>
 <p>HLL中实际存储的是一个长度为 <code>m</code> 的大数组 <code>S</code> ，将待统计的数据集合划分成 m 组，每组根据算法记录一个统计值存入数组中。数组的大小 m 由算法实现方自己确定，redis中这个数组的大小是 <code>16834</code>，m 越大，基数统计的误差越小，但需要的内存空间也越大。</p>
 <ol>
 <li>通过hash函数计算输入值对应的比特串</li>
-<li>比特串的低 $t(t=log_2^m)t$ 位对应的数字用来找到数组 <code>S</code> 中对应的位置 <code>i</code></li>
-<li>$t+1$ 位开始找到第一个 <code>1</code> 出现的位置 <code>k</code>，将 <code>k</code> 记入数组 $S_i$ 位置</li>
-<li>基于数组 <code>S</code> 记录的所有数据的统计值，计算整体的基数值，计算公式可以简单表示为：$\hat{n}=f(S)$</li>
+<li>比特串的低 
+
+<span class="katex">
+  \(t(t=log_2^m)t\)
+</span>
+ 位对应的数字用来找到数组 <code>S</code> 中对应的位置 <code>i</code></li>
+<li>
+
+<span class="katex">
+  \(t+1\)
+</span>
+ 位开始找到第一个 <code>1</code> 出现的位置 <code>k</code>，将 <code>k</code> 记入数组 
+
+<span class="katex">
+  \(S_i\)
+</span>
+ 位置</li>
+<li>基于数组 <code>S</code> 记录的所有数据的统计值，计算整体的基数值，计算公式可以简单表示为：
+
+<span class="katex">
+  \(\hat{n}=f(S)\)
+</span>
+</li>
 </ol>
 <h3 id="原理">原理</h3>
-<p>举一个我们最熟悉的抛硬币例子，出现正反面的概率都是 <code>1/2</code> ，一直抛硬币直到出现正面，记录下投掷次数 <code>k</code> ，将这种抛硬币多次直到出现正面的过程记为一次伯努利过程，对于 <code>n</code> 次伯努利过程，我们会得到nn个出现正面的投掷次数值 $k_1$, $k_2$ …… $k_n$，其中最大值记为 $k_{max}$，那么可以得到下面结论：</p>
+<p>举一个我们最熟悉的抛硬币例子，出现正反面的概率都是 <code>1/2</code> ，一直抛硬币直到出现正面，记录下投掷次数 <code>k</code> ，将这种抛硬币多次直到出现正面的过程记为一次伯努利过程，对于 <code>n</code> 次伯努利过程，我们会得到nn个出现正面的投掷次数值 
+
+<span class="katex">
+  \(k_1\)
+</span>
+, 
+
+<span class="katex">
+  \(k_2\)
+</span>
+ …… 
+
+<span class="katex">
+  \(k_n\)
+</span>
+，其中最大值记为 
+
+<span class="katex">
+  \(k_{max}\)
+</span>
+，那么可以得到下面结论：</p>
 <ul>
-<li>n 次伯努利过程的投掷次数都不大于 $k_{max}$</li>
-<li>n 次伯努利过程，至少有一次投掷次数等于 $k_{max}$
+<li>n 次伯努利过程的投掷次数都不大于 
+
+<span class="katex">
+  \(k_{max}\)
+</span>
+</li>
+<li>n 次伯努利过程，至少有一次投掷次数等于 
+
+<span class="katex">
+  \(k_{max}\)
+</span>
+
 ​​
-回到基数统计的问题，我们需要统计一组数据中不重复元素的个数，集合中每个元素的经过hash函数后可以表示成 0 和 1 构成的二进制数串，一个二进制串可以类比为一次抛硬币实验，1 是抛到正面，0 是反面。二进制串中从低位开始第一个 1 出现的位置可以理解为抛硬币试验中第一次出现正面的抛掷次数 <code>k</code> ，那么基于上面的结论，我们可以通过多次抛硬币实验的最大抛到正面的次数来预估总共进行了多少次实验，同样可以可以通过第一个 1 出现位置的最大值 $k_{max}$ 来预估总共有多少个不同的数字（整体基数）。</li>
+回到基数统计的问题，我们需要统计一组数据中不重复元素的个数，集合中每个元素的经过hash函数后可以表示成 0 和 1 构成的二进制数串，一个二进制串可以类比为一次抛硬币实验，1 是抛到正面，0 是反面。二进制串中从低位开始第一个 1 出现的位置可以理解为抛硬币试验中第一次出现正面的抛掷次数 <code>k</code> ，那么基于上面的结论，我们可以通过多次抛硬币实验的最大抛到正面的次数来预估总共进行了多少次实验，同样可以可以通过第一个 1 出现位置的最大值 
+
+<span class="katex">
+  \(k_{max}\)
+</span>
+ 来预估总共有多少个不同的数字（整体基数）。</li>
 </ul>
 <p>这种通过局部信息预估整体数据流特性的方法似乎有些超出我们的基本认知，需要用概率和统计的方法才能推导和验证这种关联关系。HyperLogLog 核心在于观察集合中每个数字对应的比特串，通过统计和记录比特串中最大的出现 1 的位置来估计集合整体的基数，可以大大减少内存耗费。</p>
 <hr>
@@ -515,25 +739,67 @@ T2 = &quot;it is a banana&quot;
 <h3 id="问题实例-5">问题实例</h3>
 <p>文档检索系统，查询那些文件包含了某单词，比如常见的学术论文的关键字搜索。</p>
 <hr>
-<h2 id="外排序">外排序</h2>
-<p><a href="https://blog.csdn.net/lsf921016/article/details/64885699">https://blog.csdn.net/lsf921016/article/details/64885699</a>
-<a href="http://data.biancheng.net/view/78.html">http://data.biancheng.net/view/78.html</a></p>
+<h2 id="k-路归并">K 路归并</h2>
 <h3 id="适用范围-7">适用范围</h3>
-<p>大数据的排序，去重。场景具有很明显的特点，词的大小为16个字节，但是内存只有 1m 做 hash 有些不够，所以可以用来排序。内存可以当输入缓冲区使用。</p>
+<p>大数据的排序，去重。</p>
 <h3 id="基本原理-7">基本原理</h3>
 <p>一般来说外排序分为两个步骤：预处理和合并排序。</p>
-<ul>
-<li>根据可用内存的大小，将外存上含有 n 个纪录的文件分成若干长度为t的子文件（或段）；</li>
-<li>利用内部排序的方法，对每个子文件的t个纪录进行内部排序。</li>
-<li>这些经过排序的子文件（段）通常称为顺串(run)，顺串生成后即将其写入外存。这样在外存上就得到了m个顺串（m=[n/t]）。</li>
-<li>对这些顺串进行归并，使顺串的长度逐渐增大，直到所有的待排序的记录成为一个顺串为止。</li>
-</ul>
-<h3 id="扩展-6">扩展</h3>
-<p>外排序的归并方法，置换选择败者树原理，最优归并树</p>
+<ol>
+<li>按照内存大小，将大文件分成若干长度为 l 的子文件（l 应小于内存的可使用容量），然后将各个子文件依次读入内存，使用适当的内部排序算法对其进行排序（排好序的子文件统称为“归并段”或者“顺段”），将排好序的归并段重新写入外存，为下一个子文件排序腾出内存空间；</li>
+<li>对得到的顺段进行合并，直至得到整个有序的文件为止。</li>
+</ol>
 <h3 id="问题实例-6">问题实例</h3>
 <ul>
 <li>有一个1G大小的一个文件，里面每一行是一个词，词的大小不超过16个字节，内存限制大小是1M。返回频数最高的100个词。</li>
 </ul>
+<hr>
+<h2 id="败胜者树">败/胜者树</h2>
+<p>对于外部排序算法来说，其直接影响算法效率的因素为读写外存的次数，即次数越多，算法效率越低。若想提高算法的效率，即减少算法运行过程中读写外存的次数，可以增加 k 路平衡归并中的 k 值。但是如果毫无限度地增加 k 值，虽然会减少读写外存数据的次数，但会增加内部归并的时间，得不偿失。</p>
+<p>为了避免在增加 k 值的过程中影响内部归并的效率，在进行 k-路归并时可以使用 <strong>败者树</strong> 来实现，该方法在增加 k 值时不会影响其内部归并的效率。</p>
+<h3 id="基本原理-8">基本原理</h3>
+<p><strong>败/胜者树实际上是保存部分数据的比较结果</strong>，以减少新增数据的比较次数，以减少IO。对于无序表 <code>{49，38，65，97，76，13，27，49}</code> 创建的完全二叉树如图所示，构建此树的目的是选出无序表中的最小值。</p>
+<p><img src="assists/winner_tree.svg" alt=""></p>
+<p>这是一棵 <strong>胜者树</strong> 。因为树中每个非终端结点（除叶子结点之外的其它结点）中的值都表示的是左右孩子相比较后的较小值（谁最小即为胜者）。例如叶子结点 49 和 38 相对比，由于 38 更小，所以其双亲结点中的值保留的是胜者 38。然后用 38 去继续同上层去比较，一直比较到树的根结点。</p>
+<blockquote>
+<p>胜者树和败者树的区别就是：胜者树中的非终端结点中存储的是胜利的一方；而败者树中的非终端结点存储的是失败的一方。而在比较过程中，都是拿胜者去比较。</p>
+</blockquote>
+<p>对于 10 个临时文件，采用 5-路平衡归并时，若每次从 5 个文件中想得到一个最小值就需要比较 4 次。而采用败者树，只需要进行 2 次比较。以上仅仅是得到一个最小值记录，如要得到整个临时文件，其耗费的时间就会相差很大。</p>
+<hr>
+<h2 id="置换选择排序">置换选择排序</h2>
+<p>除了增加 k-路归并排序中的 k 值来提高外部排序效率的方法，还有另外一条路可走，即减少初始归并段的个数：<strong>置换选择排序</strong> 是为在较小的空间内，得到更大的有序段。相比于按照内存容量大小对初始文件进行等分，大大减少了初始归并段的数量，从而提高了外部排序的整体效率。</p>
+<blockquote>
+<p>通过置换选择排序算法得到的初始归并段，其长度并不会受内存容量的限制，且通过证明得知使用该方法所获得的归并段的平均长度为内存工作区大小的两倍。</p>
+</blockquote>
+<p>例如已知初始文件中总共有 24 个记录，假设内存工作区最多可容纳 6 个记录，按照之前的选择排序算法最少也只能分为 4 个初始归并段。而如果使用置换—选择排序，可以实现将 24 个记录分为 3 个初始归并段：</p>
+<p><img src="assists/swap_select.png" alt=""></p>
+<p>置换—选择排序算法的具体操作过程为：</p>
+<ol>
+<li>首先从初始文件中输入 6 个记录到内存工作区中；</li>
+<li>从内存工作区中选出关键字最小的记录，将其记为 <code>MINIMAX</code> 记录；</li>
+<li>然后将 <code>MINIMAX</code> 记录输出到归并段文件中；</li>
+<li>此时内存工作区中还剩余 5 个记录，若初始文件不为空，则从初始文件中输入下一个记录到内存工作区中；</li>
+<li>从内存工作区中的所有比 <code>MINIMAX</code> 值大的记录中选出值最小的关键字的记录，作为新的 <code>MINIMAX</code> 记录；</li>
+<li>重复过程 3—5，直至在内存工作区中选不出新的 <code>MINIMAX</code> 记录为止，由此就得到了一个初始归并段；</li>
+<li>重复 2—6，直至内存工作为空，由此就可以得到全部的初始归并段。</li>
+</ol>
+<hr>
+<h2 id="最佳归并树">最佳归并树</h2>
+<p>无论是通过等分还是置换-选择排序得到的归并段，如何设置它们的归并顺序，可以使得对外存的访问次数降到最低？现有通过置换选择排序算法所得到的 9 个初始归并段，其长度分别为：<code>9，30，12，18，3，17，2，6，24</code>。在对其采用 3-路平衡归并的方式时可能出现如图所示的情况：</p>
+<p><img src="assists/best_merge_tree_1.png" alt=""></p>
+<blockquote>
+<p>图中的叶子结点表示初始归并段，各自包含记录的长度用结点的权重来表示；非终端结点表示归并后的临时文件。</p>
+</blockquote>
+<p>假设在进行平衡归并时，操作每个记录都需要单独进行一次对外存的读写，那么图中的归并过程需要对外存进行读或者写的次数为：</p>
+<p>$$(9+30+12+18+3+17+2+6+24)\times 2 \times 2 = 484$$</p>
+<blockquote>
+<p>图中涉及到了两次归并，对外存的读和写各进行 2 次</p>
+</blockquote>
+<p>从计算结果上看，对于图中的 3 叉树来讲，其操作外存的次数恰好是树的带权路径长度的 2 倍。所以，对于如何减少访问外存的次数的问题，就等同于考虑如何使 k 路归并所构成的 k 叉树的带权路径长度最短。</p>
+<p>若想使树的带权路径长度最短，就是构造<strong>赫夫曼树</strong>。若对上述 9 个初始归并段构造一棵赫夫曼树作为归并树，如图所示：</p>
+<p><img src="assists/best_merge_tree_2.png" alt=""></p>
+<p>归并过程中需要对外存进行IO的次数为：</p>
+<p>$$(2\times3+3\times3+6\times3+9\times2+12\times2+17\times2+18\times2+24\times2+30)\times2=446$$</p>
+<p>通过以构建赫夫曼树的方式构建归并树，使其对读写外存的次数降至最低（k-路平衡归并，需要选取合适的 k 值，构建赫夫曼树作为归并树），所以称此归并树为 <strong>最佳归并树</strong> 。</p>
 <hr>
 <h2 id="trie树">Trie树</h2>
 <h3 id="适用范围-8">适用范围</h3>
@@ -544,18 +810,33 @@ T2 = &quot;it is a banana&quot;
 <li>最长公共前缀</li>
 <li>自动匹配前缀显示后缀</li>
 </ul>
-<h3 id="基本原理-8">基本原理</h3>
+<h3 id="基本原理-9">基本原理</h3>
 <p>Trie树的创建要考虑的是父节点如何保存孩子节点，主要有链表和数组两种方式</p>
 <ul>
 <li>链表：空间占用少，查找效率低</li>
 <li>数组：空间占用多，查找效率高</li>
 <li>Hash：</li>
 </ul>
-<h3 id="扩展-7">扩展</h3>
+<h3 id="扩展-6">扩展</h3>
 <h4 id="压缩trie-patricia-tree">压缩Trie Patricia Tree</h4>
 <p><img src="./assets/800px-Patricia_trie.svg.png" alt="800px-Patricia_trie.svg"></p>
 <p>基数树（也叫基数特里树或压缩前缀树）是一种数据结构，是一种更节省空间的Trie（前缀树），其中作为唯一子节点的每个节点都与其父节点合并，<strong>边既可以表示为元素序列又可以表示为单个元素</strong>。</p>
-<p>基数树的查找方式也与常规树不同（常规的树查找一开始就对整个键进行比较，直到不相同为止），基数树查找时节点时，对于节点上的键都按块进行逐块比较，其中该节点中块的长度是基数r； 当 $r$ 为2时，基数树为二进制的（即该节点的键的长度为1比特位），能最大程度地减小树的深度来最小化稀疏性（最大限度地合并键中没有分叉的节点）。 当 $r≥4$ 且为2的整数次幂时，基数树是 $r$ 元基数树，能以潜在的稀疏性为代价降低基数树的深度。</p>
+<p>基数树的查找方式也与常规树不同（常规的树查找一开始就对整个键进行比较，直到不相同为止），基数树查找时节点时，对于节点上的键都按块进行逐块比较，其中该节点中块的长度是基数r； 当 
+
+<span class="katex">
+  \(r\)
+</span>
+ 为2时，基数树为二进制的（即该节点的键的长度为1比特位），能最大程度地减小树的深度来最小化稀疏性（最大限度地合并键中没有分叉的节点）。 当 
+
+<span class="katex">
+  \(r≥4\)
+</span>
+ 且为2的整数次幂时，基数树是 
+
+<span class="katex">
+  \(r\)
+</span>
+ 元基数树，能以潜在的稀疏性为代价降低基数树的深度。</p>
 <h4 id="后缀trie">后缀Trie</h4>
 <p>压缩的后缀字典树</p>
 <ul>
@@ -565,7 +846,6 @@ T2 = &quot;it is a banana&quot;
 <li>最长回文串</li>
 </ul>
 <h4 id="双数组字典树-double-array-trie">双数组字典树 Double-Array Trie</h4>
-<p><a href="https://github.com/komiya-atsushi/darts-java">https://github.com/komiya-atsushi/darts-java</a></p>
 <p>双数组Trie (Double-Array Trie)结构由日本人JUN-ICHI AOE于1989年提出的，是 <strong>Trie结构的压缩形式</strong>，仅用两个线性数组来表示Trie树，该结构有效结合了数字搜索树(Digital Search Tree)检索时间高效的特点和链式表示的Trie空间结构紧凑的特点。双数组Trie的本质是一个确定有限状态自动机（DFA），每个节点代表自动机的一个状态，根据变量不同，进行状态转移，当到达结束状态或无法转移时，完成一次查询操作。<strong>在双数组所有键中包含的字符之间的联系都是通过简单的数学加法运算表示，不仅提高了检索速度，而且省去了链式结构中使用的大量指针，节省了存储空间</strong>。</p>
 <blockquote>
 <p>DAT的生成如上说的只能对 <strong>排序</strong> 好的单词进行构建</p>
@@ -606,43 +886,52 @@ base[i]&lt;0 即为结束
 <h2 id="参考链接">参考链接</h2>
 <ul>
 <li><a href="https://www.infoq.cn/article/pF3_wx3rQ43VYMpLdAPC">360 搜索的百亿级网页搜索引擎架构实现</a></li>
+<li><a href="http://data.biancheng.net/view/79.html">最佳归并树</a></li>
 </ul>
 </article>
+ 
 
-      <div class="book-footer justify-between">
-  
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
 
-  
-  
+
+
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/4f2c40ad0c023e0f81919a5bc67209f92074bf99" title='Last modified by haoyang.shi | 2020-01-22' target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/d87c891b02a4575f586779f1dd582e21a44d7541" title='Last modified by haoyang.shi | 2020-02-16' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-01-22</span>
+      <span>2020-02-16</span>
     </a>
   </div>
-  
-  
 
-  
+
+
   <div>
-    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/architecture/bigdata/algo/index.md" target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/architecture/bigdata/algo/index.md" target="_blank" rel="noopener">
       <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
       <span>Edit this page</span>
     </a>
   </div>
-  
 
 </div>
 
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
       
     </div>
 
     
-  
-
-  <aside class="book-toc levels-3 fixed">
-    <nav id="TableOfContents">
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
   <ul>
     <li><a href="#bloom-filter">Bloom filter</a>
       <ul>
@@ -704,19 +993,25 @@ base[i]&lt;0 即为结束
         <li><a href="#问题实例-5">问题实例</a></li>
       </ul>
     </li>
-    <li><a href="#外排序">外排序</a>
+    <li><a href="#k-路归并">K 路归并</a>
       <ul>
         <li><a href="#适用范围-7">适用范围</a></li>
         <li><a href="#基本原理-7">基本原理</a></li>
-        <li><a href="#扩展-6">扩展</a></li>
         <li><a href="#问题实例-6">问题实例</a></li>
       </ul>
     </li>
+    <li><a href="#败胜者树">败/胜者树</a>
+      <ul>
+        <li><a href="#基本原理-8">基本原理</a></li>
+      </ul>
+    </li>
+    <li><a href="#置换选择排序">置换选择排序</a></li>
+    <li><a href="#最佳归并树">最佳归并树</a></li>
     <li><a href="#trie树">Trie树</a>
       <ul>
         <li><a href="#适用范围-8">适用范围</a></li>
-        <li><a href="#基本原理-8">基本原理</a></li>
-        <li><a href="#扩展-7">扩展</a></li>
+        <li><a href="#基本原理-9">基本原理</a></li>
+        <li><a href="#扩展-6">扩展</a></li>
         <li><a href="#问题实例-7">问题实例</a></li>
       </ul>
     </li>
@@ -731,13 +1026,25 @@ base[i]&lt;0 即为结束
     <li><a href="#参考链接">参考链接</a></li>
   </ul>
 </nav>
-  </aside>
 
-
-
+ 
+    </aside>
+    
   </main>
 
   
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+

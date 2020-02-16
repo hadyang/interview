@@ -237,9 +237,8 @@
       <description>头条重点
 题目 给定一个整数数组 nums ，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
 示例: 输入: [-2,1,-3,4,-1,2,1,-5,4], 输出: 6 解释: 连续子数组 [4,-1,2,1] 的和最大，为 6。 进阶: 如果你已经实现复杂度为 O(n) 的解法，尝试使用更为精妙的分治法求解。
-解题思路   动态规划：$$f(i)=\begin{cases}num[i]&amp;amp;f(i-1)+num[i]&amp;lt;num[i]\f(i-1)+num[i] &amp;amp;f(i-1)+num[i]&amp;gt;num[i]\end{cases}$$
-  用result[i]保存以数字nums[i]结尾的最大子序和，然后不断更新result数组的最大值即可。总的时间复杂度O(n)
-  public int maxSubArray(int[] nums) { if (nums.length == 0) { return 0; } if (nums.length == 1) { return nums[0]; } int[] res = new int[nums.length]; res[0] = nums[0]; int max = res[0]; for (int i = 1; i &amp;lt; nums.length; i++) { int curMax = nums[i] + res[i - 1]; if (curMax &amp;gt; nums[i]) { res[i] = curMax; } else { res[i] = nums[i]; } max = Math.</description>
+解题思路   动态规划：   \(f(i)=\begin{cases}num[i]&amp;f(i-1)+num[i]num[i]\end{cases}\)    用result[i]保存以数字nums[i]结尾的最大子序和，然后不断更新result数组的最大值即可。总的时间复杂度O(n)
+  public int maxSubArray(int[] nums) { if (nums.length == 0) { return 0; } if (nums.length == 1) { return nums[0]; } int[] res = new int[nums.length]; res[0] = nums[0]; int max = res[0]; for (int i = 1; i &amp;lt; nums.</description>
     </item>
     
     <item>
@@ -320,7 +319,7 @@ push(x) &amp;ndash; 将元素 x 推入栈中。 pop() &amp;ndash; 删除栈顶�
 题目 实现 int sqrt(int x) 函数。
 计算并返回 x 的平方根，其中 x 是非负整数。
 由于返回类型是整数，结果只保留整数的部分，小数部分将被舍去。
-示例 1: 输入: 4 输出: 2 示例 2: 输入: 8 输出: 2 说明: 8 的平方根是 2.82842...,由于返回类型是整数，小数部分将被舍去。 解题思路  牛顿迭代法：$$a_{i}=(x/a_{i-1}+a_{i-1})/2$$  public int mySqrt(int x) { double a = 1, diff = 0; do { a = (x / a + a) / 2.0; diff = Math.abs(a * a - x); } while (diff &amp;gt; 0.1); return (int) a; } </description>
+示例 1: 输入: 4 输出: 2 示例 2: 输入: 8 输出: 2 说明: 8 的平方根是 2.82842...,由于返回类型是整数，小数部分将被舍去。 解题思路  牛顿迭代法：   \(a_{i}=(x/a_{i-1}+a_{i-1})/2\)    public int mySqrt(int x) { double a = 1, diff = 0; do { a = (x / a + a) / 2.0; diff = Math.abs(a * a - x); } while (diff &amp;gt; 0.</description>
     </item>
     
     <item>

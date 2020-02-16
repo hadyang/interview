@@ -4,19 +4,25 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Gc"><meta property="og:title" content="" />
-<meta property="og:description" content="" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://hadyang.github.io/interview/docs/java/gc/" />
-<meta property="og:updated_time" content="2019-08-21T11:00:41+08:00" />
-<title>Gc | Interview</title>
+<meta name="description" content="JVM 架构"><meta property="og:title" content="JVM 架构" />
+<meta property="og:description" content="JVM 架构 Java 源码通过 javac 编译为 Java 字节码 ，Java 字节码是 Java 虚拟机执行的一套代码格式，其抽象了计算机的基本操作。大多数指令只有一个字节，而有些操作符需要参数，导致多使用了一些字节。
+JVM 的基本架构如上图所示，其主要包含三个大块：
+ 类加载器：负责动态加载Java类到Java虚拟机的内存空间中。 运行时数据区：存储 JVM 运行时所有数据 执行引擎：提供 JVM 在不同平台的运行能力  线程 在 JVM 中运行着许多线程，这里面有一部分是应用程序创建来执行代码逻辑的 应用线程，剩下的就是 JVM 创建来执行一些后台任务的 系统线程。
+主要的系统线程有：
+ Compile Threads：运行时将字节码编译为本地代码所使用的线程 GC Threads：包含所有和 GC 有关操作 Periodic Task Thread：JVM 周期性任务调度的线程，主要包含 JVM 内部的采样分析 Singal Dispatcher Thread：处理 OS 发来的信号 VM Thread：某些操作需要等待 JVM 到达 安全点（Safe Point），即堆区没有变化。比如：GC 操作、线程 Dump、线程挂起 这些操作都在 VM Thread 中进行。  按照线程类型来分，在 JVM 内部有两种线程：
+  守护线程：通常是由虚拟机自己使用，比如 GC 线程。但是，Java程序也可以把它自己创建的任何线程标记为守护线程（public final void setDaemon(boolean on)来设置，但必须在start()方法之前调用）。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hadyang.github.io/interview/docs/java/jvm/architecture/" />
+<meta property="article:published_time" content="2020-02-15T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-02-16T17:16:32+08:00" />
+<title>JVM 架构 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/interview/book.min.68d45956421753cdf6bcfc865ede445c56afc5bcaaebfe02961f44fe77d8f45a.css" integrity="sha256-aNRZVkIXU832vPyGXt5EXFavxbyq6/4Clh9E/nfY9Fo=">
+<link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.b3b2c70afee32e5f8f47d39dd103f314de9204a50c836cb3bd12458767dc3432.js" integrity="sha256-s7LHCv7jLl&#43;PR9Od0QPzFN6SBKUMg2yzvRJFh2fcNDI="></script>
+<script defer src="/interview/en.search.min.6428487c559814b45170a26d7292c7d790a6496210f62ec666f9f4a021518372.js" integrity="sha256-ZChIfFWYFLRRcKJtcpLH15CmSWIQ9i7GZvn0oCFRg3I="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -29,7 +35,6 @@ if (!doNotTrack) {
 </script>
 <script async src='https://www.google-analytics.com/analytics.js'></script>
 
-<link rel="alternate" type="application/rss+xml" href="https://hadyang.github.io/interview/docs/java/gc/index.xml" title="Interview" />
 <!--
 Made with Book Theme
 https://github.com/alex-shpak/hugo-book
@@ -40,18 +45,18 @@ https://github.com/alex-shpak/hugo-book
 
 <body>
   <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="flex container">
-
-    <aside class="book-menu fixed">
-      <nav>
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
 <h2 class="book-brand">
-  <a href="https://hadyang.github.io/interview/"><span>Interview</span>
+  <a href="/interview"><span>Interview</span>
   </a>
 </h2>
 
 
 <div class="book-search">
-  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" />
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
   <div class="book-search-spinner spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
@@ -60,7 +65,11 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-    <ul>
+
+
+
+
+  <ul>
 <li><a href="/interview/docs/basic/">计算机基础</a>
 <ul>
 <li><a href="/interview/docs/basic/algo/">算法</a>
@@ -145,20 +154,15 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
 </ul>
 </li>
-<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<li><a href="/interview/docs/java/jvm/">Java虚拟机</a>
 <ul>
-<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/architecture/"class=active>JVM架构</a></li>
+<li><a href="/interview/docs/java/jvm/classloader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/runtime_area/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/gc/">垃圾收集</a></li>
 <li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
-<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
-<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/java/gc/"class=active>GC</a>
-<ul>
-<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
-<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String常量池</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-object-lifecycle/">对象生命周期</a></li>
 </ul>
 </li>
 </ul>
@@ -332,73 +336,150 @@ https://github.com/alex-shpak/hugo-book
 
 
 
+
+
+
 </nav>
 
 
-<script>
-(function() {
-  var menu = document.querySelector("aside.book-menu nav");
-  addEventListener("beforeunload", function(event) {
-    localStorage.setItem("menu.scrollTop", menu.scrollTop);
-  });
-  menu.scrollTop = localStorage.getItem("menu.scrollTop");
-})();
-</script>
 
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
     </aside>
 
     <div class="book-page">
-      <header class="flex align-center justify-between book-header">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
   <label for="menu-control">
     <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
-  <strong>Gc</strong>
-</header>
+
+  <strong>JVM 架构</strong>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#线程">线程</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
 
       
-<article class="markdown"></article>
+<article class="markdown"><h1 id="jvm-架构">JVM 架构</h1>
+<p>Java 源码通过 javac 编译为 Java 字节码 ，Java 字节码是 Java 虚拟机执行的一套代码格式，其抽象了计算机的基本操作。大多数指令只有一个字节，而有些操作符需要参数，导致多使用了一些字节。</p>
+<p><img src="./assists/jvm_architecture.svg" alt="jvm_architecture"></p>
+<p>JVM 的基本架构如上图所示，其主要包含三个大块：</p>
+<ul>
+<li>类加载器：负责动态加载Java类到Java虚拟机的内存空间中。</li>
+<li>运行时数据区：存储 JVM 运行时所有数据</li>
+<li>执行引擎：提供 JVM 在不同平台的运行能力</li>
+</ul>
+<h2 id="线程">线程</h2>
+<p>在 JVM 中运行着许多线程，这里面有一部分是应用程序创建来执行代码逻辑的 <strong>应用线程</strong>，剩下的就是 JVM 创建来执行一些后台任务的 <strong>系统线程</strong>。</p>
+<p>主要的系统线程有：</p>
+<ul>
+<li><strong>Compile Threads</strong>：运行时将字节码编译为本地代码所使用的线程</li>
+<li><strong>GC Threads</strong>：包含所有和 GC 有关操作</li>
+<li><strong>Periodic Task Thread</strong>：JVM 周期性任务调度的线程，主要包含 JVM 内部的采样分析</li>
+<li><strong>Singal Dispatcher Thread</strong>：处理 OS 发来的信号</li>
+<li><strong>VM Thread</strong>：某些操作需要等待 JVM 到达 <strong>安全点（Safe Point）</strong>，即堆区没有变化。比如：GC 操作、线程 Dump、线程挂起 这些操作都在 VM Thread 中进行。</li>
+</ul>
+<p>按照线程类型来分，在 JVM 内部有两种线程：</p>
+<ul>
+<li>
+<p><code>守护线程</code>：通常是由虚拟机自己使用，比如 GC 线程。但是，Java程序也可以把它自己创建的任何线程标记为守护线程（<code>public final void setDaemon(boolean on)</code>来设置，但必须在<code>start()</code>方法之前调用）。</p>
+</li>
+<li>
+<p><code>非守护线程</code>：main方法执行的线程，我们通常也称为用户线程。</p>
+</li>
+</ul>
+<p><strong>只要有任何的非守护线程在运行，Java程序也会继续运行</strong>。当该程序中所有的非守护线程都终止时，虚拟机实例将自动退出（守护线程随 JVM 一同结束工作）。</p>
+<p>守护线程中不适合进行IO、计算等操作，因为守护线程是在所有的非守护线程退出后结束，这样并不能判断守护线程是否完成了相应的操作，如果非守护线程退出后，还有大量的数据没来得及读写，这将造成很严重的后果。</p>
+</article>
+ 
 
-      <div class="book-footer justify-between">
-  
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
 
-  
-  
+
+
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/4aa999772f091bbec6654909c2d32614aede803b" title='Last modified by haoyang.shi | 2019-09-28' target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/d87c891b02a4575f586779f1dd582e21a44d7541" title='Last modified by haoyang.shi | 2020-02-16' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2019-09-28</span>
+      <span>2020-02-16</span>
     </a>
   </div>
-  
-  
 
-  
+
+
   <div>
-    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/java/gc/_index.md" target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/java/jvm/architecture/index.md" target="_blank" rel="noopener">
       <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
       <span>Edit this page</span>
     </a>
   </div>
-  
 
 </div>
 
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
       
     </div>
 
     
-  
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#线程">线程</a></li>
+  </ul>
+</nav>
 
-  <aside class="book-toc levels-3 fixed">
-    <nav id="TableOfContents"></nav>
-  </aside>
-
-
-
+ 
+    </aside>
+    
   </main>
 
   
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+

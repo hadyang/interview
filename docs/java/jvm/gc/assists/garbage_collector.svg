@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="720px" height="361px" viewBox="0 0 720 361" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 63.1 (92452) - https://sketch.com -->
+    <title>Slice</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="96" y="19" width="608" height="129" rx="2"></rect>
+        <filter x="-1.2%" y="-5.0%" width="102.8%" height="113.2%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="1" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-3" x="96" y="148" width="608" height="191" rx="2"></rect>
+        <filter x="-1.2%" y="-3.4%" width="102.8%" height="108.9%" filterUnits="objectBoundingBox" id="filter-4">
+            <feOffset dx="1" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-5" x="144" y="59" width="128" height="48" rx="2"></rect>
+        <filter x="-5.9%" y="-13.5%" width="113.3%" height="135.4%" filterUnits="objectBoundingBox" id="filter-6">
+            <feOffset dx="1" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-7" x="290" y="59" width="128" height="48" rx="2"></rect>
+        <filter x="-5.9%" y="-13.5%" width="113.3%" height="135.4%" filterUnits="objectBoundingBox" id="filter-8">
+            <feOffset dx="1" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-9" x="464" y="59" width="128" height="48" rx="2"></rect>
+        <filter x="-5.9%" y="-13.5%" width="113.3%" height="135.4%" filterUnits="objectBoundingBox" id="filter-10">
+            <feOffset dx="1" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-11" x="143" y="239" width="128" height="48" rx="2"></rect>
+        <filter x="-5.9%" y="-13.5%" width="113.3%" height="135.4%" filterUnits="objectBoundingBox" id="filter-12">
+            <feOffset dx="1" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-13" x="320" y="239" width="128" height="48" rx="2"></rect>
+        <filter x="-5.9%" y="-13.5%" width="113.3%" height="135.4%" filterUnits="objectBoundingBox" id="filter-14">
+            <feOffset dx="1" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-15" x="464" y="186" width="128" height="48" rx="2"></rect>
+        <filter x="-5.9%" y="-13.5%" width="113.3%" height="135.4%" filterUnits="objectBoundingBox" id="filter-16">
+            <feOffset dx="1" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-17" x="638" y="107" width="48" height="86" rx="2"></rect>
+        <filter x="-15.6%" y="-7.6%" width="135.4%" height="119.8%" filterUnits="objectBoundingBox" id="filter-18">
+            <feOffset dx="1" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Page-2" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Rectangle">
+            <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
+            <use fill="#FFCD3C" fill-rule="evenodd" xlink:href="#path-1"></use>
+        </g>
+        <g id="Rectangle-Copy">
+            <use fill="black" fill-opacity="1" filter="url(#filter-4)" xlink:href="#path-3"></use>
+            <use fill="#FEFED5" fill-rule="evenodd" xlink:href="#path-3"></use>
+        </g>
+        <line x1="207.5" y1="107.5" x2="384.5" y2="239.5" id="Line-4" stroke="#979797" stroke-linecap="square"></line>
+        <line x1="384.5" y1="239.5" x2="354.5" y2="107.5" id="Line-5" stroke="#979797" stroke-linecap="square"></line>
+        <line x1="384.5" y1="239.5" x2="528.5" y2="107.5" id="Line-6" stroke="#979797" stroke-linecap="square"></line>
+        <text id="UseParallelGC" fill="#000000" font-family="PingFangSC-Regular, PingFang SC" font-size="10" font-weight="normal">
+            <tspan x="392.325" y="197">UseParallelGC</tspan>
+        </text>
+        <line x1="528.5" y1="107.5" x2="528.5" y2="186.5" id="Line-7" stroke="#979797" stroke-linecap="square"></line>
+        <text id="Yong-Gen" font-family="PingFangSC-Regular, PingFang SC" font-size="14" font-weight="normal" fill="#000000">
+            <tspan x="15.349" y="88">Yong Gen</tspan>
+        </text>
+        <text id="Old-Gen" font-family="PingFangSC-Regular, PingFang SC" font-size="14" font-weight="normal" fill="#000000">
+            <tspan x="27.019" y="239">Old Gen</tspan>
+        </text>
+        <g id="Rectangle">
+            <use fill="black" fill-opacity="1" filter="url(#filter-6)" xlink:href="#path-5"></use>
+            <use fill="#35D0BA" fill-rule="evenodd" xlink:href="#path-5"></use>
+        </g>
+        <text id="Serial" font-family="PingFangSC-Regular, PingFang SC" font-size="14" font-weight="normal" fill="#000000">
+            <tspan x="189.286" y="88">Serial</tspan>
+        </text>
+        <g id="Rectangle-Copy-2">
+            <use fill="black" fill-opacity="1" filter="url(#filter-8)" xlink:href="#path-7"></use>
+            <use fill="#35D0BA" fill-rule="evenodd" xlink:href="#path-7"></use>
+        </g>
+        <text id="ParNew" font-family="PingFangSC-Regular, PingFang SC" font-size="14" font-weight="normal" fill="#000000">
+            <tspan x="328.335" y="88">ParNew</tspan>
+        </text>
+        <g id="Rectangle-Copy-3">
+            <use fill="black" fill-opacity="1" filter="url(#filter-10)" xlink:href="#path-9"></use>
+            <use fill="#35D0BA" fill-rule="evenodd" xlink:href="#path-9"></use>
+        </g>
+        <text id="Parallel-Scavenge" font-family="PingFangSC-Regular, PingFang SC" font-size="14" font-weight="normal" fill="#000000">
+            <tspan x="470.114" y="88">Parallel Scavenge</tspan>
+        </text>
+        <g id="Rectangle-Copy-4">
+            <use fill="black" fill-opacity="1" filter="url(#filter-12)" xlink:href="#path-11"></use>
+            <use fill="#35D0BA" fill-rule="evenodd" xlink:href="#path-11"></use>
+        </g>
+        <text id="CMS" font-family="PingFangSC-Regular, PingFang SC" font-size="14" font-weight="normal" fill="#000000">
+            <tspan x="190.806" y="268">CMS</tspan>
+        </text>
+        <g id="Rectangle-Copy-5">
+            <use fill="black" fill-opacity="1" filter="url(#filter-14)" xlink:href="#path-13"></use>
+            <use fill="#35D0BA" fill-rule="evenodd" xlink:href="#path-13"></use>
+        </g>
+        <text id="Serial-Old" font-family="PingFangSC-Regular, PingFang SC" font-size="14" font-weight="normal" fill="#000000">
+            <tspan x="351.839" y="268">Serial Old</tspan>
+        </text>
+        <g id="Rectangle-Copy-6">
+            <use fill="black" fill-opacity="1" filter="url(#filter-16)" xlink:href="#path-15"></use>
+            <use fill="#35D0BA" fill-rule="evenodd" xlink:href="#path-15"></use>
+        </g>
+        <text id="Parallel-Old" font-family="PingFangSC-Regular, PingFang SC" font-size="14" font-weight="normal" fill="#000000">
+            <tspan x="490.358" y="215">Parallel Old</tspan>
+        </text>
+        <g id="Rectangle-Copy-7">
+            <use fill="black" fill-opacity="1" filter="url(#filter-18)" xlink:href="#path-17"></use>
+            <use fill="#35D0BA" fill-rule="evenodd" xlink:href="#path-17"></use>
+        </g>
+        <text id="UseG1GC" fill="#000000" font-family="PingFangSC-Regular, PingFang SC" font-size="10" font-weight="normal">
+            <tspan x="640.005" y="104">UseG1GC</tspan>
+        </text>
+        <text id="G1" font-family="PingFangSC-Regular, PingFang SC" font-size="14" font-weight="normal" fill="#000000">
+            <tspan x="654.457" y="158">G1</tspan>
+        </text>
+        <line x1="175.5" y1="239.5" x2="175.5" y2="107.5" id="Line" stroke="#979797" stroke-linecap="square"></line>
+        <line x1="272.5" y1="263.5" x2="320.5" y2="263.5" id="Line-3" stroke="#979797" stroke-linecap="square"></line>
+        <line x1="207.5" y1="239.5" x2="354.5" y2="107.5" id="Line-2" stroke="#979797" stroke-linecap="square"></line>
+        <text id="UseSerialGC" fill="#000000" font-family="PingFangSC-Regular, PingFang SC" font-size="10" font-weight="normal">
+            <tspan x="281.24" y="189">UseSerialGC</tspan>
+        </text>
+        <text id="UseConcMarkSweepGC" fill="#000000" font-family="PingFangSC-Regular, PingFang SC" font-size="10" font-weight="normal">
+            <tspan x="186.06" y="217">UseConcMarkSweepGC</tspan>
+        </text>
+        <text id="UseConcMarkSweepGC-&amp;" fill="#000000" font-family="PingFangSC-Regular, PingFang SC" font-size="10" font-weight="normal">
+            <tspan x="117.765" y="171">UseConcMarkSweepGC &amp; </tspan>
+            <tspan x="149.24" y="185">UseSerialGC</tspan>
+        </text>
+        <text id="UseParNewGC" fill="#000000" font-family="PingFangSC-Regular, PingFang SC" font-size="10" font-weight="normal">
+            <tspan x="334.275" y="164">UseParNewGC</tspan>
+        </text>
+        <text id="UseParallelOldGC" fill="#000000" font-family="PingFangSC-Regular, PingFang SC" font-size="10" font-weight="normal">
+            <tspan x="493.385" y="164">UseParallelOldGC</tspan>
+        </text>
+    </g>
+</svg>

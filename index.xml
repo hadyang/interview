@@ -11,6 +11,70 @@
     
     
     <item>
+      <title>垃圾回收</title>
+      <link>https://hadyang.github.io/interview/docs/java/jvm/gc/</link>
+      <pubDate>Sun, 16 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/jvm/gc/</guid>
+      <description>垃圾回收 对象存活检测 Java堆中存放着大量的Java对象实例，在垃圾收集器回收内存前，第一件事情就是确定哪些对象是活着的，哪些是可以回收的。
+引用计数算法 引用计数算法是判断对象是否存活的基本算法：给每个对象添加一个引用计数器，没当一个地方引用它的时候，计数器值加1；当引用失效后，计数器值减1。但是这种方法有一个致命的缺陷，当两个对象相互引用时会导致这两个都无法被回收。
+根搜索算法 引用计数是通过为堆中每个对象保存一个计数来区分活动对象和垃圾。根搜索算法实际上是追踪从根结点开始的 引用图。
+在根搜索算法追踪的过程中，起点即 GC Root，GC Root 根据 JVM 实现不同而不同，但是总会包含以下几个方面：
+ 虚拟机栈（栈帧中的本地变量表）中引用的对象。 方法区中的类静态属性引用的变量。 方法区中的常量引用的变量。 本地方法 JNI 的引用对象。  根搜索算法是从 GC Root 开始的引用图，引用图是一个有向图，其中节点是各个对象，边为引用类型。JVM 中的引用类型分为四种：强引用（StrongReference）、软引用（SoftReference）、弱引用（WeakReference） 和 虚引用（PhantomReference）。
+除强引用外，其他引用在Java 由 Reference 的子类封装了指向其他对象的连接：被指向的对象称为 引用目标。
+若一个对象的引用类型有多个，那到底如何判断它的回收策略呢？其实规则如下：
+ 单条引用链以链上最弱的一个引用类型来决定； 多条引用链以多个单条引用链中最强的一个引用类型来决定；  在引用图中，当一个节点没有任何路径可达时，我们认为它是可回收的对象。
+StrongReference 强引用在Java中是普遍存在的，类似 Object o = new Object(); 。强引用和其他引用的区别在于：强引用禁止引用目标被垃圾收集器收集，而其他引用不禁止。
+SoftReference 对象可以从根节点通过一个或多个(未被清除的)软引用对象触及，垃圾收集器在要发生内存溢出前将这些对象列入回收范围中进行回收，如果该软引用对象和引用队列相关联，它会把该软引用对象加入队列。
+JVM 的实现需要在抛出 OutOfMemoryError 之前清除 SoftReference，但在其他的情况下可以选择清理的时间或者是否清除它们。
+WeakReference 对象可以从 GC Root 开始通过一个或多个(未被清除的)弱引用对象触及， 垃圾收集器在 GC 的时候会回收所有的 WeakReference，如果该弱引用对象和引用队列相关联，它会把该弱引用对象加入队列。
+PhantomReference 垃圾收集器在 GC 不会清除 PhantomReference，所有的虚引用都必须由程序明确的清除。同时也不能通过虚引用来取得一个对象的实例。</description>
+    </item>
+    
+    <item>
+      <title>JVM 架构</title>
+      <link>https://hadyang.github.io/interview/docs/java/jvm/architecture/</link>
+      <pubDate>Sat, 15 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/jvm/architecture/</guid>
+      <description>JVM 架构 Java 源码通过 javac 编译为 Java 字节码 ，Java 字节码是 Java 虚拟机执行的一套代码格式，其抽象了计算机的基本操作。大多数指令只有一个字节，而有些操作符需要参数，导致多使用了一些字节。
+JVM 的基本架构如上图所示，其主要包含三个大块：
+ 类加载器：负责动态加载Java类到Java虚拟机的内存空间中。 运行时数据区：存储 JVM 运行时所有数据 执行引擎：提供 JVM 在不同平台的运行能力  线程 在 JVM 中运行着许多线程，这里面有一部分是应用程序创建来执行代码逻辑的 应用线程，剩下的就是 JVM 创建来执行一些后台任务的 系统线程。
+主要的系统线程有：
+ Compile Threads：运行时将字节码编译为本地代码所使用的线程 GC Threads：包含所有和 GC 有关操作 Periodic Task Thread：JVM 周期性任务调度的线程，主要包含 JVM 内部的采样分析 Singal Dispatcher Thread：处理 OS 发来的信号 VM Thread：某些操作需要等待 JVM 到达 安全点（Safe Point），即堆区没有变化。比如：GC 操作、线程 Dump、线程挂起 这些操作都在 VM Thread 中进行。  按照线程类型来分，在 JVM 内部有两种线程：
+  守护线程：通常是由虚拟机自己使用，比如 GC 线程。但是，Java程序也可以把它自己创建的任何线程标记为守护线程（public final void setDaemon(boolean on)来设置，但必须在start()方法之前调用）。</description>
+    </item>
+    
+    <item>
+      <title>类加载器</title>
+      <link>https://hadyang.github.io/interview/docs/java/jvm/classloader/</link>
+      <pubDate>Sat, 15 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/jvm/classloader/</guid>
+      <description>类加载器 类加载器是 Java 运行时环境（Java Runtime Environment）的一部分，负责动态加载 Java 类到 Java 虚拟机的内存空间中。类通常是按需加载，即第一次使用该类时才加载。 由于有了类加载器，Java 运行时系统不需要知道文件与文件系统。每个 Java 类必须由某个类加载器装入到内存。
+类装载器除了要定位和导入二进制 class 文件外，还必须负责验证被导入类的正确性，为变量分配初始化内存，以及帮助解析符号引用。这些动作必须严格按一下顺序完成：
+ 装载：查找并装载类型的二进制数据。 链接：执行验证、准备以及解析(可选) - 验证：确保被导入类型的正确性 - 准备：为类变量分配内存，并将其初始化为默认值。 - 解析：把类型中的符号引用转换为直接引用。 初始化：把类变量初始化为正确的初始值。  装载 类加载器分类 在Java虚拟机中存在多个类装载器，Java应用程序可以使用两种类装载器：
+ Bootstrap ClassLoader：此装载器是 Java 虚拟机实现的一部分。由原生代码（如C语言）编写，不继承自 java.lang.ClassLoader 。负责加载核心 Java 库，启动类装载器通常使用某种默认的方式从本地磁盘中加载类，包括 Java API。 Extention Classloader：用来在&amp;lt;JAVA_HOME&amp;gt;/jre/lib/ext ,或 java.ext.dirs 中指明的目录中加载 Java 的扩展库。 Java 虚拟机的实现会提供一个扩展库目录。 Application Classloader：根据 Java应用程序的类路径（ java.class.path 或 CLASSPATH 环境变量）来加载 Java 类。一般来说，Java 应用的类都是由它来完成加载的。可以通过 ClassLoader.getSystemClassLoader() 来获取它。 自定义类加载器：可以通过继承 java.lang.ClassLoader 类的方式实现自己的类加载器，以满足一些特殊的需求而不需要完全了解 Java 虚拟机的类加载的细节。  全盘负责双亲委托机制 在一个 JVM 系统中，至少有 3 种类加载器，那么这些类加载器如何配合工作？在 JVM 种类加载器通过 全盘负责双亲委托机制 来协调类加载器。</description>
+    </item>
+    
+    <item>
+      <title>运行时数据区</title>
+      <link>https://hadyang.github.io/interview/docs/java/jvm/runtime_area/</link>
+      <pubDate>Sat, 15 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/jvm/runtime_area/</guid>
+      <description>运行时数据区 运行时数据区用于保存 JVM 在运行过程中产生的数据，结构如图所示：
+Heap Java 堆是可供各线程共享的运行时内存区域，是 Java 虚拟机所管理的内存区域中最大的一块。此区域非常重要，几乎所有的对象实例和数组实例都要在 Java 堆上分配，但随着 JIT 编译器及逃逸分析技术的发展，也可能会被优化为栈上分配。
+Heap 中除了作为对象分配使用，还包含字符串字面量 常量池（Internd Strings） 。 除此之外 Heap 中还包含一个 新生代（Yong Generation）、一个 老年代（Old Generation）。
+新生代分三个区，一个Eden区，两个Survivor区，大部分对象在Eden区中生成。Survivor 区总有一个是空的。
+老年代中保存一些生命周期较长的对象，当一个对象经过多次的 GC 后还没有被回收，那么它将被移动到老年代。
+Methoad Area 方法区的数据由所有线程共享，因此为安全的使用方法区的数据，需要注意线程安全问题。
+方法区主要保存类级别的数据，包括：
+ ClassLoader Reference Runtime Constant Pool  数字常量 类属性引用 方法引用   Field Data：每个类属性的名称、类型等 Methoad Data：每个方法的名称、返回值类型、参数列表等 Methoad Code：每个方法的字节码、本地变量表等  方法区的实现在不同的 JVM 版本有不同，在 JVM 1.8 之前，方法区的实现为 永久代（PermGen），但是由于永久代的大小限制， 经常会出现内存溢出。于是在 JVM 1.8 方法区的实现改为 元空间（Metaspace），元空间是在 Native 的一块内存空间。
+Stack 对于每个 JVM 线程，当线程启动时，都会分配一个独立的运行时栈，用以保存方法调用。每个方法调用，都会在栈顶增加一个栈帧（Stack Frame）。</description>
+    </item>
+    
+    <item>
       <title>AtomicInteger</title>
       <link>https://hadyang.github.io/interview/docs/java/concurrent/atomic/</link>
       <pubDate>Wed, 22 Jan 2020 00:00:00 +0000</pubDate>
@@ -29,13 +93,9 @@ public final int getAndAddInt(Object var1, long var2, int var4) { int var5; //�
       <guid>https://hadyang.github.io/interview/docs/architecture/bigdata/algo/</guid>
       <description>Bloom filter 适用范围 实现数据字典，进行数据的判重，或者集合求交集
 基本原理 　对于原理来说很简单，Bit-Map + K个独立 Hash 函数。将 Hash 函数对应的值的位数组置1，查找时如果发现所有 Hash 函数对应位都是1说明存在。很明显这个过程并不保证查找的结果是 100% 正确的。同时也不支持删除一个已经插入的关键字，因为该关键字对应的位会牵动到其他的关键字。所以一个简单的改进就是 Counting Bloom filter，用一个 Counter 数组代替位数组，就可以支持删除了。
-对于元素个数：$n$，错误率（假阳率）：$P$。我们可以计算：
- Bit-Map 大小：$m\ge -\frac{n\times ln^P}{(ln^2)^2}$ Hash 函数个数：$k=log_2^\frac{1}{P}$   参数在线计算工具：https://hur.st/bloomfilter
- 举个例子我们假设 $P=0.01$，$n=4000$，则此时 m 应大概是 $9.5\times n=38000$ bit，$k=7$
-注意这里 m 与 n 的单位不同，m是 bit 为单位，而n则是以元素个数为单位(准确的说是不同元素的个数)。通常单个元素的长度都是有很多 bit 的。所以使用bloom filter内存上通常都是节省的。
-扩展 　Bloom filter 将集合中的元素映射到位数组中，用 k 个映射位是否全1表示元素在不在这个集合中。Counting bloom filter（CBF）将 位数组中的每一位扩展为一个 Counter，从而支持了元素的删除操作。Spectral Bloom Filter（SBF）将其与集合元素的出现次数关联。SBF采用 Counter 中的最小值来近似表示元素的出现频率。
-问题实例 给你A,B两个文件，各存放50亿条URL，每条URL占用64字节，内存限制是4G，让你找出A,B文件共同的URL。如果是三个乃至n个文件呢？
-答：根据这个问题我们来计算下内存的占用，4G=2^32大概是40亿*8大概是 340亿，n=50亿，如果按出错率 0.</description>
+对于元素个数：   \(n\)  ，错误率（假阳率）： \(P\)  。我们可以计算：
+ Bit-Map 大小： \(m\ge -\frac{n\times ln^P}{(ln^2)^2}\)   Hash 函数个数： \(k=log_2^\frac{1}{P}\)     参数在线计算工具：https://hur.st/bloomfilter
+ 举个例子我们假设 \(P=0.01\)  ， \(n=4000\)  ，则此时 m 应大概是 \(9.5\times n=38000\)  bit， \(k=7\)  注意这里 m 与 n 的单位不同，m是 bit 为单位，而n则是以元素个数为单位(准确的说是不同元素的个数)。通常单个元素的长度都是有很多 bit 的。所以使用bloom filter内存上通常都是节省的。</description>
     </item>
     
     <item>
@@ -385,117 +445,6 @@ Java 线程池 </description>
     </item>
     
     <item>
-      <title>JVM 内存模型</title>
-      <link>https://hadyang.github.io/interview/docs/java/jvm/memory-model/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/java/jvm/memory-model/</guid>
-      <description>JVM 内存模型 HotSpot 内存模型 &amp;ndash; JDK8
- Heap: Java 堆是可供各线程共享的运行时内存区域，是 Java 虚拟机所管理的内存区域中最大的一块。此区域非常重要，几乎所有的对象实例和数组实例都要在 Java 堆上分配，但随着 JIT 编译器及逃逸分析技术的发展，也可能会被优化为栈上分配 Internd String: 字符串字面量常量池 Calss Meta Data: 每一个类的结构信息，比如 字段 和 方法数据、构造函数和普通方法的字节码内容，还包括一些初始化的时候用到的特殊方法。 Runtime Constant Pool: 运行时常量池是 class 文件中每一个类或接口的 常量池表(Constant Pool)的运行时表示形式，是方法区的一部分。它包括了若干种不同的常量。常量池表存放编译器生成的 各种字面量和符号引用，这部分内容将在类加载后进入方法区的运行时常量池中存放。运行时常量池具有动态性，运行期间也可以将新的量放到运行时常量池中，典型的应用是 String 类的 intern 方法 Code Cache: JIT 编译缓存的本地代码 PC Register: CPU内部的寄存器中就包含一个程序计数器，存放程序执行的下一条指令地址。 JVM Stacks: Java 虚拟机栈也是线程私有的，每一条线程都拥有自己私有的Java 虚拟机栈，它与线程同时创建。它描述了 Java 方法执行的内存模型：每个方法在执行的同时都会创建一个栈帧，用于存储局部变量表、操作数栈、动态链接、方法出口等信息。 Native Stacks: 本地方法栈和 Java 虚拟机栈的作用相似，Java 虚拟机栈执行的是字节码，而本地方法栈执行的是 native 方法。本地方法栈使用传统的栈（C Stack）来支持 native 方法。   JDK 1.7开始，字符串常量和符号引用等就被移出永久代：
- 符号引用迁移至系统堆内存(Native Heap) 字符串字面量迁移至Java堆(Java Heap)   在 JVM 规范中，并不存在这么多分区，只包含 5 大分区：</description>
-    </item>
-    
-    <item>
-      <title>JVM 垃圾回收</title>
-      <link>https://hadyang.github.io/interview/docs/java/gc/jvm-gc/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/java/gc/jvm-gc/</guid>
-      <description>JVM垃圾回收  本片文章均指 HotSpot 的GC
- Java堆中存放着大量的Java对象实例，在垃圾收集器回收内存前，第一件事情就是确定哪些对象是“活着的”，哪些是可以回收的。
-引用计数算法 引用计数算法是判断对象是否存活的基本算法：给每个对象添加一个引用计数器，没当一个地方引用它的时候，计数器值加1；当引用失效后，计数器值减1。但是这种方法有一个致命的缺陷，当两个对象相互引用时会导致这两个都无法被回收。
-根搜索算法 在主流的商用语言中（Java、C#&amp;hellip;）都是使用根搜索算法来判断对象是否存活。对于程序来说，根对象总是可以访问的。从这些根对象开始，任何可以被触及的对象都被认为是&amp;quot;活着的&amp;quot;的对象。无法触及的对象被认为是垃圾，需要被回收。
-Java虚拟机的根对象集合根据实现不同而不同，但是总会包含以下几个方面：
- 虚拟机栈（栈帧中的本地变量表）中引用的对象。 方法区中的类静态属性引用的变量。 方法区中的常量引用的变量。 本地方法JNI的引用对象。  区分活动对象和垃圾的两个基本方法是引用计数和根搜索。 引用计数是通过为堆中每个对象保存一个计数来区分活动对象和垃圾。根搜索算法实际上是追踪从根结点开始的引用图。
-引用对象 引用对象封装了指向其他对象的连接：被指向的对象称为引用目标。Reference有三个直接子类SoftReference、WeakReference、PhantomReference分别代表：软引用、弱引用、虚引用。强引用在Java中是普遍存在的，类似Object o = new Object();这类引用就是强引用，强引用和以上引用的区别在于：强引用禁止引用目标被垃圾收集器收集，而其他引用不禁止。
- 当使用软引用、弱引用、虚引用时，并且对可触及性状态的改变有兴趣，可以把引用对象和引用队列关联起来。
- 对象有六种可触及状态变化：
-  强可触及：对象可以从根节点不通过任何引用对象搜索到。垃圾收集器不会回收这个对象的内存空间。
-  软可触及：对象可以从根节点通过一个或多个(未被清除的)软引用对象触及，垃圾收集器在要发生内存溢出前将这些对象列入回收范围中进行回收，如果该软引用对象和引用队列相关联，它会把该软引用对象加入队列。
- SoftReference 可以用来创建内存中缓存，JVM 的实现需要在抛出 OutOfMemoryError 之前清除软引用（SoftReference），但在其他的情况下可以选择清理的时间或者是否清除它们。
-   弱可触及：对象可以从根节点开始通过一个或多个(未被清除的)弱引用对象触及，垃圾收集器在一次 GC 的时候会回收所有的弱引用对象（WeakReference），如果该弱引用对象和引用队列相关联，它会把该弱引用对象加入队列。
-  可复活的：对象既不是强可触及、软可触及、也不是弱可触及，但仍然可能通过执行某些终结方法复活到这几个状态之一。
- Java类可以通过重写 finalize 方法复活准备回收的对象，但 finalize 方法只是在对象第一次回收时会调用。
-   虚可触及：垃圾收集器不会清除一个虚引用（PhantomReference），所有的虚引用都必须由程序明确的清除。 同时也不能通过虚引用来取得一个对象的实例。
-  不可触及：不可触及对象已经准备好回收了。
-   若一个对象的引用类型有多个，那到底如何判断它的可达性呢？其实规则如下：
- 单条引用链的可达性以最弱的一个引用类型来决定； 多条引用链的可达性以最强的一个引用类型来决定；   垃圾回收算法 标记&amp;ndash;清除算法 首先标记出所有需要回收的对象，在标记完成后统一回收所有被标记的对象，标记的方法使用根搜索算法。主要有两个缺点：</description>
-    </item>
-    
-    <item>
-      <title>JVM 架构</title>
-      <link>https://hadyang.github.io/interview/docs/java/jvm/jvm-architecture/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/java/jvm/jvm-architecture/</guid>
-      <description>JVM架构 Java虚拟机简介 “Java虚拟机”可能指如下三个不同的东西
- 抽象规范 一个具体的实现 一个运行中的虚拟机实例  每个Java程序都运行在某个具体的Java虚拟机实现的实例上。一个Java虚拟机的实例负责运行一个Java程序。当启动一个Java程序的时候，一个虚拟机的实例也就诞生了。当该程序关闭退出时，这个虚拟机实例也就随之消亡。
-线程介绍 在Java虚拟机内部有两种线程：
-  守护线程：通常是由虚拟机自己使用，比如GC线程。但是，Java程序也可以把它自己创建的任何线程标记为守护线程（public final void setDaemon(boolean on)来设置，但必须在start()方法之前调用）。
-  非守护线程：main方法执行的线程，我们通常也称为用户线程。
-   只要有任何的非守护线程在运行，Java程序也会继续运行。当该程序中所有的非守护线程都终止时，虚拟机实例将自动退出（守护线程随JVM一同结束工作）。
- 守护线程中不适合进行IO、计算等操作，因为守护线程是在所有的非守护线程退出后结束，这样并不能判断守护线程是否完成了相应的操作，如果非守护线程退出后，还有大量的数据没来得及读写，这将造成很严重的后果。
- web服务器中的Servlet，容器启动时后台初始化一个服务线程，即调度线程，负责处理http请求，然后每个请求过来调度线程从线程池中取出一个工作者线程来处理该请求，从而实现并发控制的目的。
- Java虚拟机体系结构 每个Java虚拟机都有一个类装载器子系统，他根据给定的全限定名来装在类型。同样，每个Java虚拟机都有一个执行引擎，它负责执行那些包含在被装载类的方法中的指令。当Java虚拟机运行一个程序时，它需要内存来存储很多东西，例如：字节码，从已装载的class文件中得到的其他信息，程序创建的对象，传递给方法的参数，返回值，局部变量，以及运算的中间结果等等，Java虚拟机把这些东西都组织到几个“运行时数据区”中，以便管理。
-每个Java虚拟机实例都有一个方法区以及一个堆， 他们是由 该虚拟机实例中所有线程共享的。 当虚拟机装载一个class文件时，它会从这个class文件包含的二进制数据中解析类型信息。然后把这些类型信息放到方法区中。 当程序运行的时候，虚拟机会把所有该程序在运行时创建的对象都放到堆中。
-每个新线程都会得到它自己的PC寄存器(程序计数器)以及一个Java栈。
-  如果线程正在执行的是一个Java方法(非Native方法)。那么PC寄存器的值将总指向下一条将被执行的指令，而 它的Java栈则总是存储该线程中Java方法调用的转台&amp;ndash;包括它的局部变量、被调用时传进来的参数、返回值以及运算的中间结果等等。
-  Native方法调用的状态，则是以某种依赖于具体实现的方式存储在本地方法栈中，也可能是在寄存器或者其他某些与特定实现相关的内存区中。
-  Java栈是由很多的栈帧(stack frame)或者说帧(frame)组成的，一个栈帧包含一个Java方法调用状态。 当现场调用一个Java方法的时候，虚拟机压入一个新的栈帧到该线程的Java栈中：当该方法返回时，这个栈帧被从Java栈中弹出并抛弃
-Java虚拟机没有指令寄存器，其指令集使用Java栈来存储中间数据。这样设计的原因是为了保持Java虚拟机的指令集尽量紧凑、同时也便于Java虚拟机在那些只有很少通用寄存器的平台上实现。另外，Java虚拟机这种基于栈的体系结构，也有助于运行时某些虚拟机实现的动态编译器和即时编译器的代码优化。
-  这些内存区域是私有的，任何线程都不能访问另外一个线程的PC寄存器或Java栈。 图中是一个虚拟机实例的快照，它有三个线程正在执行。线程1和线程2都正在执行Java方法，而线程3在执行Native方法。   数据类型 数据类型分为两种：
- 基本类型：基本类型的变量持有原始值。 引用类型：引用类型的变量持有引用值。引用值是指对某个对象的引用，而不是该对象本身。    基本类型:
- Java语言中的所有基本类型都是Java虚拟机中的基本类型。但boolean有点特别，虽然Java虚拟机也把boolean看做基本类型，但指令集对boolean只有很有限的支持。 当编译器把Java源码编译成字节码时，它会用int或byte来表示boolean。在Java虚拟机中false是由整数&#39;0&#39;表示，所有的非零整数都表示true，涉及boolean值的操作则会用int。另外boolean数组是当做byte数组来访问的， 但是在“堆”区，它也可以被表示为位域。 Java虚拟机的基本类型的值域在任何地方都是一致的， 比如：不管底层主机平台是什么，一个long在任何虚拟机中总是一个64位二进制补码表示的又复活整数。 Java虚拟机中有一个值在内部使用的基本类型returnAddress，Java程序员不能使用这个类型。这个基本类型是用来实现Java程序中的finally子句。    引用类型：</description>
-    </item>
-    
-    <item>
-      <title>JVM 类加载</title>
-      <link>https://hadyang.github.io/interview/docs/java/jvm/jvm-class-load-init/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/java/jvm/jvm-class-load-init/</guid>
-      <description>JVM类加载三步走 简介 Java虚拟机通过装载、连接和初始化一个类型，使该类型可以被正在运行的Java程序使用。
- 装载：把二进制形式的Java类型读入Java虚拟机中。 连接：把装载的二进制形式的类型数据合并到虚拟机的运行时状态中去。 1. 验证：确保Java类型数据格式正确并且适合于Java虚拟机使用。 2. 准备：负责为该类型分配它所需内存。 3. 解析：把常量池中的符号引用转换为直接引用。(可推迟到运行中的程序真正使用某个符号引用时再解析) 初始化：为类变量赋适当的初始值  所有Java虚拟机实现必须在每个类或接口首次主动使用时初始化。以下六种情况符合主动使用的要求：
- 当创建某个类的新实例时(new、反射、克隆、序列化) 调用某个类的静态方法 使用某个类或接口的静态字段，或对该字段赋值(用final修饰的静态字段除外，它被初始化为一个编译时常量表达式) 当调用Java API的某些反射方法时。 初始化某个类的子类时。 当虚拟机启动时被标明为启动类的类。  除以上六种情况，所有其他使用Java类型的方式都是被动的，它们不会导致Java类型的初始化。
- 对于接口来说，只有在某个接口声明的非常量字段被使用时，该接口才会初始化，而不会因为事先这个接口的子接口或类要初始化而被初始化。
- 父类需要在子类初始化之前被初始化，所以这些类应该被装载了。当实现了接口的类被初始化的时候，不需要初始化父接口。然而，当实现了父接口的子类(或者是扩展了父接口的子接口)被装载时，父接口也要被装载。(只是被装载，没有初始化)
-装载  通过该类型的全限定名，产生一个代表该类型的二进制数据流。 解析这个二进制数据流为方法去内的内部数据结构。 创建一个表示该类型的java.lang.Class类的实例。  Java虚拟机在识别Java class文件，产生了类型的二进制数据后，Java虚拟机必须把这些二进制数据解析为与实现相关的内部数据结构。装载的最终产品就是Class实例，它称为Java程序与内部数据结构之间的接口。要访问关于该类型的信息(存储在内部数据结构中)，程序就要调用该类型对应的Class实例的方法。这样一个过程，就是把一个类型的二进制数据解析为方法区中的内部数据结构，并在堆上建立一个Class对象的过程，这被称为&amp;quot;创建&amp;quot;类型。
-验证 确认装载后的类型符合Java语言的语义，并且不会危及虚拟机的完整性。
- 装载时验证：检查二进制数据以确保数据全部是预期格式、确保除Object之外的每个类都有父类、确保该类的所有父类都已经被装载。 正式验证阶段：检查final类不能有子类、确保final方法不被覆盖、确保在类型和超类型之间没有不兼容的方法声明(比如拥有两个名字相同的方法，参数在数量、顺序、类型上都相同，但返回类型不同)。 符号引用的验证：当虚拟机搜寻一个被符号引用的元素(类型、字段或方法)时，必须首先确认该元素存在。如果虚拟机发现元素存在，则必须进一步检查引用类型有访问该元素的权限。  准备 当Java虚拟机装载一个类，并执行了一些验证之后，类就可以进入准备阶段。在准备阶段，Java虚拟机为类变量分配内存，设置默认初始值。但在到到初始化阶段之前，类变量都没有被初始化为真正的初始值。
- boolean在内部常常被实现为一个int，会被默认初始化为0。
- 解析 类型经过连接的前两个阶段&amp;ndash;验证和准备&amp;ndash;之后，就可以进入第三个阶段&amp;ndash;解析。解析的过程就是在类型的常量池总寻找类、接口、字段和方法的符号引用，把这些符号引用替换为直接引用的过程。
-  类或接口的解析：判断所要转化成的直接引用是数组类型，还是普通的对象类型的引用，从而进行不同的解析。
-  字段解析：对字段进行解析时，会先在本类中查找是否包含有简单名称和字段描述符都与目标相匹配的字段，如果有，则查找结束；如果没有，则会按照继承关系从上往下递归搜索该类所实现的各个接口和它们的父接口，还没有，则按照继承关系从上往下递归搜索其父类，直至查找结束，
-  初始化 为类变量赋予“正确”的初始值。这里的“正确”的初始值是指程序员希望这个类变量所具备的初始值。所有的类变量(即静态量)初始化语句和类型的静态初始化器都被Java编译器收集在一起，放到一个特殊的方法中。 对于类来说，这个方法被称作类初始化方法；对于接口来说，它被称为接口初始化方法。在类和接口的class文件中，这个方法被称为&amp;lt;clinit&amp;gt;。
-初始化类的步骤：  如果存在直接父类，且直接父类没有被初始化，先初始化直接父类。 如果类存在一个类初始化方法，执行此方法。  这个步骤是递归执行的，即第一个初始化的类一定是Object。初始化接口并不需要初始化它的父接口。
-Java虚拟机必须确保初始化过程被正确地同步。 如果多个线程需要初始化一个类，仅仅允许一个线程来进行初始化，其他线程需等待。</description>
-    </item>
-    
-    <item>
-      <title>JVM 类加载器</title>
-      <link>https://hadyang.github.io/interview/docs/java/jvm/jvm-class-loader/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/java/jvm/jvm-class-loader/</guid>
-      <description>类加载器 简介 Java类加载器是Java运行时环境（Java Runtime Environment）的一部分，负责动态加载Java类到Java虚拟机的内存空间中。类通常是按需加载，即第一次使用该类时才加载。 由于有了类加载器，Java运行时系统不需要知道文件与文件系统。每个Java类必须由某个类加载器装入到内存。
-类装载器子系统涉及Java虚拟机的其他几个组成部分，以及几个来自java.lang库的类。比如，用户自定义的类装载器只是普通的Java对象，它的类必须派生自java.lang.ClassLoader。ClassLoader中定义的方法为程序提供了访问类装载器机制的接口。此外，对于每个被装载的类型，Java虚拟机都会为他创建一个java.lang.Class类的实例来代表该类型。和所有其他对象一样，用户自定义的类装载器以及Class类的实例都放在内存中的堆区，而装载的类型信息都位于方法区。
-类装载器子系统除了要定位和导入二进制class文件外，还必须负责验证被导入类的正确性，为变量分配初始化内存，以及帮助解析符号引用。这些动作必须严格按一下顺序完成：
- 装载&amp;ndash;查找并装载类型的二进制数据。 链接&amp;ndash;执行验证、准备以及解析(可选) - 验证：确保被导入类型的正确性 - 准备：为类变量分配内存，并将其初始化为默认值。 - 解析：把类型中的符号引用转换为直接引用。 初始化&amp;ndash;把类变量初始化为正确的初始值。 使用 卸载：类加载器加载的每个类和类加载器本身都被没有引用  分类 在Java虚拟机中存在多个类装载器，Java应用程序可以使用两种类装载器：
-  启动(bootstrap)类装载器：此装载器是Java虚拟机实现的一部分。由原生代码（如C语言）编写，不继承自java.lang.ClassLoader。负责加载核心Java库，存储在&amp;lt;JAVA_HOME&amp;gt;/jre/lib目录中。（如果Java虚拟机在已有操作系统中实现为C程序，那么启动类加载器就是此C程序的一部分） 启动类装载器通常使用某种默认的方式从本地磁盘中加载类，包括Java API。
-  用户自定义类装载器：（包含但不止，扩展类加载器以及系统类加载器） ，继承自Java中的java.lang.ClassLoader类，Java应用程序能在运行时安装用户自定义类装载器，这种累装载器使用自定义的方式来装载类。用户定义的类装载器能用Java编写，能够被编译为Class文件，能被虚拟机装载，还能像其他对象一样实例化。它们实际上只是运行中的Java程序可执行代码的一部分。一般JVM都会提供一些基本实现。应用程序的开发人员也可以根据需要编写自己的类加载器。JVM中最常使用的是系统类加载器（system），它用来启动Java应用程序的加载。 通过java.lang.ClassLoader.getSystemClassLoader() 可以获取到该类加载器对象。该类由sun.misc.Launcher$AppClassLoader实现。
-  全盘负责双亲委托机制 全盘负责是指当一个ClassLoader装载一个类的时，除非显式地使用另一个ClassLoader，该类所依赖及引用的类也由这个ClassLoader载入；“双亲委托机制”是指先委托父装载器寻找目标类，只有在找不到的情况下才从自己的类路径中查找并装载目标类。这一点是从安全角度考虑的，试想如果有人编写了一个恶意的基础类（如java.lang.String）并装载到JVM中将会引起多么可怕的后果。但是由于有了“全盘负责委托机制”，java.lang.String永远是由根装载器来装载的，这样就避免了上述事件的发生。
-类加载器需要完成的最终功能是定义一个Java类，即把Java字节代码转换成JVM中的java.lang.Class类的对象。但是类加载的过程并不是这么简单。Java类加载器有两个比较重要的特征：
-  层次组织结构指的是每个类加载器都有一个父类加载器，通过getParent()方法可以获取到。类加载器通过这种父亲-后代的方式组织在一起，形成树状层次结构。
-  代理模式则指的是一个类加载器既可以自己完成Java类的定义工作，也可以代理给其它的类加载器来完成。由于代理模式的存在，启动一个类的加载过程的类加载器和最终定义这个类的类加载器可能并不是一个。前者称为初始类加载器，而后者称为定义类加载器。
-  两者的关联在于：在每个类被装载的时候，Java虚拟机都会监视这个类，看它到底是被启动类装载器还是被用户自定义类装载器装载。当被装载的类引用了另外一个类的时候，虚拟机就会使用装载第一个类的类装载器装载被引用的类。
- 注意：JVM加载类A，并使用A的ClassLoader去加载B，但B的类加载器并不一定和A的类加载器一致，这是因为有双亲委托机制的存在。
- 一般的类加载器在尝试自己去加载某个Java类之前，会 首先代理给其父类加载器。当父类加载器找不到的时候，才会尝试自己加载。这个逻辑是封装在java.lang.ClassLoader类的loadClass()方法中的。一般来说，父类优先的策略就足够好了。在某些情况下，可能需要采取相反的策略，即先尝试自己加载，找不到的时候再代理给父类加载器。这种做法在Java的Web容器中比较常见，也是Servlet规范推荐的做法。 比如，Apache Tomcat为每个Web应用都提供一个独立的类加载器，使用的就是自己优先加载的策略。IBM WebSphere Application Server则允许Web应用选择类加载器使用的策略。
- 假设 类加载器B2被要求装载类MyClass，在parent delegation模型下，类加载器B2首先请求类加载器B代为装载，类加载器B再请求系统类装载器去装载MyClass，系统类装载器也会继续请求它的Parent扩展类加载器去装载MyClass，以此类推直到引导类装载器。若引导类装载器能成功装载，则将MyClass所对应的Class对象的reference逐层返回到类加载器B2，若引导类装载器不能成功装载，下层的扩展类装载器将尝试装载，并以此类推直到类装载器B2如果也不能成功装载，则装载失败。
-  需要指出的是，Class Loader是对象，它的父子关系和类的父子关系没有任何关系。一对父子loader可能实例化自同一个 Class，也可能不是，甚至父loader实例化自子类，子loader实例化自父类。
- defineClass vs findClass vs loadClass  loadclass：判断是否已加载，使用双亲委派模型，请求父加载器，都为空，使用 findclass findclass：根据名称或位置加载 .</description>
-    </item>
-    
-    <item>
       <title>Kafka</title>
       <link>https://hadyang.github.io/interview/docs/architecture/distributed/kafka/</link>
       <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
@@ -623,10 +572,10 @@ hashCode 返回该对象的 hashcode，该方法对hash表提供支持，例如 
 31 不论是String、Arrays在计算多个元素的哈希值的时候，都会有31这个数字。主要有以下两个原因：
   31是一个不大不小的质数，是作为 hashCode 乘子的优选质数之一。
  另外一些相近的质数，比如37、41、43等等，也都是不错的选择。那么为啥偏偏选中了31呢？请看第二个原因。
-   31可以被 JVM 优化，$$31 * i = (i &amp;laquo; 5) - i$$。
+   31可以被 JVM 优化，   \(31 * i = (i 。
   上面两个原因中，第一个需要解释一下，第二个比较简单，就不说了。一般在设计哈希算法时，会选择一个特殊的质数。至于为啥选择质数，我想应该是可以降低哈希算法的冲突率。
 在 Effective Java 中有一段相关的解释：
- 选择数字31是因为它是一个奇质数，如果选择一个偶数会在乘法运算中产生溢出，导致数值信息丢失，因为乘二相当于移位运算。选择质数的优势并不是特别的明显，但这是一个传统。同时，数字31有一个很好的特性，即乘法运算可以被移位和减法运算取代，来获取更好的性能：$$31 * i == (i &amp;laquo; 5) - i$$，现代的 Java 虚拟机可以自动的完成这个优化。</description>
+ 选择数字31是因为它是一个奇质数，如果选择一个偶数会在乘法运算中产生溢出，导致数值信息丢失，因为乘二相当于移位运算。选择质数的优势并不是特别的明显，但这是一个传统。同时，数字31有一个很好的特性，即乘法运算可以被移位和减法运算取代，来获取更好的性能： \(31 * i == (i ，现代的 Java 虚拟机可以自动的完成这个优化。</description>
     </item>
     
     <item>
@@ -811,7 +760,7 @@ ZooKeeper 的好处：
       <guid>https://hadyang.github.io/interview/docs/offer/GetUglyNumber/</guid>
       <description>牛客网
 把只包含质因子2、3和5的数称作丑数（Ugly Number）。例如6、8都是丑数，但14不是，因为它包含质因子7。 习惯上我们把1当做是第一个丑数。求按从小到大的顺序的第N个丑数。
-解题思路  通过保存已有丑数的方式，用空间换时间 对于已有丑数 $$M$$ ，那么下一个丑数 $$M=\min(M_{2}\times2,M_{3}\times3,M_{5}\times5)$$ $$M_{max}$$ 是目前最大的丑数，那么 $$M_{2}$$ 是已有丑数中 $$M_{2}\times2$$ 第一个大于 $$M_{max}$$ 的丑数  public int GetUglyNumber_Solution(int index) { if (index == 0) { return 0; } if (index == 1) { return 1; } ArrayList&amp;lt;Integer&amp;gt; list = new ArrayList&amp;lt;&amp;gt;(index); list.add(1); int preIndex2 = 0; int preIndex3 = 0; int preIndex5 = 0; for (int i = 0; i &amp;lt; index; i++) { int next2 = list.</description>
+解题思路  通过保存已有丑数的方式，用空间换时间 对于已有丑数   \(M\)  ，那么下一个丑数 \(M=\min(M_{2}\times2,M_{3}\times3,M_{5}\times5)\)    \(M_{max}\)  是目前最大的丑数，那么 \(M_{2}\)  是已有丑数中 \(M_{2}\times2\)  第一个大于 \(M_{max}\)  的丑数  public int GetUglyNumber_Solution(int index) { if (index == 0) { return 0; } if (index == 1) { return 1; } ArrayList&amp;lt;Integer&amp;gt; list = new ArrayList&amp;lt;&amp;gt;(index); list.add(1); int preIndex2 = 0; int preIndex3 = 0; int preIndex5 = 0; for (int i = 0; i &amp;lt; index; i++) { int next2 = list.</description>
     </item>
     
     <item>
@@ -845,7 +794,7 @@ ZooKeeper 的好处：
       
       <guid>https://hadyang.github.io/interview/docs/offer/SumOfNDice/</guid>
       <description>题目 把 n 个骰子扔在地上，所有骰子朝上一面的和为 s，输入 n，打印 s 所有可能值的概率
-解题思路  首先考虑一个骰子的情况，那么有 1～6 出现的次数均为 1 再增加一个骰子时，由于各个点数出现的概率一致。用 $$f(n,s)=f(n-1,s-1)+f(n-1,s-2)+f(n-1,s-3)+f(n-1,s-4)+f(n-1,s-5)+f(n-1,s-6)$$ 使用两个数组循环求解  public void SumOfNDice(int n) { if (n &amp;lt; 1) { return; } int[][] nums = new int[2][n * 6 + 1]; int flag = 0; //初始化第一个骰子各总和出现的次数 int maxLen = nums[0].length; for (int i = 1; i &amp;lt; maxLen; i++) { nums[flag][i] = 1; } for (int i = 2; i &amp;lt;= n; i++) { int newFlag = flag ^ 0x01; Arrays.</description>
+解题思路  首先考虑一个骰子的情况，那么有 1～6 出现的次数均为 1 再增加一个骰子时，由于各个点数出现的概率一致。用   \(f(n,s)=f(n-1,s-1)+f(n-1,s-2)+f(n-1,s-3)+f(n-1,s-4)+f(n-1,s-5)+f(n-1,s-6)\)   使用两个数组循环求解  public void SumOfNDice(int n) { if (n &amp;lt; 1) { return; } int[][] nums = new int[2][n * 6 + 1]; int flag = 0; //初始化第一个骰子各总和出现的次数 int maxLen = nums[0].length; for (int i = 1; i &amp;lt; maxLen; i++) { nums[flag][i] = 1; } for (int i = 2; i &amp;lt;= n; i++) { int newFlag = flag ^ 0x01; Arrays.</description>
     </item>
     
     <item>
@@ -1141,7 +1090,7 @@ Session Stick 在单机情况， session 保存在单机上，请求也是到这
 SET resource_name my_random_value NX PX 30000 锁释放：
 if redis.call(&amp;quot;get&amp;quot;,KEYS[1]) == ARGV[1] then return redis.call(&amp;quot;del&amp;quot;,KEYS[1]) else return 0 end RedLock 为了解决 Redis 单点的问题。 Redis 的作者提出了 RedLock 的解决方案。方案非常的巧妙和简洁。 RedLock 的核心思想就是，同时使用多个 Redis Master 来冗余，且这些节点都是完全的独立的，也不需要对这些节点之间的数据进行同步。
 假设我们有N个Redis节点，N应该是一个大于2的奇数。RedLock的实现步骤:
- 取得当前时间 使用单节点获取锁的方式，依次获取 N 个节点的 Redis 锁。 如果获取到的锁的数量大于 $N/2+1$ 个，且获取的时间小于锁的有效时间(lock validity time)就认为获取到了一个有效的锁，锁自动释放时间就是最初的锁释放时间减去之前获取锁所消耗的时间。 如果获取锁的数量小于 $N/2+1$，或者在锁的有效时间(lock validity time)内没有获取到足够的锁，就认为获取锁失败，这个时候需要向所有节点发送释放锁的消息。  对于释放锁的实现就很简单了，向所有的 Redis 节点发起释放的操作，无论之前是否获取锁成功。
+ 取得当前时间 使用单节点获取锁的方式，依次获取 N 个节点的 Redis 锁。 如果获取到的锁的数量大于   \(N/2+1\)  个，且获取的时间小于锁的有效时间(lock validity time)就认为获取到了一个有效的锁，锁自动释放时间就是最初的锁释放时间减去之前获取锁所消耗的时间。 如果获取锁的数量小于 \(N/2+1\)  ，或者在锁的有效时间(lock validity time)内没有获取到足够的锁，就认为获取锁失败，这个时候需要向所有节点发送释放锁的消息。  对于释放锁的实现就很简单了，向所有的 Redis 节点发起释放的操作，无论之前是否获取锁成功。
 缺陷 RedLock中，为了防止死锁，锁是具有过期时间的。
  如果 Client 1 在持有锁的时候，发生了一次很长时间的 FGC 超过了锁的过期时间。锁就被释放了。 这个时候 Client 2 又获得了一把锁，提交数据。 这个时候 Client 1 从 FGC 中苏醒过来了，又一次提交数据。  这种情况下，数据就发生了错误。RedLock 只是保证了锁的高可用性，并没有保证锁的正确性。</description>
     </item>
@@ -1395,10 +1344,10 @@ public ArrayList&amp;lt;String&amp;gt; Permutation(String str) { Set&amp;lt;Stri
     
     <item>
       <title>对象的生命周期</title>
-      <link>https://hadyang.github.io/interview/docs/java/gc/jvm-object-lifecycle/</link>
+      <link>https://hadyang.github.io/interview/docs/java/jvm/jvm-object-lifecycle/</link>
       <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
       
-      <guid>https://hadyang.github.io/interview/docs/java/gc/jvm-object-lifecycle/</guid>
+      <guid>https://hadyang.github.io/interview/docs/java/jvm/jvm-object-lifecycle/</guid>
       <description>对象的生命周期 一旦一个类被装载、连接和初始化，它就随时可以被使用。程序可以访问它的静态字段，调用它的静态方法，或者创建它的实例。作为Java程序员有必要了解Java对象的生命周期。
 类实例化 在Java程序中，类可以被明确或隐含地实例化。明确的实例化类有四种途径：
  明确调用new。 调用Class或者java.lang.reflect.Constructor对象的newInstance方法。 调用任何现有对象的clone。 通过java.io.ObjectInputStream.getObject()反序列化。  隐含的实例化：
@@ -1535,7 +1484,7 @@ LL今天心情特别好,因为他去买了一副扑克牌,发现里面居然有 
       
       <guid>https://hadyang.github.io/interview/docs/offer/TranslateNumToStr/</guid>
       <description>题目 给定一个数字，按照如下规则翻译成字符串：0 翻译成“a”，1 翻译成“b”… 25翻译成“z”。一个数字有多种翻译可能，例如12258一共有5种，分别是bccfi，bwfi，bczi，mcfi，mzi。实现一个函数，用来计算一个数字有多少种不同的翻译方法。
-解题思路  定义 $$f(i)$$ 表示第 i 位有多少种翻译的方法，动态规划方程：$$f(i)=f(i+1)+g(i,i+1) \times f(i+2)$$ 其中 $$g(i,i+1)$$ 表示 i,i+1 是否能组成 10 ~ 25  public int translateNumToStr(int num) { char[] str = String.valueOf(num).toCharArray(); int[] res = new int[str.length]; for (int i = str.length - 1; i &amp;gt;= 0; i--) { if (i + 1 &amp;gt;= str.length) { res[i] = 1; continue; } res[i] = res[i + 1]; if (i + 2 &amp;lt; str.</description>
+解题思路  定义   \(f(i)\)  表示第 i 位有多少种翻译的方法，动态规划方程： \(f(i)=f(i+1)+g(i,i+1) \times f(i+2)\)   其中 \(g(i,i+1)\)  表示 i,i+1 是否能组成 10 ~ 25  public int translateNumToStr(int num) { char[] str = String.valueOf(num).toCharArray(); int[] res = new int[str.length]; for (int i = str.length - 1; i &amp;gt;= 0; i--) { if (i + 1 &amp;gt;= str.length) { res[i] = 1; continue; } res[i] = res[i + 1]; if (i + 2 &amp;lt; str.</description>
     </item>
     
     <item>
@@ -1546,7 +1495,7 @@ LL今天心情特别好,因为他去买了一副扑克牌,发现里面居然有 
       <guid>https://hadyang.github.io/interview/docs/offer/PrintMinNumber/</guid>
       <description>题目 把数组排成最小的数
 输入一个正整数数组，把数组里所有数字拼接起来排成一个数，打印能拼接出的所有数字中最小的一个。例如输入数组{3，32，321}，则打印出这三个数字能排成的最小数字为321323。
-解题思路  最直接的办法就是，找到数组中数字的所有排列组合，找到最小的 对于 $$m, n$$，可以组成 $$mn , nm$$ 这两个数，如果 $$mn &amp;lt; nm$$ 那么，$$m$$ 应该在 $$n$$ 之前 对于一组数，可以通过上述规则进行排序，依次打印出来就是最小的数 由于组合之后的数可能超出 int 的表示范围，注意使用字符串来处理大数问题  public String PrintMinNumber(int[] numbers) { List&amp;lt;String&amp;gt; nums = new ArrayList&amp;lt;&amp;gt;(); for (int number : numbers) { nums.add(String.valueOf(number)); } nums.sort(Comparator.comparing(s -&amp;gt; s, (o1, o2) -&amp;gt; (o1 + o2).compareTo(o2 + o1))); StringJoiner joiner = new StringJoiner(&amp;quot;&amp;quot;); nums.forEach(joiner::add); return joiner.toString(); } </description>
+解题思路  最直接的办法就是，找到数组中数字的所有排列组合，找到最小的 对于   \(m, n\)  ，可以组成 \(mn , nm\)  这两个数，如果 \(mn 那么， \(m\)  应该在 \(n\)  之前 对于一组数，可以通过上述规则进行排序，依次打印出来就是最小的数 由于组合之后的数可能超出 int 的表示范围，注意使用字符串来处理大数问题  public String PrintMinNumber(int[] numbers) { List&amp;lt;String&amp;gt; nums = new ArrayList&amp;lt;&amp;gt;(); for (int number : numbers) { nums.add(String.valueOf(number)); } nums.sort(Comparator.comparing(s -&amp;gt; s, (o1, o2) -&amp;gt; (o1 + o2).compareTo(o2 + o1))); StringJoiner joiner = new StringJoiner(&amp;quot;&amp;quot;); nums.forEach(joiner::add); return joiner.toString(); } </description>
     </item>
     
     <item>
@@ -1705,7 +1654,7 @@ public boolean searchMatrix(int[][] matrix, int target) { if (matrix.</descripti
       <guid>https://hadyang.github.io/interview/docs/offer/NumberOfOneBetweenOneAndN/</guid>
       <description>题目 牛客网
 求出1~13的整数中 1 出现的次数,并算出 100~1300 的整数中1出现的次数？为此他特别数了一下 1~13 中包含1的数字有 1、10、11、12、13 因此共出现 6 次,但是对于后面问题他就没辙了。ACMer 希望你们帮帮他,并把问题更加普遍化,可以很快的求出任意非负整数区间中1出现的次数（从1 到 n 中1出现的次数）。
-解题思路  假定 $$n=21345$$ 将数字分为首位和非首位两个部分 对于首位为 1 的情况，如果首位 $$&amp;gt;1$$ 那么$$sum=sum+10^{len(n)-1}$$，如果首位 $$=1$$ 那么 $$sum=sum+1$$ 对于非首位 1，指定其中一位为 1，根据排列组合有 $$10^{len(n)-2}\times(len(n)-1)$$ 个。那么非首位 1 总共有 $$2\times10^{len(n)-2}\times(len(n)-1)$$  public int NumberOf1Between1AndN_Solution(int n) { int[] res = {0}; NumberOf1Between1AndN(res, n); return res[0]; } private void NumberOf1Between1AndN(int[] res, int n) { //假设 num=21345 String num = String.valueOf(n); int firstNum = num.charAt(0) - &#39;0&#39;; if (num.</description>
+解题思路  假定   \(n=21345\)  将数字分为首位和非首位两个部分 对于首位为 1 的情况，如果首位 \(1\)  那么 \(sum=sum+10^{len(n)-1}\)  ，如果首位 \(=1\)  那么 \(sum=sum+1\)   对于非首位 1，指定其中一位为 1，根据排列组合有 \(10^{len(n)-2}\times(len(n)-1)\)  个。那么非首位 1 总共有 \(2\times10^{len(n)-2}\times(len(n)-1)\)    public int NumberOf1Between1AndN_Solution(int n) { int[] res = {0}; NumberOf1Between1AndN(res, n); return res[0]; } private void NumberOf1Between1AndN(int[] res, int n) { //假设 num=21345 String num = String.</description>
     </item>
     
     <item>
@@ -1761,9 +1710,8 @@ public boolean searchMatrix(int[][] matrix, int target) { if (matrix.</descripti
       <description>头条重点
 题目 给定一个整数数组 nums ，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
 示例: 输入: [-2,1,-3,4,-1,2,1,-5,4], 输出: 6 解释: 连续子数组 [4,-1,2,1] 的和最大，为 6。 进阶: 如果你已经实现复杂度为 O(n) 的解法，尝试使用更为精妙的分治法求解。
-解题思路   动态规划：$$f(i)=\begin{cases}num[i]&amp;amp;f(i-1)+num[i]&amp;lt;num[i]\f(i-1)+num[i] &amp;amp;f(i-1)+num[i]&amp;gt;num[i]\end{cases}$$
-  用result[i]保存以数字nums[i]结尾的最大子序和，然后不断更新result数组的最大值即可。总的时间复杂度O(n)
-  public int maxSubArray(int[] nums) { if (nums.length == 0) { return 0; } if (nums.length == 1) { return nums[0]; } int[] res = new int[nums.length]; res[0] = nums[0]; int max = res[0]; for (int i = 1; i &amp;lt; nums.length; i++) { int curMax = nums[i] + res[i - 1]; if (curMax &amp;gt; nums[i]) { res[i] = curMax; } else { res[i] = nums[i]; } max = Math.</description>
+解题思路   动态规划：   \(f(i)=\begin{cases}num[i]&amp;f(i-1)+num[i]num[i]\end{cases}\)    用result[i]保存以数字nums[i]结尾的最大子序和，然后不断更新result数组的最大值即可。总的时间复杂度O(n)
+  public int maxSubArray(int[] nums) { if (nums.length == 0) { return 0; } if (nums.length == 1) { return nums[0]; } int[] res = new int[nums.length]; res[0] = nums[0]; int max = res[0]; for (int i = 1; i &amp;lt; nums.</description>
     </item>
     
     <item>
@@ -1829,11 +1777,10 @@ public ArrayList&amp;lt;Integer&amp;gt; GetLeastNumbers_Solution_Partition(int[]
       <guid>https://hadyang.github.io/interview/docs/basic/algo/path/</guid>
       <description>最短路径算法 Dijkstra —— 贪心算法  从一个顶点到其余顶点的最短路径
  设G=(V,E)是一个带权有向图，把图中顶点集合V分成两组，第1组为已求出最短路径的顶点（用S表示，初始时S只有一个源点，以后每求得一条最短路径v,...k，就将k加到集合S中，直到全部顶点都加入S）。第2组为其余未确定最短路径的顶点集合（用U表示），按最短路径长度的递增次序把第2组的顶点加入S中。
-步骤： 1. 初始时，S只包含源点，即`S={v}`，顶点v到自己的距离为0。U包含除v外的其他顶点，v到U中顶点i的距离为边上的权。 2. 从U中选取一个顶点u，顶点v到u的距离最小，然后把顶点u加入S中。 3. 以顶点u为新考虑的中间点，修改v到U中各个点的距离。 4. 重复以上步骤知道S包含所有顶点。 Floyd —— 动态规划 Floyd 算法是解决任意两点间的最短路径的一种算法，可以正确处理有向图或负权（但不可存在负权回路）的最短路径问题。该算法的时间复杂度为 $$O(N^{3})$$，空间复杂度为 $$O(N^{2})$$
-设 $$D_{i,j,k}$$ 为从 $$i$$ 到 $$j$$ 的只以 $$(1..k)$$ 集合中的节点为中间节点的最短路径的长度。
+步骤： 1. 初始时，S只包含源点，即`S={v}`，顶点v到自己的距离为0。U包含除v外的其他顶点，v到U中顶点i的距离为边上的权。 2. 从U中选取一个顶点u，顶点v到u的距离最小，然后把顶点u加入S中。 3. 以顶点u为新考虑的中间点，修改v到U中各个点的距离。 4. 重复以上步骤知道S包含所有顶点。 Floyd —— 动态规划 Floyd 算法是解决任意两点间的最短路径的一种算法，可以正确处理有向图或负权（但不可存在负权回路）的最短路径问题。该算法的时间复杂度为   \(O(N^{3})\)  ，空间复杂度为 \(O(N^{2})\)  设 \(D_{i,j,k}\)  为从 \(i\)  到 \(j\)  的只以 \((1..k)\)  集合中的节点为中间节点的最短路径的长度。
 $$ D_{i,j,k}=\begin{cases} D_{i,j,k-1} &amp;amp; 最短路径不经过 k\
 D_{i,k,k-1}+D_{k,j,k-1} &amp;amp; 最短路径经过 k \end{cases} $$
-因此， $$D_{i,j,k}=min(D_{i,k,k-1}+D_{k,j,k-1},D_{i,j,k-1})$$。伪代码描述如下：
+因此， \(D_{i,j,k}=min(D_{i,k,k-1}+D_{k,j,k-1},D_{i,j,k-1})\)  。伪代码描述如下：
 // let dist be a |V| × |V| array of minimum distances initialized to ∞ (infinity) for each vertex v dist[v][v] ← 0 for each edge (u,v) dist[u][v] ← w(u,v) // the weight of the edge (u,v) for k from 1 to |V| for i from 1 to |V| for j from 1 to |V| if dist[i][j] &amp;gt; dist[i][k] + dist[k][j] dist[i][j] ← dist[i][k] + dist[k][j] end if </description>
     </item>
     
@@ -2029,7 +1976,7 @@ Stack&amp;lt;Integer&amp;gt; pushStack = new Stack&amp;lt;&amp;gt;(); Stack&amp;
 题目 实现 int sqrt(int x) 函数。
 计算并返回 x 的平方根，其中 x 是非负整数。
 由于返回类型是整数，结果只保留整数的部分，小数部分将被舍去。
-示例 1: 输入: 4 输出: 2 示例 2: 输入: 8 输出: 2 说明: 8 的平方根是 2.82842...,由于返回类型是整数，小数部分将被舍去。 解题思路  牛顿迭代法：$$a_{i}=(x/a_{i-1}+a_{i-1})/2$$  public int mySqrt(int x) { double a = 1, diff = 0; do { a = (x / a + a) / 2.0; diff = Math.abs(a * a - x); } while (diff &amp;gt; 0.1); return (int) a; } </description>
+示例 1: 输入: 4 输出: 2 示例 2: 输入: 8 输出: 2 说明: 8 的平方根是 2.82842...,由于返回类型是整数，小数部分将被舍去。 解题思路  牛顿迭代法：   \(a_{i}=(x/a_{i-1}+a_{i-1})/2\)    public int mySqrt(int x) { double a = 1, diff = 0; do { a = (x / a + a) / 2.0; diff = Math.abs(a * a - x); } while (diff &amp;gt; 0.</description>
     </item>
     
     <item>
@@ -2104,7 +2051,7 @@ Stack&amp;lt;Integer&amp;gt; pushStack = new Stack&amp;lt;&amp;gt;(); Stack&amp;
       <description>题目 在一个 m*n 的棋盘中的每一个格都放一个礼物，每个礼物都有一定的价值（价值大于0）.你可以从棋盘的左上角开始拿各种里的礼物，并每次向左或者向下移动一格，直到到达棋盘的右下角。给定一个棋盘及上面个的礼物，请计算你最多能拿走多少价值的礼物？
 比如说现在有一个如下的棋盘:
 在这个棋盘中，按照1，12，5，7，7，16，5的顺序可以拿到总价值最大的礼物。
-解题思路  动态规划，定义 $$f(x,y)$$ 表示x,y点上能获取的最大数 状态转移方程：$$f(x,y)=\max(f(x-1,y),f(x,y-1))+g(x,y)$$ 可以考虑使用一维数组进行记录  public int maxGift(int[][] matrix) { for (int i = 0; i &amp;lt; matrix.length; i++) { for (int j = 0; j &amp;lt; matrix[i].length; j++) { int a = i &amp;gt; 0 ? matrix[i - 1][j] : 0; int b = j &amp;gt; 0 ? matrix[i][j - 1] : 0; matrix[i][j] += Math.max(a, b); } } System.out.println(Arrays.deepToString(matrix)); return matrix[matrix.</description>
+解题思路  动态规划，定义   \(f(x,y)\)  表示x,y点上能获取的最大数 状态转移方程： \(f(x,y)=\max(f(x-1,y),f(x,y-1))+g(x,y)\)   可以考虑使用一维数组进行记录  public int maxGift(int[][] matrix) { for (int i = 0; i &amp;lt; matrix.length; i++) { for (int j = 0; j &amp;lt; matrix[i].length; j++) { int a = i &amp;gt; 0 ? matrix[i - 1][j] : 0; int b = j &amp;gt; 0 ? matrix[i][j - 1] : 0; matrix[i][j] += Math.</description>
     </item>
     
     <item>
@@ -2410,7 +2357,7 @@ package io.github.hadyang.leetcode.algo; import lombok.Getter; import lombok.Set
       <guid>https://hadyang.github.io/interview/docs/offer/FindGreatestSumOfSubArray/</guid>
       <description>题目 牛客网
 例如:{6,-3,-2,7,-15,1,2,2},连续子向量的最大和为8(从第0个开始,到第3个为止)。给一个数组，返回它的最大连续子序列的和，你会不会被他忽悠住？(子向量的长度至少是1)
-解题思路 通过动态规划计算最大和，$$f(i)$$ 定义为以第 $$i$$ 个数字结尾的子数组的最大和，那么 $$max(f(i))$$ 就有以下公式：
+解题思路 通过动态规划计算最大和，   \(f(i)\)  定义为以第 \(i\)  个数字结尾的子数组的最大和，那么 \(max(f(i))\)  就有以下公式：
 $$ max(f(i))=\begin{cases} num[i] &amp;amp; i=0 or f(i)&amp;lt;0\
 num[i]+f(i) &amp;amp; i\ne0 and f(i)&amp;gt;0 \end{cases} $$
 public int FindGreatestSumOfSubArray(int[] array) { if (array == null || array.length == 0) { return 0; } int max = array[0]; int sum = 0; for (int a : array) { if (sum + a &amp;gt; a) { sum += a; } else { sum = a; } if (sum &amp;gt; max) { max = sum; } } return max; } </description>
@@ -2528,7 +2475,7 @@ Java NIO的缓冲导向方法略有不同。数据读取到一个它稍后处理
       <guid>https://hadyang.github.io/interview/docs/offer/power/</guid>
       <description>牛客网
 给定一个 double 类型的浮点数 base 和 int 类型的整数 exponent 。求 base 的 exponent 次方。
-解题思路  当 n 为偶数时，$$a^n = a^{n/2} * a^{n/2}$$ 当 n 为奇数时，$$a^n = a^{n/2} * a^{n/2} * a$$ 可以利用类似斐波纳切的方式，利用递归来进行求解  public double Power(double base, int exponent) { if (base == 0) { return 0; } if (base == 1) { return 1; } int t_exponent = Math.abs(exponent); double t = PositivePower(base, t_exponent); return exponent &amp;gt; 0 ?</description>
+解题思路  当 n 为偶数时，   \(a^n = a^{n/2} * a^{n/2}\)   当 n 为奇数时， \(a^n = a^{n/2} * a^{n/2} * a\)   可以利用类似斐波纳切的方式，利用递归来进行求解  public double Power(double base, int exponent) { if (base == 0) { return 0; } if (base == 1) { return 1; } int t_exponent = Math.abs(exponent); double t = PositivePower(base, t_exponent); return exponent &amp;gt; 0 ?</description>
     </item>
     
     <item>

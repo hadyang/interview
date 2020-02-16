@@ -15,15 +15,15 @@ Compact 和 Redundant 格式最大的不同就是记录格式的第一个部分�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/database/innodb/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-02-14T23:21:58+08:00" />
+<meta property="article:modified_time" content="2020-02-16T17:16:32+08:00" />
 <title>InnoDB | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/interview/book.min.68d45956421753cdf6bcfc865ede445c56afc5bcaaebfe02961f44fe77d8f45a.css" integrity="sha256-aNRZVkIXU832vPyGXt5EXFavxbyq6/4Clh9E/nfY9Fo=">
+<link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.b3b2c70afee32e5f8f47d39dd103f314de9204a50c836cb3bd12458767dc3432.js" integrity="sha256-s7LHCv7jLl&#43;PR9Od0QPzFN6SBKUMg2yzvRJFh2fcNDI="></script>
+<script defer src="/interview/en.search.min.6428487c559814b45170a26d7292c7d790a6496210f62ec666f9f4a021518372.js" integrity="sha256-ZChIfFWYFLRRcKJtcpLH15CmSWIQ9i7GZvn0oCFRg3I="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -46,18 +46,18 @@ https://github.com/alex-shpak/hugo-book
 
 <body>
   <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="flex container">
-
-    <aside class="book-menu fixed">
-      <nav>
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
 <h2 class="book-brand">
-  <a href="https://hadyang.github.io/interview/"><span>Interview</span>
+  <a href="/interview"><span>Interview</span>
   </a>
 </h2>
 
 
 <div class="book-search">
-  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" />
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
   <div class="book-search-spinner spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
@@ -66,7 +66,11 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-    <ul>
+
+
+
+
+  <ul>
 <li><a href="/interview/docs/basic/">计算机基础</a>
 <ul>
 <li><a href="/interview/docs/basic/algo/">算法</a>
@@ -151,20 +155,15 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
 </ul>
 </li>
-<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<li><a href="/interview/docs/java/jvm/">Java虚拟机</a>
 <ul>
-<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/architecture/">JVM架构</a></li>
+<li><a href="/interview/docs/java/jvm/classloader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/runtime_area/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/gc/">垃圾收集</a></li>
 <li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
-<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
-<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/java/gc/">GC</a>
-<ul>
-<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
-<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String常量池</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-object-lifecycle/">对象生命周期</a></li>
 </ul>
 </li>
 </ul>
@@ -338,28 +337,86 @@ https://github.com/alex-shpak/hugo-book
 
 
 
+
+
+
 </nav>
 
 
-<script>
-(function() {
-  var menu = document.querySelector("aside.book-menu nav");
-  addEventListener("beforeunload", function(event) {
-    localStorage.setItem("menu.scrollTop", menu.scrollTop);
-  });
-  menu.scrollTop = localStorage.getItem("menu.scrollTop");
-})();
-</script>
 
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
     </aside>
 
     <div class="book-page">
-      <header class="flex align-center justify-between book-header">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
   <label for="menu-control">
     <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
+
   <strong>InnoDB</strong>
-</header>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#数据存储">数据存储</a>
+      <ul>
+        <li><a href="#行溢出数据">行溢出数据</a></li>
+        <li><a href="#数据页结构">数据页结构</a></li>
+      </ul>
+    </li>
+    <li><a href="#索引">索引</a>
+      <ul>
+        <li><a href="#b-树的高度">B+ 树的高度</a></li>
+        <li><a href="#聚集索引">聚集索引</a></li>
+        <li><a href="#辅助索引">辅助索引</a></li>
+        <li><a href="#覆盖索引">覆盖索引</a></li>
+      </ul>
+    </li>
+    <li><a href="#innodb-锁机制httpssegmentfaultcoma1190000014133576">InnoDB 锁机制</a>
+      <ul>
+        <li><a href="#当前读--快照读">当前读 & 快照读</a></li>
+        <li><a href="#共享锁与独占锁">共享锁与独占锁</a></li>
+        <li><a href="#意向锁">意向锁</a></li>
+        <li><a href="#record-lock">Record Lock</a></li>
+        <li><a href="#gap-lock">Gap Lock</a></li>
+        <li><a href="#插入意向锁">插入意向锁</a></li>
+        <li><a href="#自增锁">自增锁</a></li>
+        <li><a href="#锁选择httphedengchengcomp771_toc374698309">锁选择</a></li>
+      </ul>
+    </li>
+    <li><a href="#innodb-事务隔离">InnoDB 事务隔离</a>
+      <ul>
+        <li><a href="#几种隔离级别">几种隔离级别</a></li>
+        <li><a href="#脏读">脏读</a></li>
+        <li><a href="#不可重复读">不可重复读</a></li>
+        <li><a href="#幻读">幻读</a></li>
+      </ul>
+    </li>
+    <li><a href="#加锁规则">加锁规则</a></li>
+    <li><a href="#参考连接">参考连接</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
 
       
 <article class="markdown"><h1 id="innodb">InnoDB</h1>
@@ -404,11 +461,26 @@ https://github.com/alex-shpak/hugo-book
 <p><code>B+</code> 树的叶子节点存放所有指向关键字的指针，节点内部关键字记录和节点之间都根据关键字的大小排列。当顺序递增插入的时候，只有最后一个节点会在满掉的时候引起索引分裂，此时无需移动记录，只需创建一个新的节点即可。而当非递增插入的时候，会使得旧的节点分裂，还可能伴随移动记录，以便使得新数据能够插入其中。<strong>一般建议使用一列顺序递增的 ID 来作为主键</strong>，但不必是数据库的 <code>autoincrement</code> 字段，只要满足顺序增加即可，如 <code>twitter</code> 的 <code>snowflake</code> 即为顺序递增的 ID 生成器。</p>
 </blockquote>
 <h3 id="b-树的高度">B+ 树的高度</h3>
-<p>这里我们先假设 B+ 树高为2，即存在一个根节点和若干个叶子节点，那么这棵 B+ 树的存放总记录数为：根节点指针数*单个叶子节点记录行数。这里假设一行记录的大小为1k，那么一个页上的能放 16 行数据。假设主键ID为 bigint 类型，长度为 8 字节，而指针大小在 InnoDB 源码中设置为 6 字节，这样一共14字节，那么可以算出一棵高度为 2 的 B+ 树，能存放 $16\times1024\div 14\times 16=18720$ 条这样的数据记录。</p>
-<p>根据同样的原理我们可以算出一个高度为3的B+树可以存放：$1170\times 1170\times 16=21,902,400$ 条这样的记录。所以在 InnoDB 中 B+ 树高度一般为 1~3 层，它就能满足千万级的数据存储。</p>
-<h3 id="聚集索引和辅助索引">聚集索引和辅助索引</h3>
-<p>数据库中的 B+ 树索引可以分为聚集索引（clustered index）和辅助索引（secondary index），它们之间的最大区别就是，聚集索引中存放着一条行记录的全部信息，而辅助索引中只包含索引列和一个用于查找对应行记录的『书签』。</p>
-<h4 id="聚集索引">聚集索引</h4>
+<p>这里我们先假设 B+ 树高为2，即存在一个根节点和若干个叶子节点，那么这棵 B+ 树的存放总记录数为：根节点指针数*单个叶子节点记录行数。这里假设一行记录的大小为1k，那么一个页上的能放 16 行数据。假设主键ID为 bigint 类型，长度为 8 字节，而指针大小在 InnoDB 源码中设置为 6 字节，这样一共14字节，那么可以算出一棵高度为 2 的 B+ 树，能存放 
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+
+
+
+<span class="katex">
+  \(16 \times 1024\div 14\times 16=18720\)
+</span>
+ 条这样的数据记录。</p>
+<p>根据同样的原理我们可以算出一个高度为3的B+树可以存放：
+
+<span class="katex">
+  \(1170\times 1170\times 16=21,902,400\)
+</span>
+ 条这样的记录。所以在 InnoDB 中 B+ 树高度一般为 1~3 层，它就能满足千万级的数据存储。</p>
+<h3 id="聚集索引">聚集索引</h3>
 <p>InnoDB 存储引擎中的表都是使用索引组织的，也就是按照键的顺序存放；聚集索引就是按照表中主键的顺序构建一颗 B+ 树，并在叶节点中存放表中的行记录数据。</p>
 <blockquote>
 <p>如果没有定义主键，则会使用非空的 UNIQUE键 做主键 ; 如果没有非空的 UNIQUE键 ，则系统生成一个6字节的 <code>rowid</code> 做主键;</p>
@@ -429,7 +501,7 @@ https://github.com/alex-shpak/hugo-book
 </blockquote>
 <p>聚集索引与表的物理存储方式有着非常密切的关系，所有正常的表应该 <strong>有且仅有一个</strong> 聚集索引（绝大多数情况下都是主键），表中的所有行记录数据都是按照 <strong>聚集索引</strong> 的顺序存放的。</p>
 <p>当我们使用聚集索引对表中的数据进行检索时，可以直接获得聚集索引所对应的整条行记录数据所在的页，不需要进行第二次操作。</p>
-<h4 id="辅助索引">辅助索引</h4>
+<h3 id="辅助索引">辅助索引</h3>
 <p>数据库将 <strong>所有的非聚集索引都划分为辅助索引</strong>，但是这个概念对我们理解辅助索引并没有什么帮助；辅助索引也是通过 B+ 树实现的，但是它的叶节点并不包含行记录的全部数据，仅包含索引中的所有键和一个用于查找对应行记录的『书签』，在 InnoDB 中这个书签就是当前记录的主键。</p>
 <p>辅助索引的存在并不会影响聚集索引，因为聚集索引构成的 B+ 树是数据实际存储的形式，而辅助索引只用于加速数据的查找，所以一张表上往往有多个辅助索引以此来提升数据库的性能。</p>
 <blockquote>
@@ -439,7 +511,7 @@ https://github.com/alex-shpak/hugo-book
 <p>如果在表 <code>users</code> 中存在一个辅助索引 (<code>first_name, age</code>)，那么它构成的 B+ 树大致就是上图这样，按照 (first_name, age) 的字母顺序对表中的数据进行排序，当查找到主键时，再通过聚集索引获取到整条行记录。</p>
 <p><img src="images/2f31d7b8720a113ae5a7ed3c48a1c9d4.png" alt=""></p>
 <p>上图展示了一个使用辅助索引查找一条表记录的过程：通过辅助索引查找到对应的主键，最后在聚集索引中使用主键获取对应的行记录，这也是通常情况下行记录的查找方式。</p>
-<h4 id="回表">回表</h4>
+<h3 id="覆盖索引">覆盖索引</h3>
 <p>聚簇索引这种实现方式使得按主键的搜索十分高效，但是辅助索引搜索需要检索两遍索引：首先检索辅助索引获得主键，然后用主键到主索引中检索获得记录，这种行为被称之为 <strong>回表</strong>。回表会导致查询时多次读取磁盘，为减少IO MySQL 在辅助索引上进行优化，将辅助索引作为 <strong>覆盖索引</strong>（Covering index）。在查询的时候，如果 <code>SELECT</code> 子句中的字段为主键、辅助索引的键则不进行回表。</p>
 <p>在 <code>EXPLAIN</code> 命令下查看 <code>Extra</code> 字段，如果包含 <code>Using index</code> 则使用覆盖索引。下面通过例子直观的理解下，有表：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">CREATE</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#f92672">`</span>Employee<span style="color:#f92672">`</span> (
@@ -669,41 +741,49 @@ MySQL Server 此时才会判断返回的记录是否满足<code>id&lt;7</code>�
 <li><a href="https://dev.mysql.com/doc/refman/5.6/en/innodb-locks-set.html">Locks Set by Different SQL Statements in InnoDB</a></li>
 </ul>
 </article>
+ 
 
-      <div class="book-footer justify-between">
-  
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
 
-  
-  
+
+
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/1c7432dfb92a31021597dbb2daa303d6c7156d3a" title='Last modified by haoyang.shi | 2020-02-14' target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/d87c891b02a4575f586779f1dd582e21a44d7541" title='Last modified by haoyang.shi | 2020-02-16' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-02-14</span>
+      <span>2020-02-16</span>
     </a>
   </div>
-  
-  
 
-  
+
+
   <div>
-    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/basic/database/innodb/index.md" target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/basic/database/innodb/index.md" target="_blank" rel="noopener">
       <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
       <span>Edit this page</span>
     </a>
   </div>
-  
 
 </div>
 
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
       
     </div>
 
     
-  
-
-  <aside class="book-toc levels-3 fixed">
-    <nav id="TableOfContents">
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
   <ul>
     <li><a href="#数据存储">数据存储</a>
       <ul>
@@ -714,7 +794,9 @@ MySQL Server 此时才会判断返回的记录是否满足<code>id&lt;7</code>�
     <li><a href="#索引">索引</a>
       <ul>
         <li><a href="#b-树的高度">B+ 树的高度</a></li>
-        <li><a href="#聚集索引和辅助索引">聚集索引和辅助索引</a></li>
+        <li><a href="#聚集索引">聚集索引</a></li>
+        <li><a href="#辅助索引">辅助索引</a></li>
+        <li><a href="#覆盖索引">覆盖索引</a></li>
       </ul>
     </li>
     <li><a href="#innodb-锁机制httpssegmentfaultcoma1190000014133576">InnoDB 锁机制</a>
@@ -741,13 +823,25 @@ MySQL Server 此时才会判断返回的记录是否满足<code>id&lt;7</code>�
     <li><a href="#参考连接">参考连接</a></li>
   </ul>
 </nav>
-  </aside>
 
-
-
+ 
+    </aside>
+    
   </main>
 
   
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+

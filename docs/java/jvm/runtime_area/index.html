@@ -4,22 +4,28 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="JVM 内存模型"><meta property="og:title" content="JVM 内存模型" />
-<meta property="og:description" content="JVM 内存模型 HotSpot 内存模型 &ndash; JDK8
- Heap: Java 堆是可供各线程共享的运行时内存区域，是 Java 虚拟机所管理的内存区域中最大的一块。此区域非常重要，几乎所有的对象实例和数组实例都要在 Java 堆上分配，但随着 JIT 编译器及逃逸分析技术的发展，也可能会被优化为栈上分配 Internd String: 字符串字面量常量池 Calss Meta Data: 每一个类的结构信息，比如 字段 和 方法数据、构造函数和普通方法的字节码内容，还包括一些初始化的时候用到的特殊方法。 Runtime Constant Pool: 运行时常量池是 class 文件中每一个类或接口的 常量池表(Constant Pool)的运行时表示形式，是方法区的一部分。它包括了若干种不同的常量。常量池表存放编译器生成的 各种字面量和符号引用，这部分内容将在类加载后进入方法区的运行时常量池中存放。运行时常量池具有动态性，运行期间也可以将新的量放到运行时常量池中，典型的应用是 String 类的 intern 方法 Code Cache: JIT 编译缓存的本地代码 PC Register: CPU内部的寄存器中就包含一个程序计数器，存放程序执行的下一条指令地址。 JVM Stacks: Java 虚拟机栈也是线程私有的，每一条线程都拥有自己私有的Java 虚拟机栈，它与线程同时创建。它描述了 Java 方法执行的内存模型：每个方法在执行的同时都会创建一个栈帧，用于存储局部变量表、操作数栈、动态链接、方法出口等信息。 Native Stacks: 本地方法栈和 Java 虚拟机栈的作用相似，Java 虚拟机栈执行的是字节码，而本地方法栈执行的是 native 方法。本地方法栈使用传统的栈（C Stack）来支持 native 方法。   JDK 1.7开始，字符串常量和符号引用等就被移出永久代：
- 符号引用迁移至系统堆内存(Native Heap) 字符串字面量迁移至Java堆(Java Heap)   在 JVM 规范中，并不存在这么多分区，只包含 5 大分区：" />
+<meta name="description" content="运行时数据区"><meta property="og:title" content="运行时数据区" />
+<meta property="og:description" content="运行时数据区 运行时数据区用于保存 JVM 在运行过程中产生的数据，结构如图所示：
+Heap Java 堆是可供各线程共享的运行时内存区域，是 Java 虚拟机所管理的内存区域中最大的一块。此区域非常重要，几乎所有的对象实例和数组实例都要在 Java 堆上分配，但随着 JIT 编译器及逃逸分析技术的发展，也可能会被优化为栈上分配。
+Heap 中除了作为对象分配使用，还包含字符串字面量 常量池（Internd Strings） 。 除此之外 Heap 中还包含一个 新生代（Yong Generation）、一个 老年代（Old Generation）。
+新生代分三个区，一个Eden区，两个Survivor区，大部分对象在Eden区中生成。Survivor 区总有一个是空的。
+老年代中保存一些生命周期较长的对象，当一个对象经过多次的 GC 后还没有被回收，那么它将被移动到老年代。
+Methoad Area 方法区的数据由所有线程共享，因此为安全的使用方法区的数据，需要注意线程安全问题。
+方法区主要保存类级别的数据，包括：
+ ClassLoader Reference Runtime Constant Pool  数字常量 类属性引用 方法引用   Field Data：每个类属性的名称、类型等 Methoad Data：每个方法的名称、返回值类型、参数列表等 Methoad Code：每个方法的字节码、本地变量表等  方法区的实现在不同的 JVM 版本有不同，在 JVM 1.8 之前，方法区的实现为 永久代（PermGen），但是由于永久代的大小限制， 经常会出现内存溢出。于是在 JVM 1.8 方法区的实现改为 元空间（Metaspace），元空间是在 Native 的一块内存空间。
+Stack 对于每个 JVM 线程，当线程启动时，都会分配一个独立的运行时栈，用以保存方法调用。每个方法调用，都会在栈顶增加一个栈帧（Stack Frame）。" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://hadyang.github.io/interview/docs/java/jvm/memory-model/" />
-<meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2019-09-28T09:50:48+08:00" />
-<title>JVM 内存模型 | Interview</title>
+<meta property="og:url" content="https://hadyang.github.io/interview/docs/java/jvm/runtime_area/" />
+<meta property="article:published_time" content="2020-02-15T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-02-16T17:16:32+08:00" />
+<title>运行时数据区 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/interview/book.min.68d45956421753cdf6bcfc865ede445c56afc5bcaaebfe02961f44fe77d8f45a.css" integrity="sha256-aNRZVkIXU832vPyGXt5EXFavxbyq6/4Clh9E/nfY9Fo=">
+<link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.b3b2c70afee32e5f8f47d39dd103f314de9204a50c836cb3bd12458767dc3432.js" integrity="sha256-s7LHCv7jLl&#43;PR9Od0QPzFN6SBKUMg2yzvRJFh2fcNDI="></script>
+<script defer src="/interview/en.search.min.6428487c559814b45170a26d7292c7d790a6496210f62ec666f9f4a021518372.js" integrity="sha256-ZChIfFWYFLRRcKJtcpLH15CmSWIQ9i7GZvn0oCFRg3I="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -42,18 +48,18 @@ https://github.com/alex-shpak/hugo-book
 
 <body>
   <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="flex container">
-
-    <aside class="book-menu fixed">
-      <nav>
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
 <h2 class="book-brand">
-  <a href="https://hadyang.github.io/interview/"><span>Interview</span>
+  <a href="/interview"><span>Interview</span>
   </a>
 </h2>
 
 
 <div class="book-search">
-  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" />
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
   <div class="book-search-spinner spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
@@ -62,7 +68,11 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-    <ul>
+
+
+
+
+  <ul>
 <li><a href="/interview/docs/basic/">计算机基础</a>
 <ul>
 <li><a href="/interview/docs/basic/algo/">算法</a>
@@ -147,20 +157,15 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
 </ul>
 </li>
-<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<li><a href="/interview/docs/java/jvm/">Java虚拟机</a>
 <ul>
-<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/architecture/">JVM架构</a></li>
+<li><a href="/interview/docs/java/jvm/classloader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/runtime_area/"class=active>内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/gc/">垃圾收集</a></li>
 <li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
-<li><a href="/interview/docs/java/jvm/memory-model/"class=active>内存模型</a></li>
-<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/java/gc/">GC</a>
-<ul>
-<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
-<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String常量池</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-object-lifecycle/">对象生命周期</a></li>
 </ul>
 </li>
 </ul>
@@ -334,116 +339,167 @@ https://github.com/alex-shpak/hugo-book
 
 
 
+
+
+
 </nav>
 
 
-<script>
-(function() {
-  var menu = document.querySelector("aside.book-menu nav");
-  addEventListener("beforeunload", function(event) {
-    localStorage.setItem("menu.scrollTop", menu.scrollTop);
-  });
-  menu.scrollTop = localStorage.getItem("menu.scrollTop");
-})();
-</script>
 
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
     </aside>
 
     <div class="book-page">
-      <header class="flex align-center justify-between book-header">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
   <label for="menu-control">
     <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
-  <strong>JVM 内存模型</strong>
-</header>
+
+  <strong>运行时数据区</strong>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#heap">Heap</a></li>
+    <li><a href="#methoad-area">Methoad Area</a></li>
+    <li><a href="#stack">Stack</a></li>
+    <li><a href="#pc-register">PC Register</a></li>
+    <li><a href="#native-method-stack">Native Method Stack</a></li>
+    <li><a href="#direct-memory">Direct Memory</a></li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
 
       
-<article class="markdown"><h1 id="jvm-内存模型">JVM 内存模型</h1>
-<p>HotSpot 内存模型 &ndash; JDK8</p>
-<p><img src="./images/2019-04-12-11-21-50.png" alt="image"></p>
+<article class="markdown"><h1 id="运行时数据区">运行时数据区</h1>
+<p>运行时数据区用于保存 JVM 在运行过程中产生的数据，结构如图所示：</p>
+<p><img src="./assists/runtime_data_area.svg" alt=""></p>
+<h2 id="heap">Heap</h2>
+<p>Java 堆是可供各线程共享的运行时内存区域，是 Java 虚拟机所管理的内存区域中最大的一块。此区域非常重要，几乎所有的对象实例和数组实例都要在 Java 堆上分配，但随着 JIT 编译器及逃逸分析技术的发展，<strong>也可能会被优化为栈上分配</strong>。</p>
+<p>Heap 中除了作为对象分配使用，还包含字符串字面量 <strong>常量池（Internd Strings）</strong> 。 除此之外 Heap 中还包含一个 <strong>新生代（Yong Generation）</strong>、一个 <strong>老年代（Old Generation）</strong>。</p>
+<p>新生代分三个区，一个Eden区，两个Survivor区，<strong>大部分对象在Eden区中生成</strong>。Survivor 区总有一个是空的。</p>
+<p>老年代中保存一些生命周期较长的对象，当一个对象经过多次的 GC 后还没有被回收，那么它将被移动到老年代。</p>
+<h2 id="methoad-area">Methoad Area</h2>
+<p>方法区的数据由所有线程共享，因此为安全的使用方法区的数据，需要注意线程安全问题。</p>
+<p>方法区主要保存类级别的数据，包括：</p>
 <ul>
-<li><strong>Heap</strong>: Java 堆是可供各线程共享的运行时内存区域，是 Java 虚拟机所管理的内存区域中最大的一块。此区域非常重要，几乎所有的对象实例和数组实例都要在 Java 堆上分配，但随着 JIT 编译器及逃逸分析技术的发展，<strong>也可能会被优化为栈上分配</strong></li>
-<li><strong>Internd String</strong>: 字符串字面量常量池</li>
-<li><strong>Calss Meta Data</strong>: 每一个类的结构信息，比如 字段 和 方法数据、构造函数和普通方法的字节码内容，还包括一些初始化的时候用到的特殊方法。</li>
-<li><strong>Runtime Constant Pool</strong>: 运行时常量池是 <code>class</code> 文件中每一个类或接口的 常量池表(<code>Constant Pool</code>)的运行时表示形式，是方法区的一部分。它包括了若干种不同的常量。常量池表存放编译器生成的 <strong>各种字面量和符号引用</strong>，这部分内容将在类加载后进入方法区的运行时常量池中存放。运行时常量池具有动态性，运行期间也可以将新的量放到运行时常量池中，典型的应用是 <code>String</code> 类的 <code>intern</code> 方法</li>
-<li><strong>Code Cache</strong>: JIT 编译缓存的本地代码</li>
-<li><strong>PC Register</strong>: CPU内部的寄存器中就包含一个程序计数器，存放程序执行的下一条指令地址。</li>
-<li><strong>JVM Stacks</strong>: Java 虚拟机栈也是线程私有的，每一条线程都拥有自己私有的Java 虚拟机栈，它与线程同时创建。它描述了 Java 方法执行的内存模型：每个方法在执行的同时都会创建一个栈帧，用于存储局部变量表、操作数栈、动态链接、方法出口等信息。</li>
-<li><strong>Native Stacks</strong>: 本地方法栈和 Java 虚拟机栈的作用相似，Java 虚拟机栈执行的是字节码，而本地方法栈执行的是 <code>native</code> 方法。本地方法栈使用传统的栈（C Stack）来支持 <code>native</code> 方法。</li>
-</ul>
-<blockquote>
-<p>JDK 1.7开始，字符串常量和符号引用等就被移出永久代：</p>
+<li>ClassLoader Reference</li>
+<li>Runtime Constant Pool
 <ul>
-<li>符号引用迁移至系统堆内存(Native Heap)</li>
-<li>字符串字面量迁移至Java堆(Java Heap)</li>
+<li>数字常量</li>
+<li>类属性引用</li>
+<li>方法引用</li>
 </ul>
-</blockquote>
-<p>在 JVM 规范中，并不存在这么多分区，只包含 5 大分区：</p>
-<p><img src="./images/jvm-architecture.png" alt="image"></p>
-<ul>
-<li>Metahod Area</li>
-<li>Heap</li>
-<li>JVM Stack</li>
-<li>PC Register</li>
-<li>Native Stack</li>
+</li>
+<li>Field Data：每个类属性的名称、类型等</li>
+<li>Methoad Data：每个方法的名称、返回值类型、参数列表等</li>
+<li>Methoad Code：每个方法的字节码、本地变量表等</li>
 </ul>
-<p>在 HotSpot 中，方法区涵盖了除 <code>Heap,JVM Stack,PC Register,Native Stack</code> 之外的其他区域。</p>
-<h2 id="参考链接">参考链接</h2>
-<ul>
-<li><a href="http://openjdk.java.net/jeps/122">JEP 122: Remove the Permanent Generation</a></li>
-<li><a href="https://javapapers.com/core-java/java-jvm-run-time-data-areas/#Run_time_Constant_Pool">Java JVM Run-time Data Areas - Javapapers</a></li>
-<li><a href="http://blog.jamesdbloom.com/JVMInternals.html#constant_pool">JVM Internals</a></li>
-<li><a href="https://www.sczyh30.com/posts/Java/jvm-memory/">深入探究 JVM | Java 的内存区域解析</a></li>
-<li><a href="http://www.artima.com/insidejvm/ed2/jvm2.html">The Java Virtual Machine</a></li>
-<li><a href="https://www.oracle.com/technetwork/java/whitepaper-135217.html">The Java HotSpot Performance Engine Architecture</a></li>
-</ul>
+<p>方法区的实现在不同的 JVM 版本有不同，在 JVM 1.8 之前，方法区的实现为 <strong>永久代（PermGen）</strong>，但是由于永久代的大小限制， 经常会出现内存溢出。于是在 JVM 1.8 方法区的实现改为 <strong>元空间（Metaspace）</strong>，元空间是在 Native 的一块内存空间。</p>
+<h2 id="stack">Stack</h2>
+<p>对于每个 JVM 线程，当线程启动时，都会分配一个独立的运行时栈，用以保存方法调用。每个方法调用，都会在栈顶增加一个栈帧（Stack Frame）。</p>
+<p>每个栈帧都保存三个引用：<strong>本地变量表（Local Variable Array）</strong>、 <strong>操作数栈（Operand Stack）</strong> 和 <strong>当前方法所属类的运行时常量池（Runtime Constant Pool）</strong>。由于本地变量表和操作数栈的大小都在编译时确定，所以栈帧的大小是固定的。</p>
+<p>当被调用的方法返回或抛出异常，栈帧会被弹出。在抛出异常时 <code>printStackTrace()</code> 打印的每一行就是一个栈帧。同时得益于栈帧的特点，栈帧内的数据是线程安全的。</p>
+<p>栈的大小可以动态扩展，但是如果一个线程需要的栈大小超过了允许的大小，就会抛出 <code>StackOverflowError</code>。</p>
+<h2 id="pc-register">PC Register</h2>
+<p>对于每个 JVM 线程，当线程启动时，都会有一个独立的  <strong>PC（Program Counter） 计数器</strong>，用来保存当前执行的代码地址（方法区中的内存地址）。如果当前方法是 Native 方法，PC 的值为 NULL。一旦执行完成，PC 计数器会被更新为下一个需要执行代码的地址。</p>
+<h2 id="native-method-stack">Native Method Stack</h2>
+<p>本地方法栈和 Java 虚拟机栈的作用相似，Java 虚拟机栈执行的是字节码，而本地方法栈执行的是 <code>native</code> 方法。本地方法栈使用传统的栈（C Stack）来支持 <code>native</code> 方法。</p>
+<h2 id="direct-memory">Direct Memory</h2>
+<p><a href="https://docs.oracle.com/javase/8/docs/technotes/guides/troubleshoot/tooldescr007.html">Native Memory Tracking</a></p>
+<p>在 JDK 1.4 中新加入了 NIO 类，它可以使用 Native 函数库直接分配堆外内存，然后通过一个存储在 Java 堆里的 <code>DirectByteBuffer</code> 对象作为这块内存的引用进行操作。这样能在一些场景中显著提高性能，因为 <strong>避免了在 Java 堆和 Native 堆中来回复制数据</strong>。</p>
 </article>
+ 
 
-      <div class="book-footer justify-between">
-  
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
 
-  
-  
+
+
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/4aa999772f091bbec6654909c2d32614aede803b" title='Last modified by haoyang.shi | 2019-09-28' target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/d87c891b02a4575f586779f1dd582e21a44d7541" title='Last modified by haoyang.shi | 2020-02-16' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2019-09-28</span>
+      <span>2020-02-16</span>
     </a>
   </div>
-  
-  
 
-  
+
+
   <div>
-    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/java/jvm/memory-model/index.md" target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/java/jvm/runtime_area/index.md" target="_blank" rel="noopener">
       <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
       <span>Edit this page</span>
     </a>
   </div>
-  
 
 </div>
 
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
       
     </div>
 
     
-  
-
-  <aside class="book-toc levels-3 fixed">
-    <nav id="TableOfContents">
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
   <ul>
-    <li><a href="#参考链接">参考链接</a></li>
+    <li><a href="#heap">Heap</a></li>
+    <li><a href="#methoad-area">Methoad Area</a></li>
+    <li><a href="#stack">Stack</a></li>
+    <li><a href="#pc-register">PC Register</a></li>
+    <li><a href="#native-method-stack">Native Method Stack</a></li>
+    <li><a href="#direct-memory">Direct Memory</a></li>
   </ul>
 </nav>
-  </aside>
 
-
-
+ 
+    </aside>
+    
   </main>
 
   
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+

@@ -170,7 +170,7 @@ Session Stick 在单机情况， session 保存在单机上，请求也是到这
 SET resource_name my_random_value NX PX 30000 锁释放：
 if redis.call(&amp;quot;get&amp;quot;,KEYS[1]) == ARGV[1] then return redis.call(&amp;quot;del&amp;quot;,KEYS[1]) else return 0 end RedLock 为了解决 Redis 单点的问题。 Redis 的作者提出了 RedLock 的解决方案。方案非常的巧妙和简洁。 RedLock 的核心思想就是，同时使用多个 Redis Master 来冗余，且这些节点都是完全的独立的，也不需要对这些节点之间的数据进行同步。
 假设我们有N个Redis节点，N应该是一个大于2的奇数。RedLock的实现步骤:
- 取得当前时间 使用单节点获取锁的方式，依次获取 N 个节点的 Redis 锁。 如果获取到的锁的数量大于 $N/2+1$ 个，且获取的时间小于锁的有效时间(lock validity time)就认为获取到了一个有效的锁，锁自动释放时间就是最初的锁释放时间减去之前获取锁所消耗的时间。 如果获取锁的数量小于 $N/2+1$，或者在锁的有效时间(lock validity time)内没有获取到足够的锁，就认为获取锁失败，这个时候需要向所有节点发送释放锁的消息。  对于释放锁的实现就很简单了，向所有的 Redis 节点发起释放的操作，无论之前是否获取锁成功。
+ 取得当前时间 使用单节点获取锁的方式，依次获取 N 个节点的 Redis 锁。 如果获取到的锁的数量大于   \(N/2+1\)  个，且获取的时间小于锁的有效时间(lock validity time)就认为获取到了一个有效的锁，锁自动释放时间就是最初的锁释放时间减去之前获取锁所消耗的时间。 如果获取锁的数量小于 \(N/2+1\)  ，或者在锁的有效时间(lock validity time)内没有获取到足够的锁，就认为获取锁失败，这个时候需要向所有节点发送释放锁的消息。  对于释放锁的实现就很简单了，向所有的 Redis 节点发起释放的操作，无论之前是否获取锁成功。
 缺陷 RedLock中，为了防止死锁，锁是具有过期时间的。
  如果 Client 1 在持有锁的时候，发生了一次很长时间的 FGC 超过了锁的过期时间。锁就被释放了。 这个时候 Client 2 又获得了一把锁，提交数据。 这个时候 Client 1 从 FGC 中苏醒过来了，又一次提交数据。  这种情况下，数据就发生了错误。RedLock 只是保证了锁的高可用性，并没有保证锁的正确性。</description>
     </item>

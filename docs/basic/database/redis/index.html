@@ -16,15 +16,15 @@ Redis 内部使用文件事件处理器 file event handler，这个文件事件�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/database/redis/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-01-16T14:29:30+08:00" />
+<meta property="article:modified_time" content="2020-02-16T17:16:32+08:00" />
 <title>Redis | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
 
-<link rel="stylesheet" href="/interview/book.min.68d45956421753cdf6bcfc865ede445c56afc5bcaaebfe02961f44fe77d8f45a.css" integrity="sha256-aNRZVkIXU832vPyGXt5EXFavxbyq6/4Clh9E/nfY9Fo=">
+<link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.b3b2c70afee32e5f8f47d39dd103f314de9204a50c836cb3bd12458767dc3432.js" integrity="sha256-s7LHCv7jLl&#43;PR9Od0QPzFN6SBKUMg2yzvRJFh2fcNDI="></script>
+<script defer src="/interview/en.search.min.6428487c559814b45170a26d7292c7d790a6496210f62ec666f9f4a021518372.js" integrity="sha256-ZChIfFWYFLRRcKJtcpLH15CmSWIQ9i7GZvn0oCFRg3I="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -47,18 +47,18 @@ https://github.com/alex-shpak/hugo-book
 
 <body>
   <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="flex container">
-
-    <aside class="book-menu fixed">
-      <nav>
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
 <h2 class="book-brand">
-  <a href="https://hadyang.github.io/interview/"><span>Interview</span>
+  <a href="/interview"><span>Interview</span>
   </a>
 </h2>
 
 
 <div class="book-search">
-  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" />
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
   <div class="book-search-spinner spinner hidden"></div>
   <ul id="book-search-results"></ul>
 </div>
@@ -67,7 +67,11 @@ https://github.com/alex-shpak/hugo-book
 
 
 
-    <ul>
+
+
+
+
+  <ul>
 <li><a href="/interview/docs/basic/">计算机基础</a>
 <ul>
 <li><a href="/interview/docs/basic/algo/">算法</a>
@@ -152,20 +156,15 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
 </ul>
 </li>
-<li><a href="/interview/docs/java/jvm/">Java 虚拟机</a>
+<li><a href="/interview/docs/java/jvm/">Java虚拟机</a>
 <ul>
-<li><a href="/interview/docs/java/jvm/jvm-class-load-init/">类加载</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-class-loader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/architecture/">JVM架构</a></li>
+<li><a href="/interview/docs/java/jvm/classloader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/runtime_area/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/gc/">垃圾收集</a></li>
 <li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-architecture/">虚拟机架构</a></li>
-<li><a href="/interview/docs/java/jvm/memory-model/">内存模型</a></li>
-<li><a href="/interview/docs/java/jvm/string-constant-pool/">String 常量池</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/java/gc/">GC</a>
-<ul>
-<li><a href="/interview/docs/java/gc/jvm-gc/">Java 虚拟机垃圾收集</a></li>
-<li><a href="/interview/docs/java/gc/jvm-object-lifecycle/">Java 虚拟机对象生命周期</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String常量池</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-object-lifecycle/">对象生命周期</a></li>
 </ul>
 </li>
 </ul>
@@ -339,28 +338,98 @@ https://github.com/alex-shpak/hugo-book
 
 
 
+
+
+
 </nav>
 
 
-<script>
-(function() {
-  var menu = document.querySelector("aside.book-menu nav");
-  addEventListener("beforeunload", function(event) {
-    localStorage.setItem("menu.scrollTop", menu.scrollTop);
-  });
-  menu.scrollTop = localStorage.getItem("menu.scrollTop");
-})();
-</script>
 
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
     </aside>
 
     <div class="book-page">
-      <header class="flex align-center justify-between book-header">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
   <label for="menu-control">
     <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
+
   <strong>Redis</strong>
-</header>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#线程模型">线程模型</a>
+      <ul>
+        <li><a href="#为啥-redis-单线程模型也能效率这么高">为啥 redis 单线程模型也能效率这么高？</a></li>
+      </ul>
+    </li>
+    <li><a href="#数据结构">数据结构</a></li>
+    <li><a href="#持久化">持久化：</a></li>
+    <li><a href="#一致性哈希算法">一致性哈希算法</a>
+      <ul>
+        <li><a href="#需求">需求</a></li>
+        <li><a href="#实现">实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#实践httpsyikungithubio20160609e4b880e887b4e680a7e59388e5b88ce7ae97e6b395e79a84e79086e8a7a3e4b88ee5ae9ee8b7b5">实践</a>
+      <ul>
+        <li></li>
+      </ul>
+    </li>
+    <li><a href="#集群">集群</a>
+      <ul>
+        <li><a href="#哨兵----sentinel">哨兵 &ndash; Sentinel</a></li>
+        <li><a href="#redis-clusterhttpsredisiotopicscluster-tutorial">Redis Cluster</a></li>
+        <li><a href="#redis-sharding-集群">Redis Sharding 集群</a></li>
+      </ul>
+    </li>
+    <li><a href="#string">string</a>
+      <ul>
+        <li><a href="#缓冲区溢出">缓冲区溢出</a></li>
+        <li><a href="#减少修改字符串时带来的内存重分配次数">减少修改字符串时带来的内存重分配次数</a></li>
+        <li><a href="#二进制安全">二进制安全</a></li>
+      </ul>
+    </li>
+    <li><a href="#zset底层实现">zset底层实现</a></li>
+    <li><a href="#bitmap-实现">BitMap 实现</a></li>
+    <li><a href="#缓存穿透缓存击穿缓存雪崩">缓存穿透、缓存击穿、缓存雪崩</a>
+      <ul>
+        <li><a href="#缓存穿透">缓存穿透</a></li>
+        <li><a href="#缓存雪崩">缓存雪崩</a></li>
+        <li><a href="#缓存击穿">缓存击穿</a></li>
+      </ul>
+    </li>
+    <li><a href="#redis分布式锁">Redis分布式锁</a></li>
+    <li><a href="#数据淘汰机制">数据淘汰机制</a>
+      <ul>
+        <li><a href="#对象过期">对象过期</a></li>
+        <li><a href="#内存淘汰">内存淘汰</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
 
       
 <article class="markdown"><h1 id="redis">Redis</h1>
@@ -551,8 +620,25 @@ for item in range(ITEMS):
 <p>Redis 就会使用跳跃表来作为有序集合键的底层实现。</p>
 <p>和链表、字典等数据结构被广泛地应用在 Redis 内部不同， <strong>Redis 只在两个地方用到了跳跃表， 一个是实现有序集合键， 另一个是在集群节点中用作内部数据结构</strong>， 除此之外， 跳跃表在 Redis 里面没有其他用途。</p>
 <h2 id="bitmap-实现">BitMap 实现</h2>
-<p>Bitmaps 并不是实际的数据类型，而是定义在 String 类型上的一个面向字节操作的集合。因为字符串是二进制安全的，最大长度是 512M ，所以最长拥有 $2^32$ 个不同字节。</p>
-<p>Redis 提供以下 BitMap 操作接口：<code>setBit</code>、<code>getBit</code>、<code>bitCount</code>、<code>bitop</code>、<code>bitpos</code>。其中 <code>setBit</code>、<code>getBit</code>都是 $O(1)$ 复杂度的操作。</p>
+<p>Bitmaps 并不是实际的数据类型，而是定义在 String 类型上的一个面向字节操作的集合。因为字符串是二进制安全的，最大长度是 512M ，所以最长拥有 
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+
+
+
+<span class="katex">
+  \(2^32\)
+</span>
+ 个不同字节。</p>
+<p>Redis 提供以下 BitMap 操作接口：<code>setBit</code>、<code>getBit</code>、<code>bitCount</code>、<code>bitop</code>、<code>bitpos</code>。其中 <code>setBit</code>、<code>getBit</code>都是 
+
+<span class="katex">
+  \(O(1)\)
+</span>
+ 复杂度的操作。</p>
 <p>优势：</p>
 <ol>
 <li>基于最小的单位bit进行存储，所以非常省空间。</li>
@@ -560,7 +646,12 @@ for item in range(ITEMS):
 <li>二进制数据的存储，进行相关计算的时候非常快。</li>
 <li>方便扩容</li>
 </ol>
-<p>限制：redis中bit映射被限制在512MB之内，所以最大是 $2^32$ 位。</p>
+<p>限制：redis中bit映射被限制在512MB之内，所以最大是 
+
+<span class="katex">
+  \(2^32\)
+</span>
+ 位。</p>
 <h2 id="缓存穿透缓存击穿缓存雪崩">缓存穿透、缓存击穿、缓存雪崩</h2>
 <h3 id="缓存穿透">缓存穿透</h3>
 <p>访问一个不存在的key，缓存不起作用，请求会穿透到 DB，流量大时 DB 会挂掉。</p>
@@ -611,41 +702,49 @@ for item in range(ITEMS):
 <p>上面提到的LRU（Least Recently Used）策略，实际上 <strong>Redis 实现的 LRU 并不是可靠的 LRU</strong>，也就是名义上我们使用LRU算法淘汰键，但是实际上被淘汰的键并不一定是真正的最久没用的，这里涉及到一个权衡的问题，如果需要在全部键空间内搜索最优解，则必然会增加系统的开销，Redis是单线程的，也就是同一个实例在每一个时刻只能服务于一个客户端，所以耗时的操作一定要谨慎。</p>
 <p>为了在一定成本内实现相对的LRU，早期的 Redis 版本是 <strong>基于采样的 LRU</strong> ，也就是放弃全部键空间内搜索解改为采样空间搜索最优解。自从 Redis3.0 版本之后，Redis 作者对于基于采样的 LRU 进行了一些优化，目的是在一定的成本内让结果更靠近真实的 LRU。</p>
 </article>
+ 
 
-      <div class="book-footer justify-between">
-  
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
 
-  
-  
+
+
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/b67a12b22fe0578b4f0dbb386d0995543d7ab146" title='Last modified by haoyang.shi | 2020-01-16' target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/d87c891b02a4575f586779f1dd582e21a44d7541" title='Last modified by haoyang.shi | 2020-02-16' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-01-16</span>
+      <span>2020-02-16</span>
     </a>
   </div>
-  
-  
 
-  
+
+
   <div>
-    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/basic/database/redis/index.md" target="_blank">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/basic/database/redis/index.md" target="_blank" rel="noopener">
       <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
       <span>Edit this page</span>
     </a>
   </div>
-  
 
 </div>
 
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
       
     </div>
 
     
-  
-
-  <aside class="book-toc levels-3 fixed">
-    <nav id="TableOfContents">
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
   <ul>
     <li><a href="#线程模型">线程模型</a>
       <ul>
@@ -697,13 +796,25 @@ for item in range(ITEMS):
     </li>
   </ul>
 </nav>
-  </aside>
 
-
-
+ 
+    </aside>
+    
   </main>
 
   
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+

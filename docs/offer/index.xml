@@ -30,7 +30,7 @@
       <guid>https://hadyang.github.io/interview/docs/offer/GetUglyNumber/</guid>
       <description>牛客网
 把只包含质因子2、3和5的数称作丑数（Ugly Number）。例如6、8都是丑数，但14不是，因为它包含质因子7。 习惯上我们把1当做是第一个丑数。求按从小到大的顺序的第N个丑数。
-解题思路  通过保存已有丑数的方式，用空间换时间 对于已有丑数 $$M$$ ，那么下一个丑数 $$M=\min(M_{2}\times2,M_{3}\times3,M_{5}\times5)$$ $$M_{max}$$ 是目前最大的丑数，那么 $$M_{2}$$ 是已有丑数中 $$M_{2}\times2$$ 第一个大于 $$M_{max}$$ 的丑数  public int GetUglyNumber_Solution(int index) { if (index == 0) { return 0; } if (index == 1) { return 1; } ArrayList&amp;lt;Integer&amp;gt; list = new ArrayList&amp;lt;&amp;gt;(index); list.add(1); int preIndex2 = 0; int preIndex3 = 0; int preIndex5 = 0; for (int i = 0; i &amp;lt; index; i++) { int next2 = list.</description>
+解题思路  通过保存已有丑数的方式，用空间换时间 对于已有丑数   \(M\)  ，那么下一个丑数 \(M=\min(M_{2}\times2,M_{3}\times3,M_{5}\times5)\)    \(M_{max}\)  是目前最大的丑数，那么 \(M_{2}\)  是已有丑数中 \(M_{2}\times2\)  第一个大于 \(M_{max}\)  的丑数  public int GetUglyNumber_Solution(int index) { if (index == 0) { return 0; } if (index == 1) { return 1; } ArrayList&amp;lt;Integer&amp;gt; list = new ArrayList&amp;lt;&amp;gt;(index); list.add(1); int preIndex2 = 0; int preIndex3 = 0; int preIndex5 = 0; for (int i = 0; i &amp;lt; index; i++) { int next2 = list.</description>
     </item>
     
     <item>
@@ -51,7 +51,7 @@
       
       <guid>https://hadyang.github.io/interview/docs/offer/SumOfNDice/</guid>
       <description>题目 把 n 个骰子扔在地上，所有骰子朝上一面的和为 s，输入 n，打印 s 所有可能值的概率
-解题思路  首先考虑一个骰子的情况，那么有 1～6 出现的次数均为 1 再增加一个骰子时，由于各个点数出现的概率一致。用 $$f(n,s)=f(n-1,s-1)+f(n-1,s-2)+f(n-1,s-3)+f(n-1,s-4)+f(n-1,s-5)+f(n-1,s-6)$$ 使用两个数组循环求解  public void SumOfNDice(int n) { if (n &amp;lt; 1) { return; } int[][] nums = new int[2][n * 6 + 1]; int flag = 0; //初始化第一个骰子各总和出现的次数 int maxLen = nums[0].length; for (int i = 1; i &amp;lt; maxLen; i++) { nums[flag][i] = 1; } for (int i = 2; i &amp;lt;= n; i++) { int newFlag = flag ^ 0x01; Arrays.</description>
+解题思路  首先考虑一个骰子的情况，那么有 1～6 出现的次数均为 1 再增加一个骰子时，由于各个点数出现的概率一致。用   \(f(n,s)=f(n-1,s-1)+f(n-1,s-2)+f(n-1,s-3)+f(n-1,s-4)+f(n-1,s-5)+f(n-1,s-6)\)   使用两个数组循环求解  public void SumOfNDice(int n) { if (n &amp;lt; 1) { return; } int[][] nums = new int[2][n * 6 + 1]; int flag = 0; //初始化第一个骰子各总和出现的次数 int maxLen = nums[0].length; for (int i = 1; i &amp;lt; maxLen; i++) { nums[flag][i] = 1; } for (int i = 2; i &amp;lt;= n; i++) { int newFlag = flag ^ 0x01; Arrays.</description>
     </item>
     
     <item>
@@ -346,7 +346,7 @@ LL今天心情特别好,因为他去买了一副扑克牌,发现里面居然有 
       
       <guid>https://hadyang.github.io/interview/docs/offer/TranslateNumToStr/</guid>
       <description>题目 给定一个数字，按照如下规则翻译成字符串：0 翻译成“a”，1 翻译成“b”… 25翻译成“z”。一个数字有多种翻译可能，例如12258一共有5种，分别是bccfi，bwfi，bczi，mcfi，mzi。实现一个函数，用来计算一个数字有多少种不同的翻译方法。
-解题思路  定义 $$f(i)$$ 表示第 i 位有多少种翻译的方法，动态规划方程：$$f(i)=f(i+1)+g(i,i+1) \times f(i+2)$$ 其中 $$g(i,i+1)$$ 表示 i,i+1 是否能组成 10 ~ 25  public int translateNumToStr(int num) { char[] str = String.valueOf(num).toCharArray(); int[] res = new int[str.length]; for (int i = str.length - 1; i &amp;gt;= 0; i--) { if (i + 1 &amp;gt;= str.length) { res[i] = 1; continue; } res[i] = res[i + 1]; if (i + 2 &amp;lt; str.</description>
+解题思路  定义   \(f(i)\)  表示第 i 位有多少种翻译的方法，动态规划方程： \(f(i)=f(i+1)+g(i,i+1) \times f(i+2)\)   其中 \(g(i,i+1)\)  表示 i,i+1 是否能组成 10 ~ 25  public int translateNumToStr(int num) { char[] str = String.valueOf(num).toCharArray(); int[] res = new int[str.length]; for (int i = str.length - 1; i &amp;gt;= 0; i--) { if (i + 1 &amp;gt;= str.length) { res[i] = 1; continue; } res[i] = res[i + 1]; if (i + 2 &amp;lt; str.</description>
     </item>
     
     <item>
@@ -357,7 +357,7 @@ LL今天心情特别好,因为他去买了一副扑克牌,发现里面居然有 
       <guid>https://hadyang.github.io/interview/docs/offer/PrintMinNumber/</guid>
       <description>题目 把数组排成最小的数
 输入一个正整数数组，把数组里所有数字拼接起来排成一个数，打印能拼接出的所有数字中最小的一个。例如输入数组{3，32，321}，则打印出这三个数字能排成的最小数字为321323。
-解题思路  最直接的办法就是，找到数组中数字的所有排列组合，找到最小的 对于 $$m, n$$，可以组成 $$mn , nm$$ 这两个数，如果 $$mn &amp;lt; nm$$ 那么，$$m$$ 应该在 $$n$$ 之前 对于一组数，可以通过上述规则进行排序，依次打印出来就是最小的数 由于组合之后的数可能超出 int 的表示范围，注意使用字符串来处理大数问题  public String PrintMinNumber(int[] numbers) { List&amp;lt;String&amp;gt; nums = new ArrayList&amp;lt;&amp;gt;(); for (int number : numbers) { nums.add(String.valueOf(number)); } nums.sort(Comparator.comparing(s -&amp;gt; s, (o1, o2) -&amp;gt; (o1 + o2).compareTo(o2 + o1))); StringJoiner joiner = new StringJoiner(&amp;quot;&amp;quot;); nums.forEach(joiner::add); return joiner.toString(); } </description>
+解题思路  最直接的办法就是，找到数组中数字的所有排列组合，找到最小的 对于   \(m, n\)  ，可以组成 \(mn , nm\)  这两个数，如果 \(mn 那么， \(m\)  应该在 \(n\)  之前 对于一组数，可以通过上述规则进行排序，依次打印出来就是最小的数 由于组合之后的数可能超出 int 的表示范围，注意使用字符串来处理大数问题  public String PrintMinNumber(int[] numbers) { List&amp;lt;String&amp;gt; nums = new ArrayList&amp;lt;&amp;gt;(); for (int number : numbers) { nums.add(String.valueOf(number)); } nums.sort(Comparator.comparing(s -&amp;gt; s, (o1, o2) -&amp;gt; (o1 + o2).compareTo(o2 + o1))); StringJoiner joiner = new StringJoiner(&amp;quot;&amp;quot;); nums.forEach(joiner::add); return joiner.toString(); } </description>
     </item>
     
     <item>
@@ -459,7 +459,7 @@ public boolean searchMatrix(int[][] matrix, int target) { if (matrix.</descripti
       <guid>https://hadyang.github.io/interview/docs/offer/NumberOfOneBetweenOneAndN/</guid>
       <description>题目 牛客网
 求出1~13的整数中 1 出现的次数,并算出 100~1300 的整数中1出现的次数？为此他特别数了一下 1~13 中包含1的数字有 1、10、11、12、13 因此共出现 6 次,但是对于后面问题他就没辙了。ACMer 希望你们帮帮他,并把问题更加普遍化,可以很快的求出任意非负整数区间中1出现的次数（从1 到 n 中1出现的次数）。
-解题思路  假定 $$n=21345$$ 将数字分为首位和非首位两个部分 对于首位为 1 的情况，如果首位 $$&amp;gt;1$$ 那么$$sum=sum+10^{len(n)-1}$$，如果首位 $$=1$$ 那么 $$sum=sum+1$$ 对于非首位 1，指定其中一位为 1，根据排列组合有 $$10^{len(n)-2}\times(len(n)-1)$$ 个。那么非首位 1 总共有 $$2\times10^{len(n)-2}\times(len(n)-1)$$  public int NumberOf1Between1AndN_Solution(int n) { int[] res = {0}; NumberOf1Between1AndN(res, n); return res[0]; } private void NumberOf1Between1AndN(int[] res, int n) { //假设 num=21345 String num = String.valueOf(n); int firstNum = num.charAt(0) - &#39;0&#39;; if (num.</description>
+解题思路  假定   \(n=21345\)  将数字分为首位和非首位两个部分 对于首位为 1 的情况，如果首位 \(1\)  那么 \(sum=sum+10^{len(n)-1}\)  ，如果首位 \(=1\)  那么 \(sum=sum+1\)   对于非首位 1，指定其中一位为 1，根据排列组合有 \(10^{len(n)-2}\times(len(n)-1)\)  个。那么非首位 1 总共有 \(2\times10^{len(n)-2}\times(len(n)-1)\)    public int NumberOf1Between1AndN_Solution(int n) { int[] res = {0}; NumberOf1Between1AndN(res, n); return res[0]; } private void NumberOf1Between1AndN(int[] res, int n) { //假设 num=21345 String num = String.</description>
     </item>
     
     <item>
@@ -624,7 +624,7 @@ Stack&amp;lt;Integer&amp;gt; pushStack = new Stack&amp;lt;&amp;gt;(); Stack&amp;
       <description>题目 在一个 m*n 的棋盘中的每一个格都放一个礼物，每个礼物都有一定的价值（价值大于0）.你可以从棋盘的左上角开始拿各种里的礼物，并每次向左或者向下移动一格，直到到达棋盘的右下角。给定一个棋盘及上面个的礼物，请计算你最多能拿走多少价值的礼物？
 比如说现在有一个如下的棋盘:
 在这个棋盘中，按照1，12，5，7，7，16，5的顺序可以拿到总价值最大的礼物。
-解题思路  动态规划，定义 $$f(x,y)$$ 表示x,y点上能获取的最大数 状态转移方程：$$f(x,y)=\max(f(x-1,y),f(x,y-1))+g(x,y)$$ 可以考虑使用一维数组进行记录  public int maxGift(int[][] matrix) { for (int i = 0; i &amp;lt; matrix.length; i++) { for (int j = 0; j &amp;lt; matrix[i].length; j++) { int a = i &amp;gt; 0 ? matrix[i - 1][j] : 0; int b = j &amp;gt; 0 ? matrix[i][j - 1] : 0; matrix[i][j] += Math.max(a, b); } } System.out.println(Arrays.deepToString(matrix)); return matrix[matrix.</description>
+解题思路  动态规划，定义   \(f(x,y)\)  表示x,y点上能获取的最大数 状态转移方程： \(f(x,y)=\max(f(x-1,y),f(x,y-1))+g(x,y)\)   可以考虑使用一维数组进行记录  public int maxGift(int[][] matrix) { for (int i = 0; i &amp;lt; matrix.length; i++) { for (int j = 0; j &amp;lt; matrix[i].length; j++) { int a = i &amp;gt; 0 ? matrix[i - 1][j] : 0; int b = j &amp;gt; 0 ? matrix[i][j - 1] : 0; matrix[i][j] += Math.</description>
     </item>
     
     <item>
@@ -688,7 +688,7 @@ Stack&amp;lt;Integer&amp;gt; pushStack = new Stack&amp;lt;&amp;gt;(); Stack&amp;
       <guid>https://hadyang.github.io/interview/docs/offer/FindGreatestSumOfSubArray/</guid>
       <description>题目 牛客网
 例如:{6,-3,-2,7,-15,1,2,2},连续子向量的最大和为8(从第0个开始,到第3个为止)。给一个数组，返回它的最大连续子序列的和，你会不会被他忽悠住？(子向量的长度至少是1)
-解题思路 通过动态规划计算最大和，$$f(i)$$ 定义为以第 $$i$$ 个数字结尾的子数组的最大和，那么 $$max(f(i))$$ 就有以下公式：
+解题思路 通过动态规划计算最大和，   \(f(i)\)  定义为以第 \(i\)  个数字结尾的子数组的最大和，那么 \(max(f(i))\)  就有以下公式：
 $$ max(f(i))=\begin{cases} num[i] &amp;amp; i=0 or f(i)&amp;lt;0\
 num[i]+f(i) &amp;amp; i\ne0 and f(i)&amp;gt;0 \end{cases} $$
 public int FindGreatestSumOfSubArray(int[] array) { if (array == null || array.length == 0) { return 0; } int max = array[0]; int sum = 0; for (int a : array) { if (sum + a &amp;gt; a) { sum += a; } else { sum = a; } if (sum &amp;gt; max) { max = sum; } } return max; } </description>
@@ -757,7 +757,7 @@ public int FindGreatestSumOfSubArray(int[] array) { if (array == null || array.l
       <guid>https://hadyang.github.io/interview/docs/offer/power/</guid>
       <description>牛客网
 给定一个 double 类型的浮点数 base 和 int 类型的整数 exponent 。求 base 的 exponent 次方。
-解题思路  当 n 为偶数时，$$a^n = a^{n/2} * a^{n/2}$$ 当 n 为奇数时，$$a^n = a^{n/2} * a^{n/2} * a$$ 可以利用类似斐波纳切的方式，利用递归来进行求解  public double Power(double base, int exponent) { if (base == 0) { return 0; } if (base == 1) { return 1; } int t_exponent = Math.abs(exponent); double t = PositivePower(base, t_exponent); return exponent &amp;gt; 0 ?</description>
+解题思路  当 n 为偶数时，   \(a^n = a^{n/2} * a^{n/2}\)   当 n 为奇数时， \(a^n = a^{n/2} * a^{n/2} * a\)   可以利用类似斐波纳切的方式，利用递归来进行求解  public double Power(double base, int exponent) { if (base == 0) { return 0; } if (base == 1) { return 1; } int t_exponent = Math.abs(exponent); double t = PositivePower(base, t_exponent); return exponent &amp;gt; 0 ?</description>
     </item>
     
   </channel>
