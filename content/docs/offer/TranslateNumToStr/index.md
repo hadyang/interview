@@ -13,8 +13,8 @@ categories: offer
 
 ## 解题思路
 
-  1. 定义 $$f(i)$$ 表示第 `i` 位有多少种翻译的方法，动态规划方程：$$f(i)=f(i+1)+g(i,i+1) \times f(i+2)$$
-  2. 其中 $$g(i,i+1)$$ 表示 `i,i+1` 是否能组成 `10 ~ 25`
+  1. 定义 {{<katex>}}f(i){{</katex>}} 表示第 `i` 位有多少种翻译的方法，动态规划方程：{{<katex>}}f(i)=f(i+1)+g(i,i+1) \times f(i+2){{</katex>}}
+  2. 其中 {{<katex>}}g(i,i+1){{</katex>}} 表示 `i,i+1` 是否能组成 `10 ~ 25`
 
 ```
 public int translateNumToStr(int num) {

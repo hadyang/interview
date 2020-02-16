@@ -14,8 +14,8 @@ categories: offer
 ## 解题思路
 
   1. 通过保存已有丑数的方式，用空间换时间
-  1. 对于已有丑数 $$M$$ ，那么下一个丑数 $$M=\min(M_{2}\times2,M_{3}\times3,M_{5}\times5)$$
-  2. $$M_{max}$$ 是目前最大的丑数，那么 $$M_{2}$$ 是已有丑数中 $$M_{2}\times2$$ 第一个大于 $$M_{max}$$ 的丑数
+  1. 对于已有丑数 {{<katex>}}M{{</katex>}} ，那么下一个丑数 {{<katex>}}M=\min(M_{2}\times2,M_{3}\times3,M_{5}\times5){{</katex>}}
+  2. {{<katex>}}M_{max}{{</katex>}} 是目前最大的丑数，那么 {{<katex>}}M_{2}{{</katex>}} 是已有丑数中 {{<katex>}}M_{2}\times2{{</katex>}} 第一个大于 {{<katex>}}M_{max}{{</katex>}} 的丑数
 
 ```
 public int GetUglyNumber_Solution(int index) {

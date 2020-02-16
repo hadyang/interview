@@ -34,7 +34,7 @@ static final int hash(Object key) {
   - 首先根据 `hashCode()` 做 hash ，然后确定 bucket 的 index ；
   - 如果 bucket 的节点的 key 不是我们需要的，则通过 `keys.equals()` 在链中找。
 
-在Java 8之前的实现中是用链表解决冲突的，在产生碰撞的情况下，进行 get 时，两步的时间复杂度是 $$O(1)+O(n)$$。因此，当碰撞很厉害的时候n很大， $$O(n)$$ 的速度显然是影响速度的。因此在Java 8中，如果一个 bucket 中碰撞冲突的元素超过某个限制(默认是8)，则使用红黑树来替换链表，这样复杂度就变成了 $$O(1)+O(logn)$$ 了，这样在 n 很大的时候，能够比较理想的解决这个问题，在[Java 8：HashMap的性能提升](http://www.importnew.com/14417.html)一文中有性能测试的结果。
+在Java 8之前的实现中是用链表解决冲突的，在产生碰撞的情况下，进行 get 时，两步的时间复杂度是 {{<katex>}}O(1)+O(n){{</katex>}}。因此，当碰撞很厉害的时候n很大， {{<katex>}}O(n){{</katex>}} 的速度显然是影响速度的。因此在Java 8中，如果一个 bucket 中碰撞冲突的元素超过某个限制(默认是8)，则使用红黑树来替换链表，这样复杂度就变成了 {{<katex>}}O(1)+O(logn){{</katex>}} 了，这样在 n 很大的时候，能够比较理想的解决这个问题，在[Java 8：HashMap的性能提升](http://www.importnew.com/14417.html)一文中有性能测试的结果。
 
 ## Resize
 

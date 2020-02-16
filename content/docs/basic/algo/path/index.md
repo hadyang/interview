@@ -24,9 +24,9 @@ categories: algo
 
 ## Floyd —— 动态规划
 
-Floyd 算法是解决任意两点间的最短路径的一种算法，可以正确处理有向图或负权（但不可存在负权回路）的最短路径问题。该算法的时间复杂度为 $$O(N^{3})$$，空间复杂度为 $$O(N^{2})$$
+Floyd 算法是解决任意两点间的最短路径的一种算法，可以正确处理有向图或负权（但不可存在负权回路）的最短路径问题。该算法的时间复杂度为 {{<katex>}}O(N^{3}){{</katex>}}，空间复杂度为 {{<katex>}}O(N^{2}){{</katex>}}
 
-设 $$D_{i,j,k}$$ 为从 $$i$$ 到 $$j$$ 的只以 $$(1..k)$$ 集合中的节点为中间节点的最短路径的长度。
+设 {{<katex>}}D_{i,j,k}{{</katex>}} 为从 {{<katex>}}i{{</katex>}} 到 {{<katex>}}j{{</katex>}} 的只以 {{<katex>}}(1..k){{</katex>}} 集合中的节点为中间节点的最短路径的长度。
 
 $$
 D_{i,j,k}=\begin{cases}
@@ -35,7 +35,7 @@ D_{i,k,k-1}+D_{k,j,k-1} & 最短路径经过 k
 \end{cases}
 $$
 
-因此， $$D_{i,j,k}=min(D_{i,k,k-1}+D_{k,j,k-1},D_{i,j,k-1})$$。伪代码描述如下：
+因此， {{<katex>}}D_{i,j,k}=min(D_{i,k,k-1}+D_{k,j,k-1},D_{i,j,k-1}){{</katex>}}。伪代码描述如下：
 
 ```
 // let dist be a |V| × |V| array of minimum distances initialized to ∞ (infinity)

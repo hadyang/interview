@@ -15,7 +15,7 @@ categories: offer
 
 ## 解题思路
 
-通过动态规划计算最大和，$$f(i)$$ 定义为以第 $$i$$ 个数字结尾的子数组的最大和，那么 $$max(f(i))$$ 就有以下公式：
+通过动态规划计算最大和，{{<katex>}}f(i){{</katex>}} 定义为以第 {{<katex>}}i{{</katex>}} 个数字结尾的子数组的最大和，那么 {{<katex>}}max(f(i)){{</katex>}} 就有以下公式：
 
 $$
 max(f(i))=\begin{cases}

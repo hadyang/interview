@@ -26,7 +26,7 @@ categories: leetcode
 
 ## 解题思路
 
-  1. 动态规划：$$f(i)=\begin{cases}num[i]&f(i-1)+num[i]<num[i]\\f(i-1)+num[i] &f(i-1)+num[i]>num[i]\end{cases}$$
+  1. 动态规划：{{<katex>}}f(i)=\begin{cases}num[i]&f(i-1)+num[i]<num[i]\\f(i-1)+num[i] &f(i-1)+num[i]>num[i]\end{cases}{{</katex>}}
 
   2. 用`result[i]`保存以数字`nums[i]`结尾的最大子序和，然后不断更新`result`数组的最大值即可。总的时间复杂度O(n)
 

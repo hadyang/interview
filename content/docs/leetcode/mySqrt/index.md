@@ -31,7 +31,7 @@ categories: leetcode
 
 ## 解题思路
 
-  1. 牛顿迭代法：$$a_{i}=(x/a_{i-1}+a_{i-1})/2$$
+  1. 牛顿迭代法：{{<katex>}}a_{i}=(x/a_{i-1}+a_{i-1})/2{{</katex>}}
 
 ```
 public int mySqrt(int x) {

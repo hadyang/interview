@@ -241,9 +241,9 @@ Redis 就会使用跳跃表来作为有序集合键的底层实现。
 
 ## BitMap 实现
 
-Bitmaps 并不是实际的数据类型，而是定义在 String 类型上的一个面向字节操作的集合。因为字符串是二进制安全的，最大长度是 512M ，所以最长拥有 $2^32$ 个不同字节。
+Bitmaps 并不是实际的数据类型，而是定义在 String 类型上的一个面向字节操作的集合。因为字符串是二进制安全的，最大长度是 512M ，所以最长拥有 {{<katex>}}2^32{{</katex>}} 个不同字节。
 
-Redis 提供以下 BitMap 操作接口：`setBit`、`getBit`、`bitCount`、`bitop`、`bitpos`。其中 `setBit`、`getBit`都是 $O(1)$ 复杂度的操作。
+Redis 提供以下 BitMap 操作接口：`setBit`、`getBit`、`bitCount`、`bitop`、`bitpos`。其中 `setBit`、`getBit`都是 {{<katex>}}O(1){{</katex>}} 复杂度的操作。
 
 优势：
 1. 基于最小的单位bit进行存储，所以非常省空间。
@@ -251,7 +251,7 @@ Redis 提供以下 BitMap 操作接口：`setBit`、`getBit`、`bitCount`、`bit
 3. 二进制数据的存储，进行相关计算的时候非常快。
 4. 方便扩容
 
-限制：redis中bit映射被限制在512MB之内，所以最大是 $2^32$ 位。
+限制：redis中bit映射被限制在512MB之内，所以最大是 {{<katex>}}2^32{{</katex>}} 位。
 
 ## 缓存穿透、缓存击穿、缓存雪崩
 

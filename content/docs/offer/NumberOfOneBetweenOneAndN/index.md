@@ -15,9 +15,9 @@ categories: offer
 
 ## 解题思路
 
-  1. 假定 $$n=21345$$ 将数字分为首位和非首位两个部分
-  2. 对于首位为 1 的情况，如果首位 $$>1$$ 那么$$sum=sum+10^{len(n)-1}$$，如果首位 $$=1$$ 那么 $$sum=sum+1$$
-  3. 对于非首位 1，指定其中一位为 1，根据排列组合有 $$10^{len(n)-2}\times(len(n)-1)$$ 个。那么非首位 1 总共有 $$2\times10^{len(n)-2}\times(len(n)-1)$$
+  1. 假定 {{<katex>}}n=21345{{</katex>}} 将数字分为首位和非首位两个部分
+  2. 对于首位为 1 的情况，如果首位 {{<katex>}}>1{{</katex>}} 那么{{<katex>}}sum=sum+10^{len(n)-1}{{</katex>}}，如果首位 {{<katex>}}=1{{</katex>}} 那么 {{<katex>}}sum=sum+1{{</katex>}}
+  3. 对于非首位 1，指定其中一位为 1，根据排列组合有 {{<katex>}}10^{len(n)-2}\times(len(n)-1){{</katex>}} 个。那么非首位 1 总共有 {{<katex>}}2\times10^{len(n)-2}\times(len(n)-1){{</katex>}}
 
 ```
 public int NumberOf1Between1AndN_Solution(int n) {
