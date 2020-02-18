@@ -90,7 +90,6 @@ headless: true
         - [短链接系统]({{< relref "/docs/architecture/design/tinyURL/index.md" >}})
     - [分布式]({{< relref "/docs/architecture/distributed/_index.md" >}})
         - [分布式一致性与共识算法]({{< relref "/docs/architecture/distributed/consensus/index.md" >}})
-        - [分布式Session]({{< relref "/docs/architecture/distributed/session/index.md" >}})
         - [分布式缓存]({{< relref "/docs/architecture/distributed/cache/index.md" >}})
         - [分布式锁]({{< relref "/docs/architecture/distributed/lock/index.md" >}})
         - [分布式事务]({{< relref "/docs/architecture/distributed/transaction/index.md" >}})
