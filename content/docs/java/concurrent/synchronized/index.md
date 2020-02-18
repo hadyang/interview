@@ -51,6 +51,8 @@ Java中的每一个对象都可以作为锁。
 
 `Monitor` 本身是依赖与操作系统的互斥锁（mutex lock）实现的。由于 JVM 线程是映射到操作系统的原生线程之上的，如果要阻塞或唤醒一条线程，都需要操作系统来帮忙完成，这就需要从用户态转换到核心态中，因此这种转换需要耗费很多的 CPU 时间。
 
+![](./assists/monitor_lock.svg)
+
 ## 锁粗化
 
 同步块的作用范围应该尽可能小，仅在共享数据的实际作用域中才进行同步，这样做的目的是为了使需要同步的操作数量尽可能缩小，缩短阻塞时间，如果存在锁竞争，那么等待锁的线程也能尽快拿到锁。 
@@ -65,3 +67,4 @@ Java虚拟机在JIT编译时(可以简单理解为当某段代码即将第一次
 
 - [不可不说的Java“锁”事](https://tech.meituan.com/2018/11/15/java-lock.html)
 - [Threads and Locks](https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html)
+- [从jvm源码看 synchronized](https://www.linuxidc.com/Linux/2018-02/150798.htm)
