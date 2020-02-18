@@ -15,7 +15,7 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/java/concurrent/synchronized/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-02-17T21:31:06+08:00" />
+<meta property="article:modified_time" content="2020-02-18T10:41:53+08:00" />
 <title>Synchronized | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -23,7 +23,7 @@
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.2845ae83754bfc4ff6974ee824fba2a425307f32257690a7cebc2d21ea19425b.js" integrity="sha256-KEWug3VL/E/2l07oJPuipCUwfzIldpCnzrwtIeoZQls="></script>
+<script defer src="/interview/en.search.min.b63f446b3eadfad7a5f59691070e197a67e00748a2b73f1ea71ec9d3772d7571.js" integrity="sha256-tj9Eaz6t&#43;tel9ZaRBw4ZemfgB0iitz8epx7J03ctdXE="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -449,6 +449,7 @@ https://github.com/alex-shpak/hugo-book
 <h3 id="重量级锁">重量级锁</h3>
 <p>在重量级锁的状态下， JVM 基于进入和退出 <code>Monitor</code> 对象来实现方法同步和代码块同步，<code>Monitor</code> 的引用存储在对象头中。</p>
 <p><code>Monitor</code> 本身是依赖与操作系统的互斥锁（mutex lock）实现的。由于 JVM 线程是映射到操作系统的原生线程之上的，如果要阻塞或唤醒一条线程，都需要操作系统来帮忙完成，这就需要从用户态转换到核心态中，因此这种转换需要耗费很多的 CPU 时间。</p>
+<p><img src="./assists/monitor_lock.svg" alt=""></p>
 <h2 id="锁粗化">锁粗化</h2>
 <p>同步块的作用范围应该尽可能小，仅在共享数据的实际作用域中才进行同步，这样做的目的是为了使需要同步的操作数量尽可能缩小，缩短阻塞时间，如果存在锁竞争，那么等待锁的线程也能尽快拿到锁。 </p>
 <p>但是加锁解锁也需要消耗资源，如果存在一系列的连续加锁解锁操作，可能会导致不必要的性能损耗。 <strong>锁粗化就是JVM将多个连续的加锁、解锁操作连接在一起</strong>，扩展成一个范围更大的锁，避免频繁的加锁解锁操作。</p>
@@ -458,6 +459,7 @@ https://github.com/alex-shpak/hugo-book
 <ul>
 <li><a href="https://tech.meituan.com/2018/11/15/java-lock.html">不可不说的Java“锁”事</a></li>
 <li><a href="https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html">Threads and Locks</a></li>
+<li><a href="https://www.linuxidc.com/Linux/2018-02/150798.htm">从jvm源码看 synchronized</a></li>
 </ul>
 </article>
  
@@ -470,9 +472,9 @@ https://github.com/alex-shpak/hugo-book
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/dcba10f86ea26e3405441b882e98d7a50a7c1dec" title='Last modified by haoyang.shi | 2020-02-17' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/945c5636996dc9080c695f337ef25219fe263324" title='Last modified by haoyang.shi | 2020-02-18' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-02-17</span>
+      <span>2020-02-18</span>
     </a>
   </div>
 
