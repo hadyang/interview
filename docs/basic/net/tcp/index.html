@@ -11,11 +11,11 @@
  当发送窗口和接收窗口的大小都等于 1时，就是停止等待协议。
   当发送窗口大于1，接收窗口等于1时，就是回退N步协议。
   当发送窗口和接收窗口的大小均大于1时，就是选择重发协议。
-   TCP报文结构  源端口、目的端口：16位长。标识出远端和本地的端口号。 序列号（seq）：32位长  如果含有同步标识（SYN），则此为最初的序列号；第一个数据比特的序列码为本序列号加一 如果没有同步标识（SYN），则此为第一个数据比特的序列码   确认号（ack）：32位长。希望收到的下一个数据报的序列号，表明到序列号 N-1 为止的所有数据已经正确收到。 TCP协议数据报头长：4位长。表明TCP头中包含多少个 4字节 保留：置0 ACK：期望收到的数据的开始序列号。也即已经收到的数据的字节长度加1 PSH：表示是带有PUSH标志的数据。接收方因此请求数据报一到便可送往应用程序而不必等到缓冲区装满时才传送。 RST：用于复位由于主机崩溃或其它原因而出现的错误的连接。还可以用于拒绝非法的数据报或拒绝连接请求。 SYN：用于建立连接。 FIN：用于释放连接。 窗口大小（WIN）：16位长。窗口大小字段表示在确认了字节之后还可以发送多少个字节。 校验和（Checksum）：16位长。是为了确保高可靠性而设置的。它校验头部、数据和伪TCP头部之和。 紧急指针：URG=1时才有意义。 可选项：长度可变，最长40个字节。每个选项的开始是 1 字节的 kind 字段，说明选项的类型。  0：选项表结束（1字节） 1：无操作（1字节）用于选项字段之间的字边界对齐 2：MMS 最大报文段长度，通常在创建连接而设置 SYN 标志的数据包中指明这个选项，指明本端所能接收的最大长度的报文段。通常将 MSS 设置为（MTU-40）字节，携带 TCP 报文段的 IP 数据报的长度就不会超过 MTU（MTU最大长度为1518字节，最短为64字节），从而避免本机发生IP分片。只能出现在同步报文段中，否则将被忽略。 3：窗口扩大因子（4字节，wscale），取值 0-14 。用来把 TCP 的窗口的值左移的位数，使窗口值乘倍。只能出现在同步报文段中，否则将被忽略。 4：sackOK 发送端支持并同意使用SACK选项。 5：SACK 选择确认选项 8:时间戳 计算往返时间；用于处理TCP序号超过 2^32 的情况，又称为防止序号回绕（PAWS）。这种情形下一个包可能会重传以回答问题：“是否是第一个还是第二个4 GB的序号？”时间戳可以打破这一问题。     TCP最小长度为 20 个字节。" />
+   TCP报文结构  源端口、目的端口：16位长。标识出远端和本地的端口号。 序列号（seq）：32位长  如果含有同步标识（SYN），则此为最初的序列号；第一个数据比特的序列码为本序列号加一 如果没有同步标识（SYN），则此为第一个数据比特的序列码   确认号（ack）：32位长。希望收到的下一个数据报的序列号，表明到序列号 N-1 为止的所有数据已经正确收到。 TCP协议数据报头长：4位长。表明TCP头中包含多少个 4字节 保留：置0 ACK：期望收到的数据的开始序列号。也即已经收到的数据的字节长度加1 PSH：表示是带有PUSH标志的数据。接收方因此请求数据报一到便可送往应用程序而不必等到缓冲区装满时才传送。 RST：用于复位由于主机崩溃或其它原因而出现的错误的连接。还可以用于拒绝非法的数据报或拒绝连接请求。 SYN：用于建立连接。 FIN：用于释放连接。 窗口大小（WIN）：16位长。窗口大小字段表示在确认了字节之后还可以发送多少个字节。 校验和（Checksum）：16位长。是为了确保高可靠性而设置的。它校验头部、数据和伪TCP头部之和。 紧急指针：URG=1时才有意义。 可选项：长度可变，最长40个字节。每个选项的开始是 1 字节的 kind 字段，说明选项的类型。  0：选项表结束（1字节） 1：无操作（1字节）用于选项字段之间的字边界对齐 2：MMS 最大报文段长度，通常在创建连接而设置 SYN 标志的数据包中指明这个选项，指明本端所能接收的最大长度的报文段。通常将 MSS 设置为（MTU-40）字节，携带 TCP 报文段的 IP 数据报的长度就不会超过 MTU（MTU最大长度为1518字节，最短为64字节），从而避免本机发生IP分片。只能出现在同步报文段中，否则将被忽略。 3：窗口扩大因子（4字节，wscale），取值 0-14 。用来把 TCP 的窗口的值左移的位数，使窗口值乘倍。只能出现在同步报文段中，否则将被忽略。 4：sackOK 发送端支持并同意使用SACK选项。 5：SACK 选择确认选项 8：时间戳 计算 RTT；用于处理TCP序号超过   \(2^32\)  的情况，又称为防止序号回绕（PAWS）。  发送端的时间戳（Timestamp） 时间戳回显应答（Timestamp Echo）       TCP最小长度为 20 个字节。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/net/tcp/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-02-16T17:16:32+08:00" />
+<meta property="article:modified_time" content="2020-02-19T20:13:12+08:00" />
 <title>TCP | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -23,7 +23,7 @@
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.ee43e70185940b9946b044108804a8f781f9bc166eacd4c271c43ad3d187f093.js" integrity="sha256-7kPnAYWUC5lGsEQQiASo94H5vBZurNTCccQ609GH8JM="></script>
+<script defer src="/interview/en.search.min.e70a99de7ad022aef79657d4619c77176c4b709da9c957432574036f2bdc7ee8.js" integrity="sha256-5wqZ3nrQIq73llfUYZx3F2xLcJ2pyVdDJXQDbyvcfug="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -108,18 +108,20 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
 </ul>
 </li>
-<li><a href="/interview/docs/basic/database/">数据库</a>
+<li><a href="/interview/docs/basic/database/mysql/">MySQL</a>
 <ul>
-<li><a href="/interview/docs/basic/database/transaction/">事务</a></li>
-<li><a href="/interview/docs/basic/database/index/">索引</a></li>
-<li><a href="/interview/docs/basic/database/sql/">SQL</a></li>
-<li><a href="/interview/docs/basic/database/join/">连接</a></li>
-<li><a href="/interview/docs/basic/database/mysql/">MySQL</a></li>
-<li><a href="/interview/docs/basic/database/concurrent/">并发控制</a></li>
-<li><a href="/interview/docs/basic/database/innodb/">Innodb</a></li>
-<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
+<li><a href="/interview/docs/basic/database/mysql/architecture/">MySQL架构</a></li>
+<li><a href="/interview/docs/basic/database/mysql/innodb/">Innodb</a>
+<ul>
+<li><a href="/interview/docs/basic/database/mysql/innodb/index/">Innodb索引</a></li>
+<li><a href="/interview/docs/basic/database/mysql/innodb/concurrent/">Innodb并发控制</a></li>
+<li><a href="/interview/docs/basic/database/mysql/innodb/transaction/">Innodb事务</a></li>
 </ul>
 </li>
+<li><a href="/interview/docs/basic/database/mysql/sharding/">分库分表</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
 <li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
 </ul>
 </li>
@@ -499,7 +501,24 @@ https://github.com/alex-shpak/hugo-book
 <li>3：<strong>窗口扩大因子（4字节，wscale）</strong>，取值 0-14 。用来把 TCP 的窗口的值左移的位数，使窗口值乘倍。只能出现在同步报文段中，否则将被忽略。</li>
 <li>4：<strong>sackOK</strong> 发送端支持并同意使用SACK选项。</li>
 <li>5：<strong>SACK</strong> 选择确认选项</li>
-<li>8:<strong>时间戳</strong> 计算往返时间；用于处理TCP序号超过 <code>2^32</code> 的情况，又称为防止序号回绕（PAWS）。这种情形下一个包可能会重传以回答问题：“是否是第一个还是第二个4 GB的序号？”时间戳可以打破这一问题。</li>
+<li>8：<strong>时间戳</strong> 计算 RTT；用于处理TCP序号超过 
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+
+
+
+<span class="katex">
+  \(2^32\)
+</span>
+ 的情况，又称为防止序号回绕（PAWS）。
+<ul>
+<li>发送端的时间戳（Timestamp）</li>
+<li>时间戳回显应答（Timestamp Echo）</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -565,13 +584,6 @@ https://github.com/alex-shpak/hugo-book
 <h3 id="可靠传输">可靠传输</h3>
 <p>通常在每个 TCP 报文段中都有一对序号和确认号。TCP报文发送者称自己的字节流的编号为 <strong>序号</strong> （sequence number），称接收到对方的字节流编号为 <strong>确认号</strong> 。TCP 报文的接收者为了确保可靠性，在接收到一定数量的连续字节流后才发送确认。这是对 TCP 的一种扩展，称为选择确认（Selective Acknowledgement）。选择确认使得 TCP 接收者可以对乱序到达的数据块进行确认。<strong>每一个字节传输过后，SN号都会递增1</strong>。</p>
 <p>通过使用序号和确认号，TCP 层可以把收到的报文段中的字节按正确的顺序交付给应用层。序号是 32 位的无符号数，在它增大到 
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
-        onload="renderMathInElement(document.body);"></script>
-
-
 
 <span class="katex">
   \(2^{32}-1\)
@@ -668,9 +680,9 @@ https://github.com/alex-shpak/hugo-book
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/d87c891b02a4575f586779f1dd582e21a44d7541" title='Last modified by haoyang.shi | 2020-02-16' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/1eda66cc5376e39dacfc850c2cce6bc5882b8bb2" title='Last modified by haoyang.shi | 2020-02-19' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-02-16</span>
+      <span>2020-02-19</span>
     </a>
   </div>
 

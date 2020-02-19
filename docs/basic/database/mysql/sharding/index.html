@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="分库分表"><meta property="og:title" content="分库分表" />
+<meta property="og:description" content="分库分表 目前绝大多数应用采取的两种分库分表规则
+ mod方式 dayofweek系列日期方式（所有星期1的数据在一个库/表,或所有?月份的数据在一个库表）  这两种方式有个本质的特点，就是 离散性加周期性。例如以一个表的主键对 3 取余数的方式分库或分表：
+那么随着数据量的增大，每个表或库的数据量都是各自增长。当一个表或库的数据量增长到了一个极限，要加库或加表的时候， 介于这种分库分表算法的离散性，必需要做数据迁移才能完成。例如从3个扩展到5个的时候：
+需要将原先以 mod3 分类的数据，重新以 mod5 分类，不可避免的带来数据迁移。每个表的数据都要被重新分配到多个新的表 相似的例子比如从 dayofweek 分的 7 个库/表,要扩张为以 dayofmonth 分的 31 张库/表，同样需要进行数据迁移。
+数据迁移带来的问题是
+ 业务至少要两次发布 要专门写工具来导数据。由于各业务之间的差别，很难做出统一的工具。目前几乎都是每个业务写一套 要解决增量、全量、时间点，数据不一致等问题  如何在数据量扩张到现有库表极限，加库加表时避免数据迁移呢？
+通常的数据增长往往是随着时间的推移增长的。随着业务的开展，时间的推移，数据量不断增加。
+考虑到数据增长的特点，如果我们以代表时间增长的字段，按递增的范围分库，则可以避免数据迁移。这样的方式下，在数据量再增加达到前几个库/表的上限时，则继续水平增加库表，原先的数据就不需要迁移了。但是这样的方式会带来一个 热点问题：当前的数据量达到某个库表的范围时，所有的插入操作，都集中在这个库/表了。
+所以在满足基本业务功能的前提下，分库分表方案应该尽量避免的两个问题：
+ 数据迁移 热点  如何既能避免数据迁移又能避免插入更新的热点问题呢？
+结合离散分库/分表和连续分库/分表的优点，如果一定要写热点和新数据均匀分配在每个库，同时又保证易于水平扩展，可以考虑这样的模式：
+水平扩展scale-out方案 &ndash; 模式一 阶段一 一个库 DB0 之内分4个表，id%4 ：
+阶段二 增加 DB1 库，t2和t3整表搬迁到 DB1
+阶段三 增加 DB2 和 DB3 库，t1 整表搬迁到 DB2 ，t3整表搬迁的 DB3：
+为了规则表达，通过内部名称映射或其他方式，我们将DB1和DB2的名称和位置互换得到下图：
+dbRule: “DB” &#43; (id % 4) tbRule: “t” &#43; (id % 4) 即逻辑上始终保持4库4表，每个表一个库。这种做法也是目前店铺线图片空间采用的做法。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/database/mysql/sharding/" />
+<meta property="article:published_time" content="2020-02-19T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-02-19T20:13:12+08:00" />
+<title>分库分表 | Interview</title>
+<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
+
+
+<script defer src="/interview/en.search.min.e70a99de7ad022aef79657d4619c77176c4b709da9c957432574036f2bdc7ee8.js" integrity="sha256-5wqZ3nrQIq73llfUYZx3F2xLcJ2pyVdDJXQDbyvcfug="></script>
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-157595781-3', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/interview"><span>Interview</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+
+
+
+
+  <ul>
+<li><a href="/interview/docs/basic/">计算机基础</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/">算法</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
+<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
+<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
+<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
+<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
+<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
+<li><a href="/interview/docs/basic/algo/sort/">排序算法</a></li>
+<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/os/">操作系统</a>
+<ul>
+<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
+<li><a href="/interview/docs/basic/os/concurrency/">并发</a></li>
+<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
+<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
+<li><a href="/interview/docs/basic/os/linux/">Linux系统</a></li>
+<li><a href="/interview/docs/basic/os/interrupt/">中断</a></li>
+<li><a href="/interview/docs/basic/os/device/">设备管理</a></li>
+<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
+<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/net/">计算机网络</a>
+<ul>
+<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
+<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
+<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
+<li><a href="/interview/docs/basic/net/http/">HTTP</a></li>
+<li><a href="/interview/docs/basic/net/https/">HTTPS</a></li>
+<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/mysql/">MySQL</a>
+<ul>
+<li><a href="/interview/docs/basic/database/mysql/architecture/">MySQL架构</a></li>
+<li><a href="/interview/docs/basic/database/mysql/innodb/">Innodb</a>
+<ul>
+<li><a href="/interview/docs/basic/database/mysql/innodb/index/">Innodb索引</a></li>
+<li><a href="/interview/docs/basic/database/mysql/innodb/concurrent/">Innodb并发控制</a></li>
+<li><a href="/interview/docs/basic/database/mysql/innodb/transaction/">Innodb事务</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/mysql/sharding/"class=active>分库分表</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
+<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/">Java</a>
+<ul>
+<li><a href="/interview/docs/java/oop/">OOP</a></li>
+<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
+<li><a href="/interview/docs/java/operator/">运算符</a></li>
+<li><a href="/interview/docs/java/exception/">异常</a></li>
+<li><a href="/interview/docs/java/generics/">泛型</a></li>
+<li><a href="/interview/docs/java/object/">Object</a></li>
+<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
+<li><a href="/interview/docs/java/proxy/">代理</a></li>
+<li><a href="/interview/docs/java/annotation/">注解</a></li>
+<li><a href="/interview/docs/java/questions/">面试题</a></li>
+<li><a href="/interview/docs/java/nio/">NIO</a></li>
+<li><a href="/interview/docs/java/">集合</a>
+<ul>
+<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
+<li><a href="/interview/docs/java/collection/Concurrenthashmap/">Concurrenthashmap</a></li>
+<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/concurrent/">并发</a>
+<ul>
+<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
+<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
+<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
+<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
+<li><a href="/interview/docs/java/concurrent/AQS/">AQS</a></li>
+<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
+<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
+<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/jvm/">Java虚拟机</a>
+<ul>
+<li><a href="/interview/docs/java/jvm/architecture/">JVM架构</a></li>
+<li><a href="/interview/docs/java/jvm/classloader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/runtime_area/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/gc/">垃圾收集</a></li>
+<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String常量池</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-object-lifecycle/">对象生命周期</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/">框架</a>
+<ul>
+<li><a href="/interview/docs/fromwork/netty/">Netty</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
+<ul>
+<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/spring/">Spring</a>
+<ul>
+<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
+<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
+<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/">系统架构</a>
+<ul>
+<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
+<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
+<ul>
+<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/design/">系统设计</a>
+<ul>
+<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/distributed/">分布式</a>
+<ul>
+<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
+<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
+<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
+<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
+<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
+<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
+<li><a href="/interview/docs/architecture/distributed/kafka/">Kafka</a></li>
+<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
+<li><a href="/interview/docs/architecture/distributed/dubbo/">Dubbo</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
+<ul>
+<li><a href="/interview/docs/architecture/bigdata/algo/">基础算法</a></li>
+<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/offer/">剑指offer</a>
+<ul>
+<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
+<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
+<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
+<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
+<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
+<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
+<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
+<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
+<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
+<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
+<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
+<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
+<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
+<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
+<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
+<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
+<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
+<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
+<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
+<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
+<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
+<li><a href="/interview/docs/offer/VerifySquenceOfBST/">二叉搜索树的后序遍历序列</a></li>
+<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
+<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
+<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
+<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
+<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
+<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
+<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
+<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
+<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
+<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
+<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
+<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
+<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
+<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
+<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
+<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
+<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
+<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
+<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
+<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
+<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
+<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
+<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
+<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
+<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
+<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
+<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
+<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
+<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
+<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
+<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
+<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
+<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
+<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
+<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
+<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
+<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
+<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
+<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
+<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
+<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
+<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
+<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
+<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
+<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/leetcode/">LeetCode</a>
+<ul>
+<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
+<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
+<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
+<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
+<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
+<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
+<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
+<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
+<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
+<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
+<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
+<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
+<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
+<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
+<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
+<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
+<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
+<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
+<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
+<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
+<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
+<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
+<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
+<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
+<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
+<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
+<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
+<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
+<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
+<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
+<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
+<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>分库分表</strong>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#分库分表">分库分表</a>
+      <ul>
+        <li><a href="#水平扩展scale-out方案----模式一">水平扩展scale-out方案 &ndash; 模式一</a></li>
+        <li><a href="#水平扩展scale-out方案----模式二">水平扩展scale-out方案 &ndash; 模式二</a></li>
+        <li><a href="#水平扩展scale-out方案----模式三">水平扩展scale-out方案 &ndash; 模式三</a></li>
+        <li><a href="#总结">总结</a></li>
+      </ul>
+    </li>
+    <li><a href="#全局id">全局ID</a>
+      <ul>
+        <li><a href="#snowflake">Snowflake</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+<article class="markdown"><h2 id="分库分表">分库分表</h2>
+<p>目前绝大多数应用采取的两种分库分表规则</p>
+<ul>
+<li>mod方式</li>
+<li>dayofweek系列日期方式（所有星期1的数据在一个库/表,或所有?月份的数据在一个库表）</li>
+</ul>
+<p>这两种方式有个本质的特点，就是 <strong>离散性加周期性</strong>。例如以一个表的主键对 <code>3</code> 取余数的方式分库或分表：</p>
+<p><img src="images/5-mysql-ea314.png" alt=""></p>
+<p>那么随着数据量的增大，每个表或库的数据量都是各自增长。当一个表或库的数据量增长到了一个极限，要加库或加表的时候，
+介于这种分库分表算法的离散性，必需要做数据迁移才能完成。例如从3个扩展到5个的时候：</p>
+<p><img src="images/5-mysql-996d2.png" alt=""></p>
+<p>需要将原先以 <code>mod3</code> 分类的数据，重新以 <code>mod5</code> 分类，不可避免的带来数据迁移。每个表的数据都要被重新分配到多个新的表
+相似的例子比如从 <code>dayofweek</code> 分的 <code>7</code> 个库/表,要扩张为以 <code>dayofmonth</code> 分的 <code>31</code> 张库/表，同样需要进行数据迁移。</p>
+<p>数据迁移带来的问题是</p>
+<ul>
+<li>业务至少要两次发布</li>
+<li>要专门写工具来导数据。由于各业务之间的差别，很难做出统一的工具。目前几乎都是每个业务写一套</li>
+<li>要解决增量、全量、时间点，数据不一致等问题</li>
+</ul>
+<p>如何在数据量扩张到现有库表极限，加库加表时避免数据迁移呢？</p>
+<p>通常的数据增长往往是随着时间的推移增长的。随着业务的开展，时间的推移，数据量不断增加。</p>
+<p>考虑到数据增长的特点，如果我们以代表时间增长的字段，按递增的范围分库，则可以避免数据迁移。这样的方式下，在数据量再增加达到前几个库/表的上限时，则继续水平增加库表，原先的数据就不需要迁移了。但是这样的方式会带来一个 <strong>热点问题</strong>：当前的数据量达到某个库表的范围时，所有的插入操作，都集中在这个库/表了。</p>
+<p>所以在满足基本业务功能的前提下，分库分表方案应该尽量避免的两个问题：</p>
+<ol>
+<li>数据迁移</li>
+<li>热点</li>
+</ol>
+<p><strong>如何既能避免数据迁移又能避免插入更新的热点问题呢？</strong></p>
+<p>结合离散分库/分表和连续分库/分表的优点，如果一定要写热点和新数据均匀分配在每个库，同时又保证易于水平扩展，可以考虑这样的模式：</p>
+<h3 id="水平扩展scale-out方案----模式一">水平扩展scale-out方案 &ndash; 模式一</h3>
+<h4 id="阶段一">阶段一</h4>
+<p>一个库 <code>DB0</code> 之内分4个表，id%4 ：</p>
+<p><img src="images/5-mysql-20223.png" alt=""></p>
+<h4 id="阶段二">阶段二</h4>
+<p>增加 <code>DB1</code> 库，t2和t3整表搬迁到 <code>DB1</code></p>
+<p><img src="images/5-mysql-66089.png" alt=""></p>
+<h4 id="阶段三">阶段三</h4>
+<p>增加 <code>DB2</code> 和 <code>DB3</code> 库，t1 整表搬迁到 <code>DB2</code> ，t3整表搬迁的 <code>DB3</code>：</p>
+<p><img src="images/5-mysql-b78d8.png" alt=""></p>
+<p>为了规则表达，通过内部名称映射或其他方式，我们将DB1和DB2的名称和位置互换得到下图：</p>
+<pre><code>dbRule: “DB” + (id % 4)
+tbRule: “t”  + (id % 4)
+</code></pre><p><img src="images/5-mysql-d1b8a.png" alt=""></p>
+<p>即逻辑上始终保持4库4表，每个表一个库。这种做法也是目前店铺线图片空间采用的做法。</p>
+<p>上述方案有一个缺点，就是在从一个库到 4 个库的过程中，单表的数据量一直在增长。当单表的数据量超过一定范围时，可能会带来性能问题。比如索引的问题，历史数据清理的问题。另外当开始预留的表个数用尽，到了 4 物理库每库 1 个表的阶段，再进行扩容的话，不可避免的要从表上下手。</p>
+<h3 id="水平扩展scale-out方案----模式二">水平扩展scale-out方案 &ndash; 模式二</h3>
+<h4 id="阶段一-1">阶段一</h4>
+<p>一个数据库，两个表，<code>rule0 = id % 2</code></p>
+<pre><code>分库规则dbRule: “DB0″
+分表规则tbRule: “t” + (id % 2)
+</code></pre><p><img src="images/5-mysql-3a686.png" alt=""></p>
+<h4 id="阶段二-1">阶段二</h4>
+<p>当单库的数据量接近 1千万，单表的数据量接近 500 万时，进行扩容（数据量只是举例，具体扩容量要根据数据库和实际压力状况决定）：增加一个数据库 <code>DB1</code>，将 <code>DB0.t0</code> 整表迁移到新库 <code>DB1.t1</code>。每个库各增加1个表，未来10M-20M的数据mod2分别写入这2个表：<code>t0_1，t1_1</code>：</p>
+<p><img src="images/5-mysql-6885c.png" alt=""></p>
+<p>分库规则dbRule:</p>
+<pre><code>“DB” + (id % 2)
+</code></pre><p>分表规则tbRule:</p>
+<pre><code>    if(id &lt; 1千万){
+        return &quot;t&quot;+ (id % 2);   //1千万之前的数据，仍然放在t0和t1表。t1表从DB0搬迁到DB1库
+    }else if(id &lt; 2千万){
+        return &quot;t&quot;+ (id % 2) +&quot;_1&quot;; //1千万之后的数据，各放到两个库的两个表中: t0_1,t1_1
+    }else{
+        throw new IllegalArgumentException(&quot;id outof range[20000000]:&quot; + id);
+    }
+</code></pre><p>这样 <code>10M</code> 以后的新生数据会均匀分布在 <code>DB0</code> 和 <code>DB1</code>; 插入更新和查询热点仍然能够在每个库中均匀分布。每个库中同时有老数据和不断增长的新数据。每表的数据仍然控制在 <code>500万</code> 以下。</p>
+<h4 id="阶段三-1">阶段三</h4>
+<p>当两个库的容量接近上限继续水平扩展时，进行如下操作：</p>
+<ul>
+<li>新增加两个库：<code>DB2</code>和<code>DB3</code>，以<code>id % 4</code>分库。余数<code>0、1、2、3</code>分别对应<code>DB</code>的下标. <code>t0</code>和<code>t1</code>不变，</li>
+<li>将<code>DB0.t0_1</code>整表迁移到<code>DB2</code>; 将<code>DB1.t1_1</code>整表迁移到<code>DB3</code></li>
+</ul>
+<p><code>20M-40M</code>的数据 mod4 分为 4 个表：<code>t0_2，t1_2，t2_2，t3_2</code>，分别放到4个库中：</p>
+<p><img src="images/5-mysql-3f186.png" alt=""></p>
+<p>新的分库分表规则如下：</p>
+<p>分库规则dbRule:</p>
+<pre><code>  if(id &lt; 2千万){
+      //2千万之前的数据，4个表分别放到4个库
+      if(id &lt; 1千万){
+          return &quot;db&quot;+  (id % 2);     //原t0表仍在db0, t1表仍在db1
+      }else{
+          return &quot;db&quot;+ ((id % 2) +2); //原t0_1表从db0搬迁到db2; t1_1表从db1搬迁到db3
+      }
+  }else if(id &lt; 4千万){
+      return &quot;db&quot;+ (id % 4);          //超过2千万的数据，平均分到4个库
+  }else{
+      throw new IllegalArgumentException(&quot;id out of range. id:&quot;+id);
+  }
+</code></pre><p>分表规则tbRule:</p>
+<pre><code>  if(id &lt; 2千万){        //2千万之前的数据，表规则和原先完全一样，参见阶段二
+      if(id &lt; 1千万){
+          return &quot;t&quot;+ (id % 2);       //1千万之前的数据，仍然放在t0和t1表
+      }else{
+          return &quot;t&quot;+ (id % 2) +&quot;_1&quot;; //1千万之后的数据，仍然放在t0_1和t1_1表
+      }
+  }else if(id &lt; 4千万){
+      return &quot;t&quot;+ (id % 4)+&quot;_2&quot;;      //超过2千万的数据分为4个表t0_2，t1_2，t2_2，t3_2
+  }else{
+      throw new IllegalArgumentException(&quot;id out of range. id:&quot;+id);
+  }
+</code></pre><p>随着时间的推移，当第一阶段的<code>t0/t1</code>，第二阶段的<code>t0_1/t1_1</code>逐渐成为历史数据，不再使用时，可以直接<code>truncate</code>掉整个表。省去了历史数据迁移的麻烦。</p>
+<h3 id="水平扩展scale-out方案----模式三">水平扩展scale-out方案 &ndash; 模式三</h3>
+<p>非倍数扩展：如果从上文的阶段二到阶段三不希望一下增加两个库呢？尝试如下方案：</p>
+<p>迁移前：</p>
+<p><img src="images/5-mysql-6885c.png" alt=""></p>
+<p>新增库为<code>DB2</code>，<code>t0、t1</code>都放在 <code>DB0</code>，</p>
+<pre><code>t0_1整表迁移到 DB1
+t1_1整表迁移到 DB2
+</code></pre><p>迁移后：</p>
+<p><img src="images/5-mysql-f3040.png" alt=""></p>
+<p>这时 <code>DB0</code> 退化为旧数据的读库和更新库。新增数据的热点均匀分布在 <code>DB1</code> 和 <code>DB2</code>
+4无法整除3，因此如果从4表2库扩展到3个库，不做行级别的迁移而又保证热点均匀分布看似无法完成。</p>
+<p>当然如果不限制每库只有两个表，也可以如下实现：</p>
+<p><img src="images/5-mysql-f3040.png" alt=""></p>
+<p>小于 <code>10M</code> 的 <code>t0</code> 和 <code>t1</code> 都放到 <code>DB0</code> ，以 <code>mod2</code> 分为两个表，原数据不变
+<code>10M-20M</code>的，以 <code>mod2</code> 分为两个表 <code>t0_1、t1_1</code>，原数据不变，分别搬迁到 <code>DB1</code> ，和 <code>DB2</code> <code>20M</code> 以上的以 <code>mod3</code> 平均分配到 3 个 DB 库的 <code>t_0、t_2、t_3</code>表中</p>
+<p>这样 <code>DB1</code> 包含最老的两个表，和最新的 <code>1/3</code> 数据。<code>DB1</code> 和 <code>DB2</code> 都分表包含次新的两个旧表 <code>t0_1、t1_1</code> 和最新的 <code>1/3</code> 数据。新旧数据读写都可达到均匀分布。</p>
+<h3 id="总结">总结</h3>
+<p>总而言之，两种规则映射（函数）：</p>
+<ul>
+<li><code>离散映射</code>：如mod或dayofweek， 这种类型的映射能够很好的解决热点问题，但带来了数据迁移和历史数据问题。</li>
+<li><code>连续映射</code>；如按id或gmt_create_time的连续范围做映射。这种类型的映射可以避免数据迁移，但又带来热点问题。</li>
+</ul>
+<p><strong>离散映射和连续映射这两种相辅相成的映射规则，正好解决热点和迁移这一对相互矛盾的问题</strong>。</p>
+<p>我们之前只运用了离散映射，引入连续映射规则后，两者结合，精心设计，应该可以设计出满足避免热点和减少迁移之间任意权衡取舍的规则。</p>
+<p>基于以上考量，分库分表规则的设计和配置，长远说来必须满足以下要求</p>
+<ul>
+<li>可以动态推送修改</li>
+<li><strong>规则可以分层级叠加</strong>，旧规则可以在新规则下继续使用，新规则是旧规则在更宽尺度上的拓展，以此支持新旧规则的兼容，避免数据迁移</li>
+<li>用 <code>mod</code> 方式时，最好选 2 的指数级倍分库分表，这样方便以后切割。</li>
+</ul>
+<h2 id="全局id">全局ID</h2>
+<ul>
+<li>数据库自增 id</li>
+<li>设置数据库 sequence 或者表自增字段步长</li>
+<li>UUID</li>
+<li>获取系统当前时间</li>
+<li>Snowflake 算法</li>
+</ul>
+<h3 id="snowflake">Snowflake</h3>
+<p>twitter 开源的分布式 id 生成算法，采用 <code>Scala</code> 语言实现，是把一个 <code>64</code> 位的 <code>long</code> 型的 <code>id</code> ，<code>1</code> 个 <code>bit</code> 是不用的，用其中的 <code>41</code> <code>bit</code> 作为毫秒数，用 <code>10</code> <code>bit</code> 作为工作机器 <code>id</code> ，<code>12</code> <code>bit</code> 作为序列号。</p>
+<p><code>|–1位符号位–|--41位时间戳–|--10位机器ID–|--12位序列号–|</code></p>
+<ul>
+<li><strong>1 bit</strong>：不用，为啥呢？因为二进制里第一个 <code>bit</code> 为如果是 1，那么都是负数，但是我们生成的 id 都是正数，所以第一个 bit 统一都是 0。</li>
+<li><strong>41 bit</strong>：表示的是时间戳，单位是毫秒。<code>41 bit</code> 可以表示的数字多达 <code>2^41 - 1</code>，也就是可以标识 <code>2^41 - 1</code> 个毫秒值，换算成年就是表示<code>69</code>年的时间。</li>
+<li><strong>10 bit</strong>：记录工作机器 <code>id</code>，代表的是这个服务最多可以部署在 <code>2^10</code>台机器上哪，也就是<code>1024</code>台机器。但是 10 bit 里 5 个 bit 代表机房 id，5 个 bit 代表机器 id。意思就是最多代表 <code>2^5</code>个机房（32个机房），每个机房里可以代表 <code>2^5</code> 个机器（32台机器）。</li>
+<li><strong>12 bit</strong>：这个是用来记录同一个毫秒内产生的不同 id，<code>12 bit</code> 可以代表的最大正整数是 <code>2^12 - 1 = 4096</code>，也就是说可以用这个 <code>12 bit</code> 代表的数字来区分同一个毫秒内的 <code>4096</code> 个不同的 id。</li>
+</ul>
+<h4 id="snowflake-的问题">Snowflake 的问题</h4>
+<p>Snowflake 这样依赖时间的ID生成算法注定存在一个问题：<strong>时间的准确度问题</strong>。这一算法有一个默认前提：分布式环境下时间获取总是准确的，即时间总是递增的。而现实环境中，这样的条件很难满足。总会因为硬件、软件、人的原因造成时间变化。如果你的硬件时间本身就比正常时间快，而你接入了一个 NTP 服务，每当进行 NTP 时间校准时，你的机器时间总会向后 <strong>回拨</strong> 一段时间，这时悲剧就来了：有极大可能性生成重复ID。</p>
+<p>针对上面提到的两个问题，可如下改进：</p>
+<ol>
+<li>时间戳由毫秒变为秒</li>
+<li>使用环形列表对时间戳对应的序列进行缓存</li>
+<li>使用CAS操作避免大粒度悲观锁</li>
+</ol>
+<p>为了 <strong>缓解</strong> 时钟回拨问题，对之前的序列进行缓存，而原生算法很显然是不利于缓存的，最坏的情况下每秒需要缓存 1000 个值，这显然对内存很不友好。于是我将时间戳改为秒为单位，同时可以把省出来的位交给序列。此时缓存一个小时的数据（即可以容忍一个小时的时钟回拨）也就只需要缓存 3600 个序列，完全可以接受。改进后的 Snowflake 生成的ID是这样组成的：</p>
+<p><code>|–1位符号位–|--32位时间戳–|--10位机器ID–|--21位序列号–|</code></p>
+<blockquote>
+<p>环形列表：即整个列表的容量是一定的，当列表满了以后再加入的元素会按照入列的先后顺序覆盖之前的元素。</p>
+</blockquote>
+</article>
+ 
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+  <div>
+    
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/1eda66cc5376e39dacfc850c2cce6bc5882b8bb2" title='Last modified by haoyang.shi | 2020-02-19' target="_blank" rel="noopener">
+      <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
+      <span>2020-02-19</span>
+    </a>
+  </div>
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/basic/database/mysql/sharding/index.md" target="_blank" rel="noopener">
+      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
+      
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li><a href="#分库分表">分库分表</a>
+      <ul>
+        <li><a href="#水平扩展scale-out方案----模式一">水平扩展scale-out方案 &ndash; 模式一</a></li>
+        <li><a href="#水平扩展scale-out方案----模式二">水平扩展scale-out方案 &ndash; 模式二</a></li>
+        <li><a href="#水平扩展scale-out方案----模式三">水平扩展scale-out方案 &ndash; 模式三</a></li>
+        <li><a href="#总结">总结</a></li>
+      </ul>
+    </li>
+    <li><a href="#全局id">全局ID</a>
+      <ul>
+        <li><a href="#snowflake">Snowflake</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
