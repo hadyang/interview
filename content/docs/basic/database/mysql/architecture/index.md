@@ -9,7 +9,7 @@ categories: database
 
 总体来说 MySQL 可以分为两层，第一层是 MySQL 的服务层，包含 MySQL 核心服务功能：解析、分析、优化、缓存以及内置函数，所有跨存储引擎的功能都在这一层实现：存储过程、触发器、视图等。
 
-第二层是 MySQL 的 **存储引擎层**，MySQL 中可使用多种存储引擎：Innodb、MyISAM、Memory。存储引擎负责 MySQL 中数据的存取。服务层通过统一的 API 与存储引擎进行通信，这些 API 屏蔽来同步存储引擎之间的差异，使得这些差异对上层的查询过程透明。
+第二层是 MySQL 的 **存储引擎层**，MySQL 中可使用多种存储引擎：InnoDB、MyISAM、Memory。存储引擎负责 MySQL 中数据的存取。服务层通过统一的 API 与存储引擎进行通信，这些 API 屏蔽来同步存储引擎之间的差异，使得这些差异对上层的查询过程透明。
 
 ![](./assists/mysql_architecture.svg)
 
@@ -47,7 +47,7 @@ categories: database
 
 ![](./assists/mysql_update_process.jpg)
 
-1. MySQL Server 发送更新请求到 Innodb 引擎
+1. MySQL Server 发送更新请求到 InnoDB 引擎
 2. 从 Buffer Pool 加载对应记录的 Data Page（P1）
    1. 若 Buffer Pool 中没有该记录，则从磁盘加载该记录
 3. 将 P1 存储到 Undo Page 中，并在 Redo Log Buffer 中记录 Undo 操作

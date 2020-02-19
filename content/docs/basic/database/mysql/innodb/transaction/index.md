@@ -1,5 +1,5 @@
 ---
-title: Innodb 事务
+title: InnoDB 事务
 date: 2020-02-19
 draft: false
 categories: database
