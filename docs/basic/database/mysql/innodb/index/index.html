@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Innodb 索引"><meta property="og:title" content="Innodb 索引" />
-<meta property="og:description" content="Innodb 索引 数据存储 当 InnoDB 存储数据时，它可以使用不同的行格式进行存储；MySQL 5.7 版本支持以下格式的行存储方式：
+<meta name="description" content="InnoDB 索引"><meta property="og:title" content="InnoDB 索引" />
+<meta property="og:description" content="InnoDB 索引 数据存储 当 InnoDB 存储数据时，它可以使用不同的行格式进行存储；MySQL 5.7 版本支持以下格式的行存储方式：
  Antelope 是 InnoDB 最开始支持的文件格式，它包含两种行格式 Compact 和 Redundant ，它最开始并没有名字； Antelope 的名字是在新的文件格式 Barracuda 出现后才起的， Barracuda 的出现引入了两种新的行格式 Compressed 和 Dynamic ；InnoDB 对于文件格式都会向前兼容，而官方文档中也对之后会出现的新文件格式预先定义好了名字：Cheetah、Dragon、Elk 等等。
  两种行记录格式 Compact 和 Redundant 在磁盘上按照以下方式存储：
 Compact 和 Redundant 格式最大的不同就是记录格式的第一个部分；在 Compact 中，行记录的第一部分倒序存放了一行数据中列的长度（Length），而 Redundant 中存的是每一列的偏移量（Offset），从总体上上看， Compact 行记录格式相比 Redundant 格式能够减少 20% 的存储空间。
@@ -14,15 +14,15 @@ Compact 和 Redundant 格式最大的不同就是记录格式的第一个部分�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/database/mysql/innodb/index/" />
 <meta property="article:published_time" content="2020-02-19T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-02-19T20:13:12+08:00" />
-<title>Innodb 索引 | Interview</title>
+<meta property="article:modified_time" content="2020-02-19T22:43:41+08:00" />
+<title>InnoDB 索引 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
 
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.e70a99de7ad022aef79657d4619c77176c4b709da9c957432574036f2bdc7ee8.js" integrity="sha256-5wqZ3nrQIq73llfUYZx3F2xLcJ2pyVdDJXQDbyvcfug="></script>
+<script defer src="/interview/en.search.min.7cbeafa372eee07c12a2b7e9d648c8a76f098e4d780766c7c8fe760045f36b17.js" integrity="sha256-fL6vo3Lu4HwSorfp1kjIp28Jjk14B2bHyP52AEXzaxc="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -110,11 +110,11 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/interview/docs/basic/database/mysql/">MySQL</a>
 <ul>
 <li><a href="/interview/docs/basic/database/mysql/architecture/">MySQL架构</a></li>
-<li><a href="/interview/docs/basic/database/mysql/innodb/">Innodb</a>
+<li><a href="/interview/docs/basic/database/mysql/innodb/">InnoDB</a>
 <ul>
-<li><a href="/interview/docs/basic/database/mysql/innodb/index/"class=active>Innodb索引</a></li>
-<li><a href="/interview/docs/basic/database/mysql/innodb/concurrent/">Innodb并发控制</a></li>
-<li><a href="/interview/docs/basic/database/mysql/innodb/transaction/">Innodb事务</a></li>
+<li><a href="/interview/docs/basic/database/mysql/innodb/index/"class=active>InnoDB索引</a></li>
+<li><a href="/interview/docs/basic/database/mysql/innodb/concurrent/">InnoDB并发控制</a></li>
+<li><a href="/interview/docs/basic/database/mysql/innodb/transaction/">InnoDB事务</a></li>
 </ul>
 </li>
 <li><a href="/interview/docs/basic/database/mysql/sharding/">分库分表</a></li>
@@ -359,7 +359,7 @@ https://github.com/alex-shpak/hugo-book
     <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
 
-  <strong>Innodb 索引</strong>
+  <strong>InnoDB 索引</strong>
 
   <label for="toc-control">
     <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
@@ -399,7 +399,7 @@ https://github.com/alex-shpak/hugo-book
       </header>
 
       
-<article class="markdown"><h1 id="innodb-索引">Innodb 索引</h1>
+<article class="markdown"><h1 id="innodb-索引">InnoDB 索引</h1>
 <h2 id="数据存储">数据存储</h2>
 <p>当 InnoDB 存储数据时，它可以使用不同的行格式进行存储；MySQL 5.7 版本支持以下格式的行存储方式：</p>
 <p><img src="images/81407aa14450d2d6fac1a70961880aac.png" alt=""></p>
@@ -427,7 +427,7 @@ https://github.com/alex-shpak/hugo-book
 <p><img src="images/85f36113b83bba8aa1ceb1d75bc97271.png" alt="image"></p>
 <p><code>User Records</code> 就是整个页面中真正用于存放行记录的部分，而 <code>Free Space</code> 就是空余空间了，它是一个链表的数据结构，为了保证插入和删除的效率，整个页面并不会按照主键顺序对所有记录进行排序，它会自动从左侧向右寻找空白节点进行插入，行记录在物理存储上并不是按照顺序的，它们之间的顺序是由 <code>next_record</code> 这一指针控制的。</p>
 <p><code>B+</code> 树在查找对应的记录时，并不会直接从树中找出对应的行记录，它只能获取记录所在的页，将整个页加载到内存中，再通过 <code>Page Directory</code> 中存储的稀疏索引和 <code>n_owned、next_record</code> 属性取出对应的记录，不过因为这一操作是在内存中进行的，所以通常会忽略这部分查找的耗时。这样就存在一个命中率的问题，如果一个page中能够相对的存放足够多的行，那么命中率就会相对高一些，性能就会有提升。</p>
-<p>B+树底层的叶子节点为一双向链表，因此 <strong>每个页中至少应该有两行记录</strong>，这就决定了 Innodb 在存储一行数据的时候不能够超过 <code>8kb</code>，但事实上应该更小，因为还有一些 InnoDB 内部数据结构要存储。</p>
+<p>B+树底层的叶子节点为一双向链表，因此 <strong>每个页中至少应该有两行记录</strong>，这就决定了 InnoDB 在存储一行数据的时候不能够超过 <code>8kb</code>，但事实上应该更小，因为还有一些 InnoDB 内部数据结构要存储。</p>
 <p>通常我们认为 <code>blob</code> 这类的大对象的存储会把数据存放在 off-page，其实不然，<strong>关键点还是要看一个 page 中到底能否存放两行数据，blob 可以完全存放在数据页中(单行长度没有超过 <code>8kb</code>)，而 <code>varchar</code> 类型的也有可能存放在溢出页中(单行长度超过 <code>8kb</code>，前 <code>768byte</code> 存放在数据页中)</strong>。</p>
 <h2 id="索引">索引</h2>
 <p>索引是数据库中非常非常重要的概念，它是存储引擎能够快速定位记录的秘密武器，对于提升数据库的性能、减轻数据库服务器的负担有着非常重要的作用；<strong>索引优化是对查询性能优化的最有效手段</strong>，它能够轻松地将查询的性能提高几个数量级。</p>
@@ -531,7 +531,7 @@ https://github.com/alex-shpak/hugo-book
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/1eda66cc5376e39dacfc850c2cce6bc5882b8bb2" title='Last modified by haoyang.shi | 2020-02-19' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/bee88da3609e03fd8e0ea7786eae3c796a3d95c3" title='Last modified by haoyang.shi | 2020-02-19' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
       <span>2020-02-19</span>
     </a>
