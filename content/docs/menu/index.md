@@ -84,6 +84,7 @@ headless: true
 - [系统架构]({{< relref "/docs/architecture/_index.md" >}})
     - [基本概念]({{< relref "/docs/architecture/base/index.md" >}})
     - [高并发]({{< relref "/docs/architecture/concurrent/_index.md" >}})
+        - [高并发系统设计]({{< relref "/docs/architecture/concurrent/design/index.md" >}})
         - [流量控制]({{< relref "/docs/architecture/concurrent/flow-control/index.md" >}})
     - [系统设计]({{< relref "/docs/architecture/design/_index.md" >}})
         - [短链接系统]({{< relref "/docs/architecture/design/tinyURL/index.md" >}})

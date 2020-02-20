@@ -5,7 +5,7 @@ draft: false
 categories: architecture
 ---
 
-# [系统架构基础](http://www.ruanyifeng.com/blog/2018/07/cap.html)
+# 系统架构基础
 
 分布式系统的最大难点，就是各个节点的状态如何同步。CAP 定理是这方面的基本定理，也是理解分布式系统的起点。
 
