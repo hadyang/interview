@@ -20,7 +20,7 @@ MQ使用场景   异步通信：有些业务不想也不需要立即处理消息
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/architecture/distributed/mq/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2019-09-28T10:13:40+08:00" />
+<meta property="article:modified_time" content="2020-02-20T17:51:29+08:00" />
 <title>MQ | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -28,7 +28,7 @@ MQ使用场景   异步通信：有些业务不想也不需要立即处理消息
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.7cbeafa372eee07c12a2b7e9d648c8a76f098e4d780766c7c8fe760045f36b17.js" integrity="sha256-fL6vo3Lu4HwSorfp1kjIp28Jjk14B2bHyP52AEXzaxc="></script>
+<script defer src="/interview/en.search.min.0aab27ad5032f9854e24f0e13ab0aca7cdb1cc9b361e44558fdb2f981ef0f6d0.js" integrity="sha256-CqsnrVAy&#43;YVOJPDhOrCsp82xzJs2HkRVj9svmB7w9tA="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -199,6 +199,7 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/interview/docs/architecture/base/">基本概念</a></li>
 <li><a href="/interview/docs/architecture/concurrent/">高并发</a>
 <ul>
+<li><a href="/interview/docs/architecture/concurrent/design/">高并发系统设计</a></li>
 <li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
 </ul>
 </li>
@@ -470,10 +471,20 @@ https://github.com/alex-shpak/hugo-book
 </li>
 </ul>
 <h2 id="mq的通讯模式">MQ的通讯模式</h2>
-<p>   1. <strong>点对点通讯</strong>：点对点方式是最为传统和常见的通讯方式，它支持一对一、一对多、多对多、多对一等多种配置方式，支持树状、网状等多种拓扑结构。</p>
-<p>   2. <strong>多点广播</strong>：MQ适用于不同类型的应用。其中重要的，也是正在发展中的是&quot;多点广播&quot;应用，即能够将消息发送到多个目标站点(Destination List)。可以使用一条MQ指令将单一消息发送到多个目标站点，并确保为每一站点可靠地提供信息。MQ不仅提供了多点广播的功能，而且还拥有智能消息分发功能，在将一条消息发送到同一系统上的多个用户时，MQ将消息的一个复制版本和该系统上接收者的名单发送到目标MQ系统。目标MQ系统在本地复制这些消息，并将它们发送到名单上的队列，从而尽可能减少网络的传输量。</p>
-<p>   3. <strong>发布/订阅(Publish/Subscribe)模式</strong>：发布/订阅功能使消息的分发可以突破目的队列地理指向的限制，使消息按照特定的主题甚至内容进行分发，用户或应用程序可以根据主题或内容接收到所需要的消息。发布/订阅功能使得发送者和接收者之间的耦合关系变得更为松散，发送者不必关心接收者的目的地址，而接收者也不必关心消息的发送地址，而只是根据消息的主题进行消息的收发。在MQ家族产品中，MQ Event Broker是专门用于使用发布/订阅技术进行数据通讯的产品，它支持基于队列和直接基于TCP/IP两种方式的发布和订阅。</p>
-<p>   4. <strong>集群(Cluster)</strong>：为了简化点对点通讯模式中的系统配置，MQ提供 Cluster 的解决方案。集群类似于一个 域(Domain) ，集群内部的队列管理器之间通讯时，不需要两两之间建立消息通道，而是采用 Cluster 通道与其它成员通讯，从而大大简化了系统配置。此外，集群中的队列管理器之间能够自动进行负载均衡，当某一队列管理器出现故障时，其它队列管理器可以接管它的工作，从而大大提高系统的高可靠性</p>
+<ol>
+<li>
+<p><strong>点对点通讯</strong>：点对点方式是最为传统和常见的通讯方式，它支持一对一、一对多、多对多、多对一等多种配置方式，支持树状、网状等多种拓扑结构。</p>
+</li>
+<li>
+<p><strong>多点广播</strong>：MQ适用于不同类型的应用。其中重要的，也是正在发展中的是&quot;多点广播&quot;应用，即能够将消息发送到多个目标站点(Destination List)。可以使用一条MQ指令将单一消息发送到多个目标站点，并确保为每一站点可靠地提供信息。MQ不仅提供了多点广播的功能，而且还拥有智能消息分发功能，在将一条消息发送到同一系统上的多个用户时，MQ将消息的一个复制版本和该系统上接收者的名单发送到目标MQ系统。目标MQ系统在本地复制这些消息，并将它们发送到名单上的队列，从而尽可能减少网络的传输量。</p>
+</li>
+<li>
+<p><strong>发布/订阅(Publish/Subscribe)模式</strong>：发布/订阅功能使消息的分发可以突破目的队列地理指向的限制，使消息按照特定的主题甚至内容进行分发，用户或应用程序可以根据主题或内容接收到所需要的消息。发布/订阅功能使得发送者和接收者之间的耦合关系变得更为松散，发送者不必关心接收者的目的地址，而接收者也不必关心消息的发送地址，而只是根据消息的主题进行消息的收发。在MQ家族产品中，MQ Event Broker是专门用于使用发布/订阅技术进行数据通讯的产品，它支持基于队列和直接基于TCP/IP两种方式的发布和订阅。</p>
+</li>
+<li>
+<p><strong>集群(Cluster)</strong>：为了简化点对点通讯模式中的系统配置，MQ提供 Cluster 的解决方案。集群类似于一个 域(Domain) ，集群内部的队列管理器之间通讯时，不需要两两之间建立消息通道，而是采用 Cluster 通道与其它成员通讯，从而大大简化了系统配置。此外，集群中的队列管理器之间能够自动进行负载均衡，当某一队列管理器出现故障时，其它队列管理器可以接管它的工作，从而大大提高系统的高可靠性</p>
+</li>
+</ol>
 <h2 id="消息投递保证">消息投递保证</h2>
 <ul>
 <li><code>At most once</code>：消息可能会丢，但绝不会重复投递</li>
@@ -493,9 +504,9 @@ https://github.com/alex-shpak/hugo-book
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/e5da239d9532200d9cab1b8eef41394018f7356c" title='Last modified by haoyang.shi | 2019-09-28' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/68cc55677c7a3bedf3a9a330f1612688d9235311" title='Last modified by haoyang.shi | 2020-02-20' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2019-09-28</span>
+      <span>2020-02-20</span>
     </a>
   </div>
 

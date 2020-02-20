@@ -6,17 +6,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Redis"><meta property="og:title" content="Redis" />
 <meta property="og:description" content="Redis 线程模型 Redis 在处理网络请求是使用单线程模型，并通过 IO 多路复用来提高并发。但是在其他模块，比如：持久化，会使用多个线程。
-Redis 内部使用文件事件处理器 file event handler，这个文件事件处理器是单线程的，所以 redis 才叫做单线程的模型。它采用 IO 多路复用机制同时监听多个 socket ，将产生事件的 socket 压入内存队列中，事件分派器根据 socket 上的事件类型来选择对应的事件处理器进行处理。
+Redis 内部使用文件事件处理器 file event handler，这个文件事件处理器是单线程的，所以 Redis 才叫做单线程的模型。它采用 IO 多路复用机制同时监听多个 socket ，将产生事件的 socket 压入内存队列中，事件分派器根据 socket 上的事件类型来选择对应的事件处理器进行处理。
 文件事件处理器的结构包含 4 个部分：
  多个 socket IO 多路复用程序 文件事件分派器 事件处理器（连接应答处理器、命令请求处理器、命令回复处理器）  多个 socket 可能会并发产生不同的操作，每个操作对应不同的文件事件，但是 IO 多路复用程序会监听多个 socket ，会将产生事件的 socket 放入队列中排队，事件分派器每次从队列中取出一个 socket ，根据 socket 的事件类型交给对应的事件处理器进行处理。
-客户端与 redis 的一次通信过程：
-为啥 redis 单线程模型也能效率这么高？  纯内存操作 核心是基于非阻塞的 IO 多路复用机制 单线程反而避免了多线程的频繁上下文切换问题  数据结构 Redis的外围由一个键、值映射的字典构成。与其他非关系型数据库主要不同在于：Redis中值的类型不仅限于 字符串，还支持如下抽象数据类型：
- List：字符串列表 Set：无序不重复的字符串集合 Soret Set：有序不重复的字符串集合 HashTable：键、值都为字符串的哈希表  值的类型决定了值本身支持的操作。Redis支持不同无序、有序的列表，无序、有序的集合间的交集、并集等高级服务器端原子操作。
-持久化：  使用快照，一种半持久耐用模式。不时的将数据集以异步方式从内存以RDB格式写入硬盘。 1." />
+客户端与 Redis 的一次通信过程：
+为啥 Redis 单线程模型也能效率这么高？  纯内存操作 核心是基于非阻塞的 IO 多路复用机制 单线程反而避免了多线程的频繁上下文切换问题  持久化 RDB RDB 持久化机制，是对 Redis 中的数据执行周期性的持久化。
+ RDB 会生成多个数据文件，每个数据文件都代表了某一个时刻中 Redis 的数据，非常适合做冷备 RDB 对 Redis 对外提供的读写服务，影响非常小，可以让 Redis 保持高性能，因为 Redis 主进程只需要 fork 一个子进程，让子进程执行磁盘 IO 操作来进行 RDB 持久化即可。 相对于 AOF 持久化机制来说，直接基于 RDB 数据文件来重启和恢复 Redis 进程，更加快速。 一般来说，RDB 数据快照文件，都是每隔 5 分钟，或者更长时间生成一次，这个时候就得接受一旦 Redis 进程宕机，那么会丢失最近 5 分钟的数据。 RDB 每次在 fork 子进程来执行 RDB 快照数据文件生成的时候，如果数据文件特别大，可能会导致对客户端提供的服务暂停数毫秒，或者甚至数秒。  AOF AOF 机制对每条写入命令作为日志，以 append-only 的模式写入一个日志文件中，在 Redis 重启的时候，可以通过回放 AOF 日志中的写入指令来重新构建整个数据集" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/database/redis/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-02-16T17:16:32+08:00" />
+<meta property="article:modified_time" content="2020-02-20T17:51:29+08:00" />
 <title>Redis | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -24,7 +23,7 @@ Redis 内部使用文件事件处理器 file event handler，这个文件事件�
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.7cbeafa372eee07c12a2b7e9d648c8a76f098e4d780766c7c8fe760045f36b17.js" integrity="sha256-fL6vo3Lu4HwSorfp1kjIp28Jjk14B2bHyP52AEXzaxc="></script>
+<script defer src="/interview/en.search.min.0aab27ad5032f9854e24f0e13ab0aca7cdb1cc9b361e44558fdb2f981ef0f6d0.js" integrity="sha256-CqsnrVAy&#43;YVOJPDhOrCsp82xzJs2HkRVj9svmB7w9tA="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -195,6 +194,7 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/interview/docs/architecture/base/">基本概念</a></li>
 <li><a href="/interview/docs/architecture/concurrent/">高并发</a>
 <ul>
+<li><a href="/interview/docs/architecture/concurrent/design/">高并发系统设计</a></li>
 <li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
 </ul>
 </li>
@@ -377,11 +377,16 @@ https://github.com/alex-shpak/hugo-book
   <ul>
     <li><a href="#线程模型">线程模型</a>
       <ul>
-        <li><a href="#为啥-redis-单线程模型也能效率这么高">为啥 redis 单线程模型也能效率这么高？</a></li>
+        <li><a href="#为啥-redis-单线程模型也能效率这么高">为啥 Redis 单线程模型也能效率这么高？</a></li>
       </ul>
     </li>
-    <li><a href="#数据结构">数据结构</a></li>
-    <li><a href="#持久化">持久化：</a></li>
+    <li><a href="#持久化">持久化</a>
+      <ul>
+        <li><a href="#rdb">RDB</a></li>
+        <li><a href="#aof">AOF</a></li>
+        <li><a href="#rdb-和-aof-到底该如何选择">RDB 和 AOF 到底该如何选择</a></li>
+      </ul>
+    </li>
     <li><a href="#一致性哈希算法">一致性哈希算法</a>
       <ul>
         <li><a href="#需求">需求</a></li>
@@ -395,20 +400,18 @@ https://github.com/alex-shpak/hugo-book
     </li>
     <li><a href="#集群">集群</a>
       <ul>
-        <li><a href="#哨兵----sentinel">哨兵 &ndash; Sentinel</a></li>
+        <li><a href="#主从复制">主从复制</a></li>
+        <li><a href="#哨兵">哨兵</a></li>
         <li><a href="#redis-clusterhttpsredisiotopicscluster-tutorial">Redis Cluster</a></li>
-        <li><a href="#redis-sharding-集群">Redis Sharding 集群</a></li>
       </ul>
     </li>
-    <li><a href="#string">string</a>
+    <li><a href="#数据结构">数据结构</a>
       <ul>
-        <li><a href="#缓冲区溢出">缓冲区溢出</a></li>
-        <li><a href="#减少修改字符串时带来的内存重分配次数">减少修改字符串时带来的内存重分配次数</a></li>
-        <li><a href="#二进制安全">二进制安全</a></li>
+        <li><a href="#string">string</a></li>
+        <li><a href="#zset底层实现">zset底层实现</a></li>
+        <li><a href="#bitmap-实现">BitMap 实现</a></li>
       </ul>
     </li>
-    <li><a href="#zset底层实现">zset底层实现</a></li>
-    <li><a href="#bitmap-实现">BitMap 实现</a></li>
     <li><a href="#缓存穿透缓存击穿缓存雪崩">缓存穿透、缓存击穿、缓存雪崩</a>
       <ul>
         <li><a href="#缓存穿透">缓存穿透</a></li>
@@ -436,7 +439,7 @@ https://github.com/alex-shpak/hugo-book
 <article class="markdown"><h1 id="redis">Redis</h1>
 <h2 id="线程模型">线程模型</h2>
 <p>Redis 在处理网络请求是使用单线程模型，并通过 IO 多路复用来提高并发。但是在其他模块，比如：持久化，会使用多个线程。</p>
-<p>Redis 内部使用文件事件处理器 <code>file event handler</code>，<strong>这个文件事件处理器是单线程的，所以 <code>redis</code> 才叫做单线程的模型</strong>。它采用 IO 多路复用机制同时监听多个 <code>socket</code> ，将产生事件的 <code>socket</code> 压入内存队列中，事件分派器根据 <code>socket</code> 上的事件类型来选择对应的事件处理器进行处理。</p>
+<p>Redis 内部使用文件事件处理器 <code>file event handler</code>，<strong>这个文件事件处理器是单线程的，所以 <code>Redis</code> 才叫做单线程的模型</strong>。它采用 IO 多路复用机制同时监听多个 <code>socket</code> ，将产生事件的 <code>socket</code> 压入内存队列中，事件分派器根据 <code>socket</code> 上的事件类型来选择对应的事件处理器进行处理。</p>
 <p>文件事件处理器的结构包含 4 个部分：</p>
 <ul>
 <li>多个 socket</li>
@@ -445,33 +448,42 @@ https://github.com/alex-shpak/hugo-book
 <li>事件处理器（连接应答处理器、命令请求处理器、命令回复处理器）</li>
 </ul>
 <p>多个 <code>socket</code> 可能会并发产生不同的操作，每个操作对应不同的文件事件，但是 <code>IO</code> 多路复用程序会监听多个 <code>socket</code> ，会将产生事件的 <code>socket</code> 放入队列中排队，事件分派器每次从队列中取出一个 <code>socket</code> ，根据 <code>socket</code> 的事件类型交给对应的事件处理器进行处理。</p>
-<p>客户端与 redis 的一次通信过程：</p>
+<p>客户端与 Redis 的一次通信过程：</p>
 <p><img src="images/f0dacdd3779b836ad75fe6b886af1fff.png" alt="image"></p>
-<h3 id="为啥-redis-单线程模型也能效率这么高">为啥 redis 单线程模型也能效率这么高？</h3>
+<h3 id="为啥-redis-单线程模型也能效率这么高">为啥 Redis 单线程模型也能效率这么高？</h3>
 <ul>
 <li>纯内存操作</li>
 <li>核心是基于非阻塞的 IO 多路复用机制</li>
 <li>单线程反而避免了多线程的频繁上下文切换问题</li>
 </ul>
-<h2 id="数据结构">数据结构</h2>
-<p>Redis的外围由一个键、值映射的字典构成。与其他非关系型数据库主要不同在于：Redis中值的类型不仅限于 <strong>字符串</strong>，还支持如下抽象数据类型：</p>
+<h2 id="持久化">持久化</h2>
+<h3 id="rdb">RDB</h3>
+<p>RDB 持久化机制，是对 Redis 中的数据执行周期性的持久化。</p>
 <ul>
-<li><strong>List</strong>：字符串列表</li>
-<li><strong>Set</strong>：无序不重复的字符串集合</li>
-<li><strong>Soret Set</strong>：有序不重复的字符串集合</li>
-<li><strong>HashTable</strong>：键、值都为字符串的哈希表</li>
+<li>RDB 会生成多个数据文件，每个数据文件都代表了某一个时刻中 Redis 的数据，<strong>非常适合做冷备</strong></li>
+<li>RDB 对 Redis 对外提供的读写服务，影响非常小，可以让 Redis 保持高性能，因为 Redis 主进程只需要 fork 一个子进程，让子进程执行磁盘 IO 操作来进行 RDB 持久化即可。</li>
+<li>相对于 AOF 持久化机制来说，直接基于 RDB 数据文件来重启和恢复 Redis 进程，更加快速。</li>
+<li>一般来说，RDB 数据快照文件，都是每隔 5 分钟，或者更长时间生成一次，这个时候就得接受一旦 Redis 进程宕机，那么会丢失最近 5 分钟的数据。</li>
+<li>RDB 每次在 <code>fork</code> 子进程来执行 RDB 快照数据文件生成的时候，如果数据文件特别大，可能会导致对客户端提供的服务暂停数毫秒，或者甚至数秒。</li>
 </ul>
-<p>值的类型决定了值本身支持的操作。Redis支持不同无序、有序的列表，无序、有序的集合间的交集、并集等高级服务器端原子操作。</p>
-<h2 id="持久化">持久化：</h2>
+<h3 id="aof">AOF</h3>
+<p>AOF 机制对每条写入命令作为日志，以 <code>append-only</code> 的模式写入一个日志文件中，在 Redis 重启的时候，可以通过回放 AOF 日志中的写入指令来重新构建整个数据集</p>
 <ul>
-<li>使用快照，一种半持久耐用模式。不时的将数据集以异步方式从内存以RDB格式写入硬盘。</li>
-<li>1.1版本开始使用更安全的 <code>AOF</code> 格式替代，一种只能追加的日志类型。将数据集修改操作记录起来。Redis 能够在后台对只可追加的记录作修改来避免无限增长的日志。</li>
+<li>AOF 可以更好的保护数据不丢失，一般 AOF 会每隔 1 秒，通过一个后台线程执行一次 <code>fsync</code> 操作，最多丢失 1 秒钟的数据。</li>
+<li>AOF 日志文件以 <code>append-only</code> 模式写入，所以没有任何磁盘寻址的开销，写入性能非常高，而且文件不容易破损，即使文件尾部破损，也很容易修复。</li>
+<li>AOF 日志文件即使过大的时候，出现后台重写操作，也不会影响客户端的读写。因为在 <strong><code>rewrite log</code></strong> 的时候，会对其中的指令进行压缩，创建出一份需要恢复数据的最小日志出来。在创建新日志文件的时候，老的日志文件还是照常写入。当新的 <code>merge</code> 后的日志文件 <code>ready</code> 的时候，再交换新老日志文件即可。</li>
+<li>AOF 日志文件的命令通过非常可读的方式进行记录，这个特性非常 <strong>适合做灾难性的误删除的紧急恢复</strong>。比如某人不小心用 <code>flushall</code> 命令清空了所有数据，只要这个时候后台 <code>rewrite</code> 还没有发生，那么就可以立即拷贝 AOF 文件，将最后一条 <code>flushall</code> 命令给删了，然后再将该 AOF 文件放回去，就可以通过恢复机制，自动恢复所有数据。</li>
+<li>对于同一份数据来说，AOF 日志文件通常比 RDB 数据快照文件更大。</li>
+<li><strong>AOF 开启后，支持的写 QPS 会比 RDB 支持的写 QPS 低</strong>，因为 AOF 一般会配置成每秒 <code>fsync</code> 一次日志文件，当然，每秒一次 <code>fsync</code> ，性能也还是很高的。（如果实时写入，那么 QPS 会大降，Redis 性能会大大降低）</li>
+<li>以前 AOF 发生过 bug，就是通过 AOF 记录的日志，进行数据恢复的时候，没有恢复一模一样的数据出来。所以说，类似 AOF 这种较为复杂的基于命令日志 / merge / 回放的方式，比基于 RDB 每次持久化一份完整的数据快照文件的方式，更加脆弱一些，容易有 bug。不过 AOF 就是为了避免 rewrite 过程导致的 bug，因此每次 rewrite 并不是基于旧的指令日志进行 merge 的，而是基于当时内存中的数据进行指令的重新构建，这样健壮性会好很多。</li>
 </ul>
-<pre><code>  1. aof文件比rdb更新频率高，优先使用aof还原数据。
-  2. aof比rdb更安全也更大
-  3. rdb性能比aof好
-  4. 如果两个都配了优先加载AOF
-</code></pre><h2 id="一致性哈希算法">一致性哈希算法</h2>
+<h3 id="rdb-和-aof-到底该如何选择">RDB 和 AOF 到底该如何选择</h3>
+<ol>
+<li>不要仅仅使用 RDB，因为那样会导致你丢失很多数据；</li>
+<li>也不要仅仅使用 AOF，因为那样有两个问题：第一，你通过 AOF 做冷备，没有 RDB 做冷备来的恢复速度更快；第二，RDB 每次简单粗暴生成数据快照，更加健壮，可以避免 AOF 这种复杂的备份和恢复机制的 bug；</li>
+<li>Redis 支持同时开启开启两种持久化方式，我们可以综合使用 AOF 和 RDB 两种持久化机制，用 AOF 来保证数据不丢失，作为数据恢复的第一选择; 用 RDB 来做不同程度的冷备，在 AOF 文件都丢失或损坏不可用的时候，还可以使用 RDB 来进行快速的数据恢复。</li>
+</ol>
+<h2 id="一致性哈希算法">一致性哈希算法</h2>
 <p>一致哈希 是一种特殊的哈希算法。在使用一致哈希算法后，哈希表槽位数（大小）的改变平均只需要对 <code>K/n</code> 个关键字重新映射，其中 <code>K</code> 是关键字的数量，<code>n</code> 是槽位数量。然而在传统的哈希表中，添加或删除一个槽位的几乎需要对所有关键字进行重新映射。</p>
 <blockquote>
 <p>一致哈希也可用于实现健壮缓存来减少大型 Web 应用中系统部分失效带来的负面影响</p>
@@ -531,37 +543,100 @@ for item in range(ITEMS):
     node_stat[hash2node[ring[n]]] += 1
 </code></pre><p>通过增加虚节点的方法，使得每个节点在环上所“管辖”更加均匀。这样就既保证了在节点变化时，尽可能小的影响数据分布的变化，而同时又保证了数据分布的均匀。也就是靠增加“节点数量”加强管辖区间的均匀。</p>
 <h2 id="集群">集群</h2>
-<h3 id="哨兵----sentinel">哨兵 &ndash; Sentinel</h3>
-<p><code>Redis-Sentinel</code> 是 Redis 官方推荐的 <strong>高可用性( <code>HA</code> )解决方案</strong>，当用 Redis 做 <code>Master-slave</code> 的高可用方案时，假如 <code>master</code> 宕机了， Redis 本身(包括它的很多客户端)都没有实现自动进行主备切换，而 <code>Redis-sentinel</code> 本身也是一个独立运行的进程，它能监控多个 <code>master-slave</code> 集群，发现 <code>master</code> 宕机后能进行自懂切换。</p>
+<h3 id="主从复制">主从复制</h3>
+<p>单机的 Redis ，能够承载的 QPS 大概就在上万到几万不等。对于缓存来说，一般都是用来支撑读高并发的。因此架构做成 <strong>主从(Master-Slave)架构</strong> ，一主多从，主负责写，并且将数据复制到其它的 Slave 节点，从节点负责读。所有的读请求全部走从节点。这样也可以很轻松实现水平扩容，支撑读高并发。</p>
+<p><img src="./images/Redis-Master-Slave.png" alt=""></p>
+<p>Redis 默认采用异步方式复制数据到 Slave Node，同时 Slave Node 会周期性地确认自己每次复制的数据量：</p>
+<ol>
+<li>当 Master 和 Slave 网络连接顺畅时，Master 会持续向 Slave 推送命令，以保持在 Master 数据集合上执行的：客户端写、Key 过期、Key 淘汰等均在 Slave 数据集合上执行。</li>
+<li>当 Master 和 Slave 网络连接由于网络问题、超时等中断时， Slave 会尝试重连并进行连接断开期间的命令 <strong>部分同步（partial resynchronization）</strong>。</li>
+<li>当部分同步不可用时，Slave 会请求全量同步。在这个过程中，Master 会创建当前所有数据的镜像，发送给 Slave 并继续推送命令。</li>
+</ol>
+<p>Redis 主从复制包含以下几个要点：</p>
+<ol>
+<li>一个 Master 可以有多个 Slave</li>
+<li>Slave 支持级联结构，即 Slave 可以连接到其他 Slave 上</li>
+<li>Redis 在复制过程中，不阻塞 Master ，不论是全量同步还是部分同步</li>
+<li>在大部分时间里，复制也不会阻塞 Slave 。当 Slave 在进行初始化同步时，Slave 会先使用旧的数据集提供服务。但当初始化同步完成时，会删除旧数据集，这时 Slave 会拒绝服务。</li>
+<li>Redis 主从复制可以用来做水平扩容，以提供读写分离，或作为数据备份和高可用</li>
+<li>在主从复制的情况下，可以通过配置避免数据持久化，将 Slave 作为数据的备份或开启 Slave 的 AOF。但是这种情况下也会有风险：当 Master 重启后数据集将清空，这时如果 Slave 同步 Master 就会导致数据也被清空</li>
+</ol>
+<h4 id="当-master-不进行持久化如何保证数据安全">当 Master 不进行持久化如何保证数据安全</h4>
+<p>在生产环境中，强烈建议开启 Redis 持久化，不论是在 Master 还是在 Slave。如果由于磁盘速度等问题，不能开启持久化，那么需要 <strong>避免 Redis 进程的自动重启</strong>。</p>
+<h3 id="哨兵">哨兵</h3>
+<p><code>Sentinel</code> 是 Redis 官方推荐的 <strong>高可用性( <code>HA</code> )解决方案</strong>，当用 Redis 做主从复制的高可用方案时，假如 Master 宕机了， Redis 本身都没有实现自动进行主备切换，而哨兵本身也是一个独立运行的进程，它能监控多个节点，发现 Master 宕机后能进行自动切换。</p>
 <p>它的主要功能有以下几点</p>
 <ul>
-<li>不时地监控 redis 是否按照预期良好地运行;</li>
-<li>如果发现某个 redis 节点运行出现状况，能够通知另外一个进程(例如它的客户端);</li>
-<li>能够进行自动切换。当一个 master 节点不可用时，能够选举出 master 的多个slave (如果有超过一个 slave 的话)中的一个来作为新的 master ,其它的 slave 节点会将它所追随的 master 的地址改为被提升为 master 的 slave 的新地址。</li>
+<li>集群监控：负责监控 Redis Master 和 Slave 进程是否正常工作。</li>
+<li>消息通知：如果某个 Redis 实例有故障，那么哨兵负责发送消息作为报警通知给管理员。</li>
+<li>故障转移：如果 Master node 挂掉了，会自动转移到 Slave node 上。</li>
+<li>配置中心：如果故障转移发生了，通知 client 客户端新的 Master 地址。</li>
 </ul>
-<p>很显然，<strong>只使用单个 sentinel 进程来监控 redis 集群是不可靠的</strong>，当 sentinel 进程宕掉后( sentinel 本身也有单点问题，single-point-of-failure)整个集群系统将无法按照预期的方式运行。所以有必要将sentinel集群，这样有几个好处：</p>
+<h4 id="哨兵的核心知识">哨兵的核心知识</h4>
+<ol>
+<li>哨兵至少需要 3 个实例，来保证自己的健壮性。</li>
+<li>哨兵 + Redis 主从的部署架构，是 <strong>不保证数据零丢失</strong> 的，只能保证 Redis 集群的高可用性。</li>
+<li>对于哨兵 + Redis 主从这种复杂的部署架构，尽量在测试环境和生产环境，都进行充足的测试和演练。</li>
+<li>哨兵的个数与集群节点个数无关，每个哨兵都会 Check 所有节点</li>
+<li>当启用哨兵后，客户端的连接是通过哨兵连接到 Node 的</li>
+</ol>
+<p>哨兵集群必须部署 2 个以上节点，如果哨兵集群仅仅部署了 2 个哨兵实例，<code>Quorum</code> = 1。</p>
+<pre><code class="language-log" data-lang="log">+----+         +----+
+| M1 |---------| R1 |
+| S1 |         | S2 |
++----+         +----+
+</code></pre><p>如果 Master 宕机， <code>S1</code> 和 <code>S2</code> 中只要有 1 个哨兵认为 Master 宕机了，就可以进行切换，同时 <code>S1</code> 和 <code>S2</code> 会选举出一个哨兵来执行故障转移。但是同时这个时候，需要 <code>Majority</code> ，也就是超过半数的哨兵都是运行的。</p>
+<p>如果此时仅仅是 <code>M1</code> 进程宕机了，哨兵 <code>s1</code> 正常运行，那么故障转移是 OK 的。但是如果是整个 <code>M1</code> 和 <code>S1</code> 运行的机器宕机了，那么哨兵只有 1 个，此时就没有 <code>Majority</code> 来允许执行故障转移，虽然另外一台机器上还有一个 R1，但是故障转移不会执行。</p>
+<p>经典的 3 节点哨兵集群是这样的：</p>
+<pre><code class="language-log" data-lang="log">       +----+
+       | M1 |
+       | S1 |
+       +----+
+          |
++----+    |    +----+
+| R2 |----+----| R3 |
+| S2 |         | S3 |
++----+         +----+
+</code></pre><p>配置 <code>Quorum=2</code>，如果 <code>M1</code> 所在机器宕机了，那么三个哨兵还剩下 2 个， <code>S2</code> 和 <code>S3</code> 可以一致认为 Master 宕机了，然后选举出一个来执行故障转移，同时 3 个哨兵的 <code>Majority</code> 是 2，所以还剩下的 2 个哨兵运行着，就可以允许执行故障转移。</p>
+<h4 id="slave-选主算法">Slave 选主算法</h4>
+<p>如果一个 Master 被认为宕机，而且 <code>Majority</code> 数量的哨兵都允许主备切换，那么某个哨兵就会执行主备切换操作，此时首先要选举一个 Slave 来，会考虑 Slave 的一些信息：</p>
 <ul>
-<li>即使有一些sentinel进程宕掉了，依然可以进行redis集群的主备切换；</li>
-<li>如果只有一个sentinel进程，如果这个进程运行出错，或者是网络堵塞，那么将无法实现redis集群的主备切换;</li>
-<li>如果有多个sentinel，redis的客户端可以随意地连接任意一个sentinel来获得关于redis集群中的信息。</li>
+<li>跟 Master 断开连接的时长</li>
+<li>Slave 优先级</li>
+<li>复制 offset</li>
+<li>run id</li>
 </ul>
-<h3 id="redis-clusterhttpsredisiotopicscluster-tutorial"><a href="https://redis.io/topics/cluster-tutorial">Redis Cluster</a></h3>
-<p>Redis Cluster 是一种服务器 <code>Sharding</code> 技术，3.0版本开始正式提供。</p>
-<p>Redis Cluster中，Sharding 采用 <em>slot(槽)</em> 的概念，一共分成 <code>16384</code> 个槽，这有点儿类 <code>pre sharding</code> 思路。对于每个进入 Redis 的键值对，根据 key 进行散列，分配到这 <code>16384</code> 个 slot 中的某一个中。使用的hash算法也比较简单，就是 <code>CRC16</code> 后 <code>16384</code> 取模。要保证 <code>16384</code> 个槽对应的 node 都正常工作，<strong>如果某个 node 发生故障，那它负责的 slots 也就失效，整个集群将不能工作</strong>。</p>
-<blockquote>
-<p>16384 = 2048 * 8 bit，2k 大小的 bit 数</p>
-</blockquote>
-<p>为了增加集群的可访问性，官方推荐的方案是将 node 配置成 <strong>主从结构</strong>，即一个 master 主节点，挂 <code>n</code> 个 slave 从节点。这时，如果主节点失效，Redis Cluster 会根据选举算法从 slave 节点中选择一个上升为主节点，整个集群继续对外提供服务。</p>
-<p>对客户端来说，<strong>整个 cluster 被看做是一个整体</strong>，客户端可以连接任意一个 node 进行操作，就像操作单一 Redis 实例一样，当客户端操作的 key 没有分配到该 node 上时，Redis 会返回<strong>转向指令</strong>，指向正确的 node ，这有点儿像浏览器页面的 <code>302  redirect</code> 跳转。</p>
-<h3 id="redis-sharding-集群">Redis Sharding 集群</h3>
-<p>Redis Sharding 是客户端 Sharding 的方案，其主要思想是采用哈希算法 <strong>将 Redis 数据的 key 进行散列</strong>，通过 hash 函数，特定的 key 会映射到特定的 Redis 节点上。这样，客户端就知道该向哪个 Redis 节点操作数据。</p>
-<p>Jedis 的 Redis Sharding 实现具有如下特点：</p>
+<p>接下来会对 Slave 进行排序：</p>
 <ul>
-<li><strong>采用一致性哈希算法(consistent hashing)</strong>，将key和节点name同时hashing，然后进行映射匹配，采用的算法是MURMUR_HASH。采用一致性哈希而不是采用简单类似哈希求模映射的主要原因是当增加或减少节点时，不会产生由于重新匹配造成的rehashing。一致性哈希只影响相邻节点key分配，影响量小。</li>
-<li>为了避免一致性哈希只影响相邻节点造成节点分配压力， <code>ShardedJedis</code> 会对每个Redis 节点根据名字(没有，Jedis会赋予缺省名字)会 <strong>虚拟化出160个虚拟节点</strong> 进行散列。根据权重 <code>weight</code> ，也可虚拟化出160倍数的虚拟节点。用虚拟节点做映射匹配，可以在增加或减少 <code>Redis</code> 节点时，key 在各 <code>Redis</code> 节点移动再分配更均匀，而不是只有相邻节点受影响。</li>
-<li><strong>ShardedJedis 支持 keyTagPattern 模式</strong>，即抽取 key 的一部分 <code>keyTag</code> 做 <code>sharding</code> ，这样通过合理命名 key ，可以将一组相关联的key放入同一个 Redis 节点，这在避免跨节点访问相关数据时很重要。</li>
+<li>按照 Slave 优先级进行排序，Slave Priority 越低，优先级就越高。</li>
+<li>如果 Slave Priority 相同，那么看 Replica Offset，哪个 Slave 复制了越多的数据，Offset 越靠后，优先级就越高。</li>
+<li>如果上面两个条件都相同，那么选择一个 run id 比较小的那个 Slave。</li>
 </ul>
-<h2 id="string">string</h2>
+<h3 id="redis-clusterhttpsredisiotopicscluster-tutorial"><a href="https://Redis.io/topics/cluster-tutorial">Redis Cluster</a></h3>
+<p>Redis Cluster 是一种服务器 <code>Sharding</code> 技术，提供内置的高可用支持，部分 master 不可用时，还可以继续工作。Redis Cluster 功能强大，直接集成了 主从复制 和 哨兵 的功能。</p>
+<p>在 Cluster 架构下，每个 Redis 都需要开启额外的端口来进行节点间通信，这种机制被称之为 <strong>Cluster Bus</strong>。</p>
+<h4 id="内部节点通信">内部节点通信</h4>
+<p>Redis 维护集群元数据采用 <strong>gossip 协议</strong>，所有节点都持有一份元数据，不同的节点如果出现了元数据的变更，就不断将元数据发送给其它的节点，让其它节点也进行元数据的变更。</p>
+<p>gossip 好处在于，元数据的更新比较分散，不是集中在一个地方，更新请求会陆陆续续打到所有节点上去更新，降低了压力；不好在于，元数据的更新有延时，可能导致集群中的一些操作会有一些滞后。</p>
+<h4 id="寻址算法">寻址算法</h4>
+<ol>
+<li>Hash 算法（大量缓存重建）</li>
+<li>一致性 hash 算法（自动缓存迁移）+ 虚拟节点（自动负载均衡）</li>
+<li>Redis Cluster 的 Hash Slot 算法</li>
+</ol>
+<p>Redis Cluster 有固定的 16384 个 Hash Slot，对每个 key 计算 <code>CRC16</code> 值，然后对 <code>16384</code> 取模，可以获取 key 对应的 Hash Slot。</p>
+<p>Redis Cluster 中<strong>每个 Master 都会持有部分 Slot</strong>，比如有 3 个 Master，那么可能每个 Master 持有 5000 多个 Hash Slot。Hash Slot 让 node 的增加和移除很简单，增加一个 Master，就将其他 Master 的 Hash Slot 移动部分过去，减少一个 Master，就将它的 Hash Slot 移动到其他 master 上去。移动 Hash Slot 的成本是非常低的。客户端的 api，可以对指定的数据，让他们走同一个 Hash Slot，通过 hash tag 来实现。</p>
+<p>任何一台机器宕机，另外两个节点，不影响的。因为 key 找的是 Hash Slot，不是机器。</p>
+<h2 id="数据结构">数据结构</h2>
+<p>Redis的外围由一个键、值映射的字典构成。与其他非关系型数据库主要不同在于：Redis中值的类型不仅限于 <strong>字符串</strong>，还支持如下抽象数据类型：</p>
+<ul>
+<li><strong>List</strong>：字符串列表</li>
+<li><strong>Set</strong>：无序不重复的字符串集合</li>
+<li><strong>Soret Set</strong>：有序不重复的字符串集合</li>
+<li><strong>HashTable</strong>：键、值都为字符串的哈希表</li>
+</ul>
+<p>值的类型决定了值本身支持的操作。Redis支持不同无序、有序的列表，无序、有序的集合间的交集、并集等高级服务器端原子操作。</p>
+<h3 id="string">string</h3>
 <p>Redis 没有直接使用 C 语言传统的字符串表示（以空字符结尾的字符数组，以下简称 C 字符串）， 而是自己构建了一种名为简单动态字符串（simple dynamic string，SDS）的抽象类型， 并将 SDS 用作 Redis 的默认字符串表示。</p>
 <p>在 Redis 里面， C 字符串只会作为字符串字面量（string literal）， 用在一些无须对字符串值进行修改的地方， 比如打印日志。</p>
 <p>当 Redis 需要的不仅仅是一个字符串字面量， 而是一个可以被修改的字符串值时， Redis 就会使用 SDS 来表示字符串值： 比如在 Redis 的数据库里面， 包含字符串值的键值对在底层都是由 SDS 实现的。</p>
@@ -595,7 +670,7 @@ for item in range(ITEMS):
 </tr>
 </tbody>
 </table>
-<h3 id="缓冲区溢出">缓冲区溢出</h3>
+<h4 id="缓冲区溢出">缓冲区溢出</h4>
 <p>因为 C 字符串不记录自身的长度， 所以 <code>strcat</code> 假定用户在执行这个函数时， 已经为 <code>dest</code> 分配了足够多的内存， 可以容纳 <code>src</code> 字符串中的所有内容， 而一旦这个假定不成立时， 就会产生缓冲区溢出。</p>
 <p>举个例子， 假设程序里有两个在内存中紧邻着的 C 字符串 <code>s1</code> 和 <code>s2</code> ， 其中 s1 保存了字符串 <code>&quot;Redis&quot;</code> ， 而 s2 则保存了字符串 <code>&quot;MongoDB&quot;</code> ， 如图所示。</p>
 <p><img src="images/a9832e14ba184a4049f979e521ef050b.png" alt=""></p>
@@ -604,15 +679,15 @@ for item in range(ITEMS):
 </code></pre><p>将 <code>s1</code> 的内容修改为 <code>&quot;Redis Cluster&quot;</code> ， 但粗心的他却忘了在执行 <code>strcat</code> 之前为 <code>s1</code> 分配足够的空间， 那么在 <code>strcat</code> 函数执行之后， <code>s1</code> 的数据将溢出到 <code>s2</code> 所在的空间中， 导致 <code>s2</code> 保存的内容被意外地修改， 如图所示。</p>
 <p><img src="images/cc9ac0419ae3f5059076c2d66f867931.png" alt=""></p>
 <p>与 <code>C</code> 字符串不同， <code>SDS</code> 的空间分配策略完全杜绝了发生缓冲区溢出的可能性： <strong>当 SDS API 需要对 SDS 进行修改时， API 会先检查 SDS 的空间是否满足修改所需的要求</strong>， 如果不满足的话， API 会自动将 <code>SDS</code> 的空间扩展至执行修改所需的大小， 然后才执行实际的修改操作， 所以使用 <code>SDS</code> 既不需要手动修改 <code>SDS</code> 的空间大小， 也不会出现前面所说的缓冲区溢出问题。</p>
-<h3 id="减少修改字符串时带来的内存重分配次数">减少修改字符串时带来的内存重分配次数</h3>
+<h4 id="减少修改字符串时带来的内存重分配次数">减少修改字符串时带来的内存重分配次数</h4>
 <ul>
 <li>空间预分配：解决 append 问题</li>
 <li>惰性空间释放：解决 strim 问题</li>
 </ul>
-<h3 id="二进制安全">二进制安全</h3>
+<h4 id="二进制安全">二进制安全</h4>
 <p>C 字符串中的字符必须符合某种编码（比如 <code>ASCII</code>）， 并且 <strong>除了字符串的末尾之外， 字符串里面不能包含空字符</strong>， 否则最先被程序读入的空字符将被误认为是字符串结尾 —— 这些限制使得 C 字符串只能保存文本数据， 而不能保存像图片、音频、视频、压缩文件这样的二进制数据。</p>
-<h2 id="zset底层实现">zset底层实现</h2>
-<p>跳跃表（skiplist）是一种有序数据结构， 它通过在每个节点中维持多个指向其他节点的指针， 从而达到快速访问节点的目的。</p>
+<h3 id="zset底层实现">zset底层实现</h3>
+<p><strong>跳跃表（skiplist）</strong> 是一种有序数据结构， 它通过在每个节点中维持多个指向其他节点的指针， 从而达到快速访问节点的目的。</p>
 <p><code>Redis</code> 使用跳跃表作为有序集合键的底层实现之一：</p>
 <ul>
 <li>如果一个有序集合包含的元素数量比较多，</li>
@@ -620,7 +695,7 @@ for item in range(ITEMS):
 </ul>
 <p>Redis 就会使用跳跃表来作为有序集合键的底层实现。</p>
 <p>和链表、字典等数据结构被广泛地应用在 Redis 内部不同， <strong>Redis 只在两个地方用到了跳跃表， 一个是实现有序集合键， 另一个是在集群节点中用作内部数据结构</strong>， 除此之外， 跳跃表在 Redis 里面没有其他用途。</p>
-<h2 id="bitmap-实现">BitMap 实现</h2>
+<h3 id="bitmap-实现">BitMap 实现</h3>
 <p>Bitmaps 并不是实际的数据类型，而是定义在 String 类型上的一个面向字节操作的集合。因为字符串是二进制安全的，最大长度是 512M ，所以最长拥有 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
@@ -647,7 +722,7 @@ for item in range(ITEMS):
 <li>二进制数据的存储，进行相关计算的时候非常快。</li>
 <li>方便扩容</li>
 </ol>
-<p>限制：redis中bit映射被限制在512MB之内，所以最大是 
+<p>限制：Redis中bit映射被限制在512MB之内，所以最大是 
 
 <span class="katex">
   \(2^32\)
@@ -676,8 +751,8 @@ for item in range(ITEMS):
 <p>在缓存失效的时候（判断拿出来的值为空），不是立即去 <code>load db</code> ，而是先使用缓存工具的某些带成功操作返回值的操作（比如Redis的 <code>SETNX</code>）去 <code>set</code> 一个 <code>mutex key</code> ，当操作返回成功时，再进行 <code>load db</code> 的操作并回设缓存；否则，就重试整个 <code>get</code> 缓存的方法。</p>
 <h2 id="redis分布式锁">Redis分布式锁</h2>
 <ul>
-<li>加锁：<code>redis.set(String key, String value, String nxxx, String expx, int time)</code></li>
-<li>解锁：通过 Lua 脚本执行 <code>if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end</code></li>
+<li>加锁：<code>Redis.set(String key, String value, String nxxx, String expx, int time)</code></li>
+<li>解锁：通过 Lua 脚本执行 <code>if Redis.call('get', KEYS[1]) == ARGV[1] then return Redis.call('del', KEYS[1]) else return 0 end</code></li>
 </ul>
 <h2 id="数据淘汰机制">数据淘汰机制</h2>
 <h3 id="对象过期">对象过期</h3>
@@ -713,9 +788,9 @@ for item in range(ITEMS):
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/d87c891b02a4575f586779f1dd582e21a44d7541" title='Last modified by haoyang.shi | 2020-02-16' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/68cc55677c7a3bedf3a9a330f1612688d9235311" title='Last modified by haoyang.shi | 2020-02-20' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-02-16</span>
+      <span>2020-02-20</span>
     </a>
   </div>
 
@@ -749,11 +824,16 @@ for item in range(ITEMS):
   <ul>
     <li><a href="#线程模型">线程模型</a>
       <ul>
-        <li><a href="#为啥-redis-单线程模型也能效率这么高">为啥 redis 单线程模型也能效率这么高？</a></li>
+        <li><a href="#为啥-redis-单线程模型也能效率这么高">为啥 Redis 单线程模型也能效率这么高？</a></li>
       </ul>
     </li>
-    <li><a href="#数据结构">数据结构</a></li>
-    <li><a href="#持久化">持久化：</a></li>
+    <li><a href="#持久化">持久化</a>
+      <ul>
+        <li><a href="#rdb">RDB</a></li>
+        <li><a href="#aof">AOF</a></li>
+        <li><a href="#rdb-和-aof-到底该如何选择">RDB 和 AOF 到底该如何选择</a></li>
+      </ul>
+    </li>
     <li><a href="#一致性哈希算法">一致性哈希算法</a>
       <ul>
         <li><a href="#需求">需求</a></li>
@@ -767,20 +847,18 @@ for item in range(ITEMS):
     </li>
     <li><a href="#集群">集群</a>
       <ul>
-        <li><a href="#哨兵----sentinel">哨兵 &ndash; Sentinel</a></li>
+        <li><a href="#主从复制">主从复制</a></li>
+        <li><a href="#哨兵">哨兵</a></li>
         <li><a href="#redis-clusterhttpsredisiotopicscluster-tutorial">Redis Cluster</a></li>
-        <li><a href="#redis-sharding-集群">Redis Sharding 集群</a></li>
       </ul>
     </li>
-    <li><a href="#string">string</a>
+    <li><a href="#数据结构">数据结构</a>
       <ul>
-        <li><a href="#缓冲区溢出">缓冲区溢出</a></li>
-        <li><a href="#减少修改字符串时带来的内存重分配次数">减少修改字符串时带来的内存重分配次数</a></li>
-        <li><a href="#二进制安全">二进制安全</a></li>
+        <li><a href="#string">string</a></li>
+        <li><a href="#zset底层实现">zset底层实现</a></li>
+        <li><a href="#bitmap-实现">BitMap 实现</a></li>
       </ul>
     </li>
-    <li><a href="#zset底层实现">zset底层实现</a></li>
-    <li><a href="#bitmap-实现">BitMap 实现</a></li>
     <li><a href="#缓存穿透缓存击穿缓存雪崩">缓存穿透、缓存击穿、缓存雪崩</a>
       <ul>
         <li><a href="#缓存穿透">缓存穿透</a></li>
