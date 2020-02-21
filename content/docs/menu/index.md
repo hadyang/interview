@@ -30,6 +30,7 @@ headless: true
         - [HTTPS]({{< relref "/docs/basic/net/https/index.md" >}})
         - [Websocket]({{< relref "/docs/basic/net/websocket/index.md" >}})
     - [MySQL]({{< relref "/docs/basic/database/mysql/_index.md" >}})
+        - [SQL]({{< relref "/docs/basic/database/sql/index.md" >}})
         - [MySQL架构]({{< relref "/docs/basic/database/mysql/architecture/index.md" >}})
         - [InnoDB]({{< relref "/docs/basic/database/mysql/innodb/_index.md" >}})
             - [InnoDB索引]({{< relref "/docs/basic/database/mysql/innodb/index/index.md" >}})
