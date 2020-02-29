@@ -263,6 +263,68 @@ public void mergeSort(int[] array, int start, int end, int[] temp) {
 }
 ```
 
+## 桶排序
+
+桶排序工作的原理是将 **数组分到有限数量的桶** 里。每个桶再个别排序（有可能再使用别的排序算法或是以递归方式继续使用桶排序进行排序）。当要被排序的数组内的数值是均匀分配的时候，桶排序使用线性时间 {{<katex>}}O(n){{</katex>}}。由于桶排序不是比较排序，他不受到 {{<katex>}}O(n\log n){{</katex>}} 下限的影响。
+
+桶排序以下列程序进行：
+
+- 设置一个定量的数组当作空桶子。
+- 寻访序列，并且把项目一个一个放到对应的桶子去。
+- 对每个不是空的桶子进行排序。
+- 从不是空的桶子里把项目再放回原来的序列中。
+
+
+```java
+private int indexFor(int a, int min, int step) {
+	return (a - min) / step;
+}
+
+public void bucketSort(int[] arr) {
+	int max = arr[0], min = arr[0];
+	for (int a : arr) {
+		if (max < a)
+			max = a;
+		if (min > a)
+			min = a;
+	}
+	// 该值可根据实际情况选择
+	int bucketNum = max / 10 - min / 10 + 1;
+	List buckList = new ArrayList<List<Integer>>();
+	// create bucket
+	for (int i = 1; i <= bucketNum; i++) {
+		buckList.add(new ArrayList<Integer>());
+	}
+	// push into the bucket
+	for (int i = 0; i < arr.length; i++) {
+		int index = indexFor(arr[i], min, 10);
+		((ArrayList<Integer>) buckList.get(index)).add(arr[i]);
+	}
+	ArrayList<Integer> bucket = null;
+	int index = 0;
+	for (int i = 0; i < bucketNum; i++) {
+		bucket = (ArrayList<Integer>) buckList.get(i);
+		insertSort(bucket);
+		for (int k : bucket) {
+			arr[index++] = k;
+		}
+	}
+}
+
+// 把桶內元素插入排序
+private void insertSort(List<Integer> bucket) {
+	for (int i = 1; i < bucket.size(); i++) {
+		int temp = bucket.get(i);
+		int j = i - 1;
+		for (; j >= 0 && bucket.get(j) > temp; j--) {
+			bucket.set(j + 1, bucket.get(j));
+		}
+		bucket.set(j + 1, temp);
+	}
+}
+```
+
+
 ## 基数排序
 
 对于有d个关键字时，可以分别按关键字进行排序。有俩种方法：
@@ -271,7 +333,7 @@ public void mergeSort(int[] array, int start, int end, int[] temp) {
 
 > 即通过每个数的每位数字的大小来比较
 
-```
+```java
 //找出最大数字的位数
 int maxNum(int arr[], int len) {
     int _max = 0;
