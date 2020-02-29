@@ -35,7 +35,7 @@ categories: algo
   - 针对所有的元素重复以上的步骤，除了最后一个。
   - 持续每次对越来越少的元素重复上面的步骤，直到没有任何一对数字需要比较。
 
-```C
+```c++
 void bubble_sort(int a[], int n)
 {
     int i, j, temp;
@@ -64,36 +64,33 @@ void bubble_sort(int a[], int n)
 > - 最坏情况：时间复杂度为`O(n^2)`。因为最坏情况发生在每次划分过程产生的两个区间分别包含`n-1`个元素和`1`个元素的时候。
 > - 最好情况：每次划分选取的基准都是当前无序区的中值。如果每次划分过程产生的区间大小都为n/2，则快速排序法运行就快得多了。
 
-```
-    public void sort(int[] arr, int low, int high) {
-        int l = low;
-        int h = high;
-        int povit = arr[low];
-
-        while (l < h) {
-            while (l < h && arr[h] >= povit)
-                h--;
-            if (l < h) {
-                arr[l] = arr[h];
-                l++;
-            }
-
-            while (l < h && arr[l] <= povit)
-                l++;
-
-            if (l < h) {
-                arr[h] = arr[l];
-                h--;
-            }
+```java
+public void sort(int[] arr, int low, int high) {
+    int l = low;
+    int h = high;
+    int povit = arr[low];
+    while (l < h) {
+        while (l < h && arr[h] >= povit)
+            h--;
+        if (l < h) {
+            arr[l] = arr[h];
+            l++;
         }
-
-        arr[l] = povit;
-
-        System.out.print("l=" + (l + 1) + ";h=" + (h + 1) + ";povit=" + povit + "\n");
-        System.out.println(Arrays.toString(arr));
-        if (l - 1 > low) sort(arr, low, l - 1);
-        if (h + 1 < high) sort(arr, h + 1, high);
+        while (l < h && arr[l] <= povit)
+            l++;
+        if (l < h) {
+            arr[h] = arr[l];
+            h--;
+        }
     }
+
+    arr[l] = povit;
+
+    System.out.print("l=" + (l + 1) + ";h=" + (h + 1) + ";povit=" + povit + "\n");
+    System.out.println(Arrays.toString(arr));
+    if (l - 1 > low) sort(arr, low, l - 1);
+    if (h + 1 < high) sort(arr, h + 1, high);
+}
 ```
 
 #### 快排的优化
@@ -107,8 +104,7 @@ void bubble_sort(int a[], int n)
 ### 直接插入排序
 插入排序的基本操作就是将一个数据插入到已经排好序的有序数据中，从而得到一个新的、个数加一的有序数据，算法适用于少量数据的排序，**时间复杂度为O(n^2)。是稳定的排序方法。** **插入算法把要排序的数组分成两部分**：第一部分包含了这个数组的所有元素，但将最后一个元素除外（让数组多一个空间才有插入的位置），而第二部分就只包含这一个元素（即待插入元素）。在第一部分排序完成后，再将这个最后元素插入到已排好序的第一部分中。
 
-```C
-
+```c++
 void insert_sort(int* a, int len) {
     for (int i = 1; i < len; ++i) {
         int j = i - 1;
@@ -129,7 +125,7 @@ void insert_sort(int* a, int len) {
 
 希尔排序是把记录按下标的一定增量分组，对每组使用直接插入排序算法排序；随着增量逐渐减少，每组包含的关键词越来越多，当增量减至1时，整个文件恰被分成一组，算法便终止。
 
-```C
+```c++
 void shell_sort(int* a, int len) {
     int step = len / 2;
     int temp;
@@ -154,7 +150,7 @@ void shell_sort(int* a, int len) {
 ### 直接选择排序
 首先在未排序序列中找到最小（大）元素，存放到排序序列的起始位置，然后，再从剩余未排序元素中继续寻找最小（大）元素，然后放到已排序序列的末尾。**实际适用的场合非常罕见。**
 
-```C
+```c++
 void selection_sort(int arr[], int len) {
 	int i, j, min, temp;
 	for (i = 0; i < len - 1; i++) {
@@ -177,7 +173,7 @@ void selection_sort(int arr[], int len) {
   2. 将堆顶的数据与无序区末尾的数据交换
   3. 从后往前，直到所有数据排序完成
 
-```
+```java
 public void heapSort(int[] nums) {
     for (int i = nums.length - 1; i >= 0; i--) {
         maxHeap(nums, 0, i);
@@ -228,7 +224,7 @@ private void swap(int[] nums, int a, int b) {
 
 性能：时间复杂度总是为O(NlogN)，空间复杂度也总为为O(N)，算法与初始序列无关，排序是稳定的。
 
-```
+```java
 public void mergeSort(int[] array, int start, int end, int[] temp) {
     if (start >= end) {
         return;
