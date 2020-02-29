@@ -10,7 +10,7 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/algo/sort/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2019-09-28T10:47:03+08:00" />
+<meta property="article:modified_time" content="2020-02-29T10:15:04+08:00" />
 <title>排序算法 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.ef124ac04a9d52bceaa7521184c699a7620c7a5495f1d7e68f94c137b897ac3f.js" integrity="sha256-7xJKwEqdUrzqp1IRhMaZp2IMelSV8dfmj5TBN7iXrD8="></script>
+<script defer src="/interview/en.search.min.8ed4e935303e978fcbbb3f93a1f2a501bad294767d76034d1b25c46b4e423a56.js" integrity="sha256-jtTpNTA&#43;l4/Luz&#43;TofKlAbrSlHZ9dgNNGyXEa05COlY="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -396,6 +396,7 @@ https://github.com/alex-shpak/hugo-book
       </ul>
     </li>
     <li><a href="#归并排序">归并排序</a></li>
+    <li><a href="#桶排序">桶排序</a></li>
     <li><a href="#基数排序">基数排序</a></li>
     <li><a href="#拓扑排序">拓扑排序</a></li>
   </ul>
@@ -634,7 +635,79 @@ private void swap(int[] nums, int a, int b) {
         array[j++] = temp[i];
     }
 }
-</code></pre><h2 id="基数排序">基数排序</h2>
+</code></pre><h2 id="桶排序">桶排序</h2>
+<p>桶排序工作的原理是将 <strong>数组分到有限数量的桶</strong> 里。每个桶再个别排序（有可能再使用别的排序算法或是以递归方式继续使用桶排序进行排序）。当要被排序的数组内的数值是均匀分配的时候，桶排序使用线性时间 
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+
+
+
+<span class="katex">
+  \(O(n)\)
+</span>
+。由于桶排序不是比较排序，他不受到 
+
+<span class="katex">
+  \(O(n\log n)\)
+</span>
+ 下限的影响。</p>
+<p>桶排序以下列程序进行：</p>
+<ul>
+<li>设置一个定量的数组当作空桶子。</li>
+<li>寻访序列，并且把项目一个一个放到对应的桶子去。</li>
+<li>对每个不是空的桶子进行排序。</li>
+<li>从不是空的桶子里把项目再放回原来的序列中。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">indexFor</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> a<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> min<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> step<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+	<span style="color:#66d9ef">return</span> <span style="color:#f92672">(</span>a <span style="color:#f92672">-</span> min<span style="color:#f92672">)</span> <span style="color:#f92672">/</span> step<span style="color:#f92672">;</span>
+<span style="color:#f92672">}</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">bucketSort</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span><span style="color:#f92672">[</span><span style="color:#f92672">]</span> arr<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+	<span style="color:#66d9ef">int</span> max <span style="color:#f92672">=</span> arr<span style="color:#f92672">[</span>0<span style="color:#f92672">]</span><span style="color:#f92672">,</span> min <span style="color:#f92672">=</span> arr<span style="color:#f92672">[</span>0<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
+	<span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> a <span style="color:#f92672">:</span> arr<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+		<span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>max <span style="color:#f92672">&lt;</span> a<span style="color:#f92672">)</span>
+			max <span style="color:#f92672">=</span> a<span style="color:#f92672">;</span>
+		<span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>min <span style="color:#f92672">&gt;</span> a<span style="color:#f92672">)</span>
+			min <span style="color:#f92672">=</span> a<span style="color:#f92672">;</span>
+	<span style="color:#f92672">}</span>
+	<span style="color:#75715e">// 该值可根据实际情况选择
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">int</span> bucketNum <span style="color:#f92672">=</span> max <span style="color:#f92672">/</span> 10 <span style="color:#f92672">-</span> min <span style="color:#f92672">/</span> 10 <span style="color:#f92672">+</span> 1<span style="color:#f92672">;</span>
+	List buckList <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;</span>List<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+	<span style="color:#75715e">// create bucket
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 1<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span><span style="color:#f92672">=</span> bucketNum<span style="color:#f92672">;</span> i<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+		buckList<span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+	<span style="color:#f92672">}</span>
+	<span style="color:#75715e">// push into the bucket
+</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> arr<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">;</span> i<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+		<span style="color:#66d9ef">int</span> index <span style="color:#f92672">=</span> indexFor<span style="color:#f92672">(</span>arr<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span><span style="color:#f92672">,</span> min<span style="color:#f92672">,</span> 10<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+		<span style="color:#f92672">(</span><span style="color:#f92672">(</span>ArrayList<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">)</span> buckList<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>index<span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span>arr<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+	<span style="color:#f92672">}</span>
+	ArrayList<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> bucket <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
+	<span style="color:#66d9ef">int</span> index <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span>
+	<span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> bucketNum<span style="color:#f92672">;</span> i<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+		bucket <span style="color:#f92672">=</span> <span style="color:#f92672">(</span>ArrayList<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">)</span> buckList<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>i<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+		insertSort<span style="color:#f92672">(</span>bucket<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+		<span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> k <span style="color:#f92672">:</span> bucket<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+			arr<span style="color:#f92672">[</span>index<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> k<span style="color:#f92672">;</span>
+		<span style="color:#f92672">}</span>
+	<span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+<span style="color:#75715e">// 把桶內元素插入排序
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">insertSort</span><span style="color:#f92672">(</span>List<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> bucket<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+	<span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 1<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> bucket<span style="color:#f92672">.</span><span style="color:#a6e22e">size</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span> i<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+		<span style="color:#66d9ef">int</span> temp <span style="color:#f92672">=</span> bucket<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>i<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+		<span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> i <span style="color:#f92672">-</span> 1<span style="color:#f92672">;</span>
+		<span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#f92672">;</span> j <span style="color:#f92672">&gt;</span><span style="color:#f92672">=</span> 0 <span style="color:#f92672">&amp;</span><span style="color:#f92672">&amp;</span> bucket<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>j<span style="color:#f92672">)</span> <span style="color:#f92672">&gt;</span> temp<span style="color:#f92672">;</span> j<span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+			bucket<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>j <span style="color:#f92672">+</span> 1<span style="color:#f92672">,</span> bucket<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>j<span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+		<span style="color:#f92672">}</span>
+		bucket<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>j <span style="color:#f92672">+</span> 1<span style="color:#f92672">,</span> temp<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+	<span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><h2 id="基数排序">基数排序</h2>
 <p>对于有d个关键字时，可以分别按关键字进行排序。有俩种方法：</p>
 <ul>
 <li>MSD：先从高位开始进行排序，在每个关键字上，可采用基数排序</li>
@@ -643,63 +716,63 @@ private void swap(int[] nums, int a, int b) {
 <blockquote>
 <p>即通过每个数的每位数字的大小来比较</p>
 </blockquote>
-<pre><code>//找出最大数字的位数
-int maxNum(int arr[], int len) {
-    int _max = 0;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#75715e">//找出最大数字的位数
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">maxNum</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> arr<span style="color:#f92672">[</span><span style="color:#f92672">]</span><span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> len<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">int</span> _max <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span>
 
-    for (int i = 0; i &lt; len; ++i) {
-        int d = 0;
-        int a = arr[i];
+    <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> len<span style="color:#f92672">;</span> <span style="color:#f92672">+</span><span style="color:#f92672">+</span>i<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">int</span> d <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">int</span> a <span style="color:#f92672">=</span> arr<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
 
-        while (a) {
-            a /= 10;
-            d++;
-        }
+        <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span>a<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            a <span style="color:#f92672">/</span><span style="color:#f92672">=</span> 10<span style="color:#f92672">;</span>
+            d<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
 
-        if (_max &lt; d) {
-            _max = d;
-        }
-    }
-    return _max;
-}
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>_max <span style="color:#f92672">&lt;</span> d<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            _max <span style="color:#f92672">=</span> d<span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">return</span> _max<span style="color:#f92672">;</span>
+<span style="color:#f92672">}</span>
 
 
-void radixSort(int *arr, int len) {
-    int d = maxNum(arr, len);
-    int *temp = new int[len];
-    int count[10];
-    int radix = 1;
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">radixSort</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>arr<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> len<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">int</span> d <span style="color:#f92672">=</span> maxNum<span style="color:#f92672">(</span>arr<span style="color:#f92672">,</span> len<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>temp <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">[</span>len<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">int</span> count<span style="color:#f92672">[</span>10<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">int</span> radix <span style="color:#f92672">=</span> 1<span style="color:#f92672">;</span>
 
-    for (int i = 0; i &lt; d; ++i) {
-        for (int j = 0; j &lt; 10; ++j) {
-            count[j] = 0;
-        }
+    <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> d<span style="color:#f92672">;</span> <span style="color:#f92672">+</span><span style="color:#f92672">+</span>i<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> j <span style="color:#f92672">&lt;</span> 10<span style="color:#f92672">;</span> <span style="color:#f92672">+</span><span style="color:#f92672">+</span>j<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            count<span style="color:#f92672">[</span>j<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
 
-        for (int k = 0; k &lt; len; ++k) {
-            count[(arr[k] / radix) % 10]++;
-        }
+        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> k <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> k <span style="color:#f92672">&lt;</span> len<span style="color:#f92672">;</span> <span style="color:#f92672">+</span><span style="color:#f92672">+</span>k<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            count<span style="color:#f92672">[</span><span style="color:#f92672">(</span>arr<span style="color:#f92672">[</span>k<span style="color:#f92672">]</span> <span style="color:#f92672">/</span> radix<span style="color:#f92672">)</span> <span style="color:#f92672">%</span> 10<span style="color:#f92672">]</span><span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
 
-        for (int l = 1; l &lt; 10; ++l) {
-            count[l] += count[l - 1];
-        }
+        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> l <span style="color:#f92672">=</span> 1<span style="color:#f92672">;</span> l <span style="color:#f92672">&lt;</span> 10<span style="color:#f92672">;</span> <span style="color:#f92672">+</span><span style="color:#f92672">+</span>l<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            count<span style="color:#f92672">[</span>l<span style="color:#f92672">]</span> <span style="color:#f92672">+</span><span style="color:#f92672">=</span> count<span style="color:#f92672">[</span>l <span style="color:#f92672">-</span> 1<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
 
-        for (int m = 0; m &lt; len; ++m) {
-            int index = (arr[m] / radix) % 10;
-            temp[count[index] - 1] = arr[m];
-            count[index]--;
-        }
+        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> m <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> m <span style="color:#f92672">&lt;</span> len<span style="color:#f92672">;</span> <span style="color:#f92672">+</span><span style="color:#f92672">+</span>m<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            <span style="color:#66d9ef">int</span> index <span style="color:#f92672">=</span> <span style="color:#f92672">(</span>arr<span style="color:#f92672">[</span>m<span style="color:#f92672">]</span> <span style="color:#f92672">/</span> radix<span style="color:#f92672">)</span> <span style="color:#f92672">%</span> 10<span style="color:#f92672">;</span>
+            temp<span style="color:#f92672">[</span>count<span style="color:#f92672">[</span>index<span style="color:#f92672">]</span> <span style="color:#f92672">-</span> 1<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> arr<span style="color:#f92672">[</span>m<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
+            count<span style="color:#f92672">[</span>index<span style="color:#f92672">]</span><span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
 
-        for (int n = 0; n &lt; len; ++n) {
-            arr[n] = temp[n];
-        }
-        radix *= 10;
+        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> n <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> n <span style="color:#f92672">&lt;</span> len<span style="color:#f92672">;</span> <span style="color:#f92672">+</span><span style="color:#f92672">+</span>n<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            arr<span style="color:#f92672">[</span>n<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> temp<span style="color:#f92672">[</span>n<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+        radix <span style="color:#f92672">*</span><span style="color:#f92672">=</span> 10<span style="color:#f92672">;</span>
 
-    }
+    <span style="color:#f92672">}</span>
 
-    delete (temp);
-}
+    delete <span style="color:#f92672">(</span>temp<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#f92672">}</span>
 
-</code></pre><h2 id="拓扑排序">拓扑排序</h2>
+</code></pre></div><h2 id="拓扑排序">拓扑排序</h2>
 <p>在有向图中找拓扑序列的过程，就是拓扑排序。<strong>拓扑序列常常用于判定图是否有环</strong>。</p>
 <ul>
 <li>从有向图中选择一个入度为0的结点，输出它。</li>
@@ -720,9 +793,9 @@ void radixSort(int *arr, int len) {
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/8bbf70929190e8f5a5b4abadd1dd4f32553980a7" title='Last modified by haoyang.shi | 2019-09-28' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/b388b5ac402951296b5bf41ba254b14b5e5746d4" title='Last modified by haoyang.shi | 2020-02-29' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2019-09-28</span>
+      <span>2020-02-29</span>
     </a>
   </div>
 
@@ -779,6 +852,7 @@ void radixSort(int *arr, int len) {
       </ul>
     </li>
     <li><a href="#归并排序">归并排序</a></li>
+    <li><a href="#桶排序">桶排序</a></li>
     <li><a href="#基数排序">基数排序</a></li>
     <li><a href="#拓扑排序">拓扑排序</a></li>
   </ul>
