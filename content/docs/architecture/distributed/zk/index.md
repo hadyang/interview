@@ -328,4 +328,3 @@ zk自己不会进行日志清理，需要运维人员进行日志清理
 - [ZooKeeper 架构](https://zookeeper.apache.org/doc/r3.1.2/zookeeperProgrammers.html)
 - [阿里巴巴为什么不用ZooKeeper 做服务发现？](http://jm.taobao.org/2018/06/13/%E5%81%9A%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0%EF%BC%9F/)
 - [ZooKeeper 技术内幕：Leader 选举](http://ningg.top/zookeeper-lesson-2-leader-election/)
-- [Zookeeper: 分布式过程协同技术详解](http://www.dengshenyu.com/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/2017/11/01/zookeeper.html)

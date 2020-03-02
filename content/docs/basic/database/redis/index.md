@@ -159,7 +159,7 @@ for item in range(ITEMS):
 
 单机的 Redis ，能够承载的 QPS 大概就在上万到几万不等。对于缓存来说，一般都是用来支撑读高并发的。因此架构做成 **主从(Master-Slave)架构** ，一主多从，主负责写，并且将数据复制到其它的 Slave 节点，从节点负责读。所有的读请求全部走从节点。这样也可以很轻松实现水平扩容，支撑读高并发。
 
-![](./images/Redis-Master-Slave.png)
+![](./images/redis-master-slave.png)
 
 Redis 默认采用异步方式复制数据到 Slave Node，同时 Slave Node 会周期性地确认自己每次复制的数据量：
 

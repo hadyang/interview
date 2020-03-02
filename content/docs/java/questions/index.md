@@ -13,7 +13,7 @@ categories: java
 
 ---
 
-### 内部类访问局部变量的时候，为什么变量必须加上final修饰？ {#xuan}
+### 内部类访问局部变量的时候，为什么变量必须加上final修饰？ 
 
 因为生命周期不同。局部变量在方法结束后就会被销毁，但内部类对象并不一定，这样就会导致内部类引用了一个不存在的变量。
 
@@ -222,12 +222,6 @@ fabs(x) < 0.00001f
 JDK 1.7及以前：
 
 ConcurrentHashMap允许多个修改操作并发进行，其关键在于使用了锁分离技术。它使用了多个锁来控制对hash表的不同部分进行的修改。ConcurrentHashMap内部使用段\(Segment\)来表示这些不同的部分，每个段其实就是一个小的hash table，它们有自己的锁。只要多个修改操作发生在不同的段上，它们就可以并发进行。
-
-详细参考：
-
-[http:\/\/www.cnblogs.com\/ITtangtang\/p\/3948786.html](http://www.cnblogs.com/ITtangtang/p/3948786.html)
-
-[http:\/\/qifuguang.me\/2015\/09\/10\/\[Java并发包学习八\]深度剖析ConcurrentHashMap\/](http://qifuguang.me/2015/09/10/[Java%E5%B9%B6%E5%8F%91%E5%8C%85%E5%AD%A6%E4%B9%A0%E5%85%AB]%E6%B7%B1%E5%BA%A6%E5%89%96%E6%9E%90ConcurrentHashMap/)
 
 JDK 1.8：
 

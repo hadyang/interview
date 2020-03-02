@@ -5,7 +5,7 @@ draft: false
 categories: java
 ---
 
-# [BlockingQueue](http://www.importnew.com/28053.html)
+# BlockingQueue
 
 `BlockingQueue` 支持当获取队列元素但是队列为空时，会阻塞等待队列中有元素再返回；也支持添加元素时，如果队列已满，那么等到队列可以放入新元素时再放入。
 

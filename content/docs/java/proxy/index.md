@@ -7,13 +7,12 @@ categories: java
 
 # 代理
 
-[Java动态代理与CGLIB](http://www.importnew.com/22015.html)
+## Java 代理
 
 我们常说的代理分为静态代理和动态代理。
 
   - 静态代理：代码中显式指定代理
   - 动态代理：类比静态代理，可以发现，代理类不需要实现原接口了，而是实现InvocationHandler。
-
 
 ### 静态代理
 
