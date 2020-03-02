@@ -12,7 +12,7 @@ select * from table where ? lock in share mode; select * from table where ? for 
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/database/mysql/innodb/concurrent/" />
 <meta property="article:published_time" content="2020-02-19T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-02-19T22:43:41+08:00" />
+<meta property="article:modified_time" content="2020-03-02T10:07:43+08:00" />
 <title>InnoDB 并发控制 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -20,7 +20,7 @@ select * from table where ? lock in share mode; select * from table where ? for 
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.b90f216ba25e739793c76c71d8f93b2b6afca17fa0f12d0c2c7a3796fbbbb939.js" integrity="sha256-uQ8ha6Jec5eTx2xx2Pk7K2r8oX&#43;g8S0MLHo3lvu7uTk="></script>
+<script defer src="/interview/en.search.min.8e7f47db561e0917b71d7e6ba9bbd0a1f52c363c16951d1a141659deadc2744b.js" integrity="sha256-jn9H21YeCRe3HX5rqbvQofUsNjwWlR0aFBZZ3q3CdEs="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -382,7 +382,7 @@ https://github.com/alex-shpak/hugo-book
         <li><a href="#gap-lock">Gap Lock</a></li>
         <li><a href="#插入意向锁">插入意向锁</a></li>
         <li><a href="#自增锁">自增锁</a></li>
-        <li><a href="#锁选择httphedengchengcomp771_toc374698309">锁选择</a></li>
+        <li><a href="#锁选择">锁选择</a></li>
       </ul>
     </li>
     <li><a href="#mvcc">MVCC</a>
@@ -440,7 +440,6 @@ delete from table where ?;
 <li>一个事务必须先持有该表上的 IX 锁才能持有该表中某行的 X 锁</li>
 </ul>
 <p>新请求的锁只有兼容已有锁才能被允许，否则必须等待不兼容的已有锁被释放。<strong>一个不兼容的锁请求不被允许是因为它会引起死锁，错误会发生</strong>。意向锁只会阻塞全表请求（比如 <code>LOCK TABLES ... WRITE</code> ）。<strong>意向锁的主要目的是展示某人正在锁定表中一行，或者将要锁定一行</strong>。</p>
-<p>更多信息参见：<a href="./6-concurrent_control.md">并发控制</a></p>
 <h3 id="record-lock">Record Lock</h3>
 <p>记录锁（Record Lock）是加到<strong>索引记录</strong>上的锁，假设我们存在下面的一张表 <code>users</code>：</p>
 <pre><code>    CREATE TABLE users(
@@ -495,7 +494,7 @@ delete from table where ?;
 <p>插入意向锁是在插入一行记录操作之前设置的一种间隙锁，这个锁释放了一种插入方式的信号，亦即多个事务在相同的索引间隙插入时如果不是插入间隙中相同的位置就不需要互相等待。假设有索引值<code>4、7</code>，几个不同的事务准备插入<code>5、6</code>，每个锁都在获得插入行的独占锁之前用插入意向锁各自锁住了<code>4、7</code>之间的间隙，但是不阻塞对方因为插入行不冲突。</p>
 <h3 id="自增锁">自增锁</h3>
 <p>自增锁是一个特殊的表级锁，事务插入自增列的时候需要获取，最简单情况下如果一个事务插入一个值到表中，任何其他事务都要等待，这样第一个事物才能获得连续的主键值。</p>
-<h3 id="锁选择httphedengchengcomp771_toc374698309"><a href="http://hedengcheng.com/?p=771#_Toc374698309">锁选择</a></h3>
+<h3 id="锁选择">锁选择</h3>
 <pre><code>+——-+————-+
 | id | name |
 +——-+————-+
@@ -550,9 +549,9 @@ MySQL Server 此时才会判断返回的记录是否满足<code>id&lt;7</code>�
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/bee88da3609e03fd8e0ea7786eae3c796a3d95c3" title='Last modified by haoyang.shi | 2020-02-19' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/087d135749e1bcf917b793ebe364e70a8d58ea54" title='Last modified by haoyang.shi | 2020-03-02' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-02-19</span>
+      <span>2020-03-02</span>
     </a>
   </div>
 
@@ -593,7 +592,7 @@ MySQL Server 此时才会判断返回的记录是否满足<code>id&lt;7</code>�
         <li><a href="#gap-lock">Gap Lock</a></li>
         <li><a href="#插入意向锁">插入意向锁</a></li>
         <li><a href="#自增锁">自增锁</a></li>
-        <li><a href="#锁选择httphedengchengcomp771_toc374698309">锁选择</a></li>
+        <li><a href="#锁选择">锁选择</a></li>
       </ul>
     </li>
     <li><a href="#mvcc">MVCC</a>

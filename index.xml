@@ -366,7 +366,7 @@ Dubbo 结构  第一层：service 层，接口层，给服务提供者和消费�
 在对hashCode()计算hash时具体实现是这样的：
 static final int hash(Object key) { int h; return (key == null) ? 0 : (h = key.hashCode()) ^ (h &amp;gt;&amp;gt;&amp;gt; 16); }  可以看到这个函数大概的作用就是：高16bit不变，低16bit和高16bit做了一个异或。
  在设计hash函数时，因为目前的table长度n为2的幂，而计算下标的时候，是这样实现的(使用&amp;amp;位操作，而非%求余)。设计者认为这方法很容易发生碰撞。为什么这么说呢？不妨思考一下，在n - 1为15(0x1111)时，其实散列真正生效的只是低4bit的有效位，当然容易碰撞了。
-因此，设计者想了一个顾全大局的方法(综合考虑了速度、作用、质量)，就是把高16bit和低16bit异或了一下。设计者还解释到因为现在大多数的hashCode的分布已经很不错了，就算是发生了碰撞也用O(logn)的tree去做了。仅仅异或一下，既减少了系统的开销，也不会造成的因为高位没有参与下标的计算(table长度比较小时)，从而引起的碰撞。
+因此，设计者想了一个顾全大局的方法(综合考虑了速度、作用、质量)，就是把高16bit和低16bit异或了一下。设计者还解释到因为现在大多数的 hashCode 的分布已经很不错了，就算是发生了碰撞也用O(logn)的tree去做了。仅仅异或一下，既减少了系统的开销，也不会造成的因为高位没有参与下标的计算(table长度比较小时)，从而引起的碰撞。
 如果还是产生了频繁的碰撞，会发生什么问题呢？作者注释说，他们使用树来处理频繁的碰撞(we use trees to handle large sets of collisions in bins)，在JEP-180中，描述了这个问题：
  Improve the performance of java.util.HashMap under high hash-collision conditions by using balanced trees rather than linked lists to store map entries. Implement the same improvement in the LinkedHashMap class.</description>
     </item>
@@ -451,13 +451,12 @@ IOC vs Factory 简单来说，IOC 与 工厂模式 分别代表了 push 与 pull
       <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
       
       <guid>https://hadyang.github.io/interview/docs/java/proxy/</guid>
-      <description>代理 Java动态代理与CGLIB
-我们常说的代理分为静态代理和动态代理。
+      <description>代理 Java 代理 我们常说的代理分为静态代理和动态代理。
  静态代理：代码中显式指定代理 动态代理：类比静态代理，可以发现，代理类不需要实现原接口了，而是实现InvocationHandler。  静态代理 因为需要对一些函数进行二次处理，或是某些函数不让外界知道时，可以使用代理模式，通过访问第三方，间接访问原函数的方式，达到以上目的。
 弊端 如果要想为多个类进行代理，则需要建立多个代理类，维护难度加大。
 仔细想想，为什么静态代理会有这些问题，是因为代理在编译期就已经决定，如果代理发生在运行期，这些问题解决起来就比较简单，所以动态代理的存在就很有必要了。
 动态代理 当动态生成的代理类调用方法时，会触发 invoke 方法，在 invoke 方法中可以对被代理类的方法进行增强。
-// 1. 首先实现一个InvocationHandler，方法调用会被转发到该类的invoke()方法。 class LogInvocationHandler implements InvocationHandler{ ... private Hello hello; public LogInvocationHandler(Hello hello) { this.hello = hello; } @Override public Object invoke(Object proxy, Method method, Object[] args) throws Throwable { if(&amp;quot;sayHello&amp;quot;.equals(method.getName())) { logger.info(&amp;quot;You said: &amp;quot; + Arrays.toString(args)); } return method.invoke(hello, args); } } // 2. 然后在需要使用Hello的时候，通过JDK动态代理获取Hello的代理对象。 Hello hello = (Hello)Proxy.newProxyInstance( getClass().getClassLoader(), // 1.</description>
+// 1. 首先实现一个InvocationHandler，方法调用会被转发到该类的invoke()方法。 class LogInvocationHandler implements InvocationHandler{ ... private Hello hello; public LogInvocationHandler(Hello hello) { this.hello = hello; } @Override public Object invoke(Object proxy, Method method, Object[] args) throws Throwable { if(&amp;quot;sayHello&amp;quot;.equals(method.getName())) { logger.info(&amp;quot;You said: &amp;quot; + Arrays.toString(args)); } return method.invoke(hello, args); } } // 2. 然后在需要使用Hello的时候，通过JDK动态代理获取Hello的代理对象。 Hello hello = (Hello)Proxy.newProxyInstance( getClass().</description>
     </item>
     
     <item>
@@ -953,9 +952,7 @@ ZooKeeper 的好处：
       
       <guid>https://hadyang.github.io/interview/docs/offer/GetNext/</guid>
       <description>题目 给定一个二叉树和其中的一个结点，请找出中序遍历顺序的下一个结点并且返回。注意，树中的结点不仅包含左右子结点，同时包含指向父结点的指针。
-解题思路 考虑以下二叉树：
-其中序遍历的结果是：d,b,h,e,i,a,f,c,g
- 当前节点有右子树：右子树的最左节点 &amp;ndash; b 节点 当前节点无右子树并且为父节点的左子树：父节点 &amp;ndash; d 节点 当前节点无右子树并且为父节点的右子树：第一个祖先节点为左节点的节点 &amp;ndash; i 节点  public TreeLinkNode GetNext(TreeLinkNode pNode) { if (pNode == null) return null; TreeLinkNode parent = pNode.next; if (pNode.right == null) { if (parent == null) { return null; } //右节点 if (parent.right == pNode) { TreeLinkNode cursor = parent; while (true) { TreeLinkNode p = cursor.next; if (p == null) return null; if (cursor == p.</description>
+解题思路 public TreeLinkNode GetNext(TreeLinkNode pNode) { if (pNode == null) return null; TreeLinkNode parent = pNode.next; if (pNode.right == null) { if (parent == null) { return null; } //右节点 if (parent.right == pNode) { TreeLinkNode cursor = parent; while (true) { TreeLinkNode p = cursor.next; if (p == null) return null; if (cursor == p.left) return p; cursor = p; } } else { return parent; } } else { TreeLinkNode cursor = pNode.</description>
     </item>
     
     <item>
@@ -2038,8 +2035,8 @@ Stack&amp;lt;Integer&amp;gt; pushStack = new Stack&amp;lt;&amp;gt;(); Stack&amp;
       <guid>https://hadyang.github.io/interview/docs/offer/MaxGift/</guid>
       <description>题目 在一个 m*n 的棋盘中的每一个格都放一个礼物，每个礼物都有一定的价值（价值大于0）.你可以从棋盘的左上角开始拿各种里的礼物，并每次向左或者向下移动一格，直到到达棋盘的右下角。给定一个棋盘及上面个的礼物，请计算你最多能拿走多少价值的礼物？
 比如说现在有一个如下的棋盘:
-在这个棋盘中，按照1，12，5，7，7，16，5的顺序可以拿到总价值最大的礼物。
-解题思路  动态规划，定义   \(f(x,y)\)  表示x,y点上能获取的最大数 状态转移方程： \(f(x,y)=\max(f(x-1,y),f(x,y-1))+g(x,y)\)   可以考虑使用一维数组进行记录  public int maxGift(int[][] matrix) { for (int i = 0; i &amp;lt; matrix.length; i++) { for (int j = 0; j &amp;lt; matrix[i].length; j++) { int a = i &amp;gt; 0 ? matrix[i - 1][j] : 0; int b = j &amp;gt; 0 ? matrix[i][j - 1] : 0; matrix[i][j] += Math.</description>
+[1,3,1] [1,5,1] [4,2,1] 在这个棋盘中，按照 1 -&amp;gt; 3 -&amp;gt; 5 -&amp;gt; 2 -&amp;gt; 1 可以拿到最多价值的礼物。
+解题思路  动态规划，定义   \(f(x,y)\)  表示x,y点上能获取的最大数 状态转移方程： \(f(x,y)=\max(f(x-1,y),f(x,y-1))+g(x,y)\)   可以考虑使用一维数组进行记录  public int maxGift(int[][] matrix) { for (int i = 0; i &amp;lt; matrix.length; i++) { for (int j = 0; j &amp;lt; matrix[i].length; j++) { int a = i &amp;gt; 0 ? matrix[i - 1][j] : 0; int b = j &amp;gt; 0 ?</description>
     </item>
     
     <item>

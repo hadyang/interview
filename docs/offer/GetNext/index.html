@@ -6,13 +6,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="二叉树的下一个结点"><meta property="og:title" content="二叉树的下一个结点" />
 <meta property="og:description" content="题目 给定一个二叉树和其中的一个结点，请找出中序遍历顺序的下一个结点并且返回。注意，树中的结点不仅包含左右子结点，同时包含指向父结点的指针。
-解题思路 考虑以下二叉树：
-其中序遍历的结果是：d,b,h,e,i,a,f,c,g
- 当前节点有右子树：右子树的最左节点 &ndash; b 节点 当前节点无右子树并且为父节点的左子树：父节点 &ndash; d 节点 当前节点无右子树并且为父节点的右子树：第一个祖先节点为左节点的节点 &ndash; i 节点  public TreeLinkNode GetNext(TreeLinkNode pNode) { if (pNode == null) return null; TreeLinkNode parent = pNode.next; if (pNode.right == null) { if (parent == null) { return null; } //右节点 if (parent.right == pNode) { TreeLinkNode cursor = parent; while (true) { TreeLinkNode p = cursor.next; if (p == null) return null; if (cursor == p." />
+解题思路 public TreeLinkNode GetNext(TreeLinkNode pNode) { if (pNode == null) return null; TreeLinkNode parent = pNode.next; if (pNode.right == null) { if (parent == null) { return null; } //右节点 if (parent.right == pNode) { TreeLinkNode cursor = parent; while (true) { TreeLinkNode p = cursor.next; if (p == null) return null; if (cursor == p.left) return p; cursor = p; } } else { return parent; } } else { TreeLinkNode cursor = pNode." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/offer/GetNext/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2019-09-28T11:15:32+08:00" />
+<meta property="article:modified_time" content="2020-03-02T10:07:43+08:00" />
 <title>二叉树的下一个结点 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -20,7 +18,7 @@
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.b90f216ba25e739793c76c71d8f93b2b6afca17fa0f12d0c2c7a3796fbbbb939.js" integrity="sha256-uQ8ha6Jec5eTx2xx2Pk7K2r8oX&#43;g8S0MLHo3lvu7uTk="></script>
+<script defer src="/interview/en.search.min.8e7f47db561e0917b71d7e6ba9bbd0a1f52c363c16951d1a141659deadc2744b.js" integrity="sha256-jn9H21YeCRe3HX5rqbvQofUsNjwWlR0aFBZZ3q3CdEs="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -388,14 +386,6 @@ https://github.com/alex-shpak/hugo-book
 <article class="markdown"><h2 id="题目">题目</h2>
 <p>给定一个二叉树和其中的一个结点，请找出中序遍历顺序的下一个结点并且返回。注意，树中的结点不仅包含左右子结点，同时包含指向父结点的指针。</p>
 <h2 id="解题思路">解题思路</h2>
-<p>考虑以下二叉树：</p>
-<p><img src="images/07ce2975ccdf288110e897a00f76f43f.png" alt="image"></p>
-<p>其中序遍历的结果是：<code>d,b,h,e,i,a,f,c,g</code></p>
-<ol>
-<li>当前节点有右子树：右子树的最左节点 &ndash; b 节点</li>
-<li>当前节点无右子树并且为父节点的左子树：父节点 &ndash; d 节点</li>
-<li>当前节点无右子树并且为父节点的右子树：第一个祖先节点为左节点的节点 &ndash; i 节点</li>
-</ol>
 <pre><code>public TreeLinkNode GetNext(TreeLinkNode pNode) {
     if (pNode == null) return null;
 
@@ -443,9 +433,9 @@ https://github.com/alex-shpak/hugo-book
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/c0b7f220a568723e0931ab042a8cb5154b0f02c1" title='Last modified by haoyang.shi | 2019-09-28' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/087d135749e1bcf917b793ebe364e70a8d58ea54" title='Last modified by haoyang.shi | 2020-03-02' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2019-09-28</span>
+      <span>2020-03-02</span>
     </a>
   </div>
 

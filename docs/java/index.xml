@@ -30,13 +30,12 @@ SelectionKey 当向 Selector 注册 Channel 时，Channel.register() 方法会�
       <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
       
       <guid>https://hadyang.github.io/interview/docs/java/proxy/</guid>
-      <description>代理 Java动态代理与CGLIB
-我们常说的代理分为静态代理和动态代理。
+      <description>代理 Java 代理 我们常说的代理分为静态代理和动态代理。
  静态代理：代码中显式指定代理 动态代理：类比静态代理，可以发现，代理类不需要实现原接口了，而是实现InvocationHandler。  静态代理 因为需要对一些函数进行二次处理，或是某些函数不让外界知道时，可以使用代理模式，通过访问第三方，间接访问原函数的方式，达到以上目的。
 弊端 如果要想为多个类进行代理，则需要建立多个代理类，维护难度加大。
 仔细想想，为什么静态代理会有这些问题，是因为代理在编译期就已经决定，如果代理发生在运行期，这些问题解决起来就比较简单，所以动态代理的存在就很有必要了。
 动态代理 当动态生成的代理类调用方法时，会触发 invoke 方法，在 invoke 方法中可以对被代理类的方法进行增强。
-// 1. 首先实现一个InvocationHandler，方法调用会被转发到该类的invoke()方法。 class LogInvocationHandler implements InvocationHandler{ ... private Hello hello; public LogInvocationHandler(Hello hello) { this.hello = hello; } @Override public Object invoke(Object proxy, Method method, Object[] args) throws Throwable { if(&amp;quot;sayHello&amp;quot;.equals(method.getName())) { logger.info(&amp;quot;You said: &amp;quot; + Arrays.toString(args)); } return method.invoke(hello, args); } } // 2. 然后在需要使用Hello的时候，通过JDK动态代理获取Hello的代理对象。 Hello hello = (Hello)Proxy.newProxyInstance( getClass().getClassLoader(), // 1.</description>
+// 1. 首先实现一个InvocationHandler，方法调用会被转发到该类的invoke()方法。 class LogInvocationHandler implements InvocationHandler{ ... private Hello hello; public LogInvocationHandler(Hello hello) { this.hello = hello; } @Override public Object invoke(Object proxy, Method method, Object[] args) throws Throwable { if(&amp;quot;sayHello&amp;quot;.equals(method.getName())) { logger.info(&amp;quot;You said: &amp;quot; + Arrays.toString(args)); } return method.invoke(hello, args); } } // 2. 然后在需要使用Hello的时候，通过JDK动态代理获取Hello的代理对象。 Hello hello = (Hello)Proxy.newProxyInstance( getClass().</description>
     </item>
     
     <item>

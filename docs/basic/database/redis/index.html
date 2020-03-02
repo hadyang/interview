@@ -15,7 +15,7 @@ Redis 内部使用文件事件处理器 file event handler，这个文件事件�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/database/redis/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-02-20T17:51:29+08:00" />
+<meta property="article:modified_time" content="2020-03-02T10:07:43+08:00" />
 <title>Redis | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -23,7 +23,7 @@ Redis 内部使用文件事件处理器 file event handler，这个文件事件�
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.b90f216ba25e739793c76c71d8f93b2b6afca17fa0f12d0c2c7a3796fbbbb939.js" integrity="sha256-uQ8ha6Jec5eTx2xx2Pk7K2r8oX&#43;g8S0MLHo3lvu7uTk="></script>
+<script defer src="/interview/en.search.min.8e7f47db561e0917b71d7e6ba9bbd0a1f52c363c16951d1a141659deadc2744b.js" integrity="sha256-jn9H21YeCRe3HX5rqbvQofUsNjwWlR0aFBZZ3q3CdEs="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -546,7 +546,7 @@ for item in range(ITEMS):
 <h2 id="集群">集群</h2>
 <h3 id="主从复制">主从复制</h3>
 <p>单机的 Redis ，能够承载的 QPS 大概就在上万到几万不等。对于缓存来说，一般都是用来支撑读高并发的。因此架构做成 <strong>主从(Master-Slave)架构</strong> ，一主多从，主负责写，并且将数据复制到其它的 Slave 节点，从节点负责读。所有的读请求全部走从节点。这样也可以很轻松实现水平扩容，支撑读高并发。</p>
-<p><img src="./images/Redis-Master-Slave.png" alt=""></p>
+<p><img src="./images/redis-master-slave.png" alt=""></p>
 <p>Redis 默认采用异步方式复制数据到 Slave Node，同时 Slave Node 会周期性地确认自己每次复制的数据量：</p>
 <ol>
 <li>当 Master 和 Slave 网络连接顺畅时，Master 会持续向 Slave 推送命令，以保持在 Master 数据集合上执行的：客户端写、Key 过期、Key 淘汰等均在 Slave 数据集合上执行。</li>
@@ -789,9 +789,9 @@ for item in range(ITEMS):
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/68cc55677c7a3bedf3a9a330f1612688d9235311" title='Last modified by haoyang.shi | 2020-02-20' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/087d135749e1bcf917b793ebe364e70a8d58ea54" title='Last modified by haoyang.shi | 2020-03-02' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-02-20</span>
+      <span>2020-03-02</span>
     </a>
   </div>
 
