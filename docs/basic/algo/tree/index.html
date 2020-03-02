@@ -14,7 +14,7 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/algo/tree/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-03-02T10:07:43+08:00" />
+<meta property="article:modified_time" content="2020-03-02T10:48:36+08:00" />
 <title>树 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -22,7 +22,7 @@
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.8e7f47db561e0917b71d7e6ba9bbd0a1f52c363c16951d1a141659deadc2744b.js" integrity="sha256-jn9H21YeCRe3HX5rqbvQofUsNjwWlR0aFBZZ3q3CdEs="></script>
+<script defer src="/interview/en.search.min.b7c3a210cd7c46ea14d9d484a0133c9808bb1f73b5f4b46fff6876f0ab3493f6.js" integrity="sha256-t8OiEM18RuoU2dSEoBM8mAi7H3O19LRv/2h28Ks0k/Y="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -549,27 +549,40 @@ https://github.com/alex-shpak/hugo-book
 <p>在很多树数据结构的表示中，一个节点有可能只有一个子节点，而叶子节点包含数据。用这种范例表示红黑树是可能的，但是这会改变一些性质并使算法复杂。为此，本文中我们使用&quot;nil叶子&quot;或&quot;空（null）叶子&rdquo;，如上图所示，它不包含数据而只充当树在此结束的指示。<strong>这些节点在绘图中经常被省略，导致了这些树好像同上述原则相矛盾，而实际上不是这样</strong>。与此有关的结论是所有节点都有两个子节点，尽管其中的一个或两个可能是空叶子。</p>
 <p>因为每一个红黑树也是一个特化的二叉查找树，因此红黑树上的只读操作与普通二叉查找树上的只读操作相同。然而，在红黑树上进行插入操作和删除操作会导致不再符合红黑树的性质。<strong>恢复红黑树的性质需要少量（O(log n)）的颜色变更（实际是非常快速的）和不超过三次树旋转（对于插入操作是两次）</strong>。虽然插入和删除很复杂，但操作时间仍可以保持为O(log n)次。</p>
 <h2 id="b树">B树</h2>
-<p>是一种多路搜索树（并不是二叉的）：</p>
-<ol>
-<li>所有叶子结点位于同一层，并且 <strong>不带信息</strong>。</li>
-<li>树中每个节点最多有m个子树(即至多含有m-1个关键字)。</li>
-<li>若根节点不是终端节点，则根节点子树[2,m].</li>
-<li>除根节点外其他非叶子节点至少有[m/2]个子树(即至少含有[m/2]-1个关键字)。</li>
-<li>每个非叶子节点的结构为：</li>
-</ol>
-<p>| n | p0 | k1 | p1 | k2 | p2 | &hellip; | kn | pn |</p>
-<blockquote>
-<p>n为该节点中的关键字个数，除根节点外，其他所有非叶子节点的关键字个数n：[m/2]-1 &lt;= n &lt;= m-1;</p>
-</blockquote>
-<blockquote>
-<p>ki(i &lt;= i &lt;=n)为该节点的关键字且满足ki &lt; ki+1</p>
-</blockquote>
-<blockquote>
-<p>pi(0 &lt;= i &lt;=n)为该节点的孩子节点指针pi(0 &lt;= i &lt;=n-1)所指节点上的关键字大于等于ki且小于ki+1，pn所指节点上的关键字大于kn.</p>
-</blockquote>
-<blockquote>
-<p>B树的阶：所有节点的孩子节点数的最大值</p>
-</blockquote>
+<p>B树是一种自平衡的树，能够保持数据有序。这种数据结构能够让查找数据、顺序访问、插入数据及删除的动作，复杂度均为 
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
+
+
+
+<span class="katex">
+  \(O(n)\)
+</span>
+。总的来说，B树是一个泛化的二叉查找树，一个节点可以拥有两个以上的子节点。但其与自平衡二叉查找树不同，B树更适合大数据块的存储系统，例如：磁盘。</p>
+<p>在B树中，内部（非叶子）节点可以拥有可变数量的子节点（数量范围预先定义好）。当数据被插入或从一个节点中移除，它的子节点数量发生变化。为了维持在预先设定的数量范围内，内部节点可能会被 <strong>合并</strong> 或者 <strong>分离</strong>。因为子节点数量有一定的允许范围，所以B树不需要像其他自平衡查找树那样频繁地重新保持平衡，但是由于节点 <strong>没有被完全填充</strong>，可能浪费了一些空间。子节点数量的上界和下界依特定的实现而设置。例如，在一个2-3 B树（通常简称2-3树），每一个内部节点只能有 2 或 3 个子节点。</p>
+<p>根据 Knuth 的定义，一个 m 阶的B树是一个有以下属性的树：</p>
+<ul>
+<li>每一个节点最多有 m 个子节点</li>
+<li>每一个非叶子节点（除根节点）最少有 
+
+<span class="katex">
+  \(m\div 2\)
+</span>
+ 个子节点</li>
+<li>如果根节点不是叶子节点，那么它至少有两个子节点</li>
+<li>有 k 个子节点的非叶子节点拥有 k − 1 个键</li>
+<li>所有的叶子节点都在同一层</li>
+</ul>
+<p>每一个内部节点的键将节点的子树分开。例如，如果一个内部节点有 3 个子节点（子树），那么它就必须有两个键： a1 和 a2 。左边子树的所有值都必须小于 a1 ，中间子树的所有值都必须在 a1 和a2 之间，右边子树的所有值都必须大于 a2 。</p>
+<p>B树内的节点可分为三类：</p>
+<ul>
+<li>内部节点：内部节点是除叶子节点和根节点之外的所有节点。它们通常被表示为一组有序的元素和指向子节点的指针。</li>
+<li>根节点：根节点拥有的子节点数量的上限和内部节点相同，但是没有下限。</li>
+<li>叶子节点：叶子节点对元素的数量有相同的限制，但是没有子节点，也没有指向子节点的指针。</li>
+</ul>
 <p><img src="images/b.png" alt=""></p>
 <h3 id="b树的查找">B树的查找</h3>
 <p>在B树中的查找给定关键字的方法 <strong>类似于二叉排序树上的查找，不同的是在每个节点上确定向下查找的路径不一定是二路的，而是n+1路的</strong>。因为节点内的关键字序列key[1..n]有序，故既可以使用顺序查找，也可以使用二分查找。在一棵B树上查找关键字为k的方法为：将k与根节点中的key[i]进行比较：</p>
@@ -593,24 +606,14 @@ https://github.com/alex-shpak/hugo-book
 <p>首先查找B树中需删除的元素，如果该元素在B树中存在，则将该元素在其结点中进行删除；如果删除该元素后，首先判断该元素是否有左右孩子结点，如果有，则上移孩子结点中的某相近元素到父节点中，然后是移动之后的情况；如果没有，直接删除后，然后是移动之后的情况。</p>
 <p>删除元素，移动相应元素之后，如果某结点中元素数目（即关键字数）小于Min(m/2)-1，则需要看其某相邻兄弟结点是否丰满，如果丰满，则向父节点借一个元素来满足条件；如果其相邻兄弟都刚脱贫，即借了之后其结点数目小于Min(m/2)-1，则该结点与其相邻的某一兄弟结点进行“合并”成一个结点，</p>
 <h2 id="b树-1">B+树</h2>
-<p>是一种自平衡二叉树，通常用于数据库和操作系统的文件系统中。B+树的特点是能够保持数据稳定有序，其插入与修改拥有较稳定的对数时间复杂度。B+树元素自底向上插入，这与二叉树恰好相反。<strong>B+树不需要象其他自平衡二叉查找树那样经常的重新平衡。</strong></p>
 <p><img src="images/b+.png" alt=""></p>
-<p>B+树是B树的变体，也是一种多路搜索树：</p>
-<ol>
-<li>每个分支节点 <strong>最多m个子树</strong></li>
-<li>根节点没有子树或至少两个子树</li>
-<li>除根节点外，其他 <strong>每个分支节点至少[m/2]个子树</strong></li>
-<li>有n个子树的节点有n个关键字</li>
-<li>所有叶子节点包含全部关键字及指向相应记录的指针，而且叶子节点按关键字大小顺序链接(可以把每个叶子及诶单看成一个基本索引块，它的指针不再指向另一级索引块，而是直接指向数据文件中的记录)</li>
-<li>所有分支节点中仅仅包含它的哥哥子节点(即下级索引块)中最大关键字及指向子节点的指针。</li>
-</ol>
-<p>m阶的B+树和B树的主要差异如下：</p>
+<p>B+ 树是 B 树的变体，也是一种多路搜索树。m阶的 B+ 树和 B 树的主要差异如下：</p>
 <ul>
-<li>在B+树中，具有n个关键字的节点含有n个子树，即每个关键字对应一个子树，而在B树中，具有n个关键字的节点含有(n+1)个子树。</li>
+<li>在B+树中，<strong>具有n个关键字的节点含有n个子树</strong>，即每个关键字对应一个子树，而在B树中，具有n个关键字的节点含有(n+1)个子树。</li>
 <li>在B+树中，每个节点(除根节点外)中的关键字个数n的取值范围是[m/2] &lt;= n &lt;= m，根节点n的取值范围2 &lt;=n &lt;=m；而在B树中，除根节点外，其他所有非叶子节点的关键字个数：[m/2]-1 &lt;= n &lt;= m-1，根节点关键字个数为1 &lt;= n &lt;= m-1</li>
-<li><strong>B+树中所有叶子节点包含了全部关键字，即其他非叶子节点中的关键字包含在叶子节点中，而在B树中，关键字是不重复的。</strong></li>
+<li><strong>B+树中所有叶子节点包含了全部关键字</strong>，即其他非叶子节点中的关键字包含在叶子节点中，而在B树中，关键字是不重复的。</li>
 <li><strong>B+树中所有非叶子节点仅起到索引的作用</strong>，即节点中每个索引项值含有对应子树的最大关键字和指向该子树的指针，不含有该关键字对应记录的存储地址。而在B树中，每个关键字对应一个记录的存储地址。</li>
-<li>通常B+树上有两个头指针，一个指向根节点，另一个指向关键字最小的叶子节点，所有叶子节点链接成一个不定长的线性表。</li>
+<li><strong>在 B+ 树所有叶子节点链接成一个不定长的线性表</strong>。</li>
 </ul>
 <h3 id="b树的查找-1">B+树的查找</h3>
 <p>在B+树中可以采用两种查找方式：</p>
@@ -636,9 +639,6 @@ https://github.com/alex-shpak/hugo-book
 </ul>
 </li>
 </ol>
-<blockquote>
-<p>B树和B+树 主要用于外部查找，即数据在外存中。</p>
-</blockquote>
 <h3 id="b树的优势所在">B+树的优势所在</h3>
 <p>为什么说B+树比B树更适合实际应用中操作系统的文件索引和数据库索引？</p>
 <ol>
@@ -661,7 +661,7 @@ https://github.com/alex-shpak/hugo-book
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/087d135749e1bcf917b793ebe364e70a8d58ea54" title='Last modified by haoyang.shi | 2020-03-02' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/81083b02488f14d1ef134d1291ed8c825011a1db" title='Last modified by haoyang.shi | 2020-03-02' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
       <span>2020-03-02</span>
     </a>
