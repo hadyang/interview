@@ -14,7 +14,7 @@ Compact 和 Redundant 格式最大的不同就是记录格式的第一个部分�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/database/mysql/innodb/index/" />
 <meta property="article:published_time" content="2020-02-19T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-02-19T22:43:41+08:00" />
+<meta property="article:modified_time" content="2020-03-02T09:31:31+08:00" />
 <title>InnoDB 索引 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -22,7 +22,7 @@ Compact 和 Redundant 格式最大的不同就是记录格式的第一个部分�
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.8ed4e935303e978fcbbb3f93a1f2a501bad294767d76034d1b25c46b4e423a56.js" integrity="sha256-jtTpNTA&#43;l4/Luz&#43;TofKlAbrSlHZ9dgNNGyXEa05COlY="></script>
+<script defer src="/interview/en.search.min.b90f216ba25e739793c76c71d8f93b2b6afca17fa0f12d0c2c7a3796fbbbb939.js" integrity="sha256-uQ8ha6Jec5eTx2xx2Pk7K2r8oX&#43;g8S0MLHo3lvu7uTk="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -501,7 +501,7 @@ https://github.com/alex-shpak/hugo-book
 <li>如果 mysql 估计使用全表扫描要比使用索引快，则不使用索引。例如，使用<code>&lt;&gt;</code>、<code>not in</code> 、<code>not</code> <code>exist</code>，对于这三种情况大多数情况下认为结果集很大，MySQL 就有可能不使用索引。</li>
 </ol>
 <h2 id="索引使用">索引使用</h2>
-<ol>
+<ul>
 <li>(7) - SELECT</li>
 <li>(8) - DISTINCT &lt;select_list&gt;</li>
 <li>(1) - FROM &lt;left_table&gt;</li>
@@ -511,8 +511,8 @@ https://github.com/alex-shpak/hugo-book
 <li>(5) - GROUP BY &lt;group_by_list&gt;</li>
 <li>(6) - HAVING &lt;having_condition&gt;</li>
 <li>(9) - ORDER BY &lt;order_by_condition&gt;</li>
-<li>(10 - LIMIT &lt;limit_number&gt;</li>
-</ol>
+<li>(10) - LIMIT &lt;limit_number&gt;</li>
+</ul>
 <p>关于 SQL 语句的执行顺序，有三个值得我们注意的地方：</p>
 <ul>
 <li><strong>FROM 才是 SQL 语句执行的第一步，并非 SELECT</strong>。 数据库在执行 SQL 语句的第一步是将数据从硬盘加载到数据缓冲区中，以便对这些数据进行操作。</li>
@@ -533,9 +533,9 @@ https://github.com/alex-shpak/hugo-book
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/bee88da3609e03fd8e0ea7786eae3c796a3d95c3" title='Last modified by haoyang.shi | 2020-02-19' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/7a9e59add0361346d0d77f84abbbfc955c51511e" title='Last modified by haoyang.shi | 2020-03-02' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-02-19</span>
+      <span>2020-03-02</span>
     </a>
   </div>
 

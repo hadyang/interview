@@ -10,7 +10,7 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/algo/sort/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-02-29T10:15:04+08:00" />
+<meta property="article:modified_time" content="2020-02-29T10:22:49+08:00" />
 <title>排序算法 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.8ed4e935303e978fcbbb3f93a1f2a501bad294767d76034d1b25c46b4e423a56.js" integrity="sha256-jtTpNTA&#43;l4/Luz&#43;TofKlAbrSlHZ9dgNNGyXEa05COlY="></script>
+<script defer src="/interview/en.search.min.b90f216ba25e739793c76c71d8f93b2b6afca17fa0f12d0c2c7a3796fbbbb939.js" integrity="sha256-uQ8ha6Jec5eTx2xx2Pk7K2r8oX&#43;g8S0MLHo3lvu7uTk="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -436,7 +436,7 @@ https://github.com/alex-shpak/hugo-book
 <li>针对所有的元素重复以上的步骤，除了最后一个。</li>
 <li>持续每次对越来越少的元素重复上面的步骤，直到没有任何一对数字需要比较。</li>
 </ul>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">bubble_sort</span>(<span style="color:#66d9ef">int</span> a[], <span style="color:#66d9ef">int</span> n)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">bubble_sort</span>(<span style="color:#66d9ef">int</span> a[], <span style="color:#66d9ef">int</span> n)
 {
     <span style="color:#66d9ef">int</span> i, j, temp;
     <span style="color:#66d9ef">for</span> (j <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; j <span style="color:#f92672">&lt;</span> n <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>; j<span style="color:#f92672">+</span><span style="color:#f92672">+</span>)
@@ -464,36 +464,33 @@ https://github.com/alex-shpak/hugo-book
 <li>最好情况：每次划分选取的基准都是当前无序区的中值。如果每次划分过程产生的区间大小都为n/2，则快速排序法运行就快得多了。</li>
 </ul>
 </blockquote>
-<pre><code>    public void sort(int[] arr, int low, int high) {
-        int l = low;
-        int h = high;
-        int povit = arr[low];
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">sort</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span><span style="color:#f92672">[</span><span style="color:#f92672">]</span> arr<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> low<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> high<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">int</span> l <span style="color:#f92672">=</span> low<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">int</span> h <span style="color:#f92672">=</span> high<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">int</span> povit <span style="color:#f92672">=</span> arr<span style="color:#f92672">[</span>low<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span>l <span style="color:#f92672">&lt;</span> h<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span>l <span style="color:#f92672">&lt;</span> h <span style="color:#f92672">&amp;</span><span style="color:#f92672">&amp;</span> arr<span style="color:#f92672">[</span>h<span style="color:#f92672">]</span> <span style="color:#f92672">&gt;</span><span style="color:#f92672">=</span> povit<span style="color:#f92672">)</span>
+            h<span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>l <span style="color:#f92672">&lt;</span> h<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            arr<span style="color:#f92672">[</span>l<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> arr<span style="color:#f92672">[</span>h<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
+            l<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+        <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span>l <span style="color:#f92672">&lt;</span> h <span style="color:#f92672">&amp;</span><span style="color:#f92672">&amp;</span> arr<span style="color:#f92672">[</span>l<span style="color:#f92672">]</span> <span style="color:#f92672">&lt;</span><span style="color:#f92672">=</span> povit<span style="color:#f92672">)</span>
+            l<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>l <span style="color:#f92672">&lt;</span> h<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            arr<span style="color:#f92672">[</span>h<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> arr<span style="color:#f92672">[</span>l<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
+            h<span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
 
-        while (l &lt; h) {
-            while (l &lt; h &amp;&amp; arr[h] &gt;= povit)
-                h--;
-            if (l &lt; h) {
-                arr[l] = arr[h];
-                l++;
-            }
+    arr<span style="color:#f92672">[</span>l<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> povit<span style="color:#f92672">;</span>
 
-            while (l &lt; h &amp;&amp; arr[l] &lt;= povit)
-                l++;
-
-            if (l &lt; h) {
-                arr[h] = arr[l];
-                h--;
-            }
-        }
-
-        arr[l] = povit;
-
-        System.out.print(&quot;l=&quot; + (l + 1) + &quot;;h=&quot; + (h + 1) + &quot;;povit=&quot; + povit + &quot;\n&quot;);
-        System.out.println(Arrays.toString(arr));
-        if (l - 1 &gt; low) sort(arr, low, l - 1);
-        if (h + 1 &lt; high) sort(arr, h + 1, high);
-    }
-</code></pre><h4 id="快排的优化">快排的优化</h4>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">print</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;l=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#f92672">(</span>l <span style="color:#f92672">+</span> 1<span style="color:#f92672">)</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;;h=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#f92672">(</span>h <span style="color:#f92672">+</span> 1<span style="color:#f92672">)</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;;povit=&#34;</span> <span style="color:#f92672">+</span> povit <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\n&#34;</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>Arrays<span style="color:#f92672">.</span><span style="color:#a6e22e">toString</span><span style="color:#f92672">(</span>arr<span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>l <span style="color:#f92672">-</span> 1 <span style="color:#f92672">&gt;</span> low<span style="color:#f92672">)</span> sort<span style="color:#f92672">(</span>arr<span style="color:#f92672">,</span> low<span style="color:#f92672">,</span> l <span style="color:#f92672">-</span> 1<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>h <span style="color:#f92672">+</span> 1 <span style="color:#f92672">&lt;</span> high<span style="color:#f92672">)</span> sort<span style="color:#f92672">(</span>arr<span style="color:#f92672">,</span> h <span style="color:#f92672">+</span> 1<span style="color:#f92672">,</span> high<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><h4 id="快排的优化">快排的优化</h4>
 <ol>
 <li>当待排序序列的长度分割到一定大小后，使用插入排序。</li>
 <li>快排函数在函数尾部有两次递归操作，我们可以对其使用尾递归优化。优化后，可以缩减堆栈深度，由原来的O(n)缩减为O(logn)，将会提高性能。</li>
@@ -502,8 +499,7 @@ https://github.com/alex-shpak/hugo-book
 <h2 id="插入排序">插入排序</h2>
 <h3 id="直接插入排序">直接插入排序</h3>
 <p>插入排序的基本操作就是将一个数据插入到已经排好序的有序数据中，从而得到一个新的、个数加一的有序数据，算法适用于少量数据的排序，<strong>时间复杂度为O(n^2)。是稳定的排序方法。</strong> <strong>插入算法把要排序的数组分成两部分</strong>：第一部分包含了这个数组的所有元素，但将最后一个元素除外（让数组多一个空间才有插入的位置），而第二部分就只包含这一个元素（即待插入元素）。在第一部分排序完成后，再将这个最后元素插入到已排好序的第一部分中。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C">
-<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">insert_sort</span>(<span style="color:#66d9ef">int</span><span style="color:#f92672">*</span> a, <span style="color:#66d9ef">int</span> len) {
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">insert_sort</span>(<span style="color:#66d9ef">int</span><span style="color:#f92672">*</span> a, <span style="color:#66d9ef">int</span> len) {
     <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>; i <span style="color:#f92672">&lt;</span> len; <span style="color:#f92672">+</span><span style="color:#f92672">+</span>i) {
         <span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> i <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>;
         <span style="color:#66d9ef">int</span> temp <span style="color:#f92672">=</span> a[i];
@@ -517,7 +513,7 @@ https://github.com/alex-shpak/hugo-book
 </code></pre></div><h3 id="希尔排序httpszhwikipediaorgwikie5b88ce5b094e68e92e5ba8f"><a href="https://zh.wikipedia.org/wiki/%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F">希尔排序</a></h3>
 <p>也称缩小增量排序，是直接插入排序算法的一种更高效的改进版本。<strong>希尔排序是非稳定排序算法。</strong></p>
 <p>希尔排序是把记录按下标的一定增量分组，对每组使用直接插入排序算法排序；随着增量逐渐减少，每组包含的关键词越来越多，当增量减至1时，整个文件恰被分成一组，算法便终止。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">shell_sort</span>(<span style="color:#66d9ef">int</span><span style="color:#f92672">*</span> a, <span style="color:#66d9ef">int</span> len) {
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">shell_sort</span>(<span style="color:#66d9ef">int</span><span style="color:#f92672">*</span> a, <span style="color:#66d9ef">int</span> len) {
     <span style="color:#66d9ef">int</span> step <span style="color:#f92672">=</span> len <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>;
     <span style="color:#66d9ef">int</span> temp;
 
@@ -537,7 +533,7 @@ https://github.com/alex-shpak/hugo-book
 </code></pre></div><h2 id="选择排序">选择排序</h2>
 <h3 id="直接选择排序">直接选择排序</h3>
 <p>首先在未排序序列中找到最小（大）元素，存放到排序序列的起始位置，然后，再从剩余未排序元素中继续寻找最小（大）元素，然后放到已排序序列的末尾。<strong>实际适用的场合非常罕见。</strong></p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-C" data-lang="C"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">selection_sort</span>(<span style="color:#66d9ef">int</span> arr[], <span style="color:#66d9ef">int</span> len) {
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">selection_sort</span>(<span style="color:#66d9ef">int</span> arr[], <span style="color:#66d9ef">int</span> len) {
 	<span style="color:#66d9ef">int</span> i, j, min, temp;
 	<span style="color:#66d9ef">for</span> (i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> len <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>; i<span style="color:#f92672">+</span><span style="color:#f92672">+</span>) {
 		min <span style="color:#f92672">=</span> i;
@@ -556,46 +552,46 @@ https://github.com/alex-shpak/hugo-book
 <li>将堆顶的数据与无序区末尾的数据交换</li>
 <li>从后往前，直到所有数据排序完成</li>
 </ol>
-<pre><code>public void heapSort(int[] nums) {
-    for (int i = nums.length - 1; i &gt;= 0; i--) {
-        maxHeap(nums, 0, i);
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">heapSort</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span><span style="color:#f92672">[</span><span style="color:#f92672">]</span> nums<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> nums<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> 1<span style="color:#f92672">;</span> i <span style="color:#f92672">&gt;</span><span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i<span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        maxHeap<span style="color:#f92672">(</span>nums<span style="color:#f92672">,</span> 0<span style="color:#f92672">,</span> i<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
 
-        swap(nums, 0, i);
-    }
-}
+        swap<span style="color:#f92672">(</span>nums<span style="color:#f92672">,</span> 0<span style="color:#f92672">,</span> i<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
 
-public void maxHeap(int[] heap, int start, int end) {
-    if (start == end) {
-        return;
-    }
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">maxHeap</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span><span style="color:#f92672">[</span><span style="color:#f92672">]</span> heap<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> start<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> end<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>start <span style="color:#f92672">=</span><span style="color:#f92672">=</span> end<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
 
-    int parent = start;
-    int childLeft = start * 2 + 1;
-    int childRight = childLeft + 1;
+    <span style="color:#66d9ef">int</span> parent <span style="color:#f92672">=</span> start<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">int</span> childLeft <span style="color:#f92672">=</span> start <span style="color:#f92672">*</span> 2 <span style="color:#f92672">+</span> 1<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">int</span> childRight <span style="color:#f92672">=</span> childLeft <span style="color:#f92672">+</span> 1<span style="color:#f92672">;</span>
 
-    if (childLeft &lt;= end) {
-        maxHeap(heap, childLeft, end);
+    <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>childLeft <span style="color:#f92672">&lt;</span><span style="color:#f92672">=</span> end<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        maxHeap<span style="color:#f92672">(</span>heap<span style="color:#f92672">,</span> childLeft<span style="color:#f92672">,</span> end<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
 
-        if (heap[childLeft] &gt; heap[parent]) {
-            swap(heap, parent, childLeft);
-        }
-    }
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>heap<span style="color:#f92672">[</span>childLeft<span style="color:#f92672">]</span> <span style="color:#f92672">&gt;</span> heap<span style="color:#f92672">[</span>parent<span style="color:#f92672">]</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            swap<span style="color:#f92672">(</span>heap<span style="color:#f92672">,</span> parent<span style="color:#f92672">,</span> childLeft<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
 
-    if (childRight &lt;= end) {
-        maxHeap(heap, childRight, end);
+    <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>childRight <span style="color:#f92672">&lt;</span><span style="color:#f92672">=</span> end<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        maxHeap<span style="color:#f92672">(</span>heap<span style="color:#f92672">,</span> childRight<span style="color:#f92672">,</span> end<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
 
-        if (heap[childRight] &gt; heap[parent]) {
-            swap(heap, parent, childRight);
-        }
-    }
-}
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>heap<span style="color:#f92672">[</span>childRight<span style="color:#f92672">]</span> <span style="color:#f92672">&gt;</span> heap<span style="color:#f92672">[</span>parent<span style="color:#f92672">]</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            swap<span style="color:#f92672">(</span>heap<span style="color:#f92672">,</span> parent<span style="color:#f92672">,</span> childRight<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
 
-private void swap(int[] nums, int a, int b) {
-    int t = nums[a];
-    nums[a] = nums[b];
-    nums[b] = t;
-}
-</code></pre><h2 id="归并排序">归并排序</h2>
+<span style="color:#66d9ef">private</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">swap</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span><span style="color:#f92672">[</span><span style="color:#f92672">]</span> nums<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> a<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> b<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">int</span> t <span style="color:#f92672">=</span> nums<span style="color:#f92672">[</span>a<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
+    nums<span style="color:#f92672">[</span>a<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> nums<span style="color:#f92672">[</span>b<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
+    nums<span style="color:#f92672">[</span>b<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> t<span style="color:#f92672">;</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><h2 id="归并排序">归并排序</h2>
 <p>归并排序采用分治的思想：</p>
 <ul>
 <li>Divide：将n个元素平均划分为各含n/2个元素的子序列；</li>
@@ -603,39 +599,39 @@ private void swap(int[] nums, int a, int b) {
 <li>Combine：合并俩个已排序的子序列。</li>
 </ul>
 <p>性能：时间复杂度总是为O(NlogN)，空间复杂度也总为为O(N)，算法与初始序列无关，排序是稳定的。</p>
-<pre><code>public void mergeSort(int[] array, int start, int end, int[] temp) {
-    if (start &gt;= end) {
-        return;
-    }
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">mergeSort</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span><span style="color:#f92672">[</span><span style="color:#f92672">]</span> array<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> start<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> end<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">[</span><span style="color:#f92672">]</span> temp<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>start <span style="color:#f92672">&gt;</span><span style="color:#f92672">=</span> end<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
 
-    int mid = (start + end) / 2;
+    <span style="color:#66d9ef">int</span> mid <span style="color:#f92672">=</span> <span style="color:#f92672">(</span>start <span style="color:#f92672">+</span> end<span style="color:#f92672">)</span> <span style="color:#f92672">/</span> 2<span style="color:#f92672">;</span>
 
-    mergeSort(array, start, mid, temp);
-    mergeSort(array, mid + 1, end, temp);
+    mergeSort<span style="color:#f92672">(</span>array<span style="color:#f92672">,</span> start<span style="color:#f92672">,</span> mid<span style="color:#f92672">,</span> temp<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    mergeSort<span style="color:#f92672">(</span>array<span style="color:#f92672">,</span> mid <span style="color:#f92672">+</span> 1<span style="color:#f92672">,</span> end<span style="color:#f92672">,</span> temp<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
 
-    int f = start, s = mid + 1;
-    int t = 0;
-    while (f &lt;= mid &amp;&amp; s &lt;= end) {
-        if (array[f] &lt; array[s]) {
-            temp[t++] = array[f++];
-        } else {
-            temp[t++] = array[s++];
-        }
-    }
+    <span style="color:#66d9ef">int</span> f <span style="color:#f92672">=</span> start<span style="color:#f92672">,</span> s <span style="color:#f92672">=</span> mid <span style="color:#f92672">+</span> 1<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">int</span> t <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span>f <span style="color:#f92672">&lt;</span><span style="color:#f92672">=</span> mid <span style="color:#f92672">&amp;</span><span style="color:#f92672">&amp;</span> s <span style="color:#f92672">&lt;</span><span style="color:#f92672">=</span> end<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>array<span style="color:#f92672">[</span>f<span style="color:#f92672">]</span> <span style="color:#f92672">&lt;</span> array<span style="color:#f92672">[</span>s<span style="color:#f92672">]</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            temp<span style="color:#f92672">[</span>t<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> array<span style="color:#f92672">[</span>f<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">]</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span> <span style="color:#66d9ef">else</span> <span style="color:#f92672">{</span>
+            temp<span style="color:#f92672">[</span>t<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> array<span style="color:#f92672">[</span>s<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">]</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
 
-    while (f &lt;= mid) {
-        temp[t++] = array[f++];
-    }
+    <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span>f <span style="color:#f92672">&lt;</span><span style="color:#f92672">=</span> mid<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        temp<span style="color:#f92672">[</span>t<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> array<span style="color:#f92672">[</span>f<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">]</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
 
-    while (s &lt;= end) {
-        temp[t++] = array[s++];
-    }
+    <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span>s <span style="color:#f92672">&lt;</span><span style="color:#f92672">=</span> end<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        temp<span style="color:#f92672">[</span>t<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> array<span style="color:#f92672">[</span>s<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">]</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
 
-    for (int i = 0, j = start; i &lt; t; i++) {
-        array[j++] = temp[i];
-    }
-}
-</code></pre><h2 id="桶排序">桶排序</h2>
+    <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0<span style="color:#f92672">,</span> j <span style="color:#f92672">=</span> start<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> t<span style="color:#f92672">;</span> i<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        array<span style="color:#f92672">[</span>j<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> temp<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><h2 id="桶排序">桶排序</h2>
 <p>桶排序工作的原理是将 <strong>数组分到有限数量的桶</strong> 里。每个桶再个别排序（有可能再使用别的排序算法或是以递归方式继续使用桶排序进行排序）。当要被排序的数组内的数值是均匀分配的时候，桶排序使用线性时间 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
@@ -793,7 +789,7 @@ private void swap(int[] nums, int a, int b) {
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/b388b5ac402951296b5bf41ba254b14b5e5746d4" title='Last modified by haoyang.shi | 2020-02-29' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/e319857618099d1274e9280d88b7d02a514b63ca" title='Last modified by haoyang.shi | 2020-02-29' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
       <span>2020-02-29</span>
     </a>
