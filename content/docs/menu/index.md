@@ -17,7 +17,6 @@ headless: true
         - [并发]({{< relref "/docs/basic/os/concurrency/index.md" >}})
         - [内存管理]({{< relref "/docs/basic/os/memory/index.md" >}})
         - [磁盘与文件]({{< relref "/docs/basic/os/disk/index.md" >}})
-        - [Linux系统]({{< relref "/docs/basic/os/linux/index.md" >}})
         - [中断]({{< relref "/docs/basic/os/interrupt/index.md" >}})
         - [设备管理]({{< relref "/docs/basic/os/device/index.md" >}})
         - [I/O]({{< relref "/docs/basic/os/io/index.md" >}})
