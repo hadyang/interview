@@ -9,7 +9,7 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/net/tcp/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-03-07T15:56:44+08:00" />
+<meta property="article:modified_time" content="2020-03-07T16:32:55+08:00" />
 <title>TCP | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.94f1d64916c978d17ae7df8b3934e8bde994e3a0c4b3fe9d8d2e9692d998f27f.js" integrity="sha256-lPHWSRbJeNF659&#43;LOTTovemU46DEs/6djS6WktmY8n8="></script>
+<script defer src="/interview/en.search.min.0d6d83c0302bf3a9cff792ae0f1ebf9bcb7acbfc2ae78df7412523cf4efffb44.js" integrity="sha256-DW2DwDAr86nP95KuDx6/m8t6y/wq5433QSUjz07/&#43;0Q="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -387,8 +387,6 @@ https://github.com/alex-shpak/hugo-book
         <li><a href="#可靠传输">可靠传输</a></li>
         <li><a href="#流量控制">流量控制</a></li>
         <li><a href="#拥塞控制">拥塞控制</a></li>
-        <li><a href="#慢开始和拥塞避免">慢开始和拥塞避免</a></li>
-        <li><a href="#快重传和快恢复">快重传和快恢复</a></li>
       </ul>
     </li>
     <li><a href="#最大分段大小">最大分段大小</a></li>
@@ -619,7 +617,7 @@ https://github.com/alex-shpak/hugo-book
 <li>当拥塞窗口大小大于慢启动阈值时，使用拥塞避免算法；</li>
 <li>当拥塞窗口大小等于慢启动阈值时，使用慢启动或者拥塞避免算法；</li>
 </ul>
-<h3 id="慢开始和拥塞避免">慢开始和拥塞避免</h3>
+<h4 id="慢开始和拥塞避免">慢开始和拥塞避免</h4>
 <p>客户端维持一个 <strong>拥塞窗口 <code>cwnd</code></strong> 的状态变量，初始值一般为 
 
 <span class="katex">
@@ -635,9 +633,20 @@ https://github.com/alex-shpak/hugo-book
 <p><code>拥塞避免</code>：当慢开始到阈值（ssthresh）后，使用拥塞避免算法（ cwnd 每次加1 ）。当发送方发送的数据包丢包时，将 ssthresh 置为 cwnd 的一半，将 cwnd 置为1，再次执行慢开始。</p>
 </li>
 </ul>
-<h3 id="快重传和快恢复">快重传和快恢复</h3>
+<h4 id="快重传和快恢复">快重传和快恢复</h4>
 <p><strong>快速重传和恢复（fast retransmit and recovery，FRR）</strong> 是一种拥塞控制算法，它能快速恢复丢失的数据包。没有 FRR，如果数据包丢失了，TCP 将会使用定时器来要求传输暂停。在暂停的这段时间内，没有新的或复制的数据包被发送。有了FRR，如果接收机接收到一个不按顺序的数据段，它会立即给客户端发送一个重复确认。如果客户端接收到三个重复确认，它会认定数据段丢失，并立即重传这些丢失的数据段。</p>
 <p>有了 FRR，就不会因为重传时要求的暂停被耽误。当有单独的数据包丢失时，快速重传和恢复（FRR）能最有效地工作。当有多个数据信息包在某一段很短的时间内丢失时，它则不能很有效地工作。</p>
+<h4 id="bbr">BBR</h4>
+<p>BBR（Bottleneck Bandwidth and Round-trip propagation time）是 Google 研发的新的拥塞控制算法。自从 20 世纪 80年代后， TCP 中的拥塞控制算法都使用的是 <strong>基于丢包的拥塞控制</strong>（拥塞避免），在之前的网络带宽、路由器 Buffer 的情况下，该算法效果良好。</p>
+<p>但是在当前的网络条件下，基于丢包的拥塞控制算法则会导致 TCP 性能问题：</p>
+<ul>
+<li>在小 Buffer 路由器环境下，丢包发生在拥塞之前。在高速，长途链路中，基于丢包的拥塞控制会导致吞吐量过低，因为它反应过度，即使丢包是由瞬时流量突发引起的，也会因丢包而将发送速率减半（即使链路大部分处于空闲状态，这种丢包也可能非常频繁）</li>
+<li>在大 Buffer 路由器环境下，拥塞发生在丢包之前。在互联网的边缘，基于丢包的拥塞控制通过反复填充大量的缓存，从而导致了臭名昭著的 <strong>bufferbloat</strong> 问题。</li>
+</ul>
+<blockquote>
+<p>bufferbloat 问题：由于路由器的大缓存，减少链路丢包。再加上网络中 TCP 大量使用基于丢包的拥塞控制算法（丢包才触发速度下调，但是要丢包，缓存就得先被填满，缓存都填满，延迟更高）</p>
+</blockquote>
+<p>BBR 算法使用最大带宽和往返时间来建立网络的显式模型。每次对包传递进行累积或选择性确认，都会生成一个速率样本，该速率采样记录在数据包传输与该包确认之间的时间间隔内传递的数据量，从而使拥塞控制算法能够提供更高的吞吐量和更低的延迟。</p>
 <h2 id="最大分段大小">最大分段大小</h2>
 <p><strong>最大分段大小 (MSS)</strong> 是在单个分段中 TCP 愿意接受的数据的字节数最大值。MSS应当足够小以避免IP分片，它会导致丢包或过多的重传。</p>
 <p><strong>在 TCP 连接创建时，双端在 SYN 报文中用 MSS 选项宣布各自的 MSS ，这是从双端各自直接相连的数据链路层的最大传输单元(MTU)的尺寸减去固定的 IP 首部和 TCP 首部长度</strong>。以太网MTU为 1500 字节， MSS值可达 1460 字节。使用 IEEE 802.3 的 MTU 为 1492 字节，MSS 可达 1452 字节。</p>
@@ -666,7 +675,7 @@ https://github.com/alex-shpak/hugo-book
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/9fb0bc9e50967a8559cc524dbd65d9e1e9fcc7c3" title='Last modified by haoyang.shi | 2020-03-07' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/be5b6b2baf9eb92c66c648f3dc7bb8eebe8e8c95" title='Last modified by haoyang.shi | 2020-03-07' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
       <span>2020-03-07</span>
     </a>
@@ -718,8 +727,6 @@ https://github.com/alex-shpak/hugo-book
         <li><a href="#可靠传输">可靠传输</a></li>
         <li><a href="#流量控制">流量控制</a></li>
         <li><a href="#拥塞控制">拥塞控制</a></li>
-        <li><a href="#慢开始和拥塞避免">慢开始和拥塞避免</a></li>
-        <li><a href="#快重传和快恢复">快重传和快恢复</a></li>
       </ul>
     </li>
     <li><a href="#最大分段大小">最大分段大小</a></li>
