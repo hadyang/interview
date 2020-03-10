@@ -296,7 +296,7 @@ GET x
 2. Client 向 `ASK` 重定向节点 B 发送 `ASKING` ，再查询数据 `x`；
 3. B 查找 `x` 发现其所在 slot 状态为 `IMPORTING`，则 B 会进行查询。若第二步未发送 `ASKING` ，则 B 会返回 `MOVED`命令，重定向到 A；
 
-Redis Cluster 的迁移是以槽位单位的，迁移过程总共分 3 步，我们来举个栗子，看一下一个槽位从节点 A 迁移到节点 B 需要经过哪些步骤：
+Redis Cluster 的迁移是以槽位单位的，一个槽位从节点 A 迁移到节点 B 需要经过以下步骤：
 
 1. 节点 A 将待迁移 slot 设置为 `MIGRATING` 状态，将 B 节点 slot 设置为 `IMPORTING` 状态
 2. A 获取 slot 中的 key，逐个调用 `MIGRATE` 命令
