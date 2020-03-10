@@ -271,7 +271,7 @@ Redis Cluster 有固定的 16384 个 Hash Slot，对每个 key 计算 `CRC16` �
 
 Keys hash tags 可以破坏上述的分配规则，Hash tags 是一种保证多个键被分配到同一个槽位的方法。
 
-#### 重定向和重Hash
+#### 重定向
 
 Redis Cluster 为了提高性能，不会提供代理，而是使用重定向的方式让 client 连接到正确的节点。
 
