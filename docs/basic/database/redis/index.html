@@ -15,7 +15,7 @@ Redis 内部使用文件事件处理器 file event handler，这个文件事件�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/database/redis/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-03-02T10:07:43+08:00" />
+<meta property="article:modified_time" content="2020-03-10T12:36:26+08:00" />
 <title>Redis | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -23,7 +23,7 @@ Redis 内部使用文件事件处理器 file event handler，这个文件事件�
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.0d6d83c0302bf3a9cff792ae0f1ebf9bcb7acbfc2ae78df7412523cf4efffb44.js" integrity="sha256-DW2DwDAr86nP95KuDx6/m8t6y/wq5433QSUjz07/&#43;0Q="></script>
+<script defer src="/interview/en.search.min.80c64b154e032f2bcd57d2aac0b597f202bbbc3f415157b6496075c177e212af.js" integrity="sha256-gMZLFU4DLyvNV9KqwLWX8gK7vD9BUVe2SWB1wXfiEq8="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -402,7 +402,7 @@ https://github.com/alex-shpak/hugo-book
       <ul>
         <li><a href="#主从复制">主从复制</a></li>
         <li><a href="#哨兵">哨兵</a></li>
-        <li><a href="#redis-clusterhttpsredisiotopicscluster-tutorial">Redis Cluster</a></li>
+        <li><a href="#redis-cluster">Redis Cluster</a></li>
       </ul>
     </li>
     <li><a href="#数据结构">数据结构</a>
@@ -612,21 +612,69 @@ for item in range(ITEMS):
 <li>如果 Slave Priority 相同，那么看 Replica Offset，哪个 Slave 复制了越多的数据，Offset 越靠后，优先级就越高。</li>
 <li>如果上面两个条件都相同，那么选择一个 run id 比较小的那个 Slave。</li>
 </ul>
-<h3 id="redis-clusterhttpsredisiotopicscluster-tutorial"><a href="https://Redis.io/topics/cluster-tutorial">Redis Cluster</a></h3>
-<p>Redis Cluster 是一种服务器 <code>Sharding</code> 技术，提供内置的高可用支持，部分 master 不可用时，还可以继续工作。Redis Cluster 功能强大，直接集成了 主从复制 和 哨兵 的功能。</p>
-<p>在 Cluster 架构下，每个 Redis 都需要开启额外的端口来进行节点间通信，这种机制被称之为 <strong>Cluster Bus</strong>。</p>
+<h3 id="redis-cluster">Redis Cluster</h3>
+<p>Redis Cluster 是一种服务器 <code>Sharding</code> 技术，提供内置的高可用支持，部分 master 不可用时，还可以继续工作。Redis Cluster 功能强大，直接集成了 <strong>主从复制</strong> 和 <strong>哨兵</strong> 的功能。</p>
+<ul>
+<li><strong>高性能</strong>：在 Cluster 集群中没有代理，主从之间使用异步复制，并且不会对 Key 进行合并操作；</li>
+<li><strong>可接受的写入安全</strong>：当客户端连接到 majority master 时集群尽最大努力保留所有客户端的写操作。通常情况下，在一小段窗口时间内写请求会被丢失，当客户端连接到 minority master 时这个窗口时间会很大；</li>
+<li><strong>可用性</strong>：当 Redis Cluster 中大部分 master 是可达的，并且不可达 master 均有一个可用的 slave 时，Redis Cluster 能够在 <code>NODE_TIMEOUT</code> 时间后进行故障转移，使 Cluster 重新可用。此外，Cluster 还提供 <strong>副本迁移（replicas migration）</strong>，当 master 没有 slave 时，可从其他 master 下重新分配一个 slave ；</li>
+</ul>
+<blockquote>
+<p>majority master：能与大多数 master 连通的 master
+minority master：未能与大多数 master 连通的 master</p>
+</blockquote>
 <h4 id="内部节点通信">内部节点通信</h4>
+<p>在 Cluster 架构下，每个 Redis 都需要开启额外的端口来进行节点间通信，这种机制被称之为 <strong>Cluster Bus</strong>。</p>
 <p>Redis 维护集群元数据采用 <strong>gossip 协议</strong>，所有节点都持有一份元数据，不同的节点如果出现了元数据的变更，就不断将元数据发送给其它的节点，让其它节点也进行元数据的变更。</p>
 <p>gossip 好处在于，元数据的更新比较分散，不是集中在一个地方，更新请求会陆陆续续打到所有节点上去更新，降低了压力；不好在于，元数据的更新有延时，可能导致集群中的一些操作会有一些滞后。</p>
 <h4 id="寻址算法">寻址算法</h4>
+<p>Redis Cluster 有固定的 16384 个 Hash Slot，对每个 key 计算 <code>CRC16</code> 值，然后对 <code>16384</code> 取模，可以获取 key 对应的 Hash Slot。Redis Cluster 中<strong>每个 Master 都会持有部分 Slot</strong>，Slot 的分配在 Cluster 未进行重配置（reconfiguration）时是稳定的。当 Cluster 稳定时，一个 Hash Slot 只在一个 master 上提供服务。不过一个 master 会有一个或多个 slave ，以在发生网络分区或故障时，替换 master。这些 slave 还可以缓解 master 的读请求的压力。</p>
+<blockquote>
+<p>重配置：Hash Slot 从一个节点转移到另一个节点</p>
+</blockquote>
+<p>Keys hash tags 可以破坏上述的分配规则，Hash tags 是一种保证多个键被分配到同一个槽位的方法。</p>
+<h4 id="重定向和重hash">重定向和重Hash</h4>
+<p>Redis Cluster 为了提高性能，不会提供代理，而是使用重定向的方式让 client 连接到正确的节点。</p>
+<h5 id="moved">MOVED</h5>
+<p>Redis 客户端可以向集群的任意一个节点发送查询请求，节点接收到请求后会对其进行解析，如果是操作单个 key 的命令或者是包含多个在相同槽位 key 的命令，那么该节点就会去查找这个 key 是属于哪个槽位的。如果 key 所属的槽位由该节点提供服务，那么就直接返回结果。否则就会返回一个 <code>MOVED</code> 错误：</p>
+<pre><code class="language-log" data-lang="log">GET x
+-MOVED 3999 127.0.0.1:6381
+</code></pre><p>这个错误包括了对应的 key 属于哪个槽位（3999）以及该槽位所在的节点的 IP 地址和端口号。client 收到这个错误信息后，就将这些信息存储起来以便可以更准确的找到正确的节点。</p>
+<p>当客户端收到 <code>MOVED</code> 错误后，可以使用 <code>CLUSTER NODES</code> 或 <code>CLUSTER SLOTS</code> 命令来更新整个集群的信息，因为当重定向发生时，很少会是单个槽位的变更，一般都会是多个槽位一起更新。因此，在收到 <code>MOVED</code> 错误时，客户端应该尽早更新集群的分布信息。当集群达到稳定状态时，客户端保存的槽位和节点的对应信息都是正确的，cluster 的性能也会达到非常高效的状态。</p>
+<h5 id="ask">ASK</h5>
+<p>对于 Redis Cluster 来讲， <code>MOVED</code> 重定向意味着请求的 slot 永久的由另一个节点提供服务，而 <code>ASK</code> 重定向仅代表将当前查询重定向到指定节点，不影响后续查询。在 Redis Cluster 迁移的时候会用到 ASK 重定向，下面看下 ASK 的处理流程：</p>
 <ol>
-<li>Hash 算法（大量缓存重建）</li>
-<li>一致性 hash 算法（自动缓存迁移）+ 虚拟节点（自动负载均衡）</li>
-<li>Redis Cluster 的 Hash Slot 算法</li>
+<li>Client 向节点 A 查询数据 <code>x</code>，A 发现数据 <code>x</code> 所在的 slot 状态为 <code>MIGRATING</code>，如果 <code>x</code> 存在则返回，否则返回 <code>ASK</code> 重定向；</li>
+<li>Client 向 <code>ASK</code> 重定向节点 B 发送 <code>ASKING</code> ，再查询数据 <code>x</code>；</li>
+<li>B 查找 <code>x</code> 发现其所在 slot 状态为 <code>IMPORTING</code>，则 B 会进行查询。若第二步未发送 <code>ASKING</code> ，则 B 会返回 <code>MOVED</code>命令，重定向到 A；</li>
 </ol>
-<p>Redis Cluster 有固定的 16384 个 Hash Slot，对每个 key 计算 <code>CRC16</code> 值，然后对 <code>16384</code> 取模，可以获取 key 对应的 Hash Slot。</p>
-<p>Redis Cluster 中<strong>每个 Master 都会持有部分 Slot</strong>，比如有 3 个 Master，那么可能每个 Master 持有 5000 多个 Hash Slot。Hash Slot 让 node 的增加和移除很简单，增加一个 Master，就将其他 Master 的 Hash Slot 移动部分过去，减少一个 Master，就将它的 Hash Slot 移动到其他 master 上去。移动 Hash Slot 的成本是非常低的。客户端的 api，可以对指定的数据，让他们走同一个 Hash Slot，通过 hash tag 来实现。</p>
-<p>任何一台机器宕机，另外两个节点，不影响的。因为 key 找的是 Hash Slot，不是机器。</p>
+<p>Redis Cluster 的迁移是以槽位单位的，迁移过程总共分 3 步，我们来举个栗子，看一下一个槽位从节点 A 迁移到节点 B 需要经过哪些步骤：</p>
+<ol>
+<li>节点 A 将待迁移 slot 设置为 <code>MIGRATING</code> 状态，将 B 节点 slot 设置为 <code>IMPORTING</code> 状态</li>
+<li>A 获取 slot 中的 key，逐个调用 <code>MIGRATE</code> 命令</li>
+<li><code>MIGRATE</code> 会将特定的 key 从 A 迁移到 B，这个过程是原子操作（A、B均会进行加锁）</li>
+</ol>
+<h4 id="容错能力">容错能力</h4>
+<p>Redis Cluster和大多数集群一样，是通过心跳来判断一个节点是否存活的。心跳包的内容可以分为 header 和 gossip 消息两部分，其中header包含以下信息：</p>
+<ul>
+<li>NODE ID 节点在集群中的唯一标识</li>
+<li>currentEpoch 和 configEpoch 字段</li>
+<li>node flag，标识节点是 master 还是 slave ，另外还有一些其他的标识位</li>
+<li>节点提供服务的 hash slot 的 bitmap</li>
+<li>发送者的 TCP 端口</li>
+<li>发送者认为的集群状态（down or ok）</li>
+<li>如果是slave，则包含 master 的 NODE ID</li>
+</ul>
+<p>gossip包含了该节点认为的其他节点的状态，不过不是集群的全部节点。具体有以下信息：</p>
+<ul>
+<li>NODE ID</li>
+<li>节点的IP和端口</li>
+<li>NODE flags</li>
+</ul>
+<h5 id="故障检测">故障检测</h5>
+<p>故障检测用于识别集群中的不可达节点是否已下线，如果一个 master 下线，则会将它的 slave提 升为master。如果无法提升，则集群会处于错误状态。在 gossip 消息中，<code>NODE flags</code> 的值包括两种 PFAIL 和 FAIL。</p>
+<p>如果一个节点发现另外一个节点不可达的时间超过 <code>NODE_TIMEOUT</code> ，则会将这个节点标记为 PFAIL，也就是 Possible failure。 PFAIL 标志只是一个节点本地的信息，为了使 slave 提升为 master ，需要将 PFAIL 升级为 FAIL 。当集群中大部分节点都将某个节点标记为 PFAIL 时，则可升级为 FAIL。</p>
+<p>FAIL 状态是单向的，只能从 PFAIL 升级为 FAIL ，当节点重新可达时，可清除 FAIL 标记。</p>
 <h2 id="数据结构">数据结构</h2>
 <p>Redis的外围由一个键、值映射的字典构成。与其他非关系型数据库主要不同在于：Redis中值的类型不仅限于 <strong>字符串</strong>，还支持如下抽象数据类型：</p>
 <ul>
@@ -788,9 +836,9 @@ for item in range(ITEMS):
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/087d135749e1bcf917b793ebe364e70a8d58ea54" title='Last modified by haoyang.shi | 2020-03-02' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/20839ad7bf1716ce9d6d29c64b763cebb1ec1de3" title='Last modified by haoyang.shi | 2020-03-10' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-03-02</span>
+      <span>2020-03-10</span>
     </a>
   </div>
 
@@ -849,7 +897,7 @@ for item in range(ITEMS):
       <ul>
         <li><a href="#主从复制">主从复制</a></li>
         <li><a href="#哨兵">哨兵</a></li>
-        <li><a href="#redis-clusterhttpsredisiotopicscluster-tutorial">Redis Cluster</a></li>
+        <li><a href="#redis-cluster">Redis Cluster</a></li>
       </ul>
     </li>
     <li><a href="#数据结构">数据结构</a>
