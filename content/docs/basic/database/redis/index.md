@@ -243,13 +243,20 @@ Redis 主从复制包含以下几个要点：
 - 如果 Slave Priority 相同，那么看 Replica Offset，哪个 Slave 复制了越多的数据，Offset 越靠后，优先级就越高。
 - 如果上面两个条件都相同，那么选择一个 run id 比较小的那个 Slave。
 
-### [Redis Cluster](https://Redis.io/topics/cluster-tutorial)
+### Redis Cluster
 
-Redis Cluster 是一种服务器 `Sharding` 技术，提供内置的高可用支持，部分 master 不可用时，还可以继续工作。Redis Cluster 功能强大，直接集成了 主从复制 和 哨兵 的功能。
+Redis Cluster 是一种服务器 `Sharding` 技术，提供内置的高可用支持，部分 master 不可用时，还可以继续工作。Redis Cluster 功能强大，直接集成了 **主从复制** 和 **哨兵** 的功能。
 
-在 Cluster 架构下，每个 Redis 都需要开启额外的端口来进行节点间通信，这种机制被称之为 **Cluster Bus**。
+- **高性能**：在 Cluster 集群中没有代理，主从之间使用异步复制，并且不会对 Key 进行合并操作；
+- **可接受的写入安全**：当客户端连接到 majority master 时集群尽最大努力保留所有客户端的写操作。通常情况下，在一小段窗口时间内写请求会被丢失，当客户端连接到 minority master 时这个窗口时间会很大；
+- **可用性**：当 Redis Cluster 中大部分 master 是可达的，并且不可达 master 均有一个可用的 slave 时，Redis Cluster 能够在 `NODE_TIMEOUT` 时间后进行故障转移，使 Cluster 重新可用。此外，Cluster 还提供 **副本迁移（replicas migration）**，当 master 没有 slave 时，可从其他 master 下重新分配一个 slave ；
+
+> majority master：能与大多数 master 连通的 master
+> minority master：未能与大多数 master 连通的 master
 
 #### 内部节点通信
+
+在 Cluster 架构下，每个 Redis 都需要开启额外的端口来进行节点间通信，这种机制被称之为 **Cluster Bus**。
 
 Redis 维护集群元数据采用 **gossip 协议**，所有节点都持有一份元数据，不同的节点如果出现了元数据的变更，就不断将元数据发送给其它的节点，让其它节点也进行元数据的变更。
 
@@ -258,15 +265,68 @@ gossip 好处在于，元数据的更新比较分散，不是集中在一个地�
 
 #### 寻址算法
 
-1. Hash 算法（大量缓存重建）
-2. 一致性 hash 算法（自动缓存迁移）+ 虚拟节点（自动负载均衡）
-3. Redis Cluster 的 Hash Slot 算法
+Redis Cluster 有固定的 16384 个 Hash Slot，对每个 key 计算 `CRC16` 值，然后对 `16384` 取模，可以获取 key 对应的 Hash Slot。Redis Cluster 中**每个 Master 都会持有部分 Slot**，Slot 的分配在 Cluster 未进行重配置（reconfiguration）时是稳定的。当 Cluster 稳定时，一个 Hash Slot 只在一个 master 上提供服务。不过一个 master 会有一个或多个 slave ，以在发生网络分区或故障时，替换 master。这些 slave 还可以缓解 master 的读请求的压力。
 
-Redis Cluster 有固定的 16384 个 Hash Slot，对每个 key 计算 `CRC16` 值，然后对 `16384` 取模，可以获取 key 对应的 Hash Slot。
+> 重配置：Hash Slot 从一个节点转移到另一个节点
 
-Redis Cluster 中**每个 Master 都会持有部分 Slot**，比如有 3 个 Master，那么可能每个 Master 持有 5000 多个 Hash Slot。Hash Slot 让 node 的增加和移除很简单，增加一个 Master，就将其他 Master 的 Hash Slot 移动部分过去，减少一个 Master，就将它的 Hash Slot 移动到其他 master 上去。移动 Hash Slot 的成本是非常低的。客户端的 api，可以对指定的数据，让他们走同一个 Hash Slot，通过 hash tag 来实现。
+Keys hash tags 可以破坏上述的分配规则，Hash tags 是一种保证多个键被分配到同一个槽位的方法。
 
-任何一台机器宕机，另外两个节点，不影响的。因为 key 找的是 Hash Slot，不是机器。
+#### 重定向和重Hash
+
+Redis Cluster 为了提高性能，不会提供代理，而是使用重定向的方式让 client 连接到正确的节点。
+
+##### MOVED
+
+Redis 客户端可以向集群的任意一个节点发送查询请求，节点接收到请求后会对其进行解析，如果是操作单个 key 的命令或者是包含多个在相同槽位 key 的命令，那么该节点就会去查找这个 key 是属于哪个槽位的。如果 key 所属的槽位由该节点提供服务，那么就直接返回结果。否则就会返回一个 `MOVED` 错误：
+
+```log
+GET x
+-MOVED 3999 127.0.0.1:6381
+```
+
+这个错误包括了对应的 key 属于哪个槽位（3999）以及该槽位所在的节点的 IP 地址和端口号。client 收到这个错误信息后，就将这些信息存储起来以便可以更准确的找到正确的节点。
+
+当客户端收到 `MOVED` 错误后，可以使用 `CLUSTER NODES` 或 `CLUSTER SLOTS` 命令来更新整个集群的信息，因为当重定向发生时，很少会是单个槽位的变更，一般都会是多个槽位一起更新。因此，在收到 `MOVED` 错误时，客户端应该尽早更新集群的分布信息。当集群达到稳定状态时，客户端保存的槽位和节点的对应信息都是正确的，cluster 的性能也会达到非常高效的状态。
+
+##### ASK
+
+对于 Redis Cluster 来讲， `MOVED` 重定向意味着请求的 slot 永久的由另一个节点提供服务，而 `ASK` 重定向仅代表将当前查询重定向到指定节点，不影响后续查询。在 Redis Cluster 迁移的时候会用到 ASK 重定向，下面看下 ASK 的处理流程：
+
+1. Client 向节点 A 查询数据 `x`，A 发现数据 `x` 所在的 slot 状态为 `MIGRATING`，如果 `x` 存在则返回，否则返回 `ASK` 重定向；
+2. Client 向 `ASK` 重定向节点 B 发送 `ASKING` ，再查询数据 `x`；
+3. B 查找 `x` 发现其所在 slot 状态为 `IMPORTING`，则 B 会进行查询。若第二步未发送 `ASKING` ，则 B 会返回 `MOVED`命令，重定向到 A；
+
+Redis Cluster 的迁移是以槽位单位的，迁移过程总共分 3 步，我们来举个栗子，看一下一个槽位从节点 A 迁移到节点 B 需要经过哪些步骤：
+
+1. 节点 A 将待迁移 slot 设置为 `MIGRATING` 状态，将 B 节点 slot 设置为 `IMPORTING` 状态
+2. A 获取 slot 中的 key，逐个调用 `MIGRATE` 命令
+3. `MIGRATE` 会将特定的 key 从 A 迁移到 B，这个过程是原子操作（A、B均会进行加锁）
+
+#### 容错能力
+
+Redis Cluster和大多数集群一样，是通过心跳来判断一个节点是否存活的。心跳包的内容可以分为 header 和 gossip 消息两部分，其中header包含以下信息：
+
+- NODE ID 节点在集群中的唯一标识
+- currentEpoch 和 configEpoch 字段
+- node flag，标识节点是 master 还是 slave ，另外还有一些其他的标识位
+- 节点提供服务的 hash slot 的 bitmap
+- 发送者的 TCP 端口
+- 发送者认为的集群状态（down or ok）
+- 如果是slave，则包含 master 的 NODE ID
+
+gossip包含了该节点认为的其他节点的状态，不过不是集群的全部节点。具体有以下信息：
+
+- NODE ID
+- 节点的IP和端口
+- NODE flags
+
+##### 故障检测
+
+故障检测用于识别集群中的不可达节点是否已下线，如果一个 master 下线，则会将它的 slave提 升为master。如果无法提升，则集群会处于错误状态。在 gossip 消息中，`NODE flags` 的值包括两种 PFAIL 和 FAIL。
+
+如果一个节点发现另外一个节点不可达的时间超过 `NODE_TIMEOUT` ，则会将这个节点标记为 PFAIL，也就是 Possible failure。 PFAIL 标志只是一个节点本地的信息，为了使 slave 提升为 master ，需要将 PFAIL 升级为 FAIL 。当集群中大部分节点都将某个节点标记为 PFAIL 时，则可升级为 FAIL。
+
+FAIL 状态是单向的，只能从 PFAIL 升级为 FAIL ，当节点重新可达时，可清除 FAIL 标记。
 
 ## 数据结构
 
