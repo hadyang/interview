@@ -5,6 +5,16 @@ draft: false
 categories: java
 ---
 
+## NIO vs BIO
+
+`NIO`为所有的原始类型提供(Buffer)缓存支持，字符集编码解码解决方案。 提供多路(non-bloking) 非阻塞式的高伸缩性网络I/O 。
+
+| IO | NIO |
+| :--- | :--- |
+| 面向流 | 面向缓冲 |
+| 阻塞IO | 非阻塞IO |
+| 无 | 选择器 |
+
 ## Channel
 
 Java NIO的通道类似流，但又有些不同：
