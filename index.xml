@@ -269,11 +269,11 @@ EditLog 记录了所有针对文件的创建、删除、重命名等操作。</d
       <pubDate>Wed, 08 Jan 2020 00:00:00 +0000</pubDate>
       
       <guid>https://hadyang.github.io/interview/docs/java/nio/</guid>
-      <description>Channel Java NIO的通道类似流，但又有些不同：
+      <description>NIO vs BIO NIO为所有的原始类型提供(Buffer)缓存支持，字符集编码解码解决方案。 提供多路(non-bloking) 非阻塞式的高伸缩性网络I/O 。
+   IO NIO     面向流 面向缓冲   阻塞IO 非阻塞IO   无 选择器    Channel Java NIO的通道类似流，但又有些不同：
  既可以从通道中读取数据，又可以写数据到通道。但流的读写通常是单向的。 通道可以异步地读写。 通道中的数据总是要先读到一个Buffer，或者总是要从一个Buffer中写入。  Selector Selector（选择器）是Java NIO中能够检测一到多个NIO通道，并能够知晓通道是否为诸如读写事件做好准备的组件。这样，一个单独的线程可以管理多个channel，从而管理多个网络连接。 Channel 可以向 Selector 注册监听四种不同类型的事件：
  Connect Accept Read Write  一旦向 Selector 注册了一或多个通道，就可以调用几个重载的 select() 方法。这些方法返回你所感兴趣的事件（如连接、接受、读或写）已经准备就绪的那些通道。换句话说，如果你对“读就绪”的通道感兴趣， select() 方法会返回读事件已经就绪的那些通道。
-select 方法空转 若 Selector 的轮询结果为空，也没有 wakeup 或新消息处理，则发生空轮询，CPU使用率 100%，Netty的解决办法：对 Selector 的 select 操作周期进行统计，每完成一次空的 select 操作进行一次计数。若在某个周期内连续发生N次空轮询，则触发了 epoll 死循环 bug 。重建 Selector 判断是否是其他线程发起的重建请求，若不是则将原 SocketChannel 从旧的 Selector 上去除注册，重新注册到新的 Selector 上，并将原来的 Selector 关闭。
-SelectionKey 当向 Selector 注册 Channel 时，Channel.register() 方法会返回一个 SelectionKey 对象，这个对象代表了注册到该 Selector 和 Channel 的关联关系，并提供了一组方法来操作。当 Channel 注册的事件来到时，这个对象会在 Selector.</description>
+select 方法空转 若 Selector 的轮询结果为空，也没有 wakeup 或新消息处理，则发生空轮询，CPU使用率 100%，Netty的解决办法：对 Selector 的 select 操作周期进行统计，每完成一次空的 select 操作进行一次计数。若在某个周期内连续发生N次空轮询，则触发了 epoll 死循环 bug 。重建 Selector 判断是否是其他线程发起的重建请求，若不是则将原 SocketChannel 从旧的 Selector 上去除注册，重新注册到新的 Selector 上，并将原来的 Selector 关闭。</description>
     </item>
     
     <item>
@@ -2363,25 +2363,6 @@ public int FindGreatestSumOfSubArray(int[] array) { if (array == null || array.l
       
       <guid>https://hadyang.github.io/interview/docs/fromwork/mybatis/question/</guid>
       <description>面试题  #{}是预编译处理，${}是字符串替换。 Mybatis在处理#{}时，会将sql中的#{}替换为?号，调用PreparedStatement的set方法来赋值； Mybatis在处理${}时，就是把${}替换成变量的值。 使用#{}可以有效的防止SQL注入，提高系统安全性。 通常一个Xml映射文件，都会写一个Dao接口与之对应，请问，这个Dao接口的工作原理是什么？Dao接口里的方法，参数不同时，方法能重载吗？ Dao接口，就是人们常说的Mapper接口，接口的全限名，就是映射文件中的namespace的值，接口的方法名，就是映射文件中MappedStatement的id值，接口方法内的参数，就是传递给sql的参数。Mapper接口是没有实现类的，当调用接口方法时，接口全限名+方法名拼接字符串作为key值，可唯一定位一个MappedStatement，举例：com.mybatis3.mappers.StudentDao.findStudentById，可以唯一找到namespace为com.mybatis3.mappers.StudentDao下面id = findStudentById的MappedStatement。在Mybatis中，每一个&amp;lt;select&amp;gt;、&amp;lt;insert&amp;gt;、&amp;lt;update&amp;gt;、&amp;lt;delete&amp;gt;标签，都会被解析为一个MappedStatement对象。 Dao接口里的方法，是不能重载的，因为是全限名+方法名的保存和寻找策略。 Dao接口的工作原理是JDK动态代理，Mybatis运行时会使用JDK动态代理为Dao接口生成代理proxy对象，代理对象proxy会拦截接口方法，转而执行MappedStatement所代表的sql，然后将sql执行结果返回。 参考连接 Mybatis 的常见面试题</description>
-    </item>
-    
-    <item>
-      <title>面试题</title>
-      <link>https://hadyang.github.io/interview/docs/java/questions/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/java/questions/</guid>
-      <description>面试题 如何用数组实现队列？ 用数组实现队列时要注意 溢出 现象，这时我们可以采用循环数组的方式来解决，即将数组收尾相接。使用front指针指向队列首位，tail指针指向队列末位。
- 内部类访问局部变量的时候，为什么变量必须加上final修饰？ 因为生命周期不同。局部变量在方法结束后就会被销毁，但内部类对象并不一定，这样就会导致内部类引用了一个不存在的变量。
-所以编译器会在内部类中生成一个局部变量的拷贝，这个拷贝的生命周期和内部类对象相同，就不会出现上述问题。
-但这样就导致了其中一个变量被修改，两个变量值可能不同的问题。为了解决这个问题，编译器就要求局部变量需要被final修饰，以保证两个变量值相同。
-在JDK8之后，编译器不要求内部类访问的局部变量必须被final修饰，但局部变量值不能被修改（无论是方法中还是内部类中），否则会报编译错误。利用javap查看编译后的字节码可以发现，编译器已经加上了final。
- long s = 499999999 * 499999999 在上面的代码中，s的值是多少？ 根据代码的计算结果，s的值应该是-1371654655，这是由于Java中右侧值的计算默认是int类型。
- NIO相关，Channels、Buffers、Selectors NIO(Non-blocking IO)为所有的原始类型提供(Buffer)缓存支持，字符集编码解码解决方案。 Channel ：一个新的原始I/O 抽象。 支持锁和内存映射文件的文件访问接口。提供多路(non-bloking) 非阻塞式的高伸缩性网络I/O 。
-   IO NIO     面向流 面向缓冲   阻塞IO 非阻塞IO   无 选择器    流与缓冲 Java NIO和IO之间第一个最大的区别是，IO是面向流的，NIO是面向缓冲区的。 Java IO面向流意味着每次从流中读一个或多个字节，直至读取所有字节，它们没有被缓存在任何地方。此外，它不能前后移动流中的数据。如果需要前后移动从流中读取的数据，需要先将它缓存到一个缓冲区。
-Java NIO的缓冲导向方法略有不同。数据读取到一个它稍后处理的缓冲区，需要时可在缓冲区中前后移动。这就增加了处理过程中的灵活性。但是，还需要检查是否该缓冲区中包含所有您需要处理的数据。而且，需确保当更多的数据读入缓冲区时，不要覆盖缓冲区里尚未处理的数据。
-阻塞与非阻塞IO Java IO的各种流是阻塞的。这意味着，当一个线程调用read() 或 write()时，该线程被阻塞，直到有一些数据被读取，或数据完全写入。该线程在此期间不能再干任何事情了。 Java NIO的非阻塞模式，是线程向某通道发送请求读取数据，仅能得到目前可用的数据，如果目前没有数据可用时，就什么都不会获取，当然它不会保持线程阻塞。所以直至数据变的可以读取之前，该线程可以继续做其他的事情。 非阻塞写也是如此。所以一个单独的线程现在可以管理多个输入和输出通道。
-选择器（Selectors） Java NIO 的 选择器允许一个单独的线程来监视多个输入通道，你可以注册多个通道使用一个选择器，然后使用一个单独的线程来“选择”通道：这些通道里已经有可以处理的输入，或者选择已准备写入的通道。这种选择机制，使得一个单独的线程很容易来管理多个通道。</description>
     </item>
     
     <item>

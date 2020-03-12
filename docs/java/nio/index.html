@@ -5,15 +5,15 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="NIO"><meta property="og:title" content="NIO" />
-<meta property="og:description" content="Channel Java NIO的通道类似流，但又有些不同：
+<meta property="og:description" content="NIO vs BIO NIO为所有的原始类型提供(Buffer)缓存支持，字符集编码解码解决方案。 提供多路(non-bloking) 非阻塞式的高伸缩性网络I/O 。
+   IO NIO     面向流 面向缓冲   阻塞IO 非阻塞IO   无 选择器    Channel Java NIO的通道类似流，但又有些不同：
  既可以从通道中读取数据，又可以写数据到通道。但流的读写通常是单向的。 通道可以异步地读写。 通道中的数据总是要先读到一个Buffer，或者总是要从一个Buffer中写入。  Selector Selector（选择器）是Java NIO中能够检测一到多个NIO通道，并能够知晓通道是否为诸如读写事件做好准备的组件。这样，一个单独的线程可以管理多个channel，从而管理多个网络连接。 Channel 可以向 Selector 注册监听四种不同类型的事件：
  Connect Accept Read Write  一旦向 Selector 注册了一或多个通道，就可以调用几个重载的 select() 方法。这些方法返回你所感兴趣的事件（如连接、接受、读或写）已经准备就绪的那些通道。换句话说，如果你对“读就绪”的通道感兴趣， select() 方法会返回读事件已经就绪的那些通道。
-select 方法空转 若 Selector 的轮询结果为空，也没有 wakeup 或新消息处理，则发生空轮询，CPU使用率 100%，Netty的解决办法：对 Selector 的 select 操作周期进行统计，每完成一次空的 select 操作进行一次计数。若在某个周期内连续发生N次空轮询，则触发了 epoll 死循环 bug 。重建 Selector 判断是否是其他线程发起的重建请求，若不是则将原 SocketChannel 从旧的 Selector 上去除注册，重新注册到新的 Selector 上，并将原来的 Selector 关闭。
-SelectionKey 当向 Selector 注册 Channel 时，Channel.register() 方法会返回一个 SelectionKey 对象，这个对象代表了注册到该 Selector 和 Channel 的关联关系，并提供了一组方法来操作。当 Channel 注册的事件来到时，这个对象会在 Selector." />
+select 方法空转 若 Selector 的轮询结果为空，也没有 wakeup 或新消息处理，则发生空轮询，CPU使用率 100%，Netty的解决办法：对 Selector 的 select 操作周期进行统计，每完成一次空的 select 操作进行一次计数。若在某个周期内连续发生N次空轮询，则触发了 epoll 死循环 bug 。重建 Selector 判断是否是其他线程发起的重建请求，若不是则将原 SocketChannel 从旧的 Selector 上去除注册，重新注册到新的 Selector 上，并将原来的 Selector 关闭。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/java/nio/" />
 <meta property="article:published_time" content="2020-01-08T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-01-20T13:16:13+08:00" />
+<meta property="article:modified_time" content="2020-03-12T13:35:04+08:00" />
 <title>NIO | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -21,7 +21,7 @@ SelectionKey 当向 Selector 注册 Channel 时，Channel.register() 方法会�
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.98c3dc564839b78f305480213c09b8d93f1132265f77c09275518cd9a580900d.js" integrity="sha256-mMPcVkg5t48wVIAhPAm42T8RMiZfd8CSdVGM2aWAkA0="></script>
+<script defer src="/interview/en.search.min.26d124c99ef05b804447603ebd2ea96c6649ffe9541b3baefe22559f71efca7b.js" integrity="sha256-JtEkyZ7wW4BER2A&#43;vS6pbGZJ/&#43;lUGzuu/iJVn3Hvyns="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -134,7 +134,6 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
 <li><a href="/interview/docs/java/proxy/">代理</a></li>
 <li><a href="/interview/docs/java/annotation/">注解</a></li>
-<li><a href="/interview/docs/java/questions/">面试题</a></li>
 <li><a href="/interview/docs/java/nio/"class=active>NIO</a></li>
 <li><a href="/interview/docs/java/">集合</a>
 <ul>
@@ -373,6 +372,7 @@ https://github.com/alex-shpak/hugo-book
       
   <nav id="TableOfContents">
   <ul>
+    <li><a href="#nio-vs-bio">NIO vs BIO</a></li>
     <li><a href="#channel">Channel</a></li>
     <li><a href="#selector">Selector</a>
       <ul>
@@ -397,7 +397,31 @@ https://github.com/alex-shpak/hugo-book
       </header>
 
       
-<article class="markdown"><h2 id="channel">Channel</h2>
+<article class="markdown"><h2 id="nio-vs-bio">NIO vs BIO</h2>
+<p><code>NIO</code>为所有的原始类型提供(Buffer)缓存支持，字符集编码解码解决方案。 提供多路(non-bloking) 非阻塞式的高伸缩性网络I/O 。</p>
+<table>
+<thead>
+<tr>
+<th align="left">IO</th>
+<th align="left">NIO</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">面向流</td>
+<td align="left">面向缓冲</td>
+</tr>
+<tr>
+<td align="left">阻塞IO</td>
+<td align="left">非阻塞IO</td>
+</tr>
+<tr>
+<td align="left">无</td>
+<td align="left">选择器</td>
+</tr>
+</tbody>
+</table>
+<h2 id="channel">Channel</h2>
 <p>Java NIO的通道类似流，但又有些不同：</p>
 <ol>
 <li>既可以从通道中读取数据，又可以写数据到通道。但流的读写通常是单向的。</li>
@@ -530,9 +554,9 @@ Iterator<span style="color:#f92672">&lt;</span>SelectionKey<span style="color:#f
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/3ca64f728c7445cd6b8afa7436fd6c5678c1374c" title='Last modified by haoyang.shi | 2020-01-20' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/59b36ef224787471a7dcbf211a49a20a6c77831d" title='Last modified by haoyang.shi | 2020-03-12' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-01-20</span>
+      <span>2020-03-12</span>
     </a>
   </div>
 
@@ -564,6 +588,7 @@ Iterator<span style="color:#f92672">&lt;</span>SelectionKey<span style="color:#f
       
   <nav id="TableOfContents">
   <ul>
+    <li><a href="#nio-vs-bio">NIO vs BIO</a></li>
     <li><a href="#channel">Channel</a></li>
     <li><a href="#selector">Selector</a>
       <ul>
