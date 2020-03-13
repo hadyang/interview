@@ -17,7 +17,7 @@ ZooKeeper 的好处：
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/architecture/distributed/zk/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-03-02T10:07:43+08:00" />
+<meta property="article:modified_time" content="2020-03-13T11:14:02+08:00" />
 <title>Zookeeper | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -25,7 +25,7 @@ ZooKeeper 的好处：
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.d9e95ba9f68967fdc0be9f20dcae1d0766660cd9ce2f512ef665387a258db2cb.js" integrity="sha256-2elbqfaJZ/3Avp8g3K4dB2ZmDNnOL1Eu9mU4eiWNsss="></script>
+<script defer src="/interview/en.search.min.1c4e17d86d1ec0ad5ceb6fc1170a59992a35f830716a5e50daac89830a8fbe99.js" integrity="sha256-HE4X2G0ewK1c62/BFwpZmSo1&#43;DBxal5Q2qyJgwqPvpk="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -398,8 +398,7 @@ https://github.com/alex-shpak/hugo-book
     <li><a href="#zab-协议">ZAB 协议</a>
       <ul>
         <li><a href="#消息广播">消息广播</a></li>
-        <li><a href="#崩溃恢复保证数据一致性">崩溃恢复保证数据一致性</a></li>
-        <li><a href="#选举">选举</a></li>
+        <li><a href="#崩溃恢复">崩溃恢复</a></li>
       </ul>
     </li>
     <li><a href="#应用场景">应用场景</a>
@@ -581,9 +580,9 @@ https://github.com/alex-shpak/hugo-book
 </ul>
 <p>ZAB 的所有动作都是节点们通过协议同步的。在 ZAB 协议的事务编号 <code>Zxid</code> 设计中， <code>Zxid</code> 是一个 64 位的数字，其中低 32 位是一个简单的单调递增的计数器，针对客户端每一个事务请求，计数器加 1；而高 32 位则代表 Leader 周期 epoch 的编号，每个当选产生一个新的 Leader 服务器，就会从这个 Leader 服务器上取出其本地日志中最大事务的 ZXID ，并从中读取 epoch 值，然后加 1，以此作为新的 epoch，并将低 32 位从 0 开始计数。</p>
 <p>epoch 可以理解为当前集群所处的年代或者周期，每个 leader 就像皇帝，都有自己的年号，所以每次改朝换代，leader 变更之后，都会在前一个年代的基础上加 1。这样就算旧的 leader 崩溃恢复之后，也没有人听他的了，因为 follower 只听从当前年代的 leader 的命令。</p>
+<p>ZAB 协议有两种模式，<strong>崩溃恢复（选主+数据同步）和消息广播（事务操作）</strong>。任何时候都需要保证只有一个主进程负责进行事务操作，而如果主进程崩溃了，就需要迅速选举出一个新的主进程。主进程的选举机制与事务操作机制是紧密相关的。</p>
 <h3 id="消息广播">消息广播</h3>
-<p>在 zookeeper 集群中，数据副本的传递策略就是采用消息广播模式。 zookeeper 中数据副本的同步方式与二段提交相似。二段提交要求协调者必须等到所有的参与者全部反馈 ACK 确认消息后，再发送 commit 消息。要求所有的参与者要么全部成功，要么全部失败，因此二段提交会产生严重的阻塞问题。 Zab 协议中 Leader 等待半数以上的Follower成功反馈即可，不需要收到全部Follower反馈。</p>
-<p>消息广播具体步骤</p>
+<p>在 zookeeper 集群中，数据副本的传递策略就是采用消息广播模式。 zookeeper 中数据副本的同步方式与二段提交相似。二段提交要求协调者必须等到所有的参与者全部反馈 ACK 确认消息后，再发送 commit 消息。要求所有的参与者要么全部成功，要么全部失败，因此二段提交会产生严重的阻塞问题。 Zab 协议中 Leader 等待半数以上的Follower成功反馈即可，不需要收到全部Follower反馈。消息广播具体步骤：</p>
 <ol>
 <li>客户端发起一个写操作请求。</li>
 <li>Leader 服务器将客户端的请求转化为事务 Proposal 提案，同时为每个 Proposal 分配一个全局的ID，即 zxid。</li>
@@ -592,9 +591,10 @@ https://github.com/alex-shpak/hugo-book
 <li>Leader 接收到超过半数以上 Follower 的 Ack 响应消息后，即认为消息发送成功，可以发送 commit 消息。</li>
 <li>Leader 向所有 Follower 广播 commit 消息，同时自身也会完成事务提交。Follower 接收到 commit 消息后，会将上一条事务提交。</li>
 </ol>
-<h3 id="崩溃恢复保证数据一致性">崩溃恢复保证数据一致性</h3>
+<h3 id="崩溃恢复">崩溃恢复</h3>
+<h4 id="数据同步">数据同步</h4>
 <p>主从架构下，leader 崩溃，为了保证数据一致性，会在选出新leader后进入恢复阶段，新 leader 具有所有已经提交的提议，因此它会保证让 followers 同步已经提交的提议，丢弃未提交的提议（以 leader 的记录为准）</p>
-<h3 id="选举">选举</h3>
+<h4 id="选举">选举</h4>
 <p>下面任何一种情况，都会触发 Leader 选举：</p>
 <ul>
 <li>启动时，集群服务器刚启动</li>
@@ -605,7 +605,7 @@ https://github.com/alex-shpak/hugo-book
 <p>Leader 选举过程，本质就是 <strong>广播优先级消息</strong> 的过程，选出 <strong>数据最新的服务节点</strong>，选出优先级最高的服务节点，基本步骤：</p>
 <ul>
 <li>各个服务器节点，广播自己的优先级标识 <code>(sid，zxid)</code></li>
-<li>服务器节点收到其他广播消息后，跟自己的优先级对比，自己优先级低，则变更当前节点投票的优先级<code>(sid，zxid)</code> ，并广播变更后的结果</li>
+<li>服务器节点收到其他广播消息后，跟自己的优先级（zxid）对比，自己优先级低，则变更当前节点投票的优先级<code>(sid，zxid)</code> ，并广播变更后的结果</li>
 <li>当任意一个服务器节点收到的投票数，超过了法定数量(<code>quorum</code>)，则，升级为 Leader，并广播结果。</li>
 </ul>
 <p><img src="images/7ca755dfe9b16f9c130f5de492549a86.png" alt="image"></p>
@@ -739,9 +739,9 @@ https://github.com/alex-shpak/hugo-book
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/087d135749e1bcf917b793ebe364e70a8d58ea54" title='Last modified by haoyang.shi | 2020-03-02' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/9bb466d7baf7cf5a5132691f59fa681795f83b60" title='Last modified by haoyang.shi | 2020-03-13' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-03-02</span>
+      <span>2020-03-13</span>
     </a>
   </div>
 
@@ -796,8 +796,7 @@ https://github.com/alex-shpak/hugo-book
     <li><a href="#zab-协议">ZAB 协议</a>
       <ul>
         <li><a href="#消息广播">消息广播</a></li>
-        <li><a href="#崩溃恢复保证数据一致性">崩溃恢复保证数据一致性</a></li>
-        <li><a href="#选举">选举</a></li>
+        <li><a href="#崩溃恢复">崩溃恢复</a></li>
       </ul>
     </li>
     <li><a href="#应用场景">应用场景</a>
