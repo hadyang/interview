@@ -34,7 +34,7 @@ headless: true
             - [InnoDB索引]({{< relref "/docs/basic/database/mysql/innodb/index/index.md" >}})
             - [InnoDB并发控制]({{< relref "/docs/basic/database/mysql/innodb/concurrent/index.md" >}})
             - [InnoDB事务]({{< relref "/docs/basic/database/mysql/innodb/transaction/index.md" >}})
-        - [分库分表]({{< relref "/docs/basic/database/mysql/sharding/index.md" >}})
+        - [MySQL集群]({{< relref "/docs/basic/database/mysql/sharding/index.md" >}})
     - [Redis]({{< relref "/docs/basic/database/redis/index.md" >}})
     - [密码学]({{< relref "/docs/basic/cryptology/index.md" >}})
 - [Java]({{< relref "/docs/java/_index.md" >}})
