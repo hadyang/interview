@@ -9,7 +9,7 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/net/tcp/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-03-07T16:32:55+08:00" />
+<meta property="article:modified_time" content="2020-03-15T19:20:53+08:00" />
 <title>TCP | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.692db7f1af4eeef347b0587b5d0777c8cee3298518ef1e4a1c3f7cd258626d25.js" integrity="sha256-aS238a9O7vNHsFh7XQd3yM7jKYUY7x5KHD980lhibSU="></script>
+<script defer src="/interview/en.search.min.6405333a922e566dc5e97cbde49a9de4921c73644f208c4eb28add0b70e257dd.js" integrity="sha256-ZAUzOpIuVm3F6Xy95Jqd5JIcc2RPIIxOsordC3DiV90="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -533,9 +533,6 @@ https://github.com/alex-shpak/hugo-book
 }
 </code></pre><h2 id="四次挥手">四次挥手</h2>
 <p><img src="images/tcp_finish.jpg" alt=""></p>
-<blockquote>
-<p>在Time_Wait阶段，主动端等待2*MSL时间，MSL建议为2分钟。</p>
-</blockquote>
 <p>由于TCP连接是全双工的，因此每个方向都必须单独进行关闭。</p>
 <ul>
 <li>客户端A发送一个FIN，用来关闭客户A到服务器B的数据传送（报文段4）。</li>
@@ -543,10 +540,11 @@ https://github.com/alex-shpak/hugo-book
 <li>服务器B关闭与客户端A的连接，发送一个FIN给客户端A（报文段6）。</li>
 <li>客户端A发回ACK报文确认，并将确认序号设置为收到序号加1（报文段7）</li>
 </ul>
+<p>对于复杂的网络状态，TCP 的实现提出了多种应对措施， <code>TIME_WAIT</code> 状态的提出就是为了应对其中一种异常状况。在 <code>TIME_WAIT</code> 阶段，主动端等待 2*MSL（<strong>最大分段寿命</strong>：表示一个 TCP 分段可以存在于互联网系统中的最大时间，由 TCP 的实现，超出这个寿命的分片都会被丢弃） 时间， MSL 建议为 2 分钟。</p>
+<p>如果没有 <code>TIME_WAIT</code> 状态，Client 不再保存这个连接的信息，收到一个不存在的连接的包，Client 会响应 <code>RST</code> 包，导致 Server 端异常响应。此时， <code>TIME_WAIT</code> 是为了 <strong>保证全双工的 TCP 连接正常终止</strong>。</p>
+<p>如果双方挥手之后，一个 网络四元组（src/dst ip/port）被回收，而此时网络中还有一个迟到的数据包没有被 Server 接收，Client 应用程序又立刻使用了同样的四元组再创建了一个新的连接后，这个迟到的数据包才到达 Server，那么这个数据包就会让 Server 以为是 Client 刚发过来的。此时， <code>TIME_WAIT</code> 的存在是为了 <strong>保证网络中迷失的数据包正常过期</strong>。</p>
 <blockquote>
 <p>TCP采用四次挥手关闭连接如图所示为什么建立连接协议是三次握手，而关闭连接却是四次握手呢？</p>
-</blockquote>
-<blockquote>
 <p>这是因为服务端的LISTEN状态下的SOCKET当收到SYN报文的建连请求后，它可以把ACK和SYN（ACK起应答作用，而SYN起同步作用）放在一个报文里来发送。但关闭连接时，当收到对方的FIN报文通知时，它仅仅表示对方没有数据发送给你了；但未必你所有的数据都全部发送给对方了，所以你可以未必会马上会关闭SOCKET,也即你可能还需要发送一些数据给对方之后，再发送FIN报文给对方来表示你同意现在可以关闭连接了，所以它这里的ACK报文和FIN报文多数情况下都是分开发送的。</p>
 </blockquote>
 <h2 id="数据传输">数据传输</h2>
@@ -673,9 +671,9 @@ https://github.com/alex-shpak/hugo-book
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/be5b6b2baf9eb92c66c648f3dc7bb8eebe8e8c95" title='Last modified by haoyang.shi | 2020-03-07' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/f358c5697e1d3bbf7d1e1ea7ec93b9dd2cefdc09" title='Last modified by haoyang.shi | 2020-03-15' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-03-07</span>
+      <span>2020-03-15</span>
     </a>
   </div>
 
