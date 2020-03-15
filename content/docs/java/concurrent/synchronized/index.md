@@ -63,6 +63,15 @@ Java中的每一个对象都可以作为锁。
 
 Java虚拟机在JIT编译时(可以简单理解为当某段代码即将第一次被执行时进行编译，又称即时编译)，通过对运行上下文的扫描，经过逃逸分析，**去除不可能存在共享资源竞争的锁，通过这种方式消除没有必要的锁**，可以节省毫无意义的请求锁时间
 
+## Synchronized vs ReentrantLock
+
+1. synchronized 是 Java 关键字，ReentrantLock 是基于 AQS 的 API 层面的互斥锁
+2. ReentrantLock 设置等待超时时间
+3. ReentrantLock 可进行公平锁与非公平锁设置
+4. ReentrantLock 可绑定多个 Condition
+5. synchronized 不需要手动释放锁
+6. synchronized 可以修饰方法、代码块
+
 ## 参考链接
 
 - [不可不说的Java“锁”事](https://tech.meituan.com/2018/11/15/java-lock.html)
