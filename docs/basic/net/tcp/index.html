@@ -9,7 +9,7 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/net/tcp/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-03-16T12:35:25+08:00" />
+<meta property="article:modified_time" content="2020-03-16T13:25:59+08:00" />
 <title>TCP | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.14c617f78491d6a7f42ac26735a8d8a0420862edd4bcce2daa31d709907cbac9.js" integrity="sha256-FMYX94SR1qf0KsJnNajYoEIIYu3UvM4tqjHXCZB8usk="></script>
+<script defer src="/interview/en.search.min.2bca63e6cea1ab77fb7d3d53e22a054a4cdb3c44b4fcd6fbeeeea2c6492c1f67.js" integrity="sha256-K8pj5s6hq3f7fT1T4ioFSkzbPES0/Nb77u6ixkksH2c="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -496,11 +496,19 @@ https://github.com/alex-shpak/hugo-book
 <p>TCP最小长度为 20 个字节。</p>
 </blockquote>
 <h2 id="三次握手">三次握手</h2>
+<p><img src="assists/tcp_handshake.png" alt=""></p>
 <ul>
 <li>第一次握手：建立连接时，客户端发送 SYN 包（seq=j）到服务器，并进入<code>SYN_SENT</code>状态，等待服务器确认。</li>
 <li>第二次握手：服务器收到 SYN 包，必须确认客户的 SYN（ack=j+1），同时自己也发送一个 SYN 包（seq=k），即 SYN + ACK 包，此时服务器进入 <code>SYN_RECV</code> 状态；</li>
 <li>第三次握手：客户端收到服务器的 SYN+ACK 包，向服务器发送确认包 ACK（ack=k+1），此包发送完毕，客户端和服务器进入<code>ESTABLISHED</code>（TCP连接成功）状态，完成三次握手。</li>
 </ul>
+<p>TCP 连接使用三次握手的首要原因：为了 <strong>阻止历史的重复连接初始化造成的混乱问题</strong>。如果通信双方的通信次数只有两次，那么发送方一旦发出建立连接的请求之后它就没有办法撤回这一次请求，如果在网络状况复杂或者较差的网络中，发送方连续发送多次建立连接的请求，如果 TCP 建立连接只能通信两次，那么接收方只能选择接受或者拒绝发送方发起的请求，它并不清楚这一次请求是不是由于网络拥堵而早早过期的连接。</p>
+<p>所以，TCP 选择使用三次握手来建立连接并在连接引入了 RST 这一控制消息，接收方当收到请求时会将发送方发来的 SEQ+1 发送给对方，这时由发送方来判断当前连接是否是历史连接：</p>
+<ul>
+<li>如果当前连接是历史连接，即 SEQ 过期或者超时，那么发送方就会直接发送 RST 控制消息中止这一次连接；</li>
+<li>如果当前连接不是历史连接，那么发送方就会发送 ACK 控制消息，通信双方就会成功建立连接；</li>
+</ul>
+<p>使用三次握手和 RST 控制消息将是否建立连接的最终控制权交给了发送方，因为只有发送方有足够的上下文来判断当前连接是否是错误的或者过期的，这也是 TCP 使用三次握手建立连接的最主要原因。</p>
 <h3 id="内核对-tcp-的处理">内核对 TCP 的处理</h3>
 <p>Socket 是一个由 （源IP、源Port、目标IP、目标Port、协议） 组成的五元组，唯一标示一个 socket 连接。</p>
 <p>TCP 建立连接的整体流程：</p>
@@ -672,7 +680,7 @@ https://github.com/alex-shpak/hugo-book
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/bcfed062c94c1d69fd31fca9e4acb762f7d15256" title='Last modified by haoyang.shi | 2020-03-16' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/09cb9729ab840bad0f4a537aaf802b5ebddb97bb" title='Last modified by haoyang.shi | 2020-03-16' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
       <span>2020-03-16</span>
     </a>
