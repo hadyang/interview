@@ -11,7 +11,7 @@ categories: java
 
 关于中断状态，我们需要重点关注 `Thread` 类中的以下几个方法：
 
-```
+```java
 // Thread 类中的实例方法，持有线程实例引用即可检测线程中断状态
 public boolean isInterrupted() {}
 
@@ -26,7 +26,7 @@ public void interrupt() {}
 
 我们说 **中断一个线程，其实就是设置了线程的 `interrupted status` 为 `true`**，至于说被中断的线程怎么处理这个状态，那是那个线程自己的事。如以下代码：
 
-```
+```java
 while (!Thread.interrupted()) {
    doWork();
    System.out.println("我做完一件事了，准备做下一件，如果没有其他线程中断我的话");
@@ -61,9 +61,8 @@ while (!Thread.interrupted()) {
 除了几个特殊类（如 `Object，Thread`等）外，**感知中断并提前返回是通过轮询中断状态来实现的**。我们自己需要写可中断的方法的时候，就是通过在合适的时机（通常在循环的开始处）去判断线程的中断状态，然后做相应的操作（通常是方法直接返回或者抛出异常）。当然，我们也要看到，如果我们一次循环花的时间比较长的话，那么就需要比较长的时间才能感知到线程中断了。
 
 ## 处理中断
-一旦中断发生，我们接收到了这个信息，然后怎么去处理中断呢？本小节将简单分析这个问题。
 
-我们经常会这么写代码：
+一旦中断发生，我们接收到了这个信息，然后怎么去处理中断呢？本小节将简单分析这个问题。我们经常会这么写代码：
 
 ```java
 try {
@@ -100,7 +99,7 @@ public final void acquire(int arg) {
 }
 ```
 
-而对于 `lockInterruptibly()` 方法，因为其方法上面有` throws InterruptedException` ，这个信号告诉我们，如果我们要取消线程抢锁，直接中断这个线程即可，它会立即返回，抛出 `InterruptedException` 异常。
+而对于 `lockInterruptibly()` 方法，因为其方法上面有 `throws InterruptedException` ，这个信号告诉我们，如果我们要取消线程抢锁，直接中断这个线程即可，它会立即返回，抛出 `InterruptedException` 异常。
 
 在并发包中，有非常多的这种处理中断的例子，提供两个方法，分别为响应中断和不响应中断，对于不响应中断的方法，记录中断而不是丢失这个信息。如 `Condition` 中的两个方法就是这样的：
 
@@ -129,6 +128,6 @@ synchronized (this) {
 上面的代码会造成什么问题？仔细分析可以发现，代码中如果抛出 `InterruptedException`，就会陷入死循环中，导致异常日志打爆。为什么会这样呢？首先我们来看下这两个方法：
 
 - `wait()`: if any thread interrupted the current thread before or while the current thread was waiting for a notification. The interrupted status of the current thread is cleared when this exception is thrown.
-- `Thread.currentThread().interrupt()`:If none of the previous conditions hold then this thread's interrupt status will be set.
+- `Thread.currentThread().interrupt()`: If none of the previous conditions hold then this thread's interrupt status will be set.
 
 `wait()` 在当前线程有中断标志位时抛出中断异常；而 `interrupt()` 如果当前线程没有在`wait()`等阻塞操作，则标记中断。这样就陷入死循环，无限的打印 ERROR 日志。正确的处理 `InterruptedException` 是很重要的。
