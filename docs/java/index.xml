@@ -76,18 +76,11 @@ select 方法空转 若 Selector 的轮询结果为空，也没有 wakeup 或新
       <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
       
       <guid>https://hadyang.github.io/interview/docs/java/generics/</guid>
-      <description>Java泛型 开发人员在使用泛型的时候，很容易根据自己的直觉而犯一些错误。比如一个方法如果接收List&amp;lt;Object&amp;gt;作为形式参数，那么如果尝试将一个List&amp;lt;String&amp;gt;的对象作为实际参数传进去，却发现无法通过编译。虽然从直觉上来说，Object是String的父类，这种类型转换应该是合理的。但是实际上这会产生隐含的类型转换问题，因此编译器直接就禁止这样的行为。
-类型擦除 Java中的泛型基本上都是在编译器这个层次来实现的，在生成的Java字节代码中是不包含泛型中的类型信息的。使用泛型的时候加上的类型参数，会被编译器在编译的时候去掉，这个过程就称为类型擦除。如在代码中定义的List&amp;lt;Object&amp;gt;和List&amp;lt;String&amp;gt;等类型，在编译之后都会变成List。JVM看到的只是List，而由泛型附加的类型信息对JVM来说是不可见的。Java编译器会在编译时尽可能的发现可能出错的地方，但是仍然无法避免在运行时刻出现类型转换异常的情况。
-很多泛型的奇怪特性都与这个类型擦除的存在有关，包括：
-  泛型类并没有自己独有的Class类对象。比如并不存在List&amp;lt;String&amp;gt;.class或是List&amp;lt;Integer&amp;gt;.class，而只有List.class。
-  静态变量是被泛型类的所有实例所共享的。对于声明为MyClass&amp;lt;T&amp;gt;的类，访问其中的静态变量的方法仍然是 MyClass.myStaticVar。不管是通过new MyClass&amp;lt;String&amp;gt;还是new MyClass&amp;lt;Integer&amp;gt;创建的对象，都是共享一个静态变量。
-  泛型的类型参数不能用在Java异常处理的catch语句中。因为异常处理是由JVM在运行时刻来进行的。由于类型信息被擦除，JVM是无法区分两个异常类型MyException&amp;lt;String&amp;gt;和MyException&amp;lt;Integer&amp;gt;的。对于JVM来说，它们都是 MyException类型的。也就无法执行与异常对应的catch语句。
-  类型擦除的基本过程也比较简单，首先是找到用来替换类型参数的具体类。这个具体类一般是Object。如果指定了类型参数的上界的话，则使用这个上界。把代码中的类型参数都替换成具体的类。同时去掉出现的类型声明，即去掉 &amp;lt;&amp;gt; 的内容。比如T get()方法声明就变成了Object get()；List&amp;lt;String&amp;gt;就变成了List。接下来就可能需要生成一些桥接方法（bridge method）。这是由于擦除了类型之后的类可能缺少某些必须的方法。比如考虑下面的代码：
-class MyString implements Comparable&amp;lt;String&amp;gt; { public int compareTo(String str) { return 0; } } 当类型信息被擦除之后，上述类的声明变成了class MyString implements Comparable。但是这样的话，类MyString就会有编译错误，因为没有实现接口Comparable声明的int compareTo(Object)方法。这个时候就由编译器来动态生成这个方法。
-通配符 在使用泛型类的时候，既可以指定一个具体的类型，如List&amp;lt;String&amp;gt;就声明了具体的类型是String；也可以用通配符?来表示未知类型，如List&amp;lt;?&amp;gt;就声明了List中包含的元素类型是未知的。 通配符所代表的其实是一组类型，但具体的类型是未知的。List&amp;lt;?&amp;gt;所声明的就是所有类型都是可以的。但是List&amp;lt;?&amp;gt;并不等同于List&amp;lt;Object&amp;gt;。List&amp;lt;Object&amp;gt;实际上确定了List中包含的是Object及其子类，在使用的时候都可以通过Object来进行引用。而List&amp;lt;?&amp;gt;则其中所包含的元素类型是不确定。其中可能包含的是String，也可能是 Integer。如果它包含了String的话，往里面添加Integer类型的元素就是错误的。正因为类型未知，就不能通过new ArrayList中的元素确总是可以用Object来引用的，因为虽然类型未知，但肯定是Object及其子类。考虑下面的代码：
-public void wildcard(List&amp;lt;?&amp;gt; list) { list.add(1);//编译错误 }  如上所示，试图对一个带通配符的泛型类进行操作的时候，总是会出现编译错误。其原因在于通配符所表示的类型是未知的。
- 因为对于List&amp;lt;?&amp;gt;中的元素只能用Object来引用，在有些情况下不是很方便。在这些情况下，可以使用上下界来限制未知类型的范围。 如 List&amp;lt;? extends Number&amp;gt;说明List中可能包含的元素类型是Number及其子类。而List&amp;lt;? super Number&amp;gt;则说明List中包含的是Number及其父类。当引入了上界之后，在使用类型的时候就可以使用上界类中定义的方法。
-类型系统 在Java中，大家比较熟悉的是通过继承机制而产生的类型体系结构。比如String继承自Object。根据Liskov替换原则，子类是可以替换父类的。当需要Object类的引用的时候，如果传入一个String对象是没有任何问题的。但是反过来的话，即用父类的引用替换子类引用的时候，就需要进行强制类型转换。编译器并不能保证运行时刻这种转换一定是合法的。这种自动的子类替换父类的类型转换机制，对于数组也是适用的。 String[]可以替换Object[]。但是泛型的引入，对于这个类型系统产生了一定的影响。正如前面提到的List是不能替换掉List的。</description>
+      <description>为什么使用泛型 简而言之，泛型可以使类型（类和接口）在定义类、接口和方法时进行参数化。与在方法定义的形参类似，类型参数化能让不同的输入使用同一份代码。差别在于，形参传入的是值，而类型参数化传入的是类型。
+在使用泛型相比于直接使用 Object 有以下几个好处：
+ 强制的类型检查：Java 编译器会对泛型代码进行强制类型检查，如果违反类型安全则会抛出错误。在编译阶段解决类型错误，能更有效的减少 Bug 消除类型强制转换：如果不使用泛型，则在进行代码编写是需要手动进行类型转换 允许程序员实现通用算法：通过泛型，程序员能在不同类型的集合上实现通用算法  泛型类型 泛型类型是指被参数化的类或接口，首先我们来看看一个简单的类：Box。其方法接收和返回的都是 Object 类型，因此可以除基本类型外的其他任何类型。这样也导致在编译期间不能进行任何校验。如果 Box 期望的是一个 Integer 类型，然而外部调用时，传入 String 类型，这就会在程序运行时抛出异常。
+public class Box { private Object object; public void set(Object object) { this.object = object; } public Object get() { return object; } } 下面我们来看看泛型类型版本的 Box：
+/** * Generic version of the Box class. * @param &amp;lt;T&amp;gt; the type of the value being boxed */ public class Box&amp;lt;T&amp;gt; { // T stands for &amp;#34;Type&amp;#34;  private T t; public void set(T t) { this.</description>
     </item>
     
     <item>

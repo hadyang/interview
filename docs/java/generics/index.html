@@ -5,22 +5,15 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Java 泛型"><meta property="og:title" content="Java 泛型" />
-<meta property="og:description" content="Java泛型 开发人员在使用泛型的时候，很容易根据自己的直觉而犯一些错误。比如一个方法如果接收List&lt;Object&gt;作为形式参数，那么如果尝试将一个List&lt;String&gt;的对象作为实际参数传进去，却发现无法通过编译。虽然从直觉上来说，Object是String的父类，这种类型转换应该是合理的。但是实际上这会产生隐含的类型转换问题，因此编译器直接就禁止这样的行为。
-类型擦除 Java中的泛型基本上都是在编译器这个层次来实现的，在生成的Java字节代码中是不包含泛型中的类型信息的。使用泛型的时候加上的类型参数，会被编译器在编译的时候去掉，这个过程就称为类型擦除。如在代码中定义的List&lt;Object&gt;和List&lt;String&gt;等类型，在编译之后都会变成List。JVM看到的只是List，而由泛型附加的类型信息对JVM来说是不可见的。Java编译器会在编译时尽可能的发现可能出错的地方，但是仍然无法避免在运行时刻出现类型转换异常的情况。
-很多泛型的奇怪特性都与这个类型擦除的存在有关，包括：
-  泛型类并没有自己独有的Class类对象。比如并不存在List&lt;String&gt;.class或是List&lt;Integer&gt;.class，而只有List.class。
-  静态变量是被泛型类的所有实例所共享的。对于声明为MyClass&lt;T&gt;的类，访问其中的静态变量的方法仍然是 MyClass.myStaticVar。不管是通过new MyClass&lt;String&gt;还是new MyClass&lt;Integer&gt;创建的对象，都是共享一个静态变量。
-  泛型的类型参数不能用在Java异常处理的catch语句中。因为异常处理是由JVM在运行时刻来进行的。由于类型信息被擦除，JVM是无法区分两个异常类型MyException&lt;String&gt;和MyException&lt;Integer&gt;的。对于JVM来说，它们都是 MyException类型的。也就无法执行与异常对应的catch语句。
-  类型擦除的基本过程也比较简单，首先是找到用来替换类型参数的具体类。这个具体类一般是Object。如果指定了类型参数的上界的话，则使用这个上界。把代码中的类型参数都替换成具体的类。同时去掉出现的类型声明，即去掉 &lt;&gt; 的内容。比如T get()方法声明就变成了Object get()；List&lt;String&gt;就变成了List。接下来就可能需要生成一些桥接方法（bridge method）。这是由于擦除了类型之后的类可能缺少某些必须的方法。比如考虑下面的代码：
-class MyString implements Comparable&lt;String&gt; { public int compareTo(String str) { return 0; } } 当类型信息被擦除之后，上述类的声明变成了class MyString implements Comparable。但是这样的话，类MyString就会有编译错误，因为没有实现接口Comparable声明的int compareTo(Object)方法。这个时候就由编译器来动态生成这个方法。
-通配符 在使用泛型类的时候，既可以指定一个具体的类型，如List&lt;String&gt;就声明了具体的类型是String；也可以用通配符?来表示未知类型，如List&lt;?&gt;就声明了List中包含的元素类型是未知的。 通配符所代表的其实是一组类型，但具体的类型是未知的。List&lt;?&gt;所声明的就是所有类型都是可以的。但是List&lt;?&gt;并不等同于List&lt;Object&gt;。List&lt;Object&gt;实际上确定了List中包含的是Object及其子类，在使用的时候都可以通过Object来进行引用。而List&lt;?&gt;则其中所包含的元素类型是不确定。其中可能包含的是String，也可能是 Integer。如果它包含了String的话，往里面添加Integer类型的元素就是错误的。正因为类型未知，就不能通过new ArrayList中的元素确总是可以用Object来引用的，因为虽然类型未知，但肯定是Object及其子类。考虑下面的代码：
-public void wildcard(List&lt;?&gt; list) { list.add(1);//编译错误 }  如上所示，试图对一个带通配符的泛型类进行操作的时候，总是会出现编译错误。其原因在于通配符所表示的类型是未知的。
- 因为对于List&lt;?&gt;中的元素只能用Object来引用，在有些情况下不是很方便。在这些情况下，可以使用上下界来限制未知类型的范围。 如 List&lt;? extends Number&gt;说明List中可能包含的元素类型是Number及其子类。而List&lt;? super Number&gt;则说明List中包含的是Number及其父类。当引入了上界之后，在使用类型的时候就可以使用上界类中定义的方法。
-类型系统 在Java中，大家比较熟悉的是通过继承机制而产生的类型体系结构。比如String继承自Object。根据Liskov替换原则，子类是可以替换父类的。当需要Object类的引用的时候，如果传入一个String对象是没有任何问题的。但是反过来的话，即用父类的引用替换子类引用的时候，就需要进行强制类型转换。编译器并不能保证运行时刻这种转换一定是合法的。这种自动的子类替换父类的类型转换机制，对于数组也是适用的。 String[]可以替换Object[]。但是泛型的引入，对于这个类型系统产生了一定的影响。正如前面提到的List是不能替换掉List的。" />
+<meta property="og:description" content="为什么使用泛型 简而言之，泛型可以使类型（类和接口）在定义类、接口和方法时进行参数化。与在方法定义的形参类似，类型参数化能让不同的输入使用同一份代码。差别在于，形参传入的是值，而类型参数化传入的是类型。
+在使用泛型相比于直接使用 Object 有以下几个好处：
+ 强制的类型检查：Java 编译器会对泛型代码进行强制类型检查，如果违反类型安全则会抛出错误。在编译阶段解决类型错误，能更有效的减少 Bug 消除类型强制转换：如果不使用泛型，则在进行代码编写是需要手动进行类型转换 允许程序员实现通用算法：通过泛型，程序员能在不同类型的集合上实现通用算法  泛型类型 泛型类型是指被参数化的类或接口，首先我们来看看一个简单的类：Box。其方法接收和返回的都是 Object 类型，因此可以除基本类型外的其他任何类型。这样也导致在编译期间不能进行任何校验。如果 Box 期望的是一个 Integer 类型，然而外部调用时，传入 String 类型，这就会在程序运行时抛出异常。
+public class Box { private Object object; public void set(Object object) { this.object = object; } public Object get() { return object; } } 下面我们来看看泛型类型版本的 Box：
+/** * Generic version of the Box class. * @param &lt;T&gt; the type of the value being boxed */ public class Box&lt;T&gt; { // T stands for &#34;Type&#34;  private T t; public void set(T t) { this." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/java/generics/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-03-16T12:35:25+08:00" />
+<meta property="article:modified_time" content="2020-03-16T22:47:12+08:00" />
 <title>Java 泛型 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -28,7 +21,7 @@ public void wildcard(List&lt;?&gt; list) { list.add(1);//编译错误 }  如上�
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.d06d58accda8838a176b118faae37bbb47a0367f565e43f6da97e1a79971535c.js" integrity="sha256-0G1YrM2og4oXaxGPquN7u0egNn9WXkP22pfhp5lxU1w="></script>
+<script defer src="/interview/en.search.min.4ebc1a027ba8a3f5f9c45fc5346f6c5e5d1f67ccb00850111064c43e1a446e71.js" integrity="sha256-TrwaAnuoo/X5xF/FNG9sXl0fZ8ywCFAREGTEPhpEbnE="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -380,9 +373,36 @@ https://github.com/alex-shpak/hugo-book
       
   <nav id="TableOfContents">
   <ul>
-    <li><a href="#类型擦除">类型擦除</a></li>
-    <li><a href="#通配符">通配符</a></li>
-    <li><a href="#类型系统">类型系统</a></li>
+    <li><a href="#为什么使用泛型">为什么使用泛型</a></li>
+    <li><a href="#泛型类型">泛型类型</a>
+      <ul>
+        <li><a href="#原始类型">原始类型</a></li>
+      </ul>
+    </li>
+    <li><a href="#泛型方法">泛型方法</a></li>
+    <li><a href="#有界类型参数">有界类型参数</a>
+      <ul>
+        <li><a href="#多上界">多上界</a></li>
+      </ul>
+    </li>
+    <li><a href="#泛型继承子类型">泛型&继承&子类型</a>
+      <ul>
+        <li><a href="#子类型">子类型</a></li>
+      </ul>
+    </li>
+    <li><a href="#通配符">通配符</a>
+      <ul>
+        <li><a href="#通配符子类型">通配符&子类型</a></li>
+      </ul>
+    </li>
+    <li><a href="#类型擦除">类型擦除</a>
+      <ul>
+        <li><a href="#泛型类型的擦除">泛型类型的擦除</a></li>
+        <li><a href="#泛型方法擦除">泛型方法擦除</a></li>
+        <li><a href="#桥接方法">桥接方法</a></li>
+        <li><a href="#未擦除的泛型">未擦除的泛型</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
 
@@ -393,53 +413,288 @@ https://github.com/alex-shpak/hugo-book
       </header>
 
       
-<article class="markdown"><h1 id="java泛型">Java泛型</h1>
-<p>开发人员在使用泛型的时候，很容易根据自己的直觉而犯一些错误。比如一个方法如果接收<code>List&lt;Object&gt;</code>作为形式参数，那么如果尝试将一个<code>List&lt;String&gt;</code>的对象作为实际参数传进去，却发现无法通过编译。虽然从直觉上来说，<code>Object</code>是<code>String</code>的父类，这种类型转换应该是合理的。<strong>但是实际上这会产生隐含的类型转换问题，因此编译器直接就禁止这样的行为</strong>。</p>
-<h2 id="类型擦除">类型擦除</h2>
-<p>Java中的泛型基本上都是在编译器这个层次来实现的，<strong>在生成的Java字节代码中是不包含泛型中的类型信息的。使用泛型的时候加上的类型参数，会被编译器在编译的时候去掉，这个过程就称为类型擦除</strong>。如在代码中定义的<code>List&lt;Object&gt;</code>和<code>List&lt;String&gt;</code>等类型，在编译之后都会变成<code>List</code>。<strong>JVM看到的只是List，而由泛型附加的类型信息对JVM来说是不可见的</strong>。Java编译器会在编译时尽可能的发现可能出错的地方，但是仍然无法避免在运行时刻出现类型转换异常的情况。</p>
-<p>很多泛型的奇怪特性都与这个类型擦除的存在有关，包括：</p>
-<ul>
-<li>
-<p><strong>泛型类并没有自己独有的Class类对象</strong>。比如并不存在<code>List&lt;String&gt;.class</code>或是<code>List&lt;Integer&gt;.class</code>，而只有<code>List.class</code>。</p>
-</li>
-<li>
-<p><strong>静态变量是被泛型类的所有实例所共享的</strong>。对于声明为<code>MyClass&lt;T&gt;</code>的类，访问其中的静态变量的方法仍然是 <code>MyClass.myStaticVar</code>。不管是通过<code>new MyClass&lt;String&gt;</code>还是<code>new MyClass&lt;Integer&gt;</code>创建的对象，都是共享一个静态变量。</p>
-</li>
-<li>
-<p><strong>泛型的类型参数不能用在Java异常处理的catch语句中</strong>。因为异常处理是由<code>JVM</code>在运行时刻来进行的。由于类型信息被擦除，<code>JVM</code>是无法区分两个异常类型<code>MyException&lt;String&gt;</code>和<code>MyException&lt;Integer&gt;</code>的。对于<code>JVM</code>来说，它们都是 <code>MyException</code>类型的。也就无法执行与异常对应的catch语句。</p>
-</li>
-</ul>
-<p>类型擦除的基本过程也比较简单，首先是找到用来替换类型参数的具体类。这个具体类一般是Object。如果指定了类型参数的上界的话，则使用这个上界。把代码中的类型参数都替换成具体的类。同时去掉出现的类型声明，即去掉 <code>&lt;&gt;</code> 的内容。比如<code>T get()</code>方法声明就变成了<code>Object get()</code>；<code>List&lt;String&gt;</code>就变成了<code>List</code>。接下来就可能需要生成一些桥接方法（bridge method）。这是由于擦除了类型之后的类可能缺少某些必须的方法。比如考虑下面的代码：</p>
-<pre><code>class MyString implements Comparable&lt;String&gt; {
-    public int compareTo(String str) {        
-        return 0;    
-    }
-}
-</code></pre><p>当类型信息被擦除之后，上述类的声明变成了<code>class MyString implements Comparable</code>。但是这样的话，类<code>MyString</code>就会有编译错误，因为没有实现接口<code>Comparable</code>声明的<code>int compareTo(Object)</code>方法。这个时候就由编译器来动态生成这个方法。</p>
-<h2 id="通配符">通配符</h2>
-<p>在使用泛型类的时候，既可以指定一个具体的类型，如<code>List&lt;String&gt;</code>就声明了具体的类型是<code>String</code>；也可以用通配符<code>?</code>来表示未知类型，如<code>List&lt;?&gt;</code>就声明了<code>List</code>中包含的元素类型是未知的。 通配符所代表的其实是一组类型，但具体的类型是未知的。<code>List&lt;?&gt;</code>所声明的就是所有类型都是可以的。<strong>但是<code>List&lt;?&gt;</code>并不等同于<code>List&lt;Object&gt;</code>。<code>List&lt;Object&gt;</code>实际上确定了<code>List</code>中包含的是<code>Object</code>及其子类，在使用的时候都可以通过<code>Object</code>来进行引用。而<code>List&lt;?&gt;</code>则其中所包含的元素类型是不确定</strong>。其中可能包含的是<code>String</code>，也可能是 <code>Integer</code>。如果它包含了<code>String</code>的话，往里面添加<code>Integer</code>类型的元素就是错误的。<strong>正因为类型未知，就不能通过new ArrayList<!-- raw HTML omitted -->中的元素确总是可以用Object来引用的，因为虽然类型未知，但肯定是Object及其子类</strong>。考虑下面的代码：</p>
-<pre><code>public void wildcard(List&lt;?&gt; list) {
-    list.add(1);//编译错误
-}  
-</code></pre><blockquote>
-<p>如上所示，试图对一个带通配符的泛型类进行操作的时候，总是会出现编译错误。其原因在于通配符所表示的类型是未知的。</p>
+<article class="markdown"><h2 id="为什么使用泛型">为什么使用泛型</h2>
+<p>简而言之，泛型可以使类型（类和接口）在定义类、接口和方法时进行参数化。与在方法定义的形参类似，类型参数化能让不同的输入使用同一份代码。差别在于，形参传入的是值，而类型参数化传入的是类型。</p>
+<p>在使用泛型相比于直接使用 <code>Object</code> 有以下几个好处：</p>
+<ol>
+<li><strong>强制的类型检查</strong>：Java 编译器会对泛型代码进行强制类型检查，如果违反类型安全则会抛出错误。在编译阶段解决类型错误，能更有效的减少 Bug</li>
+<li><strong>消除类型强制转换</strong>：如果不使用泛型，则在进行代码编写是需要手动进行类型转换</li>
+<li><strong>允许程序员实现通用算法</strong>：通过泛型，程序员能在不同类型的集合上实现通用算法</li>
+</ol>
+<h2 id="泛型类型">泛型类型</h2>
+<p>泛型类型是指被参数化的类或接口，首先我们来看看一个简单的类：<code>Box</code>。其方法接收和返回的都是 <code>Object</code> 类型，因此可以除基本类型外的其他任何类型。这样也导致在编译期间不能进行任何校验。如果 <code>Box</code> 期望的是一个 <code>Integer</code> 类型，然而外部调用时，传入 <code>String</code> 类型，这就会在程序运行时抛出异常。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Box</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">private</span> Object object<span style="color:#f92672">;</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>Object object<span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">object</span> <span style="color:#f92672">=</span> object<span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> Object <span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#66d9ef">return</span> object<span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>下面我们来看看泛型类型版本的 <code>Box</code>：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#75715e">/**
+</span><span style="color:#75715e"> * Generic version of the Box class.
+</span><span style="color:#75715e"> * @param &lt;T&gt; the type of the value being boxed
+</span><span style="color:#75715e"> */</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Box</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> <span style="color:#f92672">{</span>
+    <span style="color:#75715e">// T stands for &#34;Type&#34;
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">private</span> T t<span style="color:#f92672">;</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>T t<span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">t</span> <span style="color:#f92672">=</span> t<span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> T <span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#66d9ef">return</span> t<span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>如上面代码所示，所有 <code>Object</code> 都被替换为了 <code>T</code>，<code>T</code> 是一个可以代表除基本类型外的所有类型：任意类、任意接口、任意数组类型甚至还可以是其他的类型参数（eg: <code>List&lt;T&gt;</code>）。</p>
+<h3 id="原始类型">原始类型</h3>
+<p>原始类型是泛型类型没有类型参数的形式，例如上面的 <code>Box&lt;T&gt;</code> ，其原始类型就是 <code>Box</code>，但 <strong>非泛型类类型不是原始类型</strong>。原始类型的出现，只是为兼容 JDK5 之前的历史代码，比如：<code>Collections</code>。因此，将一个泛型类型赋值给原始类型是可以的：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">Box<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;</span> stringBox <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Box<span style="color:#f92672">&lt;</span><span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+Box rawBox <span style="color:#f92672">=</span> stringBox<span style="color:#f92672">;</span>               <span style="color:#75715e">// OK
+</span></code></pre></div><p>如果将原始类型赋值给泛型类型，编译器会报告一个警告：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">Box rawBox <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Box<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>           <span style="color:#75715e">// rawBox is a raw type of Box&lt;T&gt;
+</span><span style="color:#75715e"></span>Box<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> intBox <span style="color:#f92672">=</span> rawBox<span style="color:#f92672">;</span>     <span style="color:#75715e">// warning: unchecked conversion
+</span></code></pre></div><p>同样的，如果将一个原始类型参数传递给泛型方法，也会报告一个警告：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">Box<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">&gt;</span> stringBox <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Box<span style="color:#f92672">&lt;</span><span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+Box rawBox <span style="color:#f92672">=</span> stringBox<span style="color:#f92672">;</span>
+rawBox<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>8<span style="color:#f92672">)</span><span style="color:#f92672">;</span>  <span style="color:#75715e">// warning: unchecked invocation to set(T)
+</span></code></pre></div><h2 id="泛型方法">泛型方法</h2>
+<p>泛型方法与泛型类型类似，只不过泛型方法拥有自己的参数化类型，并且其作用域只限制在声明的方法中。泛型方法可以是静态的、非静态以及构造函数。泛型方法的声明必须在返回参数之前，即：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Util</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#f92672">&lt;</span>K<span style="color:#f92672">,</span> V<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">boolean</span> <span style="color:#a6e22e">compare</span><span style="color:#f92672">(</span>Pair<span style="color:#f92672">&lt;</span>K<span style="color:#f92672">,</span> V<span style="color:#f92672">&gt;</span> p1<span style="color:#f92672">,</span> Pair<span style="color:#f92672">&lt;</span>K<span style="color:#f92672">,</span> V<span style="color:#f92672">&gt;</span> p2<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span> p1<span style="color:#f92672">.</span><span style="color:#a6e22e">getKey</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">.</span><span style="color:#a6e22e">equals</span><span style="color:#f92672">(</span>p2<span style="color:#f92672">.</span><span style="color:#a6e22e">getKey</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span> <span style="color:#f92672">&amp;</span><span style="color:#f92672">&amp;</span>
+               p1<span style="color:#f92672">.</span><span style="color:#a6e22e">getValue</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">.</span><span style="color:#a6e22e">equals</span><span style="color:#f92672">(</span>p2<span style="color:#f92672">.</span><span style="color:#a6e22e">getValue</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Pair</span><span style="color:#f92672">&lt;</span>K<span style="color:#f92672">,</span> V<span style="color:#f92672">&gt;</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#66d9ef">private</span> K key<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> V value<span style="color:#f92672">;</span>
+
+    <span style="color:#75715e">//泛型方法
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Pair</span><span style="color:#f92672">(</span>K key<span style="color:#f92672">,</span> V value<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">value</span> <span style="color:#f92672">=</span> value<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#75715e">//泛型方法
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setKey</span><span style="color:#f92672">(</span>K key<span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> key<span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setValue</span><span style="color:#f92672">(</span>V value<span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">value</span> <span style="color:#f92672">=</span> value<span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> K <span style="color:#a6e22e">getKey</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span>   <span style="color:#f92672">{</span> <span style="color:#66d9ef">return</span> key<span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">public</span> V <span style="color:#a6e22e">getValue</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#66d9ef">return</span> value<span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><h2 id="有界类型参数">有界类型参数</h2>
+<p>当一个方法进行数字计算，并且想接收所有 <code>Number</code> 类型及其子类时，就需要用到有界类型参数。要声明一个有界类型参数，先列出该类型参数的名称，然后是 <code>extends</code> 关键字，然后是其上界，在这里是 <code>Number</code>。</p>
+<blockquote>
+<p>在这里 <code>extends</code> 即可以表示 <code>extends</code>，也可以表示 <code>implements</code>。</p>
 </blockquote>
-<p>因为对于<code>List&lt;?&gt;</code>中的元素只能用<code>Object</code>来引用，在有些情况下不是很方便。在这些情况下，可以使用上下界来限制未知类型的范围。 如 <strong><code>List&lt;? extends Number&gt;</code>说明List中可能包含的元素类型是<code>Number</code>及其子类。而<code>List&lt;? super Number&gt;</code>则说明List中包含的是Number及其父类</strong>。当引入了上界之后，在使用类型的时候就可以使用上界类中定义的方法。</p>
-<h2 id="类型系统">类型系统</h2>
-<p>在Java中，大家比较熟悉的是通过继承机制而产生的类型体系结构。比如<code>String</code>继承自<code>Object</code>。根据<code>Liskov替换原则</code>，子类是可以替换父类的。当需要<code>Object</code>类的引用的时候，如果传入一个<code>String</code>对象是没有任何问题的。但是反过来的话，即用父类的引用替换子类引用的时候，就需要进行强制类型转换。编译器并不能保证运行时刻这种转换一定是合法的。<strong>这种自动的子类替换父类的类型转换机制，对于数组也是适用的。 String[]可以替换Object[]</strong>。但是泛型的引入，对于这个类型系统产生了一定的影响。<strong>正如前面提到的List<!-- raw HTML omitted -->是不能替换掉List<!-- raw HTML omitted -->的</strong>。</p>
-<p>引入泛型之后的类型系统增加了两个维度：<strong>一个是类型参数自身的继承体系结构，另外一个是泛型类或接口自身的继承体系结构</strong>。第一个指的是对于 <code>List&lt;String&gt;</code>和<code>List&lt;Object&gt;</code>这样的情况，类型参数<code>String</code>是继承自<code>Object</code>的。而第二种指的是 <code>List</code>接口继承自<code>Collection</code>接口。对于这个类型系统，有如下的一些规则：</p>
-<ul>
-<li>
-<p><strong>相同类型参数的泛型类的关系取决于泛型类自身的继承体系结构</strong>。即<code>List&lt;String&gt;</code>是<code>Collection&lt;String&gt;</code> 的子类型，<code>List&lt;String&gt;</code>可以替换<code>Collection&lt;String&gt;</code>。这种情况也适用于带有上下界的类型声明。</p>
-</li>
-<li>
-<p><strong>当泛型类的类型声明中使用了通配符的时候，其子类型可以在两个维度上分别展开</strong>。如对<code>Collection&lt;? extends Number&gt;</code>来说，其子类型可以在<code>Collection</code>这个维度上展开，即<code>List&lt;? extends Number&gt;</code>和<code>Set&lt;? extends Number&gt;</code>等；也可以在<code>Number</code>这个层次上展开，即<code>Collection&lt;Double&gt;</code>和<code>Collection&lt;Integer&gt;</code>等。如此循环下去，<code>ArrayList&lt;Long&gt;</code>和 <code>HashSet&lt;Double&gt;</code>等也都算是<code>Collection&lt;? extends Number&gt;</code>的子类型。</p>
-</li>
-<li>
-<p>如果泛型类中包含多个类型参数，则对于每个类型参数分别应用上面的规则。</p>
-</li>
-</ul>
-</article>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#f92672">&lt;</span>U <span style="color:#66d9ef">extends</span> Number<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">inspect</span><span style="color:#f92672">(</span>U u<span style="color:#f92672">)</span><span style="color:#f92672">{</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;T: &#34;</span> <span style="color:#f92672">+</span> t<span style="color:#f92672">.</span><span style="color:#a6e22e">getClass</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;U: &#34;</span> <span style="color:#f92672">+</span> u<span style="color:#f92672">.</span><span style="color:#a6e22e">getClass</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getName</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>在进行有界类型参数定义后，可使用在上界类型中定义的方法，在这里就可以调用 <code>Number</code> 内的所有方法，例如：<code>intValue</code>。</p>
+<h3 id="多上界">多上界</h3>
+<p>前面的示例说明了使用带单个界限的类型参数，但是类型参数可以具有多个界限：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#f92672">&lt;</span>T <span style="color:#66d9ef">extends</span> B1 <span style="color:#f92672">&amp;</span> B2 <span style="color:#f92672">&amp;</span> B3<span style="color:#f92672">&gt;</span>
+</code></pre></div><p>有多个上界时，如果上界中包含类型（Class），则需要放在第一位。</p>
+<h2 id="泛型继承子类型">泛型&amp;继承&amp;子类型</h2>
+<p>如 Java 语言规范所描述，只要类型兼容，就可以将一种类型的对象分配给另一种类型的对象。例如：我们可以将 <code>Integer</code> 对象赋值给 <code>Object</code> ，因为 <code>Object</code> 是 <code>Integer</code> 的父类之一。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">Object someObject <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Object<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+Integer someInteger <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Integer<span style="color:#f92672">(</span>10<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+someObject <span style="color:#f92672">=</span> someInteger<span style="color:#f92672">;</span>   <span style="color:#75715e">// OK
+</span></code></pre></div><p>用面向对象的术语来说，这是一种 <code>is a</code> 的关系。因为，<code>Integer</code> 是一种 <code>Object</code> ，这样的赋值也是允许的。同时，<code>Integer</code> 也是一种 <code>Number</code> 所以以下代码均正确：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">someMethod</span><span style="color:#f92672">(</span>Number n<span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#75715e">/* ... */</span> <span style="color:#f92672">}</span>
+
+someMethod<span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Integer<span style="color:#f92672">(</span>10<span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>   <span style="color:#75715e">// OK
+</span><span style="color:#75715e"></span>someMethod<span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Double<span style="color:#f92672">(</span>10<span style="color:#f92672">.</span><span style="color:#a6e22e">1</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>   <span style="color:#75715e">// OK
+</span></code></pre></div><p>这种关系同样可以在泛型中使用：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">Box<span style="color:#f92672">&lt;</span>Number<span style="color:#f92672">&gt;</span> box <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Box<span style="color:#f92672">&lt;</span>Number<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+box<span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Integer<span style="color:#f92672">(</span>10<span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>   <span style="color:#75715e">// OK
+</span><span style="color:#75715e"></span>box<span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Double<span style="color:#f92672">(</span>10<span style="color:#f92672">.</span><span style="color:#a6e22e">1</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>  <span style="color:#75715e">// OK
+</span></code></pre></div><p>但是在泛型方法上会有所不同，比如以下方法：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">boxTest</span><span style="color:#f92672">(</span>Box<span style="color:#f92672">&lt;</span>Number<span style="color:#f92672">&gt;</span> n<span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#75715e">/* ... */</span> <span style="color:#f92672">}</span>
+</code></pre></div><p>这个方法能够接收什么类型的参数呢？是否能够将 <code>Box&lt;Integer&gt;</code> 或者 <code>Box&lt;Double&gt;</code> 类型的对象传入呢？答案是 “否”，因为 <code>Box&lt;Integer&gt;</code> 和 <code>Box&lt;Double&gt;</code> 均不是 <code>Box&lt;Number&gt;</code> 的子类型。</p>
+<blockquote>
+<p>这是一个常见的误解</p>
+</blockquote>
+<p><img src="assists/generics_method_type.png" alt=""></p>
+<p>不论 <code>Integer</code> 和 <code>Number</code> 是什么关系，<code>Box&lt;Integer&gt;</code> 和 <code>Box&lt;Number&gt;</code> 的共同父类均是 <code>Object</code>。</p>
+<h3 id="子类型">子类型</h3>
+<p>可以通过 <code>extends</code> 或者 <code>implement</code> 创建泛型类型的子类型，他们之间的关系只依赖与被 <code>extends</code> 或者被 <code>implements</code>。我们可以看看 <code>Collections</code> 的相关类型，<code>ArrayList&lt;E&gt;</code> 实现 <code>List&lt;E&gt;</code> 并且 <code>List&lt;E&gt;</code> 继承自 <code>Collection&lt;E&gt;</code>，所以，<code>ArrayList&lt;String&gt;</code> 是 <code>List&lt;String&gt;</code> 的子类型，<code>List&lt;String&gt;</code> 是 <code>Collection&lt;String&gt;</code> 的子类型。</p>
+<p><img src="assists/generics_subtype_1.png" alt=""></p>
+<p>现在我们需要自己定义一个 list 接口：<code>PayloadList</code>，它拥有一个可选的泛型类型 <code>P</code>：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">PayloadList</span><span style="color:#f92672">&lt;</span>E<span style="color:#f92672">,</span>P<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">extends</span> List<span style="color:#f92672">&lt;</span>E<span style="color:#f92672">&gt;</span> <span style="color:#f92672">{</span>
+  <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setPayload</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> index<span style="color:#f92672">,</span> P val<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+  <span style="color:#f92672">.</span><span style="color:#f92672">.</span><span style="color:#f92672">.</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>以下所有的 <code>PayloadList</code> 都是 <code>List&lt;String&gt;</code> 的子类型:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">PayloadList<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">,</span>String<span style="color:#f92672">&gt;</span>
+PayloadList<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">,</span>Integer<span style="color:#f92672">&gt;</span>
+PayloadList<span style="color:#f92672">&lt;</span>String<span style="color:#f92672">,</span>Exception<span style="color:#f92672">&gt;</span>
+</code></pre></div><p><img src="assists/generics_subtype_2.png" alt=""></p>
+<h2 id="通配符">通配符</h2>
+<p>在泛型中，使用 <code>?</code> 做为通配符，代表未知类型。有界类型参数在上面已有介绍： <code>List&lt;? extends Number&gt;</code>。类似的，通配符可以没有上界，即 <code>List&lt;?&gt;</code>，这被称之为未知类型的List。这种未知类型的泛型在下面两个场景中很适用：</p>
+<ol>
+<li>泛型类型中只使用 Object 中声明的方法</li>
+<li>泛型类型中的代码不依赖与类型参数，例如：<code>List.size</code>、<code>List.clear</code></li>
+</ol>
+<p>另外，通配符还可声明类型参数的下界：<code>List&lt;? super Integer&gt;</code>。</p>
+<h3 id="通配符子类型">通配符&amp;子类型</h3>
+<p>当有了通配符后，泛型的继承关系又有新的规则。尽管 Integer 是 Number 的子类型，但 <code>List&lt;Integer&gt;</code> 不是 <code>List&lt;Number&gt;</code> 的子类型，实际上，这两种类型无关。 <code>List&lt;Number&gt;</code> 和 <code>List&lt;Integer&gt;</code> 的公共父类是 <code>List&lt;?&gt;</code>。</p>
+<p><img src="assists/generics_wildcards_subtype_1.png" alt=""></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">List<span style="color:#f92672">&lt;</span><span style="color:#f92672">?</span> <span style="color:#66d9ef">extends</span> Integer<span style="color:#f92672">&gt;</span> intList <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;</span><span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+List<span style="color:#f92672">&lt;</span><span style="color:#f92672">?</span> <span style="color:#66d9ef">extends</span> Number<span style="color:#f92672">&gt;</span>  numList <span style="color:#f92672">=</span> intList<span style="color:#f92672">;</span>  <span style="color:#75715e">// OK. List&lt;? extends Integer&gt; is a subtype of List&lt;? extends Number&gt;
+</span></code></pre></div><p>因为 <code>Integer</code> 是 <code>Number</code> 的子类型，并且 <code>numList</code> 是 <code>Number</code> 对象的列表，所以 <code>intList</code> （一个 Integer 对象的列表）和 <code>numList</code> 之间存在关系。下图显示了使用上下界通配符声明的几个 List 类之间的关系。</p>
+<p><img src="assists/generics_wildcards_subtype_2.png" alt=""></p>
+<h2 id="类型擦除">类型擦除</h2>
+<p>Java 语言引入了泛型，以在编译时提供更严格的类型检查并支持泛型编程。为实现泛型 Java 编译器会进行类型擦除：</p>
+<ol>
+<li>替换所有类型参数为他们的上界或者 <code>Object</code>，因此，字节码仅包含普通的类，接口和方法。</li>
+<li>必要时插入类型转换，以保持类型安全。</li>
+<li>生成桥接方法以在扩展的泛型类型中保留多态。</li>
+</ol>
+<p>类型擦除可确保不会为参数化类型创建新的类；因此，泛型不会产生运行时开销。</p>
+<h3 id="泛型类型的擦除">泛型类型的擦除</h3>
+<p>在类型擦除过程中，Java 编译器将擦除所有类型参数，如果类型参数是有界的，则将每个参数替换为其第一个边界；如果类型参数是无界的，则将其替换为 <code>Object</code>。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Node</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#66d9ef">private</span> T data<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> Node<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> next<span style="color:#f92672">;</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Node</span><span style="color:#f92672">(</span>T data<span style="color:#f92672">,</span> Node<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> next<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> data<span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">next</span> <span style="color:#f92672">=</span> next<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> T <span style="color:#a6e22e">getData</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#66d9ef">return</span> data<span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+    <span style="color:#75715e">// ...
+</span><span style="color:#75715e"></span><span style="color:#f92672">}</span>
+</code></pre></div><p>由于 <code>T</code> 是无界的，所以其类型擦除后的代码为：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Node</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#66d9ef">private</span> Object data<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> Node next<span style="color:#f92672">;</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Node</span><span style="color:#f92672">(</span>Object data<span style="color:#f92672">,</span> Node next<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> data<span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">next</span> <span style="color:#f92672">=</span> next<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> Object <span style="color:#a6e22e">getData</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#66d9ef">return</span> data<span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+    <span style="color:#75715e">// ...
+</span><span style="color:#75715e"></span><span style="color:#f92672">}</span>
+</code></pre></div><p>而对于以下代码的擦除又不一样：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Node</span><span style="color:#f92672">&lt;</span>T <span style="color:#66d9ef">extends</span> Comparable<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span><span style="color:#f92672">&gt;</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#66d9ef">private</span> T data<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> Node<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> next<span style="color:#f92672">;</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Node</span><span style="color:#f92672">(</span>T data<span style="color:#f92672">,</span> Node<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> next<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> data<span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">next</span> <span style="color:#f92672">=</span> next<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> T <span style="color:#a6e22e">getData</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#66d9ef">return</span> data<span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+    <span style="color:#75715e">// ...
+</span><span style="color:#75715e"></span><span style="color:#f92672">}</span>
+</code></pre></div><p>擦除后：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Node</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#66d9ef">private</span> Comparable data<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">private</span> Node next<span style="color:#f92672">;</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Node</span><span style="color:#f92672">(</span>Comparable data<span style="color:#f92672">,</span> Node next<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> data<span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">next</span> <span style="color:#f92672">=</span> next<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> Comparable <span style="color:#a6e22e">getData</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#66d9ef">return</span> data<span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+    <span style="color:#75715e">// ...
+</span><span style="color:#75715e"></span><span style="color:#f92672">}</span>
+</code></pre></div><h3 id="泛型方法擦除">泛型方法擦除</h3>
+<p>泛型方法的擦除规则和泛型类型的擦除规则类似：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#75715e">// Counts the number of occurrences of elem in anArray.
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">count</span><span style="color:#f92672">(</span>T<span style="color:#f92672">[</span><span style="color:#f92672">]</span> anArray<span style="color:#f92672">,</span> T elem<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">int</span> cnt <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>T e <span style="color:#f92672">:</span> anArray<span style="color:#f92672">)</span>
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>e<span style="color:#f92672">.</span><span style="color:#a6e22e">equals</span><span style="color:#f92672">(</span>elem<span style="color:#f92672">)</span><span style="color:#f92672">)</span>
+            <span style="color:#f92672">+</span><span style="color:#f92672">+</span>cnt<span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">return</span> cnt<span style="color:#f92672">;</span>
+<span style="color:#f92672">}</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#f92672">&lt;</span>T <span style="color:#66d9ef">extends</span> Shape<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">draw</span><span style="color:#f92672">(</span>T shape<span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#75715e">/* ... */</span> <span style="color:#f92672">}</span>
+</code></pre></div><p>擦除后：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">count</span><span style="color:#f92672">(</span>Object<span style="color:#f92672">[</span><span style="color:#f92672">]</span> anArray<span style="color:#f92672">,</span> Object elem<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">int</span> cnt <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>Object e <span style="color:#f92672">:</span> anArray<span style="color:#f92672">)</span>
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>e<span style="color:#f92672">.</span><span style="color:#a6e22e">equals</span><span style="color:#f92672">(</span>elem<span style="color:#f92672">)</span><span style="color:#f92672">)</span>
+            <span style="color:#f92672">+</span><span style="color:#f92672">+</span>cnt<span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">return</span> cnt<span style="color:#f92672">;</span>
+<span style="color:#f92672">}</span>
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">draw</span><span style="color:#f92672">(</span>Shape shape<span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#75715e">/* ... */</span> <span style="color:#f92672">}</span>
+</code></pre></div><h3 id="桥接方法">桥接方法</h3>
+<p>对于以下两个类：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Node</span><span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#66d9ef">public</span> T data<span style="color:#f92672">;</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Node</span><span style="color:#f92672">(</span>T data<span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> data<span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setData</span><span style="color:#f92672">(</span>T data<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Node.setData&#34;</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> data<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyNode</span> <span style="color:#66d9ef">extends</span> Node<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">MyNode</span><span style="color:#f92672">(</span>Integer data<span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#66d9ef">super</span><span style="color:#f92672">(</span>data<span style="color:#f92672">)</span><span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setData</span><span style="color:#f92672">(</span>Integer data<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;MyNode.setData&#34;</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">super</span><span style="color:#f92672">.</span><span style="color:#a6e22e">setData</span><span style="color:#f92672">(</span>data<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>类型擦除：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Node</span> <span style="color:#f92672">{</span>
+
+    <span style="color:#66d9ef">public</span> Object data<span style="color:#f92672">;</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Node</span><span style="color:#f92672">(</span>Object data<span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> data<span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setData</span><span style="color:#f92672">(</span>Object data<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;Node.setData&#34;</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">.</span><span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> data<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyNode</span> <span style="color:#66d9ef">extends</span> Node <span style="color:#f92672">{</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">MyNode</span><span style="color:#f92672">(</span>Integer data<span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#66d9ef">super</span><span style="color:#f92672">(</span>data<span style="color:#f92672">)</span><span style="color:#f92672">;</span> <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setData</span><span style="color:#f92672">(</span>Integer data<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;MyNode.setData&#34;</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">super</span><span style="color:#f92672">.</span><span style="color:#a6e22e">setData</span><span style="color:#f92672">(</span>data<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>在类型擦除后，方法的签名不匹配，导致重写的方法不生效，<code>Node.setData(T)</code> 变成了 <code>Node.setData(Object)</code>。为解决这个问题，Java 编译器在子类型中生成桥接方法，对于 <code>MyNode</code> 其生成的方法如下：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MyNode</span> <span style="color:#66d9ef">extends</span> Node <span style="color:#f92672">{</span>
+
+    <span style="color:#75715e">// Bridge method generated by the compiler
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setData</span><span style="color:#f92672">(</span>Object data<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        setData<span style="color:#f92672">(</span><span style="color:#f92672">(</span>Integer<span style="color:#f92672">)</span> data<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setData</span><span style="color:#f92672">(</span>Integer data<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;MyNode.setData&#34;</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">super</span><span style="color:#f92672">.</span><span style="color:#a6e22e">setData</span><span style="color:#f92672">(</span>data<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#75715e">// ...
+</span><span style="color:#75715e"></span><span style="color:#f92672">}</span>
+</code></pre></div><p>这样，在类型擦除之后，<code>MyNode</code> 具有与 <code>Node</code> 的 <code>setData(Object)</code> 方法相同的方法签名的桥接方法，并将其委托给的 <code>setData(Integer)</code> 方法。</p>
+<h3 id="未擦除的泛型">未擦除的泛型</h3>
+<p>类型擦除只局限于 <strong>泛型类型</strong> 和 <strong>泛型方法</strong>，对于 <code>MyNode</code> 这种非泛型类型，泛型信息并不会擦除。在 <code>MyNode</code> 内同样可以通过反射获取到它父类的泛型信息。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[</span><span style="color:#f92672">]</span> args<span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> Exception <span style="color:#f92672">{</span>
+  ParameterizedTypeImpl superclass <span style="color:#f92672">=</span> <span style="color:#f92672">(</span>ParameterizedTypeImpl<span style="color:#f92672">)</span> MyNode<span style="color:#f92672">.</span><span style="color:#a6e22e">class</span><span style="color:#f92672">.</span><span style="color:#a6e22e">getGenericSuperclass</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+  System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>Arrays<span style="color:#f92672">.</span><span style="color:#a6e22e">toString</span><span style="color:#f92672">(</span>superclass<span style="color:#f92672">.</span><span style="color:#a6e22e">getActualTypeArguments</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span><span style="color:#75715e">//[class java.lang.Integer]
+</span><span style="color:#75715e"></span><span style="color:#f92672">}</span>
+</code></pre></div></article>
  
 
       <footer class="book-footer">
@@ -450,7 +705,7 @@ https://github.com/alex-shpak/hugo-book
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/bcfed062c94c1d69fd31fca9e4acb762f7d15256" title='Last modified by haoyang.shi | 2020-03-16' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/09b74e50fdb45d56734ad2556ea18c9e1f3a4ba8" title='Last modified by haoyang.shi | 2020-03-16' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
       <span>2020-03-16</span>
     </a>
@@ -484,9 +739,36 @@ https://github.com/alex-shpak/hugo-book
       
   <nav id="TableOfContents">
   <ul>
-    <li><a href="#类型擦除">类型擦除</a></li>
-    <li><a href="#通配符">通配符</a></li>
-    <li><a href="#类型系统">类型系统</a></li>
+    <li><a href="#为什么使用泛型">为什么使用泛型</a></li>
+    <li><a href="#泛型类型">泛型类型</a>
+      <ul>
+        <li><a href="#原始类型">原始类型</a></li>
+      </ul>
+    </li>
+    <li><a href="#泛型方法">泛型方法</a></li>
+    <li><a href="#有界类型参数">有界类型参数</a>
+      <ul>
+        <li><a href="#多上界">多上界</a></li>
+      </ul>
+    </li>
+    <li><a href="#泛型继承子类型">泛型&继承&子类型</a>
+      <ul>
+        <li><a href="#子类型">子类型</a></li>
+      </ul>
+    </li>
+    <li><a href="#通配符">通配符</a>
+      <ul>
+        <li><a href="#通配符子类型">通配符&子类型</a></li>
+      </ul>
+    </li>
+    <li><a href="#类型擦除">类型擦除</a>
+      <ul>
+        <li><a href="#泛型类型的擦除">泛型类型的擦除</a></li>
+        <li><a href="#泛型方法擦除">泛型方法擦除</a></li>
+        <li><a href="#桥接方法">桥接方法</a></li>
+        <li><a href="#未擦除的泛型">未擦除的泛型</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
 
