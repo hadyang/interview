@@ -99,10 +99,10 @@ D_{i,k,k-1}+D_{k,j,k-1} &amp;amp; 最短路径经过 k \end{cases} $$
       <guid>https://hadyang.github.io/interview/docs/basic/algo/tree/</guid>
       <description>树 二叉树 L、D、R分别表示遍历左子树、访问根结点和遍历右子树
  先序遍历：DLR 中序遍历：LDR 后序遍历：LRD   仅有前序和后序遍历，不能确定一个二叉树，必须有中序遍历的结果
- 二叉树的性质  性质1：在二叉树中第 i 层的结点数最多为2^(i-1)（i ≥ 1） 性质2：高度为k的二叉树其结点总数最多为2^k－1（ k ≥ 1） 性质3：对任意的非空二叉树 T ，如果叶结点的个数为 n0，而其度为 2 的结点数为 n2，则：n0 = n2 + 1  满二叉树 深度为k，且有2^k-1个节点称之为满二叉树；
- 性质4：第i层上的节点数为2^(i-1)；  完全二叉树 深度为k，有n个节点的二叉树，当且仅当其每一个节点都与深度为k的满二叉树中，序号为1至n的节点对应时，称之为完全二叉树。
- 性质5：对于具有n个结点的完全二叉树的高度为log2(n)+1  求完全二叉树的叶子结点个数：
-二叉树的构造 //n 表示当前结点字符 Node* tree(vector&amp;lt;char&amp;gt; data, int n) { Node* node; if (n &amp;gt;= data.size()) return NULL; if (data[n] == &amp;#39;#&amp;#39;) return NULL; node = new Node; node-&amp;gt;data = data[n]; node-&amp;gt;left = tree(data, n + 1); node-&amp;gt;right = tree(data, n + 2); return node; } 堆 堆通常是一个可以被看做一棵树的数组对象。堆的实现通过构造二叉堆（binary heap），实为二叉树的一种；</description>
+ 二叉树的性质  性质1：在二叉树中第 i 层的结点数最多为   \(2^{i-1}\)  （i ≥ 1） 性质2：高度为k的二叉树其结点总数最多为 \(2^{k}－1\)  （k ≥ 1） 性质3：对任意的非空二叉树 T ，如果叶结点的个数为 \(n_0\)  ，而其度为 2 的结点数为 \(n_2\)  ，则： \(n_0 = n_2 + 1\)    满二叉树 深度为k，且有 \(2^k-1\)  个节点称之为 满二叉树；
+ 性质4：第i层上的节点数为 \(2^{i-1}\)  ；  完全二叉树 深度为k，有n个节点的二叉树，当且仅当其每一个节点都与深度为k的满二叉树中，序号为1至n的节点对应时，称之为完全二叉树。
+ 性质5：对于具有n个结点的完全二叉树的高度为 \(\log_{2}^{n}+1\)    求完全二叉树的叶子结点个数：
+二叉树的构造 //n 表示当前结点字符 Node* tree(vector&amp;lt;char&amp;gt; data, int n) { Node* node; if (n &amp;gt;= data.</description>
     </item>
     
     <item>
