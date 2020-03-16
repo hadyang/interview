@@ -204,8 +204,6 @@ TCP 协议使用慢启动阈值（Slow start threshold, ssthresh）来决定使�
 
 客户端维持一个 **拥塞窗口 `cwnd`** 的状态变量，初始值一般为 {{<katex>}}2\times MSS{{</katex>}}。
 
-![](images/tcp_slow_begin.png)
-
 - `慢开始`：**由小到大的指数增大拥塞窗口**。首先将 cwnd 设置为一个最大报文段 MMS ，在收到一个对新的报文段的确认后，把拥塞窗口增加一个 MMS 。
 
 - `拥塞避免`：当慢开始到阈值（ssthresh）后，使用拥塞避免算法（ cwnd 每次加1 ）。当发送方发送的数据包丢包时，将 ssthresh 置为 cwnd 的一半，将 cwnd 置为1，再次执行慢开始。
