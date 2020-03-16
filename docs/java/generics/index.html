@@ -11,17 +11,16 @@
   泛型类并没有自己独有的Class类对象。比如并不存在List&lt;String&gt;.class或是List&lt;Integer&gt;.class，而只有List.class。
   静态变量是被泛型类的所有实例所共享的。对于声明为MyClass&lt;T&gt;的类，访问其中的静态变量的方法仍然是 MyClass.myStaticVar。不管是通过new MyClass&lt;String&gt;还是new MyClass&lt;Integer&gt;创建的对象，都是共享一个静态变量。
   泛型的类型参数不能用在Java异常处理的catch语句中。因为异常处理是由JVM在运行时刻来进行的。由于类型信息被擦除，JVM是无法区分两个异常类型MyException&lt;String&gt;和MyException&lt;Integer&gt;的。对于JVM来说，它们都是 MyException类型的。也就无法执行与异常对应的catch语句。
-  类型擦除的基本过程也比较简单，首先是找到用来替换类型参数的具体类。这个具体类一般是Object。如果指定了类型参数的上界的话，则使用这个上界。把代码中的类型参数都替换成具体的类。同时去掉出现的类型声明，即去掉&lt;&gt;的内容。比如T get()方法声明就变成了Object get()；List&lt;String&gt;就变成了List。接下来就可能需要生成一些桥接方法（bridge method）。这是由于擦除了类型之后的类可能缺少某些必须的方法。比如考虑下面的代码：
+  类型擦除的基本过程也比较简单，首先是找到用来替换类型参数的具体类。这个具体类一般是Object。如果指定了类型参数的上界的话，则使用这个上界。把代码中的类型参数都替换成具体的类。同时去掉出现的类型声明，即去掉 &lt;&gt; 的内容。比如T get()方法声明就变成了Object get()；List&lt;String&gt;就变成了List。接下来就可能需要生成一些桥接方法（bridge method）。这是由于擦除了类型之后的类可能缺少某些必须的方法。比如考虑下面的代码：
 class MyString implements Comparable&lt;String&gt; { public int compareTo(String str) { return 0; } } 当类型信息被擦除之后，上述类的声明变成了class MyString implements Comparable。但是这样的话，类MyString就会有编译错误，因为没有实现接口Comparable声明的int compareTo(Object)方法。这个时候就由编译器来动态生成这个方法。
 通配符 在使用泛型类的时候，既可以指定一个具体的类型，如List&lt;String&gt;就声明了具体的类型是String；也可以用通配符?来表示未知类型，如List&lt;?&gt;就声明了List中包含的元素类型是未知的。 通配符所代表的其实是一组类型，但具体的类型是未知的。List&lt;?&gt;所声明的就是所有类型都是可以的。但是List&lt;?&gt;并不等同于List&lt;Object&gt;。List&lt;Object&gt;实际上确定了List中包含的是Object及其子类，在使用的时候都可以通过Object来进行引用。而List&lt;?&gt;则其中所包含的元素类型是不确定。其中可能包含的是String，也可能是 Integer。如果它包含了String的话，往里面添加Integer类型的元素就是错误的。正因为类型未知，就不能通过new ArrayList中的元素确总是可以用Object来引用的，因为虽然类型未知，但肯定是Object及其子类。考虑下面的代码：
 public void wildcard(List&lt;?&gt; list) { list.add(1);//编译错误 }  如上所示，试图对一个带通配符的泛型类进行操作的时候，总是会出现编译错误。其原因在于通配符所表示的类型是未知的。
  因为对于List&lt;?&gt;中的元素只能用Object来引用，在有些情况下不是很方便。在这些情况下，可以使用上下界来限制未知类型的范围。 如 List&lt;? extends Number&gt;说明List中可能包含的元素类型是Number及其子类。而List&lt;? super Number&gt;则说明List中包含的是Number及其父类。当引入了上界之后，在使用类型的时候就可以使用上界类中定义的方法。
-类型系统 在Java中，大家比较熟悉的是通过继承机制而产生的类型体系结构。比如String继承自Object。根据Liskov替换原则，子类是可以替换父类的。当需要Object类的引用的时候，如果传入一个String对象是没有任何问题的。但是反过来的话，即用父类的引用替换子类引用的时候，就需要进行强制类型转换。编译器并不能保证运行时刻这种转换一定是合法的。这种自动的子类替换父类的类型转换机制，对于数组也是适用的。 String[]可以替换Object[]。但是泛型的引入，对于这个类型系统产生了一定的影响。正如前面提到的List是不能替换掉List的。
-引入泛型之后的类型系统增加了两个维度：一个是类型参数自身的继承体系结构，另外一个是泛型类或接口自身的继承体系结构。第一个指的是对于 List&lt;String&gt;和List&lt;Object&gt;这样的情况，类型参数String是继承自Object的。而第二种指的是 List接口继承自Collection接口。对于这个类型系统，有如下的一些规则：" />
+类型系统 在Java中，大家比较熟悉的是通过继承机制而产生的类型体系结构。比如String继承自Object。根据Liskov替换原则，子类是可以替换父类的。当需要Object类的引用的时候，如果传入一个String对象是没有任何问题的。但是反过来的话，即用父类的引用替换子类引用的时候，就需要进行强制类型转换。编译器并不能保证运行时刻这种转换一定是合法的。这种自动的子类替换父类的类型转换机制，对于数组也是适用的。 String[]可以替换Object[]。但是泛型的引入，对于这个类型系统产生了一定的影响。正如前面提到的List是不能替换掉List的。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/java/generics/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-01-09T10:37:21+08:00" />
+<meta property="article:modified_time" content="2020-03-16T12:35:25+08:00" />
 <title>Java 泛型 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -29,7 +28,7 @@ public void wildcard(List&lt;?&gt; list) { list.add(1);//编译错误 }  如上�
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.6405333a922e566dc5e97cbde49a9de4921c73644f208c4eb28add0b70e257dd.js" integrity="sha256-ZAUzOpIuVm3F6Xy95Jqd5JIcc2RPIIxOsordC3DiV90="></script>
+<script defer src="/interview/en.search.min.14c617f78491d6a7f42ac26735a8d8a0420862edd4bcce2daa31d709907cbac9.js" integrity="sha256-FMYX94SR1qf0KsJnNajYoEIIYu3UvM4tqjHXCZB8usk="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -205,6 +204,7 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/interview/docs/architecture/design/">系统设计</a>
 <ul>
 <li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
+<li><a href="/interview/docs/architecture/design/seckill/">秒杀系统</a></li>
 </ul>
 </li>
 <li><a href="/interview/docs/architecture/distributed/">分布式</a>
@@ -408,7 +408,7 @@ https://github.com/alex-shpak/hugo-book
 <p><strong>泛型的类型参数不能用在Java异常处理的catch语句中</strong>。因为异常处理是由<code>JVM</code>在运行时刻来进行的。由于类型信息被擦除，<code>JVM</code>是无法区分两个异常类型<code>MyException&lt;String&gt;</code>和<code>MyException&lt;Integer&gt;</code>的。对于<code>JVM</code>来说，它们都是 <code>MyException</code>类型的。也就无法执行与异常对应的catch语句。</p>
 </li>
 </ul>
-<p>类型擦除的基本过程也比较简单，首先是找到用来替换类型参数的具体类。这个具体类一般是Object。如果指定了类型参数的上界的话，则使用这个上界。把代码中的类型参数都替换成具体的类。同时去掉出现的类型声明，即去掉&lt;&gt;的内容。比如<code>T get()</code>方法声明就变成了<code>Object get()</code>；<code>List&lt;String&gt;</code>就变成了<code>List</code>。接下来就可能需要生成一些桥接方法（bridge method）。这是由于擦除了类型之后的类可能缺少某些必须的方法。比如考虑下面的代码：</p>
+<p>类型擦除的基本过程也比较简单，首先是找到用来替换类型参数的具体类。这个具体类一般是Object。如果指定了类型参数的上界的话，则使用这个上界。把代码中的类型参数都替换成具体的类。同时去掉出现的类型声明，即去掉 <code>&lt;&gt;</code> 的内容。比如<code>T get()</code>方法声明就变成了<code>Object get()</code>；<code>List&lt;String&gt;</code>就变成了<code>List</code>。接下来就可能需要生成一些桥接方法（bridge method）。这是由于擦除了类型之后的类可能缺少某些必须的方法。比如考虑下面的代码：</p>
 <pre><code>class MyString implements Comparable&lt;String&gt; {
     public int compareTo(String str) {        
         return 0;    
@@ -449,9 +449,9 @@ https://github.com/alex-shpak/hugo-book
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/b27a988bdcb211d0e1403948f2e82bc0e1bf31b2" title='Last modified by haoyang.shi | 2020-01-09' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/bcfed062c94c1d69fd31fca9e4acb762f7d15256" title='Last modified by haoyang.shi | 2020-03-16' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-01-09</span>
+      <span>2020-03-16</span>
     </a>
   </div>
 

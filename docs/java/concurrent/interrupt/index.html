@@ -8,13 +8,13 @@
 <meta property="og:description" content="线程中断 中断不是类似 linux 里面的命令 kill -9 pid，不是说我们中断某个线程，这个线程就停止运行了。中断代表线程状态，每个线程都关联了一个中断状态，是一个 true 或 false 的 boolean 值，初始值为 false。
 关于中断状态，我们需要重点关注 Thread 类中的以下几个方法：
 // Thread 类中的实例方法，持有线程实例引用即可检测线程中断状态 public boolean isInterrupted() {} // Thread 中的静态方法，检测调用这个方法的线程是否已经中断 // 注意：这个方法返回中断状态的同时，会将此线程的中断状态重置为 false // 所以，如果我们连续调用两次这个方法的话，第二次的返回值肯定就是 false 了 public static boolean interrupted() {} // Thread 类中的实例方法，用于设置一个线程的中断状态为 true public void interrupt() {} 我们说 中断一个线程，其实就是设置了线程的 interrupted status 为 true，至于说被中断的线程怎么处理这个状态，那是那个线程自己的事。如以下代码：
-while (!Thread.interrupted()) { doWork(); System.out.println(&quot;我做完一件事了，准备做下一件，如果没有其他线程中断我的话&quot;); }  这种代码就是会响应中断的，它会在干活的时候先判断下中断状态，不过，除了 JDK 源码外，其他用中断的场景还是比较少的，毕竟 JDK 源码非常讲究。
+while (!Thread.interrupted()) { doWork(); System.out.println(&#34;我做完一件事了，准备做下一件，如果没有其他线程中断我的话&#34;); }  这种代码就是会响应中断的，它会在干活的时候先判断下中断状态，不过，除了 JDK 源码外，其他用中断的场景还是比较少的，毕竟 JDK 源码非常讲究。
  当然，中断除了是线程状态外，还有其他含义，否则也不需要专门搞一个这个概念出来了。如果线程处于以下三种情况，那么当线程被中断的时候，能自动感知到：
   来自 Object 类的 wait()、wait(long)、wait(long, int)，来自 Thread 类的 join()、join(long)、join(long, int)、sleep(long)、sleep(long, int)" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/java/concurrent/interrupt/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-01-09T10:37:21+08:00" />
+<meta property="article:modified_time" content="2020-03-16T12:35:25+08:00" />
 <title>线程中断 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -22,7 +22,7 @@ while (!Thread.interrupted()) { doWork(); System.out.println(&quot;我做完一�
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.6405333a922e566dc5e97cbde49a9de4921c73644f208c4eb28add0b70e257dd.js" integrity="sha256-ZAUzOpIuVm3F6Xy95Jqd5JIcc2RPIIxOsordC3DiV90="></script>
+<script defer src="/interview/en.search.min.14c617f78491d6a7f42ac26735a8d8a0420862edd4bcce2daa31d709907cbac9.js" integrity="sha256-FMYX94SR1qf0KsJnNajYoEIIYu3UvM4tqjHXCZB8usk="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -198,6 +198,7 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/interview/docs/architecture/design/">系统设计</a>
 <ul>
 <li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
+<li><a href="/interview/docs/architecture/design/seckill/">秒杀系统</a></li>
 </ul>
 </li>
 <li><a href="/interview/docs/architecture/distributed/">分布式</a>
@@ -388,22 +389,22 @@ https://github.com/alex-shpak/hugo-book
 <article class="markdown"><h1 id="线程中断httpsjavadoopcompostabstractqueuedsynchronizer-2"><a href="https://javadoop.com/post/AbstractQueuedSynchronizer-2/">线程中断</a></h1>
 <p>中断不是类似 <code>linux</code> 里面的命令 <code>kill -9 pid</code>，不是说我们中断某个线程，这个线程就停止运行了。<strong>中断代表线程状态，每个线程都关联了一个中断状态，是一个 true 或 false 的 boolean 值，初始值为 false</strong>。</p>
 <p>关于中断状态，我们需要重点关注 <code>Thread</code> 类中的以下几个方法：</p>
-<pre><code>// Thread 类中的实例方法，持有线程实例引用即可检测线程中断状态
-public boolean isInterrupted() {}
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#75715e">// Thread 类中的实例方法，持有线程实例引用即可检测线程中断状态
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">boolean</span> <span style="color:#a6e22e">isInterrupted</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span><span style="color:#f92672">}</span>
 
-// Thread 中的静态方法，检测调用这个方法的线程是否已经中断
-// 注意：这个方法返回中断状态的同时，会将此线程的中断状态重置为 false
-// 所以，如果我们连续调用两次这个方法的话，第二次的返回值肯定就是 false 了
-public static boolean interrupted() {}
+<span style="color:#75715e">// Thread 中的静态方法，检测调用这个方法的线程是否已经中断
+</span><span style="color:#75715e"></span><span style="color:#75715e">// 注意：这个方法返回中断状态的同时，会将此线程的中断状态重置为 false
+</span><span style="color:#75715e"></span><span style="color:#75715e">// 所以，如果我们连续调用两次这个方法的话，第二次的返回值肯定就是 false 了
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">boolean</span> <span style="color:#a6e22e">interrupted</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span><span style="color:#f92672">}</span>
 
-// Thread 类中的实例方法，用于设置一个线程的中断状态为 true
-public void interrupt() {}
-</code></pre><p>我们说 <strong>中断一个线程，其实就是设置了线程的 <code>interrupted status</code> 为 <code>true</code></strong>，至于说被中断的线程怎么处理这个状态，那是那个线程自己的事。如以下代码：</p>
-<pre><code>while (!Thread.interrupted()) {
-   doWork();
-   System.out.println(&quot;我做完一件事了，准备做下一件，如果没有其他线程中断我的话&quot;);
-}
-</code></pre><blockquote>
+<span style="color:#75715e">// Thread 类中的实例方法，用于设置一个线程的中断状态为 true
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">interrupt</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span><span style="color:#f92672">}</span>
+</code></pre></div><p>我们说 <strong>中断一个线程，其实就是设置了线程的 <code>interrupted status</code> 为 <code>true</code></strong>，至于说被中断的线程怎么处理这个状态，那是那个线程自己的事。如以下代码：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span><span style="color:#f92672">!</span>Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">interrupted</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+   doWork<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+   System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;我做完一件事了，准备做下一件，如果没有其他线程中断我的话&#34;</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><blockquote>
 <p>这种代码就是会响应中断的，它会在干活的时候先判断下中断状态，不过，除了 JDK 源码外，其他用中断的场景还是比较少的，毕竟 JDK 源码非常讲究。</p>
 </blockquote>
 <p>当然，中断除了是线程状态外，还有其他含义，否则也不需要专门搞一个这个概念出来了。如果线程处于以下三种情况，那么当线程被中断的时候，能自动感知到：</p>
@@ -436,8 +437,7 @@ public void interrupt() {}
 <p>当我们看到方法上带有 <code>throws InterruptedException</code> 时，我们就要知道，这个方法应该是阻塞方法，我们如果希望它能早点返回的话，我们往往可以通过中断来实现。</p>
 <p>除了几个特殊类（如 <code>Object，Thread</code>等）外，<strong>感知中断并提前返回是通过轮询中断状态来实现的</strong>。我们自己需要写可中断的方法的时候，就是通过在合适的时机（通常在循环的开始处）去判断线程的中断状态，然后做相应的操作（通常是方法直接返回或者抛出异常）。当然，我们也要看到，如果我们一次循环花的时间比较长的话，那么就需要比较长的时间才能感知到线程中断了。</p>
 <h2 id="处理中断">处理中断</h2>
-<p>一旦中断发生，我们接收到了这个信息，然后怎么去处理中断呢？本小节将简单分析这个问题。</p>
-<p>我们经常会这么写代码：</p>
+<p>一旦中断发生，我们接收到了这个信息，然后怎么去处理中断呢？本小节将简单分析这个问题。我们经常会这么写代码：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">try</span> <span style="color:#f92672">{</span>
     Thread<span style="color:#f92672">.</span><span style="color:#a6e22e">sleep</span><span style="color:#f92672">(</span>10000<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
 <span style="color:#f92672">}</span> <span style="color:#66d9ef">catch</span> <span style="color:#f92672">(</span>InterruptedException e<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
@@ -461,7 +461,7 @@ public void interrupt() {}
 </span><span style="color:#75715e"></span>        <span style="color:#75715e">// 这样，如果外层方法需要去检测的时候，至少我们没有把这个信息丢了
 </span><span style="color:#75715e"></span>        selfInterrupt<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span><span style="color:#75715e">// Thread.currentThread().interrupt();
 </span><span style="color:#75715e"></span><span style="color:#f92672">}</span>
-</code></pre></div><p>而对于 <code>lockInterruptibly()</code> 方法，因为其方法上面有<code> throws InterruptedException</code> ，这个信号告诉我们，如果我们要取消线程抢锁，直接中断这个线程即可，它会立即返回，抛出 <code>InterruptedException</code> 异常。</p>
+</code></pre></div><p>而对于 <code>lockInterruptibly()</code> 方法，因为其方法上面有 <code>throws InterruptedException</code> ，这个信号告诉我们，如果我们要取消线程抢锁，直接中断这个线程即可，它会立即返回，抛出 <code>InterruptedException</code> 异常。</p>
 <p>在并发包中，有非常多的这种处理中断的例子，提供两个方法，分别为响应中断和不响应中断，对于不响应中断的方法，记录中断而不是丢失这个信息。如 <code>Condition</code> 中的两个方法就是这样的：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">await</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span> <span style="color:#66d9ef">throws</span> InterruptedException<span style="color:#f92672">;</span>
 <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">awaitUninterruptibly</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
@@ -480,7 +480,7 @@ public void interrupt() {}
 </code></pre></div><p>上面的代码会造成什么问题？仔细分析可以发现，代码中如果抛出 <code>InterruptedException</code>，就会陷入死循环中，导致异常日志打爆。为什么会这样呢？首先我们来看下这两个方法：</p>
 <ul>
 <li><code>wait()</code>: if any thread interrupted the current thread before or while the current thread was waiting for a notification. The interrupted status of the current thread is cleared when this exception is thrown.</li>
-<li><code>Thread.currentThread().interrupt()</code>:If none of the previous conditions hold then this thread's interrupt status will be set.</li>
+<li><code>Thread.currentThread().interrupt()</code>: If none of the previous conditions hold then this thread's interrupt status will be set.</li>
 </ul>
 <p><code>wait()</code> 在当前线程有中断标志位时抛出中断异常；而 <code>interrupt()</code> 如果当前线程没有在<code>wait()</code>等阻塞操作，则标记中断。这样就陷入死循环，无限的打印 ERROR 日志。正确的处理 <code>InterruptedException</code> 是很重要的。</p>
 </article>
@@ -494,9 +494,9 @@ public void interrupt() {}
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/b27a988bdcb211d0e1403948f2e82bc0e1bf31b2" title='Last modified by haoyang.shi | 2020-01-09' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/bcfed062c94c1d69fd31fca9e4acb762f7d15256" title='Last modified by haoyang.shi | 2020-03-16' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-01-09</span>
+      <span>2020-03-16</span>
     </a>
   </div>
 

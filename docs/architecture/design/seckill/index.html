@@ -4,15 +4,17 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="最长公共前缀"><meta property="og:title" content="最长公共前缀" />
-<meta property="og:description" content="题目 编写一个函数来查找字符串数组中的最长公共前缀。
-如果不存在公共前缀，返回空字符串 &ldquo;&quot;。
-示例 1: 输入: [&quot;flower&quot;,&quot;flow&quot;,&quot;flight&quot;] 输出: &quot;fl&quot; 解题思路  找到最短字符串 多个字符串逐个字符比较  public String longestCommonPrefix(String[] strs) { if (strs.length == 0) { return &quot;&quot;; } int minLen = strs[0].length(); for (String str : strs) { minLen = Math.min(minLen, str.length()); } char[][] data = new char[strs.length][minLen]; for (int i = 0; i &lt; strs.length; i&#43;&#43;) { char[] chars = strs[i].toCharArray(); System.arraycopy(chars, 0, data[i], 0, minLen); } StringBuilder res = new StringBuilder(); for (int i = 0; i &lt; minLen; i&#43;&#43;) { for (int j = 1; j &lt; data." />
+<meta name="description" content="秒杀系统"><meta property="og:title" content="秒杀系统" />
+<meta property="og:description" content="问题场景 在进行系统设计的过程中，首先问题场景的特点。秒杀系统是十分典型的高并发场景，其特点也十分显著：高并发、低库存、高瞬时流量。再者分析整个系统的输入输出，即大概的 API 网关拥有的功能：查（用户查询商品信息）、改（用户购买商品）。将系统的特点和功能分析完毕后，就可以根据这些信息进行系统设计。一个常规的秒杀系统从前到后，依次有：
+前端页面 -&gt; 代理服务 -&gt; 后端服务 -&gt; 数据库 根据这个流程，一般优化设计思路：将 请求拦截在系统上游，降低下游压力。在一个并发量大，实际需求小的系统中，应当尽量在前端拦截无效流量，降低下游服务器和数据库的压力，不然很可能造成数据库读写锁冲突，甚至导致死锁，最终请求超时。
+整体优化手段包含：缓存、限流、削峰（MQ）、异步处理、降级、熔断、SET化、快速扩容
+前端页面  资源静态化：将活动页面上的所有可以静态的元素全部静态化，尽量减少动态元素；通过CDN缓存静态资源，来抗峰值。 禁止重复提交：用户提交之后按钮置灰，禁止重复提交 URL动态化：防止恶意抓取  代理服务 利用负载均衡（例如 Nginx 等）使用多个服务器并发处理请求，减小服务器压力。
+后端服务  用户限流：在某一时间段内只允许用户提交一次请求，比如可以采取 IP 限流 业务拆分 利用 MQ 削峰 利用缓存应对大量查询请求 利用缓存应对写请求（注意数据一致性、持久性问题）：缓存也是可以应对写请求的，可把数据库中的库存数据转移到 Redis 缓存中，所有减库存操作都在 Redis 中进行，然后再通过后台进程把Redis中的用户秒杀请求同步到数据库中。  数据库  多数据库：防止数据热点问题 优化 SQL 防止死锁  " />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://hadyang.github.io/interview/docs/leetcode/longestCommonPrefix/" />
-<meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-01-09T18:30:07+08:00" />
-<title>最长公共前缀 | Interview</title>
+<meta property="og:url" content="https://hadyang.github.io/interview/docs/architecture/design/seckill/" />
+<meta property="article:published_time" content="2020-03-16T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-03-16T12:35:25+08:00" />
+<title>秒杀系统 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
 
@@ -195,7 +197,7 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/interview/docs/architecture/design/">系统设计</a>
 <ul>
 <li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
-<li><a href="/interview/docs/architecture/design/seckill/">秒杀系统</a></li>
+<li><a href="/interview/docs/architecture/design/seckill/"class=active>秒杀系统</a></li>
 </ul>
 </li>
 <li><a href="/interview/docs/architecture/distributed/">分布式</a>
@@ -293,7 +295,7 @@ https://github.com/alex-shpak/hugo-book
 <li><a href="/interview/docs/leetcode/">LeetCode</a>
 <ul>
 <li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
-<li><a href="/interview/docs/leetcode/longestCommonPrefix/"class=active>最长公共前缀</a></li>
+<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
 <li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
 <li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
 <li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
@@ -356,7 +358,7 @@ https://github.com/alex-shpak/hugo-book
     <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
   </label>
 
-  <strong>最长公共前缀</strong>
+  <strong>秒杀系统</strong>
 
   <label for="toc-control">
     <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
@@ -370,8 +372,11 @@ https://github.com/alex-shpak/hugo-book
       
   <nav id="TableOfContents">
   <ul>
-    <li><a href="#题目">题目</a></li>
-    <li><a href="#解题思路">解题思路</a></li>
+    <li><a href="#问题场景">问题场景</a></li>
+    <li><a href="#前端页面">前端页面</a></li>
+    <li><a href="#代理服务">代理服务</a></li>
+    <li><a href="#后端服务">后端服务</a></li>
+    <li><a href="#数据库">数据库</a></li>
   </ul>
 </nav>
 
@@ -382,45 +387,33 @@ https://github.com/alex-shpak/hugo-book
       </header>
 
       
-<article class="markdown"><h2 id="题目">题目</h2>
-<p>编写一个函数来查找字符串数组中的最长公共前缀。</p>
-<p>如果不存在公共前缀，返回空字符串 &ldquo;&quot;。</p>
-<pre><code>示例 1:
-输入: [&quot;flower&quot;,&quot;flow&quot;,&quot;flight&quot;]
-输出: &quot;fl&quot;
-</code></pre><h2 id="解题思路">解题思路</h2>
-<ol>
-<li>找到最短字符串</li>
-<li>多个字符串逐个字符比较</li>
-</ol>
-<pre><code>public String longestCommonPrefix(String[] strs) {
-    if (strs.length == 0) {
-        return &quot;&quot;;
-    }
-
-    int minLen = strs[0].length();
-    for (String str : strs) {
-        minLen = Math.min(minLen, str.length());
-    }
-
-    char[][] data = new char[strs.length][minLen];
-    for (int i = 0; i &lt; strs.length; i++) {
-        char[] chars = strs[i].toCharArray();
-        System.arraycopy(chars, 0, data[i], 0, minLen);
-    }
-
-    StringBuilder res = new StringBuilder();
-    for (int i = 0; i &lt; minLen; i++) {
-        for (int j = 1; j &lt; data.length; j++) {
-            if (data[j - 1][i] != data[j][i]) {
-                return res.toString();
-            }
-        }
-        res.append(data[0][i]);
-    }
-    return res.toString();
-}
-</code></pre></article>
+<article class="markdown"><h2 id="问题场景">问题场景</h2>
+<p>在进行系统设计的过程中，首先问题场景的特点。秒杀系统是十分典型的高并发场景，其特点也十分显著：高并发、低库存、高瞬时流量。再者分析整个系统的输入输出，即大概的 API 网关拥有的功能：查（用户查询商品信息）、改（用户购买商品）。将系统的特点和功能分析完毕后，就可以根据这些信息进行系统设计。一个常规的秒杀系统从前到后，依次有：</p>
+<pre><code class="language-log" data-lang="log"> 前端页面 -&gt; 代理服务 -&gt; 后端服务 -&gt; 数据库
+</code></pre><p>根据这个流程，一般优化设计思路：将 <strong>请求拦截在系统上游，降低下游压力</strong>。在一个并发量大，实际需求小的系统中，应当尽量在前端拦截无效流量，降低下游服务器和数据库的压力，不然很可能造成数据库读写锁冲突，甚至导致死锁，最终请求超时。</p>
+<p>整体优化手段包含：<strong>缓存</strong>、<strong>限流</strong>、<strong>削峰（MQ）</strong>、<strong>异步处理</strong>、<strong>降级</strong>、<strong>熔断</strong>、<strong>SET化</strong>、<strong>快速扩容</strong></p>
+<h2 id="前端页面">前端页面</h2>
+<ul>
+<li>资源静态化：将活动页面上的所有可以静态的元素全部静态化，尽量减少动态元素；通过CDN缓存静态资源，来抗峰值。</li>
+<li>禁止重复提交：用户提交之后按钮置灰，禁止重复提交</li>
+<li>URL动态化：防止恶意抓取</li>
+</ul>
+<h2 id="代理服务">代理服务</h2>
+<p>利用负载均衡（例如 Nginx 等）使用多个服务器并发处理请求，减小服务器压力。</p>
+<h2 id="后端服务">后端服务</h2>
+<ul>
+<li>用户限流：在某一时间段内只允许用户提交一次请求，比如可以采取 IP 限流</li>
+<li>业务拆分</li>
+<li>利用 MQ 削峰</li>
+<li>利用缓存应对大量查询请求</li>
+<li>利用缓存应对写请求（注意数据一致性、持久性问题）：缓存也是可以应对写请求的，可把数据库中的库存数据转移到 Redis 缓存中，所有减库存操作都在 Redis 中进行，然后再通过后台进程把Redis中的用户秒杀请求同步到数据库中。</li>
+</ul>
+<h2 id="数据库">数据库</h2>
+<ul>
+<li>多数据库：防止数据热点问题</li>
+<li>优化 SQL 防止死锁</li>
+</ul>
+</article>
  
 
       <footer class="book-footer">
@@ -431,16 +424,16 @@ https://github.com/alex-shpak/hugo-book
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/f0a2f71f6321adba3dd8abf4266f048e89f3622d" title='Last modified by haoyang.shi | 2020-01-09' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/bcfed062c94c1d69fd31fca9e4acb762f7d15256" title='Last modified by haoyang.shi | 2020-03-16' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-01-09</span>
+      <span>2020-03-16</span>
     </a>
   </div>
 
 
 
   <div>
-    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/leetcode/longestCommonPrefix/index.md" target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/architecture/design/seckill/index.md" target="_blank" rel="noopener">
       <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
       <span>Edit this page</span>
     </a>
@@ -465,8 +458,11 @@ https://github.com/alex-shpak/hugo-book
       
   <nav id="TableOfContents">
   <ul>
-    <li><a href="#题目">题目</a></li>
-    <li><a href="#解题思路">解题思路</a></li>
+    <li><a href="#问题场景">问题场景</a></li>
+    <li><a href="#前端页面">前端页面</a></li>
+    <li><a href="#代理服务">代理服务</a></li>
+    <li><a href="#后端服务">后端服务</a></li>
+    <li><a href="#数据库">数据库</a></li>
   </ul>
 </nav>
 

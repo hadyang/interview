@@ -11,6 +11,19 @@
     
     
     <item>
+      <title>秒杀系统</title>
+      <link>https://hadyang.github.io/interview/docs/architecture/design/seckill/</link>
+      <pubDate>Mon, 16 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/architecture/design/seckill/</guid>
+      <description>问题场景 在进行系统设计的过程中，首先问题场景的特点。秒杀系统是十分典型的高并发场景，其特点也十分显著：高并发、低库存、高瞬时流量。再者分析整个系统的输入输出，即大概的 API 网关拥有的功能：查（用户查询商品信息）、改（用户购买商品）。将系统的特点和功能分析完毕后，就可以根据这些信息进行系统设计。一个常规的秒杀系统从前到后，依次有：
+前端页面 -&amp;gt; 代理服务 -&amp;gt; 后端服务 -&amp;gt; 数据库 根据这个流程，一般优化设计思路：将 请求拦截在系统上游，降低下游压力。在一个并发量大，实际需求小的系统中，应当尽量在前端拦截无效流量，降低下游服务器和数据库的压力，不然很可能造成数据库读写锁冲突，甚至导致死锁，最终请求超时。
+整体优化手段包含：缓存、限流、削峰（MQ）、异步处理、降级、熔断、SET化、快速扩容
+前端页面  资源静态化：将活动页面上的所有可以静态的元素全部静态化，尽量减少动态元素；通过CDN缓存静态资源，来抗峰值。 禁止重复提交：用户提交之后按钮置灰，禁止重复提交 URL动态化：防止恶意抓取  代理服务 利用负载均衡（例如 Nginx 等）使用多个服务器并发处理请求，减小服务器压力。
+后端服务  用户限流：在某一时间段内只允许用户提交一次请求，比如可以采取 IP 限流 业务拆分 利用 MQ 削峰 利用缓存应对大量查询请求 利用缓存应对写请求（注意数据一致性、持久性问题）：缓存也是可以应对写请求的，可把数据库中的库存数据转移到 Redis 缓存中，所有减库存操作都在 Redis 中进行，然后再通过后台进程把Redis中的用户秒杀请求同步到数据库中。  数据库  多数据库：防止数据热点问题 优化 SQL 防止死锁  </description>
+    </item>
+    
+    <item>
       <title>SQL</title>
       <link>https://hadyang.github.io/interview/docs/basic/database/sql/</link>
       <pubDate>Thu, 20 Feb 2020 00:00:00 +0000</pubDate>
@@ -507,13 +520,12 @@ Java虚拟机中有四种方法调用指令：
   泛型类并没有自己独有的Class类对象。比如并不存在List&amp;lt;String&amp;gt;.class或是List&amp;lt;Integer&amp;gt;.class，而只有List.class。
   静态变量是被泛型类的所有实例所共享的。对于声明为MyClass&amp;lt;T&amp;gt;的类，访问其中的静态变量的方法仍然是 MyClass.myStaticVar。不管是通过new MyClass&amp;lt;String&amp;gt;还是new MyClass&amp;lt;Integer&amp;gt;创建的对象，都是共享一个静态变量。
   泛型的类型参数不能用在Java异常处理的catch语句中。因为异常处理是由JVM在运行时刻来进行的。由于类型信息被擦除，JVM是无法区分两个异常类型MyException&amp;lt;String&amp;gt;和MyException&amp;lt;Integer&amp;gt;的。对于JVM来说，它们都是 MyException类型的。也就无法执行与异常对应的catch语句。
-  类型擦除的基本过程也比较简单，首先是找到用来替换类型参数的具体类。这个具体类一般是Object。如果指定了类型参数的上界的话，则使用这个上界。把代码中的类型参数都替换成具体的类。同时去掉出现的类型声明，即去掉&amp;lt;&amp;gt;的内容。比如T get()方法声明就变成了Object get()；List&amp;lt;String&amp;gt;就变成了List。接下来就可能需要生成一些桥接方法（bridge method）。这是由于擦除了类型之后的类可能缺少某些必须的方法。比如考虑下面的代码：
+  类型擦除的基本过程也比较简单，首先是找到用来替换类型参数的具体类。这个具体类一般是Object。如果指定了类型参数的上界的话，则使用这个上界。把代码中的类型参数都替换成具体的类。同时去掉出现的类型声明，即去掉 &amp;lt;&amp;gt; 的内容。比如T get()方法声明就变成了Object get()；List&amp;lt;String&amp;gt;就变成了List。接下来就可能需要生成一些桥接方法（bridge method）。这是由于擦除了类型之后的类可能缺少某些必须的方法。比如考虑下面的代码：
 class MyString implements Comparable&amp;lt;String&amp;gt; { public int compareTo(String str) { return 0; } } 当类型信息被擦除之后，上述类的声明变成了class MyString implements Comparable。但是这样的话，类MyString就会有编译错误，因为没有实现接口Comparable声明的int compareTo(Object)方法。这个时候就由编译器来动态生成这个方法。
 通配符 在使用泛型类的时候，既可以指定一个具体的类型，如List&amp;lt;String&amp;gt;就声明了具体的类型是String；也可以用通配符?来表示未知类型，如List&amp;lt;?&amp;gt;就声明了List中包含的元素类型是未知的。 通配符所代表的其实是一组类型，但具体的类型是未知的。List&amp;lt;?&amp;gt;所声明的就是所有类型都是可以的。但是List&amp;lt;?&amp;gt;并不等同于List&amp;lt;Object&amp;gt;。List&amp;lt;Object&amp;gt;实际上确定了List中包含的是Object及其子类，在使用的时候都可以通过Object来进行引用。而List&amp;lt;?&amp;gt;则其中所包含的元素类型是不确定。其中可能包含的是String，也可能是 Integer。如果它包含了String的话，往里面添加Integer类型的元素就是错误的。正因为类型未知，就不能通过new ArrayList中的元素确总是可以用Object来引用的，因为虽然类型未知，但肯定是Object及其子类。考虑下面的代码：
 public void wildcard(List&amp;lt;?&amp;gt; list) { list.add(1);//编译错误 }  如上所示，试图对一个带通配符的泛型类进行操作的时候，总是会出现编译错误。其原因在于通配符所表示的类型是未知的。
  因为对于List&amp;lt;?&amp;gt;中的元素只能用Object来引用，在有些情况下不是很方便。在这些情况下，可以使用上下界来限制未知类型的范围。 如 List&amp;lt;? extends Number&amp;gt;说明List中可能包含的元素类型是Number及其子类。而List&amp;lt;? super Number&amp;gt;则说明List中包含的是Number及其父类。当引入了上界之后，在使用类型的时候就可以使用上界类中定义的方法。
-类型系统 在Java中，大家比较熟悉的是通过继承机制而产生的类型体系结构。比如String继承自Object。根据Liskov替换原则，子类是可以替换父类的。当需要Object类的引用的时候，如果传入一个String对象是没有任何问题的。但是反过来的话，即用父类的引用替换子类引用的时候，就需要进行强制类型转换。编译器并不能保证运行时刻这种转换一定是合法的。这种自动的子类替换父类的类型转换机制，对于数组也是适用的。 String[]可以替换Object[]。但是泛型的引入，对于这个类型系统产生了一定的影响。正如前面提到的List是不能替换掉List的。
-引入泛型之后的类型系统增加了两个维度：一个是类型参数自身的继承体系结构，另外一个是泛型类或接口自身的继承体系结构。第一个指的是对于 List&amp;lt;String&amp;gt;和List&amp;lt;Object&amp;gt;这样的情况，类型参数String是继承自Object的。而第二种指的是 List接口继承自Collection接口。对于这个类型系统，有如下的一些规则：</description>
+类型系统 在Java中，大家比较熟悉的是通过继承机制而产生的类型体系结构。比如String继承自Object。根据Liskov替换原则，子类是可以替换父类的。当需要Object类的引用的时候，如果传入一个String对象是没有任何问题的。但是反过来的话，即用父类的引用替换子类引用的时候，就需要进行强制类型转换。编译器并不能保证运行时刻这种转换一定是合法的。这种自动的子类替换父类的类型转换机制，对于数组也是适用的。 String[]可以替换Object[]。但是泛型的引入，对于这个类型系统产生了一定的影响。正如前面提到的List是不能替换掉List的。</description>
     </item>
     
     <item>
@@ -2044,7 +2056,7 @@ CAP 它指出对于一个分布式计算系统来说，不可能同时满足以�
       <description>线程中断 中断不是类似 linux 里面的命令 kill -9 pid，不是说我们中断某个线程，这个线程就停止运行了。中断代表线程状态，每个线程都关联了一个中断状态，是一个 true 或 false 的 boolean 值，初始值为 false。
 关于中断状态，我们需要重点关注 Thread 类中的以下几个方法：
 // Thread 类中的实例方法，持有线程实例引用即可检测线程中断状态 public boolean isInterrupted() {} // Thread 中的静态方法，检测调用这个方法的线程是否已经中断 // 注意：这个方法返回中断状态的同时，会将此线程的中断状态重置为 false // 所以，如果我们连续调用两次这个方法的话，第二次的返回值肯定就是 false 了 public static boolean interrupted() {} // Thread 类中的实例方法，用于设置一个线程的中断状态为 true public void interrupt() {} 我们说 中断一个线程，其实就是设置了线程的 interrupted status 为 true，至于说被中断的线程怎么处理这个状态，那是那个线程自己的事。如以下代码：
-while (!Thread.interrupted()) { doWork(); System.out.println(&amp;quot;我做完一件事了，准备做下一件，如果没有其他线程中断我的话&amp;quot;); }  这种代码就是会响应中断的，它会在干活的时候先判断下中断状态，不过，除了 JDK 源码外，其他用中断的场景还是比较少的，毕竟 JDK 源码非常讲究。
+while (!Thread.interrupted()) { doWork(); System.out.println(&amp;#34;我做完一件事了，准备做下一件，如果没有其他线程中断我的话&amp;#34;); }  这种代码就是会响应中断的，它会在干活的时候先判断下中断状态，不过，除了 JDK 源码外，其他用中断的场景还是比较少的，毕竟 JDK 源码非常讲究。
  当然，中断除了是线程状态外，还有其他含义，否则也不需要专门搞一个这个概念出来了。如果线程处于以下三种情况，那么当线程被中断的时候，能自动感知到：
   来自 Object 类的 wait()、wait(long)、wait(long, int)，来自 Thread 类的 join()、join(long)、join(long, int)、sleep(long)、sleep(long, int)</description>
     </item>
