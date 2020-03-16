@@ -6,13 +6,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="InnoDB 并发控制"><meta property="og:title" content="InnoDB 并发控制" />
 <meta property="og:description" content="InnoDB 并发控制 InnoDB 锁机制 InnoDB默认使用行锁，实现了两种标准的行锁——共享锁与排他锁；
-|行锁类型| 锁功能|锁兼容性| 加锁|释放锁| | :&mdash;&mdash;&mdash;&mdash;- | :&mdash;&mdash;&mdash;&mdash;- | |共享锁（读锁、S锁）| 允许获取共享锁的亊务读数据|与共享锁兼容，与排它锁不兼容| 只有 SerializaWe 隔离级别会默认为：读加共享锁；其他隔离级别下，可显示使用 select...lock in share model 为读加共享锁| 在事务提交或回滚后会自动同时释放锁；除了使用 start transaction 的方式显式开启事务，InnoDB 也会自动为增删改査语句开启事务，并自动提交或回滚；(autocommit=1)| |排它锁（写锁、X锁）|允许获取排它锁的事务更新或删除数据|与共享锁不兼容，与排它锁不兼容|在默认的 Reapeatable Read 隔离级别下，InnoDB 会自动为增删改操作的行加排它锁；也可显式使用 select...for update 为读加排它锁|&hellip;|
-  除了显式加锁的情况，其他情况下的加锁与解锁都无需人工干预 InnoDB 所有的行锁算法都是基于索引实现的，锁定的也都是索引或索引区间   当前读 &amp; 快照读 当前读：即加锁读，读取记录的最新版本，会加锁保证其他并发事务不能修改当前记录，直至获取锁的事务释放锁；使用当前读的操作主要包括：显式加锁的读操作与插入/更新/删除等写操作，如下所示：
-select * from table where ? lock in share mode; select * from table where ? for update; insert into table values (…); update table set ?" />
+   行锁类型 锁功能 锁兼容性 加锁 释放锁     共享锁（读锁、S锁） 允许获取共享锁的亊务读数据 与共享锁兼容，与排它锁不兼容 只有 SerializaWe 隔离级别会默认为：读加共享锁；其他隔离级别下，可显示使用 select...lock in share model 为读加共享锁 在事务提交或回滚后会自动同时释放锁；除了使用 start transaction 的方式显式开启事务，InnoDB 也会自动为增删改査语句开启事务，并自动提交或回滚；(autocommit=1)   排它锁（写锁、X锁） 允许获取排它锁的事务更新或删除数据 与共享锁不兼容，与排它锁不兼容 在默认的 Reapeatable Read 隔离级别下，InnoDB 会自动为增删改操作的行加排它锁；也可显式使用 select...for update 为读加排它锁 &hellip;      除了显式加锁的情况，其他情况下的加锁与解锁都无需人工干预 InnoDB 所有的行锁算法都是基于索引实现的，锁定的也都是索引或索引区间   当前读 &amp; 快照读 当前读：即加锁读，读取记录的最新版本，会加锁保证其他并发事务不能修改当前记录，直至获取锁的事务释放锁；使用当前读的操作主要包括：显式加锁的读操作与插入/更新/删除等写操作，如下所示：
+select * from table where ? lock in share mode; select * from table where ?" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/database/mysql/innodb/concurrent/" />
 <meta property="article:published_time" content="2020-02-19T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-03-02T10:07:43+08:00" />
+<meta property="article:modified_time" content="2020-03-16T15:19:55+08:00" />
 <title>InnoDB 并发控制 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -20,7 +19,7 @@ select * from table where ? lock in share mode; select * from table where ? for 
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.761cf3b94a409dbc22154c36fa1e68b2850d456180de6a25a19c7ba1635fef60.js" integrity="sha256-dhzzuUpAnbwiFUw2&#43;h5osoUNRWGA3moloZx7oWNf72A="></script>
+<script defer src="/interview/en.search.min.e86280f90b15c753162d55c8b4706910f8df0ff40e640d28f944362e01bda273.js" integrity="sha256-6GKA&#43;QsVx1MWLVXItHBpEPjfD/QOZA0o&#43;UQ2LgG9onM="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -403,10 +402,33 @@ https://github.com/alex-shpak/hugo-book
 <h2 id="innodb-锁机制">InnoDB 锁机制</h2>
 <p><img src="images/e86d2bb63f9ecf327e588f352bb26d3b.png" alt=""></p>
 <p>InnoDB默认使用行锁，实现了两种标准的行锁——共享锁与排他锁；</p>
-<p>|行锁类型| 锁功能|锁兼容性|  加锁|释放锁|
-| :&mdash;&mdash;&mdash;&mdash;- | :&mdash;&mdash;&mdash;&mdash;- |
-|共享锁（读锁、S锁）| 允许获取共享锁的亊务读数据|与共享锁兼容，与排它锁不兼容| 只有 <code>SerializaWe</code> 隔离级别会默认为：读加共享锁；其他隔离级别下，可显示使用 <code>select...lock in share model</code> 为读加共享锁| 在事务提交或回滚后会自动同时释放锁；除了使用 <code>start transaction</code> 的方式显式开启事务，InnoDB 也会自动为增删改査语句开启事务，并自动提交或回滚；(<code>autocommit=1</code>)|
-|排它锁（写锁、X锁）|允许获取排它锁的事务更新或删除数据|与共享锁不兼容，与排它锁不兼容|在默认的 <code>Reapeatable Read</code> 隔离级别下，InnoDB 会自动为增删改操作的行加排它锁；也可显式使用 <code>select...for update</code> 为读加排它锁|&hellip;|</p>
+<table>
+<thead>
+<tr>
+<th align="left">行锁类型</th>
+<th align="left">锁功能</th>
+<th align="left">锁兼容性</th>
+<th align="left">加锁</th>
+<th align="left">释放锁</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">共享锁（读锁、S锁）</td>
+<td align="left">允许获取共享锁的亊务读数据</td>
+<td align="left">与共享锁兼容，与排它锁不兼容</td>
+<td align="left">只有 <code>SerializaWe</code> 隔离级别会默认为：读加共享锁；其他隔离级别下，可显示使用 <code>select...lock in share model</code> 为读加共享锁</td>
+<td align="left">在事务提交或回滚后会自动同时释放锁；除了使用 <code>start transaction</code> 的方式显式开启事务，InnoDB 也会自动为增删改査语句开启事务，并自动提交或回滚；(<code>autocommit=1</code>)</td>
+</tr>
+<tr>
+<td align="left">排它锁（写锁、X锁）</td>
+<td align="left">允许获取排它锁的事务更新或删除数据</td>
+<td align="left">与共享锁不兼容，与排它锁不兼容</td>
+<td align="left">在默认的 <code>Reapeatable Read</code> 隔离级别下，InnoDB 会自动为增删改操作的行加排它锁；也可显式使用 <code>select...for update</code> 为读加排它锁</td>
+<td align="left">&hellip;</td>
+</tr>
+</tbody>
+</table>
 <blockquote>
 <ol>
 <li>除了显式加锁的情况，其他情况下的加锁与解锁都无需人工干预</li>
@@ -547,9 +569,9 @@ MySQL Server 此时才会判断返回的记录是否满足<code>id&lt;7</code>�
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/087d135749e1bcf917b793ebe364e70a8d58ea54" title='Last modified by haoyang.shi | 2020-03-02' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/4cabcb8e36bc6701dd3a5de6cad4e6f48bcb6f64" title='Last modified by haoyang.shi | 2020-03-16' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-03-02</span>
+      <span>2020-03-16</span>
     </a>
   </div>
 
