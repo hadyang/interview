@@ -5,57 +5,409 @@ draft: false
 categories: java
 ---
 
-# Java泛型
+## 为什么使用泛型
 
-开发人员在使用泛型的时候，很容易根据自己的直觉而犯一些错误。比如一个方法如果接收`List<Object>`作为形式参数，那么如果尝试将一个`List<String>`的对象作为实际参数传进去，却发现无法通过编译。虽然从直觉上来说，`Object`是`String`的父类，这种类型转换应该是合理的。**但是实际上这会产生隐含的类型转换问题，因此编译器直接就禁止这样的行为**。
+简而言之，泛型可以使类型（类和接口）在定义类、接口和方法时进行参数化。与在方法定义的形参类似，类型参数化能让不同的输入使用同一份代码。差别在于，形参传入的是值，而类型参数化传入的是类型。
 
-## 类型擦除
+在使用泛型相比于直接使用 `Object` 有以下几个好处：
 
-Java中的泛型基本上都是在编译器这个层次来实现的，**在生成的Java字节代码中是不包含泛型中的类型信息的。使用泛型的时候加上的类型参数，会被编译器在编译的时候去掉，这个过程就称为类型擦除**。如在代码中定义的`List<Object>`和`List<String>`等类型，在编译之后都会变成`List`。**JVM看到的只是List，而由泛型附加的类型信息对JVM来说是不可见的**。Java编译器会在编译时尽可能的发现可能出错的地方，但是仍然无法避免在运行时刻出现类型转换异常的情况。
+1. **强制的类型检查**：Java 编译器会对泛型代码进行强制类型检查，如果违反类型安全则会抛出错误。在编译阶段解决类型错误，能更有效的减少 Bug
+2. **消除类型强制转换**：如果不使用泛型，则在进行代码编写是需要手动进行类型转换
+3. **允许程序员实现通用算法**：通过泛型，程序员能在不同类型的集合上实现通用算法
 
-很多泛型的奇怪特性都与这个类型擦除的存在有关，包括：
+## 泛型类型
 
-  - **泛型类并没有自己独有的Class类对象**。比如并不存在`List<String>.class`或是`List<Integer>.class`，而只有`List.class`。
+泛型类型是指被参数化的类或接口，首先我们来看看一个简单的类：`Box`。其方法接收和返回的都是 `Object` 类型，因此可以除基本类型外的其他任何类型。这样也导致在编译期间不能进行任何校验。如果 `Box` 期望的是一个 `Integer` 类型，然而外部调用时，传入 `String` 类型，这就会在程序运行时抛出异常。
 
-  - **静态变量是被泛型类的所有实例所共享的**。对于声明为`MyClass<T>`的类，访问其中的静态变量的方法仍然是 `MyClass.myStaticVar`。不管是通过`new MyClass<String>`还是`new MyClass<Integer>`创建的对象，都是共享一个静态变量。
+```java
+public class Box {
+    private Object object;
 
-  - **泛型的类型参数不能用在Java异常处理的catch语句中**。因为异常处理是由`JVM`在运行时刻来进行的。由于类型信息被擦除，`JVM`是无法区分两个异常类型`MyException<String>`和`MyException<Integer>`的。对于`JVM`来说，它们都是 `MyException`类型的。也就无法执行与异常对应的catch语句。
+    public void set(Object object) { this.object = object; }
+    public Object get() { return object; }
+}
+```
 
-类型擦除的基本过程也比较简单，首先是找到用来替换类型参数的具体类。这个具体类一般是Object。如果指定了类型参数的上界的话，则使用这个上界。把代码中的类型参数都替换成具体的类。同时去掉出现的类型声明，即去掉 `<>` 的内容。比如`T get()`方法声明就变成了`Object get()`；`List<String>`就变成了`List`。接下来就可能需要生成一些桥接方法（bridge method）。这是由于擦除了类型之后的类可能缺少某些必须的方法。比如考虑下面的代码：
+下面我们来看看泛型类型版本的 `Box`：
 
+```java
+/**
+ * Generic version of the Box class.
+ * @param <T> the type of the value being boxed
+ */
+public class Box<T> {
+    // T stands for "Type"
+    private T t;
 
-  ```
-  class MyString implements Comparable<String> {
-      public int compareTo(String str) {        
-          return 0;    
-      }
-  }
-  ```
+    public void set(T t) { this.t = t; }
+    public T get() { return t; }
+}
+```
 
-当类型信息被擦除之后，上述类的声明变成了`class MyString implements Comparable`。但是这样的话，类`MyString`就会有编译错误，因为没有实现接口`Comparable`声明的`int compareTo(Object)`方法。这个时候就由编译器来动态生成这个方法。
+如上面代码所示，所有 `Object` 都被替换为了 `T`，`T` 是一个可以代表除基本类型外的所有类型：任意类、任意接口、任意数组类型甚至还可以是其他的类型参数（eg: `List<T>`）。
+
+### 原始类型
+
+原始类型是泛型类型没有类型参数的形式，例如上面的 `Box<T>` ，其原始类型就是 `Box`，但 **非泛型类类型不是原始类型**。原始类型的出现，只是为兼容 JDK5 之前的历史代码，比如：`Collections`。因此，将一个泛型类型赋值给原始类型是可以的：
+
+```java
+Box<String> stringBox = new Box<>();
+Box rawBox = stringBox;               // OK
+```
+
+如果将原始类型赋值给泛型类型，编译器会报告一个警告：
+
+```java
+Box rawBox = new Box();           // rawBox is a raw type of Box<T>
+Box<Integer> intBox = rawBox;     // warning: unchecked conversion
+```
+
+同样的，如果将一个原始类型参数传递给泛型方法，也会报告一个警告：
+```java
+Box<String> stringBox = new Box<>();
+Box rawBox = stringBox;
+rawBox.set(8);  // warning: unchecked invocation to set(T)
+```
+
+## 泛型方法
+
+泛型方法与泛型类型类似，只不过泛型方法拥有自己的参数化类型，并且其作用域只限制在声明的方法中。泛型方法可以是静态的、非静态以及构造函数。泛型方法的声明必须在返回参数之前，即：
+
+```java
+public class Util {
+    public static <K, V> boolean compare(Pair<K, V> p1, Pair<K, V> p2) {
+        return p1.getKey().equals(p2.getKey()) &&
+               p1.getValue().equals(p2.getValue());
+    }
+}
+
+public class Pair<K, V> {
+
+    private K key;
+    private V value;
+
+    //泛型方法
+    public Pair(K key, V value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    //泛型方法
+    public void setKey(K key) { this.key = key; }
+    public void setValue(V value) { this.value = value; }
+    public K getKey()   { return key; }
+    public V getValue() { return value; }
+}
+```
+
+## 有界类型参数
+
+当一个方法进行数字计算，并且想接收所有 `Number` 类型及其子类时，就需要用到有界类型参数。要声明一个有界类型参数，先列出该类型参数的名称，然后是 `extends` 关键字，然后是其上界，在这里是 `Number`。
+
+> 在这里 `extends` 即可以表示 `extends`，也可以表示 `implements`。
+
+```java
+public <U extends Number> void inspect(U u){
+    System.out.println("T: " + t.getClass().getName());
+    System.out.println("U: " + u.getClass().getName());
+}
+```
+
+在进行有界类型参数定义后，可使用在上界类型中定义的方法，在这里就可以调用 `Number` 内的所有方法，例如：`intValue`。
+
+### 多上界
+
+前面的示例说明了使用带单个界限的类型参数，但是类型参数可以具有多个界限：
+
+```java
+<T extends B1 & B2 & B3>
+```
+
+有多个上界时，如果上界中包含类型（Class），则需要放在第一位。
+
+## 泛型&继承&子类型
+
+如 Java 语言规范所描述，只要类型兼容，就可以将一种类型的对象分配给另一种类型的对象。例如：我们可以将 `Integer` 对象赋值给 `Object` ，因为 `Object` 是 `Integer` 的父类之一。
+
+```java
+Object someObject = new Object();
+Integer someInteger = new Integer(10);
+someObject = someInteger;   // OK
+```
+
+用面向对象的术语来说，这是一种 `is a` 的关系。因为，`Integer` 是一种 `Object` ，这样的赋值也是允许的。同时，`Integer` 也是一种 `Number` 所以以下代码均正确：
+
+```java
+public void someMethod(Number n) { /* ... */ }
+
+someMethod(new Integer(10));   // OK
+someMethod(new Double(10.1));   // OK
+```
+
+这种关系同样可以在泛型中使用：
+
+```java
+Box<Number> box = new Box<Number>();
+box.add(new Integer(10));   // OK
+box.add(new Double(10.1));  // OK
+```
+
+但是在泛型方法上会有所不同，比如以下方法：
+
+```java
+public void boxTest(Box<Number> n) { /* ... */ }
+```
+
+这个方法能够接收什么类型的参数呢？是否能够将 `Box<Integer>` 或者 `Box<Double>` 类型的对象传入呢？答案是 “否”，因为 `Box<Integer>` 和 `Box<Double>` 均不是 `Box<Number>` 的子类型。
+
+> 这是一个常见的误解
+
+![](assists/generics_method_type.png)
+
+不论 `Integer` 和 `Number` 是什么关系，`Box<Integer>` 和 `Box<Number>` 的共同父类均是 `Object`。
+
+### 子类型
+
+可以通过 `extends` 或者 `implement` 创建泛型类型的子类型，他们之间的关系只依赖与被 `extends` 或者被 `implements`。我们可以看看 `Collections` 的相关类型，`ArrayList<E>` 实现 `List<E>` 并且 `List<E>` 继承自 `Collection<E>`，所以，`ArrayList<String>` 是 `List<String>` 的子类型，`List<String>` 是 `Collection<String>` 的子类型。
+
+![](assists/generics_subtype_1.png)
+
+现在我们需要自己定义一个 list 接口：`PayloadList`，它拥有一个可选的泛型类型 `P`：
+
+```java
+interface PayloadList<E,P> extends List<E> {
+  void setPayload(int index, P val);
+  ...
+}
+```
+
+以下所有的 `PayloadList` 都是 `List<String>` 的子类型:
+
+```java
+PayloadList<String,String>
+PayloadList<String,Integer>
+PayloadList<String,Exception>
+```
+
+![](assists/generics_subtype_2.png)
 
 ## 通配符
 
-在使用泛型类的时候，既可以指定一个具体的类型，如`List<String>`就声明了具体的类型是`String`；也可以用通配符`?`来表示未知类型，如`List<?>`就声明了`List`中包含的元素类型是未知的。 通配符所代表的其实是一组类型，但具体的类型是未知的。`List<?>`所声明的就是所有类型都是可以的。**但是`List<?>`并不等同于`List<Object>`。`List<Object>`实际上确定了`List`中包含的是`Object`及其子类，在使用的时候都可以通过`Object`来进行引用。而`List<?>`则其中所包含的元素类型是不确定**。其中可能包含的是`String`，也可能是 `Integer`。如果它包含了`String`的话，往里面添加`Integer`类型的元素就是错误的。**正因为类型未知，就不能通过new ArrayList<?>()的方法来创建一个新的ArrayList对象。因为编译器无法知道具体的类型是什么。但是对于 List<?>中的元素确总是可以用Object来引用的，因为虽然类型未知，但肯定是Object及其子类**。考虑下面的代码：
+在泛型中，使用 `?` 做为通配符，代表未知类型。有界类型参数在上面已有介绍： `List<? extends Number>`。类似的，通配符可以没有上界，即 `List<?>`，这被称之为未知类型的List。这种未知类型的泛型在下面两个场景中很适用：
+1. 泛型类型中只使用 Object 中声明的方法
+2. 泛型类型中的代码不依赖与类型参数，例如：`List.size`、`List.clear`
 
+另外，通配符还可声明类型参数的下界：`List<? super Integer>`。
+
+### 通配符&子类型
+
+当有了通配符后，泛型的继承关系又有新的规则。尽管 Integer 是 Number 的子类型，但 `List<Integer>` 不是 `List<Number>` 的子类型，实际上，这两种类型无关。 `List<Number>` 和 `List<Integer>` 的公共父类是 `List<?>`。
+
+![](assists/generics_wildcards_subtype_1.png)
+
+```java
+List<? extends Integer> intList = new ArrayList<>();
+List<? extends Number>  numList = intList;  // OK. List<? extends Integer> is a subtype of List<? extends Number>
 ```
-public void wildcard(List<?> list) {
-    list.add(1);//编译错误
-}  
+
+因为 `Integer` 是 `Number` 的子类型，并且 `numList` 是 `Number` 对象的列表，所以 `intList` （一个 Integer 对象的列表）和 `numList` 之间存在关系。下图显示了使用上下界通配符声明的几个 List 类之间的关系。
+
+![](assists/generics_wildcards_subtype_2.png)
+
+## 类型擦除
+
+Java 语言引入了泛型，以在编译时提供更严格的类型检查并支持泛型编程。为实现泛型 Java 编译器会进行类型擦除：
+1. 替换所有类型参数为他们的上界或者 `Object`，因此，字节码仅包含普通的类，接口和方法。
+2. 必要时插入类型转换，以保持类型安全。
+3. 生成桥接方法以在扩展的泛型类型中保留多态。
+
+类型擦除可确保不会为参数化类型创建新的类；因此，泛型不会产生运行时开销。
+
+### 泛型类型的擦除
+
+在类型擦除过程中，Java 编译器将擦除所有类型参数，如果类型参数是有界的，则将每个参数替换为其第一个边界；如果类型参数是无界的，则将其替换为 `Object`。
+
+```java
+public class Node<T> {
+
+    private T data;
+    private Node<T> next;
+
+    public Node(T data, Node<T> next) {
+        this.data = data;
+        this.next = next;
+    }
+
+    public T getData() { return data; }
+    // ...
+}
 ```
 
-> 如上所示，试图对一个带通配符的泛型类进行操作的时候，总是会出现编译错误。其原因在于通配符所表示的类型是未知的。
+由于 `T` 是无界的，所以其类型擦除后的代码为：
 
-因为对于`List<?>`中的元素只能用`Object`来引用，在有些情况下不是很方便。在这些情况下，可以使用上下界来限制未知类型的范围。 如 **`List<? extends Number>`说明List中可能包含的元素类型是`Number`及其子类。而`List<? super Number>`则说明List中包含的是Number及其父类**。当引入了上界之后，在使用类型的时候就可以使用上界类中定义的方法。
+```java
+public class Node {
 
-## 类型系统
+    private Object data;
+    private Node next;
 
-在Java中，大家比较熟悉的是通过继承机制而产生的类型体系结构。比如`String`继承自`Object`。根据`Liskov替换原则`，子类是可以替换父类的。当需要`Object`类的引用的时候，如果传入一个`String`对象是没有任何问题的。但是反过来的话，即用父类的引用替换子类引用的时候，就需要进行强制类型转换。编译器并不能保证运行时刻这种转换一定是合法的。**这种自动的子类替换父类的类型转换机制，对于数组也是适用的。 String[]可以替换Object[]**。但是泛型的引入，对于这个类型系统产生了一定的影响。**正如前面提到的List<String>是不能替换掉List<Object>的**。
+    public Node(Object data, Node next) {
+        this.data = data;
+        this.next = next;
+    }
 
-引入泛型之后的类型系统增加了两个维度：**一个是类型参数自身的继承体系结构，另外一个是泛型类或接口自身的继承体系结构**。第一个指的是对于 `List<String>`和`List<Object>`这样的情况，类型参数`String`是继承自`Object`的。而第二种指的是 `List`接口继承自`Collection`接口。对于这个类型系统，有如下的一些规则：
+    public Object getData() { return data; }
+    // ...
+}
+```
 
-  - **相同类型参数的泛型类的关系取决于泛型类自身的继承体系结构**。即`List<String>`是`Collection<String>` 的子类型，`List<String>`可以替换`Collection<String>`。这种情况也适用于带有上下界的类型声明。
+而对于以下代码的擦除又不一样：
 
-  - **当泛型类的类型声明中使用了通配符的时候，其子类型可以在两个维度上分别展开**。如对`Collection<? extends Number>`来说，其子类型可以在`Collection`这个维度上展开，即`List<? extends Number>`和`Set<? extends Number>`等；也可以在`Number`这个层次上展开，即`Collection<Double>`和`Collection<Integer>`等。如此循环下去，`ArrayList<Long>`和 `HashSet<Double>`等也都算是`Collection<? extends Number>`的子类型。
+```java
+public class Node<T extends Comparable<T>> {
 
-  - 如果泛型类中包含多个类型参数，则对于每个类型参数分别应用上面的规则。
+    private T data;
+    private Node<T> next;
+
+    public Node(T data, Node<T> next) {
+        this.data = data;
+        this.next = next;
+    }
+
+    public T getData() { return data; }
+    // ...
+}
+```
+
+擦除后：
+
+```java
+public class Node {
+
+    private Comparable data;
+    private Node next;
+
+    public Node(Comparable data, Node next) {
+        this.data = data;
+        this.next = next;
+    }
+
+    public Comparable getData() { return data; }
+    // ...
+}
+```
+
+### 泛型方法擦除
+
+泛型方法的擦除规则和泛型类型的擦除规则类似：
+
+```java
+// Counts the number of occurrences of elem in anArray.
+public static <T> int count(T[] anArray, T elem) {
+    int cnt = 0;
+    for (T e : anArray)
+        if (e.equals(elem))
+            ++cnt;
+        return cnt;
+}
+public static <T extends Shape> void draw(T shape) { /* ... */ }
+```
+
+擦除后：
+
+```java
+public static int count(Object[] anArray, Object elem) {
+    int cnt = 0;
+    for (Object e : anArray)
+        if (e.equals(elem))
+            ++cnt;
+        return cnt;
+}
+public static void draw(Shape shape) { /* ... */ }
+```
+
+### 桥接方法
+
+对于以下两个类：
+
+```java
+public class Node<T> {
+
+    public T data;
+
+    public Node(T data) { this.data = data; }
+
+    public void setData(T data) {
+        System.out.println("Node.setData");
+        this.data = data;
+    }
+}
+
+public class MyNode extends Node<Integer> {
+    public MyNode(Integer data) { super(data); }
+
+    public void setData(Integer data) {
+        System.out.println("MyNode.setData");
+        super.setData(data);
+    }
+}
+```
+
+类型擦除：
+
+```java
+public class Node {
+
+    public Object data;
+
+    public Node(Object data) { this.data = data; }
+
+    public void setData(Object data) {
+        System.out.println("Node.setData");
+        this.data = data;
+    }
+}
+
+public class MyNode extends Node {
+
+    public MyNode(Integer data) { super(data); }
+
+    public void setData(Integer data) {
+        System.out.println("MyNode.setData");
+        super.setData(data);
+    }
+}
+```
+
+在类型擦除后，方法的签名不匹配，导致重写的方法不生效，`Node.setData(T)` 变成了 `Node.setData(Object)`。为解决这个问题，Java 编译器在子类型中生成桥接方法，对于 `MyNode` 其生成的方法如下：
+
+```java
+class MyNode extends Node {
+
+    // Bridge method generated by the compiler
+    //
+    public void setData(Object data) {
+        setData((Integer) data);
+    }
+
+    public void setData(Integer data) {
+        System.out.println("MyNode.setData");
+        super.setData(data);
+    }
+
+    // ...
+}
+```
+
+这样，在类型擦除之后，`MyNode` 具有与 `Node` 的 `setData(Object)` 方法相同的方法签名的桥接方法，并将其委托给的 `setData(Integer)` 方法。
+
+### 未擦除的泛型
+
+类型擦除只局限于 **泛型类型** 和 **泛型方法**，对于 `MyNode` 这种非泛型类型，泛型信息并不会擦除。在 `MyNode` 内同样可以通过反射获取到它父类的泛型信息。
+
+```java
+public static void main(String[] args) throws Exception {
+  ParameterizedTypeImpl superclass = (ParameterizedTypeImpl) MyNode.class.getGenericSuperclass();
+  System.out.println(Arrays.toString(superclass.getActualTypeArguments()));//[class java.lang.Integer]
+}
+```
