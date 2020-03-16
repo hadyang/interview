@@ -6,10 +6,22 @@
     <description>Recent content on Interview</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
-    <lastBuildDate>Wed, 08 Jan 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 16 Mar 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://hadyang.github.io/interview/docs/java/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Java面试题</title>
+      <link>https://hadyang.github.io/interview/docs/java/question/</link>
+      <pubDate>Mon, 16 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://hadyang.github.io/interview/docs/java/question/</guid>
+      <description>面向对象的特征有哪些方面？  抽象：抽象是将一类对象的共同特征总结出来构造类的过程，包括数据抽象和行为抽象两方面。抽象只关注对象有哪些属性和行为，并不关注这些行为的细节是什么。 继承：继承是从已有类得到继承信息创建新类的过程。继承让变化中的软件系统有了一定的延续性，同时继承也是封装程序中可变因素的重要手段。 封装：通常认为封装是把数据和操作数据的方法绑定起来，对数据的访问只能通过已定义的接口。面向对象的本质就是将现实世界描绘成一系列完全自治、封闭的对象。 多态：多态性是指允许不同子类型的对象对同一消息作出不同的响应。  访问修饰符 public 、 private 、 protected 以及不写时的区别？ 类的成员不写访问修饰时默认为 package。默认对于同一个包中的其他类相当于公开（public），对于不是同一个包中的其他类相当于私有（private）。受保护（protected）对子类相当于公开，对不是同一包中的没有父子关系的类相当于私有。Java中，外部类的修饰符只能是 public 或默认，类的成员（包括内部类）的修饰符可以是以上四种。
+String是最基本的数据类型吗？ 不是，Java中的基本数据类型只有8个：byte、short、int、long、float、double、char、boolean；除了基本类型（primitive type），剩下的都是引用类型（reference type），Java 5以后引入的枚举类型也算是一种比较特殊的引用类型。
+float f=3.4;是否正确？ 不正确。3.4是双精度数，将双精度型（double）赋值给浮点型（float）属于下转型会造成精度损失，因此需要强制类型转换 float f =(float)3.4; 或者写成 float f =3.4F;。
+short s1 = 1; s1 = s1 + 1;有错吗? short s1 = 1; s1 += 1; 有错吗？ 对于 short s1 = 1; s1 = s1 + 1; 由于 1 是 int 类型，因此 s1+1 运算结果也是int 型，需要强制转换类型才能赋值给 short 型，编译不通过。</description>
+    </item>
     
     <item>
       <title>NIO</title>

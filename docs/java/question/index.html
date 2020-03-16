@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Java面试题"><meta property="og:title" content="Java面试题" />
+<meta property="og:description" content="面向对象的特征有哪些方面？  抽象：抽象是将一类对象的共同特征总结出来构造类的过程，包括数据抽象和行为抽象两方面。抽象只关注对象有哪些属性和行为，并不关注这些行为的细节是什么。 继承：继承是从已有类得到继承信息创建新类的过程。继承让变化中的软件系统有了一定的延续性，同时继承也是封装程序中可变因素的重要手段。 封装：通常认为封装是把数据和操作数据的方法绑定起来，对数据的访问只能通过已定义的接口。面向对象的本质就是将现实世界描绘成一系列完全自治、封闭的对象。 多态：多态性是指允许不同子类型的对象对同一消息作出不同的响应。  访问修饰符 public 、 private 、 protected 以及不写时的区别？ 类的成员不写访问修饰时默认为 package。默认对于同一个包中的其他类相当于公开（public），对于不是同一个包中的其他类相当于私有（private）。受保护（protected）对子类相当于公开，对不是同一包中的没有父子关系的类相当于私有。Java中，外部类的修饰符只能是 public 或默认，类的成员（包括内部类）的修饰符可以是以上四种。
+String是最基本的数据类型吗？ 不是，Java中的基本数据类型只有8个：byte、short、int、long、float、double、char、boolean；除了基本类型（primitive type），剩下的都是引用类型（reference type），Java 5以后引入的枚举类型也算是一种比较特殊的引用类型。
+float f=3.4;是否正确？ 不正确。3.4是双精度数，将双精度型（double）赋值给浮点型（float）属于下转型会造成精度损失，因此需要强制类型转换 float f =(float)3.4; 或者写成 float f =3.4F;。
+short s1 = 1; s1 = s1 &#43; 1;有错吗? short s1 = 1; s1 &#43;= 1; 有错吗？ 对于 short s1 = 1; s1 = s1 &#43; 1; 由于 1 是 int 类型，因此 s1&#43;1 运算结果也是int 型，需要强制转换类型才能赋值给 short 型，编译不通过。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hadyang.github.io/interview/docs/java/question/" />
+<meta property="article:published_time" content="2020-03-16T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-03-16T16:39:48+08:00" />
+<title>Java面试题 | Interview</title>
+<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+
+
+<link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
+
+
+<script defer src="/interview/en.search.min.d06d58accda8838a176b118faae37bbb47a0367f565e43f6da97e1a79971535c.js" integrity="sha256-0G1YrM2og4oXaxGPquN7u0egNn9WXkP22pfhp5lxU1w="></script>
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-157595781-3', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+
+  
+</head>
+
+<body>
+  <input type="checkbox" class="hidden" id="menu-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      
+  <nav>
+<h2 class="book-brand">
+  <a href="/interview"><span>Interview</span>
+  </a>
+</h2>
+
+
+<div class="book-search">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+
+
+
+
+
+
+
+
+
+  <ul>
+<li><a href="/interview/docs/basic/">计算机基础</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/">算法</a>
+<ul>
+<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
+<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
+<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
+<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
+<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
+<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
+<li><a href="/interview/docs/basic/algo/sort/">排序算法</a></li>
+<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/os/">操作系统</a>
+<ul>
+<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
+<li><a href="/interview/docs/basic/os/concurrency/">进程管理</a></li>
+<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
+<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
+<li><a href="/interview/docs/basic/os/device/">设备管理</a></li>
+<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
+<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/net/">计算机网络</a>
+<ul>
+<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
+<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
+<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
+<li><a href="/interview/docs/basic/net/http/">HTTP</a></li>
+<li><a href="/interview/docs/basic/net/https/">HTTPS</a></li>
+<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/mysql/">MySQL</a>
+<ul>
+<li><a href="/interview/docs/basic/database/sql/">SQL</a></li>
+<li><a href="/interview/docs/basic/database/mysql/architecture/">MySQL架构</a></li>
+<li><a href="/interview/docs/basic/database/mysql/innodb/">InnoDB</a>
+<ul>
+<li><a href="/interview/docs/basic/database/mysql/innodb/index/">InnoDB索引</a></li>
+<li><a href="/interview/docs/basic/database/mysql/innodb/concurrent/">InnoDB并发控制</a></li>
+<li><a href="/interview/docs/basic/database/mysql/innodb/transaction/">InnoDB事务</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/mysql/sharding/">MySQL集群</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
+<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/">Java</a>
+<ul>
+<li><a href="/interview/docs/java/oop/">OOP</a></li>
+<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
+<li><a href="/interview/docs/java/operator/">运算符</a></li>
+<li><a href="/interview/docs/java/exception/">异常</a></li>
+<li><a href="/interview/docs/java/generics/">泛型</a></li>
+<li><a href="/interview/docs/java/object/">Object</a></li>
+<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
+<li><a href="/interview/docs/java/proxy/">代理</a></li>
+<li><a href="/interview/docs/java/annotation/">注解</a></li>
+<li><a href="/interview/docs/java/nio/">NIO</a></li>
+<li><a href="/interview/docs/java/question/"class=active>面试题</a></li>
+<li><a href="/interview/docs/java/">集合</a>
+<ul>
+<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
+<li><a href="/interview/docs/java/collection/Concurrenthashmap/">Concurrenthashmap</a></li>
+<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/concurrent/">并发</a>
+<ul>
+<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
+<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
+<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
+<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
+<li><a href="/interview/docs/java/concurrent/AQS/">AQS</a></li>
+<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
+<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
+<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/java/jvm/">Java虚拟机</a>
+<ul>
+<li><a href="/interview/docs/java/jvm/architecture/">JVM架构</a></li>
+<li><a href="/interview/docs/java/jvm/classloader/">类加载器</a></li>
+<li><a href="/interview/docs/java/jvm/runtime_area/">内存模型</a></li>
+<li><a href="/interview/docs/java/jvm/gc/">垃圾收集</a></li>
+<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
+<li><a href="/interview/docs/java/jvm/string-constant-pool/">String常量池</a></li>
+<li><a href="/interview/docs/java/jvm/jvm-object-lifecycle/">对象生命周期</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/">框架</a>
+<ul>
+<li><a href="/interview/docs/fromwork/netty/">Netty</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
+<ul>
+<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
+<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/fromwork/spring/">Spring</a>
+<ul>
+<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
+<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
+<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/">系统架构</a>
+<ul>
+<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
+<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
+<ul>
+<li><a href="/interview/docs/architecture/concurrent/design/">高并发系统设计</a></li>
+<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/design/">系统设计</a>
+<ul>
+<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
+<li><a href="/interview/docs/architecture/design/seckill/">秒杀系统</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/distributed/">分布式</a>
+<ul>
+<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
+<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
+<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
+<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
+<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
+<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
+<li><a href="/interview/docs/architecture/distributed/kafka/">Kafka</a></li>
+<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
+<li><a href="/interview/docs/architecture/distributed/dubbo/">Dubbo</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
+<ul>
+<li><a href="/interview/docs/architecture/bigdata/algo/">基础算法</a></li>
+<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="/interview/docs/offer/">剑指offer</a>
+<ul>
+<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
+<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
+<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
+<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
+<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
+<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
+<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
+<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
+<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
+<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
+<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
+<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
+<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
+<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
+<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
+<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
+<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
+<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
+<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
+<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
+<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
+<li><a href="/interview/docs/offer/VerifySquenceOfBST/">二叉搜索树的后序遍历序列</a></li>
+<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
+<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
+<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
+<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
+<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
+<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
+<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
+<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
+<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
+<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
+<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
+<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
+<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
+<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
+<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
+<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
+<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
+<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
+<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
+<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
+<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
+<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
+<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
+<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
+<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
+<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
+<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
+<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
+<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
+<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
+<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
+<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
+<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
+<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
+<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
+<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
+<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
+<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
+<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
+<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
+<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
+<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
+<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
+<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
+<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
+</ul>
+</li>
+<li><a href="/interview/docs/leetcode/">LeetCode</a>
+<ul>
+<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
+<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
+<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
+<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
+<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
+<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
+<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
+<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
+<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
+<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
+<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
+<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
+<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
+<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
+<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
+<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
+<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
+<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
+<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
+<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
+<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
+<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
+<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
+<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
+<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
+<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
+<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
+<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
+<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
+<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
+<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
+<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
+<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
+
+
+ 
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <strong>Java面试题</strong>
+
+  <label for="toc-control">
+    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+  </label>
+</div>
+
+
+  
+    <input type="checkbox" class="hidden" id="toc-control" />
+    <aside class="hidden clearfix">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#面向对象的特征有哪些方面">面向对象的特征有哪些方面？</a></li>
+        <li><a href="#访问修饰符-public--private--protected-以及不写时的区别">访问修饰符 public 、 private 、 protected 以及不写时的区别？</a></li>
+        <li><a href="#string是最基本的数据类型吗">String是最基本的数据类型吗？</a></li>
+        <li><a href="#float-f34是否正确">float f=3.4;是否正确？</a></li>
+        <li><a href="#short-s1--1-s1--s1--1有错吗-short-s1--1-s1--1-有错吗">short s1 = 1; s1 = s1 + 1;有错吗? short s1 = 1; s1 += 1; 有错吗？</a></li>
+        <li><a href="#java有没有goto">Java有没有goto？</a></li>
+        <li><a href="#int-和-integer-有什么区别">int 和 Integer 有什么区别？</a></li>
+        <li><a href="#-和--的区别">& 和 && 的区别？</a></li>
+        <li><a href="#mathround115-等于多少mathround-115-等于多少">Math.round(11.5) 等于多少？Math.round(-11.5) 等于多少？</a></li>
+        <li><a href="#switch是否能作用在-byte-上是否能作用在-long-上是否能作用在-string-上">switch是否能作用在 byte 上，是否能作用在 long 上，是否能作用在 String 上？</a></li>
+        <li><a href="#用最有效率的方法计算-2-乘以-8-">用最有效率的方法计算 2 乘以 8 ？</a></li>
+        <li><a href="#数组有没有-length-方法-string-有没有-length-方法">数组有没有 length() 方法？ String 有没有 length() 方法？</a></li>
+        <li><a href="#在java中如何跳出当前的多重嵌套循环">在Java中，如何跳出当前的多重嵌套循环？</a></li>
+        <li><a href="#构造器constructor是否可被重写override">构造器（constructor）是否可被重写（override）？</a></li>
+        <li><a href="#两个对象-xequalsy--true但却可有不同的-hash-code-">两个对象 x.equals(y) == true，但却可有不同的 hash code ？</a></li>
+        <li><a href="#重载overload和重写override的区别重载的方法能否根据返回类型进行区分">重载（Overload）和重写（Override）的区别。重载的方法能否根据返回类型进行区分？</a></li>
+        <li><a href="#char-型变量中能不能存贮一个中文汉字为什么">char 型变量中能不能存贮一个中文汉字，为什么？</a></li>
+        <li><a href="#抽象类abstract-class和接口interface有什么异同">抽象类（abstract class）和接口（interface）有什么异同？</a></li>
+        <li><a href="#静态内部类static-nested-class和内部类inner-class的不同">静态内部类（Static Nested Class）和内部类（Inner Class）的不同</a></li>
+        <li><a href="#抽象的abstract方法是否可同时是静态的static是否可同时是本地方法native是否可同时被-synchronized-饰">抽象的（abstract）方法是否可同时是静态的（static），是否可同时是本地方法（native），是否可同时被 synchronized 饰？</a></li>
+        <li><a href="#阐述静态变量和实例变量的区别">阐述静态变量和实例变量的区别</a></li>
+        <li><a href="#如何实现对象克隆">如何实现对象克隆？</a></li>
+        <li><a href="#string-s--new-stringxyz创建了几个字符串对象">String s = new String("xyz");创建了几个字符串对象？</a></li>
+        <li><a href="#接口是否可继承extends接口抽象类是否可实现implements接口抽象类是否可继承具体类concrete-class">接口是否可继承（extends）接口？抽象类是否可实现（implements）接口？抽象类是否可继承具体类（concrete class）？</a></li>
+        <li><a href="#error和exception有什么区别">Error和Exception有什么区别？</a></li>
+        <li><a href="#运行时异常与受检异常有何异同">运行时异常与受检异常有何异同？</a></li>
+        <li><a href="#try-里有一个-return-语句那么紧跟在这个-try-后的-finally-里的代码会不会被执行什么时候被执行在-return-前还是后如果-finally">try{} 里有一个 return 语句，那么紧跟在这个 try 后的 finally{} 里的代码会不会被执行，什么时候被执行，在 return 前还是后？如果 `finally</a></li>
+        <li><a href="#listsetmap是否继承自collection接口">List、Set、Map是否继承自Collection接口？</a></li>
+        <li><a href="#thread类的-sleep-方法和对象的-wait-方法都可以让线程暂停执行它们有什么区别">Thread类的 sleep() 方法和对象的 wait() 方法都可以让线程暂停执行，它们有什么区别？</a></li>
+        <li><a href="#线程的-sleep-方法和-yield-方法有什么区别">线程的 sleep() 方法和 yield() 方法有什么区别？</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+
+    </aside>
+  
+ 
+      </header>
+
+      
+<article class="markdown"><h3 id="面向对象的特征有哪些方面">面向对象的特征有哪些方面？</h3>
+<ul>
+<li><strong>抽象</strong>：抽象是将一类对象的共同特征总结出来构造类的过程，包括数据抽象和行为抽象两方面。抽象只关注对象有哪些属性和行为，并不关注这些行为的细节是什么。</li>
+<li><strong>继承</strong>：继承是从已有类得到继承信息创建新类的过程。继承让变化中的软件系统有了一定的延续性，同时继承也是封装程序中可变因素的重要手段。</li>
+<li><strong>封装</strong>：通常认为封装是把数据和操作数据的方法绑定起来，对数据的访问只能通过已定义的接口。面向对象的本质就是将现实世界描绘成一系列完全自治、封闭的对象。</li>
+<li><strong>多态</strong>：多态性是指允许不同子类型的对象对同一消息作出不同的响应。</li>
+</ul>
+<h3 id="访问修饰符-public--private--protected-以及不写时的区别">访问修饰符 <code>public</code> 、 <code>private</code> 、 <code>protected</code> 以及不写时的区别？</h3>
+<p>类的成员不写访问修饰时默认为 <code>package</code>。默认对于同一个包中的其他类相当于公开（public），对于不是同一个包中的其他类相当于私有（private）。受保护（protected）对子类相当于公开，对不是同一包中的没有父子关系的类相当于私有。Java中，外部类的修饰符只能是 public 或默认，类的成员（包括内部类）的修饰符可以是以上四种。</p>
+<h3 id="string是最基本的数据类型吗">String是最基本的数据类型吗？</h3>
+<p>不是，Java中的基本数据类型只有8个：<code>byte</code>、<code>short</code>、<code>int</code>、<code>long</code>、<code>float</code>、<code>double</code>、<code>char</code>、<code>boolean</code>；除了基本类型（primitive type），剩下的都是引用类型（reference type），Java 5以后引入的枚举类型也算是一种比较特殊的引用类型。</p>
+<h3 id="float-f34是否正确"><code>float f=3.4;</code>是否正确？</h3>
+<p>不正确。3.4是双精度数，将双精度型（double）赋值给浮点型（float）属于下转型会造成精度损失，因此需要强制类型转换 <code>float f =(float)3.4;</code> 或者写成 <code>float f =3.4F;</code>。</p>
+<h3 id="short-s1--1-s1--s1--1有错吗-short-s1--1-s1--1-有错吗"><code>short s1 = 1; s1 = s1 + 1;</code>有错吗? <code>short s1 = 1; s1 += 1;</code> 有错吗？</h3>
+<p>对于 <code>short s1 = 1; s1 = s1 + 1;</code> 由于 1 是 int 类型，因此 <code>s1+1</code> 运算结果也是int 型，需要强制转换类型才能赋值给 short 型，编译不通过。</p>
+<p>而 <code>short s1 = 1; s1 += 1;</code> 可以正确编译，因为 <code>s1+= 1;</code> 相当于 <code>s1 = (short)(s1 + 1);</code> 其中有隐含的强制类型转换。</p>
+<h3 id="java有没有goto">Java有没有goto？</h3>
+<p>goto 是Java中的保留字，但在目前版本的Java中没有使用。</p>
+<h3 id="int-和-integer-有什么区别">int 和 Integer 有什么区别？</h3>
+<p>Java为每一个基本数据类型都引入了对应的包装类型（wrapper class）， <code>int</code> 的包装类就是 <code>Integer</code> ，从 Java 5 开始引入了自动装箱/拆箱机制，使得二者可以相互转换。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span>String<span style="color:#f92672">[</span><span style="color:#f92672">]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    Integer f1 <span style="color:#f92672">=</span> 100<span style="color:#f92672">,</span> f2 <span style="color:#f92672">=</span> 100<span style="color:#f92672">,</span> f3 <span style="color:#f92672">=</span> 150<span style="color:#f92672">,</span> f4 <span style="color:#f92672">=</span> 150<span style="color:#f92672">;</span>
+    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>f1 <span style="color:#f92672">=</span><span style="color:#f92672">=</span> f2<span style="color:#f92672">)</span><span style="color:#f92672">;</span><span style="color:#75715e">//true
+</span><span style="color:#75715e"></span>    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>f3 <span style="color:#f92672">=</span><span style="color:#f92672">=</span> f4<span style="color:#f92672">)</span><span style="color:#f92672">;</span><span style="color:#75715e">//false
+</span><span style="color:#75715e"></span><span style="color:#f92672">}</span>
+</code></pre></div><p>当我们给一个 Integer 对象赋一个 int 值的时候，会调用 Integer 类的静态方法 <code>valueOf</code> ，如果看看 <code>valueOf</code> 的源代码就知道发生了什么。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> Integer <span style="color:#a6e22e">valueOf</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>i <span style="color:#f92672">&gt;</span><span style="color:#f92672">=</span> IntegerCache<span style="color:#f92672">.</span><span style="color:#a6e22e">low</span> <span style="color:#f92672">&amp;</span><span style="color:#f92672">&amp;</span> i <span style="color:#f92672">&lt;</span><span style="color:#f92672">=</span> IntegerCache<span style="color:#f92672">.</span><span style="color:#a6e22e">high</span><span style="color:#f92672">)</span>
+        <span style="color:#66d9ef">return</span> IntegerCache<span style="color:#f92672">.</span><span style="color:#a6e22e">cache</span><span style="color:#f92672">[</span>i <span style="color:#f92672">+</span> <span style="color:#f92672">(</span><span style="color:#f92672">-</span>IntegerCache<span style="color:#f92672">.</span><span style="color:#a6e22e">low</span><span style="color:#f92672">)</span><span style="color:#f92672">]</span><span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> Integer<span style="color:#f92672">(</span>i<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>如果整型（short、int、double、byte）字面量的值在 <code>-128</code> 到 <code>127</code> 之间，那么不会 new 新的 Integer 对象，而是直接引用常量池中的 Integer 对象。</p>
+<h3 id="-和--的区别">&amp; 和 &amp;&amp; 的区别？</h3>
+<p><code>&amp;</code> 运算符有两种用法：按位与；逻辑与。<code>&amp;&amp;</code> 运算符是短路与运算。</p>
+<p>逻辑与跟短路与的差别是非常巨大的，虽然二者都要求运算符左右两端的布尔值都是 <code>true</code> 整个表达式的值才是 <code>true</code> 。 <code>&amp;&amp;</code> 之所以称为短路运算是因为，如果 <code>&amp;&amp;</code> 左边的表达式的值是 <code>false</code> ，右边的表达式会被直接短路掉，不会进行运算。</p>
+<blockquote>
+<p>逻辑或运算符 <code>|</code> 和短路或运算符 <code>||</code> 的差别也是如此。</p>
+</blockquote>
+<h3 id="mathround115-等于多少mathround-115-等于多少"><code>Math.round(11.5)</code> 等于多少？<code>Math.round(-11.5)</code> 等于多少？</h3>
+<p><code>Math.round(11.5)</code> 的返回值是 <code>12</code> ，<code>Math.round(-11.5)</code> 的返回值是 <code>-11</code>。四舍五入的原理是在参数上加 <code>0.5</code> 然后进行下取整。</p>
+<h3 id="switch是否能作用在-byte-上是否能作用在-long-上是否能作用在-string-上">switch是否能作用在 byte 上，是否能作用在 long 上，是否能作用在 String 上？</h3>
+<p>在 Java 5 以前， <code>switch(expr)</code> 中， <code>expr</code> 只能是 <code>byte</code> 、<code>short</code>、<code>char</code>、<code>int</code>；从 Java 5 开始，Java 中引入了枚举类型，<code>expr</code> 也可以是 enum 类型；从 Java 7 开始， <code>expr</code> 还可以是字符串 <code>String</code> ，但是长整型 <code>long</code> 在目前所有的版本中都是不可以的。</p>
+<h3 id="用最有效率的方法计算-2-乘以-8-">用最有效率的方法计算 2 乘以 8 ？</h3>
+<p>2 &laquo; 3（左移3位相当于乘以2的3次方，右移3位相当于除以2的3次方）。</p>
+<h3 id="数组有没有-length-方法-string-有没有-length-方法">数组有没有 <code>length()</code> 方法？ <code>String</code> 有没有 <code>length()</code> 方法？</h3>
+<p>数组没有 <code>length()</code> 方法，有length的属性。String有 <code>length()</code> 方法。</p>
+<h3 id="在java中如何跳出当前的多重嵌套循环">在Java中，如何跳出当前的多重嵌套循环？</h3>
+<p>在最外层循环前加一个标记如A，然后用break A;可以跳出多重循环。</p>
+<h3 id="构造器constructor是否可被重写override">构造器（constructor）是否可被重写（override）？</h3>
+<p>构造器不能被继承，因此不能被重写，但可以被重载。</p>
+<h3 id="两个对象-xequalsy--true但却可有不同的-hash-code-">两个对象 <code>x.equals(y) == true</code>，但却可有不同的 <code>hash code</code> ？</h3>
+<p>不对，如果两个对象 x 和 y 满足 <code>x.equals(y) == true</code>，它们的哈希码（hash code）应当相同</p>
+<h3 id="重载overload和重写override的区别重载的方法能否根据返回类型进行区分">重载（Overload）和重写（Override）的区别。重载的方法能否根据返回类型进行区分？</h3>
+<p>方法的重载和重写都是实现多态的方式，区别在于 <strong>重载是编译时的多态性</strong>，而 <strong>重写是运行时的多态性</strong>。</p>
+<p>重载发生在一个类中，<strong>同名的方法如果有不同的参数列表</strong>（参数类型不同、参数个数不同或者二者都不同）则视为重载。</p>
+<p>重写发生在子类与父类之间，重写要求子类被重写方法与父类被重写方法有相同的返回类型（或子类型），不能比父类被重写方法声明更多的异常（里氏代换原则）。</p>
+<h3 id="char-型变量中能不能存贮一个中文汉字为什么">char 型变量中能不能存贮一个中文汉字，为什么？</h3>
+<p>char 类型可以存储一个中文汉字，因为 Java 中使用的编码是 Unicode （不选择任何特定的编码，直接使用字符在字符集中的编号，这是统一的唯一方法），<strong>一个 char 类型占2个字节</strong>，所以放一个中文是没问题的。</p>
+<h3 id="抽象类abstract-class和接口interface有什么异同">抽象类（abstract class）和接口（interface）有什么异同？</h3>
+<ul>
+<li>抽象类和接口都不能够实例化，但可以定义抽象类和接口类型的引用。</li>
+<li>一个类如果继承了某个抽象类或者实现了某个接口都需要对其中的抽象方法全部进行实现，否则该类仍然需要被声明为抽象类。</li>
+<li>接口比抽象类更加抽象，因为抽象类中可以定义构造器，可以有抽象方法和具体方法，而接口中不能定义构造器而且其中的方法全部都是抽象方法。</li>
+<li>抽象类中的成员可以是 <code>private</code>、默认、 protected 、public的，而接口中的成员全都是public的</li>
+<li>抽象类中可以定义成员变量，而接口中定义的成员变量实际上都是常量</li>
+<li>有抽象方法的类必须被声明为抽象类，而抽象类未必要有抽象方法</li>
+</ul>
+<h3 id="静态内部类static-nested-class和内部类inner-class的不同">静态内部类（Static Nested Class）和内部类（Inner Class）的不同</h3>
+<p>Static Nested Class是被声明为静态（static）的内部类，它可以不依赖于外部类实例被实例化。而通常的 <strong>内部类需要在外部类实例化后才能实例化</strong>：<code>new Outer().new Inner();</code></p>
+<h3 id="抽象的abstract方法是否可同时是静态的static是否可同时是本地方法native是否可同时被-synchronized-饰">抽象的（abstract）方法是否可同时是静态的（static），是否可同时是本地方法（native），是否可同时被 synchronized 饰？</h3>
+<p>都不能。抽象方法需要子类重写，而静态的方法是无法被重写的，因此二者是矛盾的。</p>
+<p>本地方法是由本地代码（如C代码）实现的方法，而抽象方法是没有实现的，也是矛盾的。</p>
+<p>synchronized 和方法的实现细节有关，抽象方法不涉及实现细节，因此也是相互矛盾的。</p>
+<h3 id="阐述静态变量和实例变量的区别">阐述静态变量和实例变量的区别</h3>
+<p>静态变量是被static修饰符修饰的变量，也称为类变量，它属于类，不属于类的任何一个对象，一个类不管创建多少个对象，静态变量在内存中有且仅有一个拷贝；实例变量必须依存于某一实例，需要先创建对象然后通过对象才能访问到它。静态变量可以实现让多个对象共享内存。</p>
+<h3 id="如何实现对象克隆">如何实现对象克隆？</h3>
+<p>有两种方式：</p>
+<ol>
+<li>实现 <code>Cloneable</code> 接口并重写 Object 类中的 <code>clone()</code> 方法；</li>
+<li>实现 <code>Serializable</code> 接口，通过对象的序列化和反序列化实现克隆，可以实现真正的深度克隆。</li>
+</ol>
+<h3 id="string-s--new-stringxyz创建了几个字符串对象"><code>String s = new String(&quot;xyz&quot;);</code>创建了几个字符串对象？</h3>
+<p>两个对象，一个是常量池的 <code>&quot;xyz&quot;</code> ，一个是用 <code>new</code> 创建在堆上的对象。</p>
+<h3 id="接口是否可继承extends接口抽象类是否可实现implements接口抽象类是否可继承具体类concrete-class">接口是否可继承（extends）接口？抽象类是否可实现（implements）接口？抽象类是否可继承具体类（concrete class）？</h3>
+<p>接口可以继承接口，而且支持多重继承。抽象类可以实现(implements)接口，抽象类可继承具体类也可以继承抽象类。</p>
+<h3 id="error和exception有什么区别">Error和Exception有什么区别？</h3>
+<p>Error表示系统级的错误和程序不必处理的异常，是恢复不是不可能但很困难的情况下的一种严重问题；比如内存溢出，不可能指望程序能处理这样的情况；Exception表示需要捕捉或者需要程序进行处理的异常，是一种设计或实现问题；也就是说，它表示如果程序运行正常，从不会发生的情况。</p>
+<h3 id="运行时异常与受检异常有何异同">运行时异常与受检异常有何异同？</h3>
+<p>运行时异常表示虚拟机的通常操作中可能遇到的异常，是一种常见运行错误，只要程序设计得没有问题通常就不会发生。</p>
+<p>受检异常跟程序运行的上下文环境有关，即使程序设计无误，仍然可能因使用的问题而引发。</p>
+<h3 id="try-里有一个-return-语句那么紧跟在这个-try-后的-finally-里的代码会不会被执行什么时候被执行在-return-前还是后如果-finally"><code>try{}</code> 里有一个 <code>return</code> 语句，那么紧跟在这个 <code>try</code> 后的 <code>finally{}</code> 里的代码会不会被执行，什么时候被执行，在 <code>return</code> 前还是后？如果 `finally</h3>
+<p><code>finally</code> 会执行，在方法返回调用者前执行。如果 <code>finally{}</code> 里也进行了 <code>return</code> 最终返回 <code>finally</code> 里的 <code>return</code></p>
+<h3 id="listsetmap是否继承自collection接口">List、Set、Map是否继承自Collection接口？</h3>
+<p>List、Set 是，Map 不是。Map是键值对映射容器，与List和Set有明显的区别</p>
+<h3 id="thread类的-sleep-方法和对象的-wait-方法都可以让线程暂停执行它们有什么区别">Thread类的 <code>sleep()</code> 方法和对象的 <code>wait()</code> 方法都可以让线程暂停执行，它们有什么区别？</h3>
+<p><code>sleep()</code>方法是线程类（Thread）的静态方法，调用此方法会让当前线程暂停执行指定的时间，将执行机会（CPU）让给其他线程，但是对象的锁依然保持，因此休眠时间结束后会自动恢复。</p>
+<p><code>wait()</code>是Object类的方法，调用对象的 <code>wait()</code> 方法导致当前线程放弃对象的锁（线程暂停执行），进入对象的等待池（wait pool），只有调用对象的 <code>notify()</code> 方法（或 <code>notifyAll()</code> 方法）时才能唤醒等待池中的线程进入等锁池（lock pool），如果线程重新获得对象的锁就可以进入就绪状态。</p>
+<h3 id="线程的-sleep-方法和-yield-方法有什么区别">线程的 sleep() 方法和 yield() 方法有什么区别？</h3>
+<p>1、<code>sleep()</code>方法给其他线程运行机会时不考虑线程的优先级，因此会给低优先级的线程以运行的机会；<code>yield()</code>方法只会给相同优先级或更高优先级的线程以运行的机会；
+2、 线程执行sleep()方法后转入阻塞（blocked）状态，而执行yield()方法后转入就绪（ready）状态；
+3、<code>sleep()</code>方法声明抛出InterruptedException，而yield()方法没有声明任何异常；
+4、<code>sleep()</code>方法比 yield() 方法（跟操作系统CPU调度相关）具有更好的可移植性。</p>
+</article>
+ 
+
+      <footer class="book-footer">
+        
+  <div class="flex justify-between">
+
+
+
+  <div>
+    
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/f0836759104399b8ff562936c9669da62b6913c3" title='Last modified by haoyang.shi | 2020-03-16' target="_blank" rel="noopener">
+      <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
+      <span>2020-03-16</span>
+    </a>
+  </div>
+
+
+
+  <div>
+    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/java/question/index.md" target="_blank" rel="noopener">
+      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
+      <span>Edit this page</span>
+    </a>
+  </div>
+
+</div>
+
+ 
+        
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+      </footer>
+      
+    </div>
+
+    
+    <aside class="book-toc">
+      
+  <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#面向对象的特征有哪些方面">面向对象的特征有哪些方面？</a></li>
+        <li><a href="#访问修饰符-public--private--protected-以及不写时的区别">访问修饰符 public 、 private 、 protected 以及不写时的区别？</a></li>
+        <li><a href="#string是最基本的数据类型吗">String是最基本的数据类型吗？</a></li>
+        <li><a href="#float-f34是否正确">float f=3.4;是否正确？</a></li>
+        <li><a href="#short-s1--1-s1--s1--1有错吗-short-s1--1-s1--1-有错吗">short s1 = 1; s1 = s1 + 1;有错吗? short s1 = 1; s1 += 1; 有错吗？</a></li>
+        <li><a href="#java有没有goto">Java有没有goto？</a></li>
+        <li><a href="#int-和-integer-有什么区别">int 和 Integer 有什么区别？</a></li>
+        <li><a href="#-和--的区别">& 和 && 的区别？</a></li>
+        <li><a href="#mathround115-等于多少mathround-115-等于多少">Math.round(11.5) 等于多少？Math.round(-11.5) 等于多少？</a></li>
+        <li><a href="#switch是否能作用在-byte-上是否能作用在-long-上是否能作用在-string-上">switch是否能作用在 byte 上，是否能作用在 long 上，是否能作用在 String 上？</a></li>
+        <li><a href="#用最有效率的方法计算-2-乘以-8-">用最有效率的方法计算 2 乘以 8 ？</a></li>
+        <li><a href="#数组有没有-length-方法-string-有没有-length-方法">数组有没有 length() 方法？ String 有没有 length() 方法？</a></li>
+        <li><a href="#在java中如何跳出当前的多重嵌套循环">在Java中，如何跳出当前的多重嵌套循环？</a></li>
+        <li><a href="#构造器constructor是否可被重写override">构造器（constructor）是否可被重写（override）？</a></li>
+        <li><a href="#两个对象-xequalsy--true但却可有不同的-hash-code-">两个对象 x.equals(y) == true，但却可有不同的 hash code ？</a></li>
+        <li><a href="#重载overload和重写override的区别重载的方法能否根据返回类型进行区分">重载（Overload）和重写（Override）的区别。重载的方法能否根据返回类型进行区分？</a></li>
+        <li><a href="#char-型变量中能不能存贮一个中文汉字为什么">char 型变量中能不能存贮一个中文汉字，为什么？</a></li>
+        <li><a href="#抽象类abstract-class和接口interface有什么异同">抽象类（abstract class）和接口（interface）有什么异同？</a></li>
+        <li><a href="#静态内部类static-nested-class和内部类inner-class的不同">静态内部类（Static Nested Class）和内部类（Inner Class）的不同</a></li>
+        <li><a href="#抽象的abstract方法是否可同时是静态的static是否可同时是本地方法native是否可同时被-synchronized-饰">抽象的（abstract）方法是否可同时是静态的（static），是否可同时是本地方法（native），是否可同时被 synchronized 饰？</a></li>
+        <li><a href="#阐述静态变量和实例变量的区别">阐述静态变量和实例变量的区别</a></li>
+        <li><a href="#如何实现对象克隆">如何实现对象克隆？</a></li>
+        <li><a href="#string-s--new-stringxyz创建了几个字符串对象">String s = new String("xyz");创建了几个字符串对象？</a></li>
+        <li><a href="#接口是否可继承extends接口抽象类是否可实现implements接口抽象类是否可继承具体类concrete-class">接口是否可继承（extends）接口？抽象类是否可实现（implements）接口？抽象类是否可继承具体类（concrete class）？</a></li>
+        <li><a href="#error和exception有什么区别">Error和Exception有什么区别？</a></li>
+        <li><a href="#运行时异常与受检异常有何异同">运行时异常与受检异常有何异同？</a></li>
+        <li><a href="#try-里有一个-return-语句那么紧跟在这个-try-后的-finally-里的代码会不会被执行什么时候被执行在-return-前还是后如果-finally">try{} 里有一个 return 语句，那么紧跟在这个 try 后的 finally{} 里的代码会不会被执行，什么时候被执行，在 return 前还是后？如果 `finally</a></li>
+        <li><a href="#listsetmap是否继承自collection接口">List、Set、Map是否继承自Collection接口？</a></li>
+        <li><a href="#thread类的-sleep-方法和对象的-wait-方法都可以让线程暂停执行它们有什么区别">Thread类的 sleep() 方法和对象的 wait() 方法都可以让线程暂停执行，它们有什么区别？</a></li>
+        <li><a href="#线程的-sleep-方法和-yield-方法有什么区别">线程的 sleep() 方法和 yield() 方法有什么区别？</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+ 
+    </aside>
+    
+  </main>
+
+  
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
