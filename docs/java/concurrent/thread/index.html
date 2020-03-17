@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Java线程"><meta property="og:title" content="Java线程" />
-<meta property="og:description" content="Java线程 线程定义 线程（英语：thread）是操作系统能够进行运算调度的最小单位。它被包含在进程之中，是进程中的实际运作单位。一条线程指的是进程中一个单一顺序的控制流，一个进程中可以并发多个线程，每条线程并行执行不同的任务。在Unix System V及SunOS中也被称为轻量进程（lightweight processes），但轻量进程更多指内核线程（kernel thread），而把用户线程（user thread）称为线程。
+<meta property="og:description" content="Java线程 线程定义 线程（Thread）是操作系统能够进行运算调度的最小单位。它被包含在进程之中，是进程中的实际运作单位。一条线程指的是进程中一个单一顺序的控制流，一个进程中可以并发多个线程，每条线程并行执行不同的任务。
 线程是独立调度和分派的基本单位。线程可以操作系统内核调度的内核线程，如Win32线程；由用户进程自行调度的用户线程，如Linux平台的POSIX Thread；或者由内核与用户进程，如Windows 7的线程，进行混合调度。
 同一进程中的多条线程将共享该进程中的全部系统资源，如虚拟地址空间，文件描述符和信号处理等等。但同一进程中的多个线程有各自的调用栈（call stack），自己的寄存器环境（register context），自己的线程本地存储（thread-local storage）。
 线程实现 Java中的线程都是调用的原生系统的本地函数，Java线程模型是基于操作系统原生线程模型实现的，实现线程有三种方式：内核线程实现、用户线程实现、混合线程实现。
@@ -20,11 +20,13 @@ Java线程调度 线程调度分为协同式和抢占式。
  协同式调度：线程的执行时间由线程自己控制，这种的实现很简单，但是很可能造成很严重的后果。 抢占式调度：由操作系统分配线程执行的时间，线程切换的决定权在操作系统。  有时候我们需要为某些线程多分配时间，这时我们就需要用到线程优先级的方法，Java提供了10种优先级。Java优先级是在操作系统的原生线程优先级上实现的，所以对于同一个优先级，不同的操作系统可能有不同的表现，也就是说 Java线程优先级不是可靠的。
 Java线程状态切换 Java线程模型定义了 6 种状态，在任意一个时间点，一个线程有且只有其中一个状态：
  新建（New）：新建的Thread，尚未开始。 运行（Runable）：包含操作系统线程状态中的Running、Ready，也就是处于正在执行或正在等待CPU分配时间的状态。 无限期等待（Waiting）：处于这种状态的线程不会被分配CPU时间，等待其他线程唤醒。 限期等待（Timed Waiting）：处于这种状态的线程不会被分配CPU时间，在一定时间后会由系统自动唤醒。 阻塞（Blocked）：在等待获得排他锁。 结束（Terminated）：已终止的线程。  线程安全 多线程访问同一代码，不会产生不确定的结果。
-Java 线程池 " />
+Java 线程池 线程池提供了一种限制和管理资源（包括执行一个任务）。 每个线程池还维护一些基本统计信息，例如已完成任务的数量。使用线程池的好处：
+ 降低资源消耗：通过重复利用已创建的线程降低线程创建和销毁造成的消耗。 提高响应速度：当任务到达时，任务可以不需要的等到线程创建就能立即执行。 提高线程的可管理性：线程是稀缺资源，如果无限制的创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以进行统一的分配，调优和监控。  在创建线程池时不允许使用 Executors 去创建，而是通过 ThreadPoolExecutor 的方式，这样的处理方式让写的同学更加明确线程池的运行规则，规避资源耗尽的风险。Executors 返回线程池对象的弊端如下：
+ FixedThreadPool 和 SingleThreadExecutor ： 允许请求的队列长度为 Integer.MAX_VALUE ，可能堆积大量的请求，从而导致OOM。 CachedThreadPool 和 ScheduledThreadPool ： 允许创建的线程数量为 Integer." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/java/concurrent/thread/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-01-19T11:53:04+08:00" />
+<meta property="article:modified_time" content="2020-03-17T09:38:29+08:00" />
 <title>Java线程 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -32,7 +34,7 @@ Java 线程池 " />
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.79d251dbde0bb088b447497ff3e292eda879506852c61fa479fd57f01e7f3e50.js" integrity="sha256-edJR294LsIi0R0l/8&#43;KS7ah5UGhSxh&#43;kef1X8B5/PlA="></script>
+<script defer src="/interview/en.search.min.40971360e363da25e0a2959a718d8622165fa3f4c7b3f316a5f7b6b429cd6561.js" integrity="sha256-QJcTYONj2iXgopWacY2GIhZfo/THs/MWpfe2tCnNZWE="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -395,7 +397,11 @@ https://github.com/alex-shpak/hugo-book
     <li><a href="#java线程调度">Java线程调度</a></li>
     <li><a href="#java线程状态切换">Java线程状态切换</a></li>
     <li><a href="#线程安全">线程安全</a></li>
-    <li><a href="#java-线程池">Java 线程池</a></li>
+    <li><a href="#java-线程池">Java 线程池</a>
+      <ul>
+        <li><a href="#线程池提交任务">线程池提交任务</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
 
@@ -408,7 +414,7 @@ https://github.com/alex-shpak/hugo-book
       
 <article class="markdown"><h1 id="java线程">Java线程</h1>
 <h2 id="线程定义">线程定义</h2>
-<p><strong>线程（英语：thread）是操作系统能够进行运算调度的最小单位。它被包含在进程之中，是进程中的实际运作单位。一条线程指的是进程中一个单一顺序的控制流，一个进程中可以并发多个线程，每条线程并行执行不同的任务</strong>。在<code>Unix System V</code>及<code>SunOS</code>中也被称为轻量进程（<code>lightweight processes</code>），但轻量进程更多指内核线程（<code>kernel thread</code>），而把用户线程（<code>user thread</code>）称为线程。</p>
+<p><strong>线程（Thread）是操作系统能够进行运算调度的最小单位</strong>。它被包含在进程之中，是进程中的实际运作单位。一条线程指的是进程中一个单一顺序的控制流，一个进程中可以并发多个线程，每条线程并行执行不同的任务。</p>
 <p>线程是独立调度和分派的基本单位。线程可以操作系统内核调度的内核线程，如Win32线程；由用户进程自行调度的用户线程，如Linux平台的<code>POSIX Thread</code>；或者由内核与用户进程，如Windows 7的线程，进行混合调度。</p>
 <p>同一进程中的多条线程将共享该进程中的全部系统资源，如虚拟地址空间，文件描述符和信号处理等等。但同一进程中的多个线程有各自的调用栈（<code>call stack</code>），自己的寄存器环境（<code>register context</code>），自己的线程本地存储（<code>thread-local storage</code>）。</p>
 <h2 id="线程实现">线程实现</h2>
@@ -447,6 +453,70 @@ https://github.com/alex-shpak/hugo-book
 <h2 id="线程安全">线程安全</h2>
 <p>多线程访问同一代码，不会产生不确定的结果。</p>
 <h2 id="java-线程池">Java 线程池</h2>
+<p>线程池提供了一种限制和管理资源（包括执行一个任务）。 每个线程池还维护一些基本统计信息，例如已完成任务的数量。使用线程池的好处：</p>
+<ul>
+<li><strong>降低资源消耗</strong>：通过重复利用已创建的线程降低线程创建和销毁造成的消耗。</li>
+<li><strong>提高响应速度</strong>：当任务到达时，任务可以不需要的等到线程创建就能立即执行。</li>
+<li><strong>提高线程的可管理性</strong>：线程是稀缺资源，如果无限制的创建，不仅会消耗系统资源，还会降低系统的稳定性，使用线程池可以进行统一的分配，调优和监控。</li>
+</ul>
+<p>在创建线程池时不允许使用 <code>Executors</code> 去创建，而是通过 <code>ThreadPoolExecutor</code> 的方式，这样的处理方式让写的同学更加明确线程池的运行规则，规避资源耗尽的风险。<code>Executors</code> 返回线程池对象的弊端如下：</p>
+<ul>
+<li><strong>FixedThreadPool</strong> 和 <strong>SingleThreadExecutor</strong> ： 允许请求的队列长度为 Integer.MAX_VALUE ，可能堆积大量的请求，从而导致OOM。</li>
+<li><strong>CachedThreadPool</strong> 和 <strong>ScheduledThreadPool</strong> ： 允许创建的线程数量为 Integer.MAX_VALUE ，可能会创建大量线程，从而导致OOM。</li>
+</ul>
+<p><code>ThreadPoolExecutor</code> 构造函数重要参数：</p>
+<ul>
+<li><strong>corePoolSize</strong> : 核心线程数线程数定义了最小可以同时运行的线程数量。</li>
+<li><strong>maximumPoolSize</strong> : 当队列中存放的任务达到队列容量的时候，当前可以同时运行的线程数量变为最大线程数。</li>
+<li><strong>workQueue</strong>: 当新任务来的时候会先判断当前运行的线程数量是否达到核心线程数，如果达到的话，新任务就会被存放在队列中。</li>
+<li><strong>keepAliveTime</strong>：当线程池中的线程数量大于 corePoolSize 的时候，如果这时没有新的任务提交，核心线程外的线程不会立即销毁，而是会等待，直到等待的时间超过了 keepAliveTime才会被回收销毁；</li>
+<li><strong>unit</strong> ：keepAliveTime 参数的时间单位。</li>
+<li><strong>threadFactory</strong> ：executor 创建新线程的时候会用到。</li>
+<li><strong>handler</strong> ：饱和策略。关于饱和策略下面单独介绍一下。</li>
+</ul>
+<h3 id="线程池提交任务">线程池提交任务</h3>
+<p>为了搞懂线程池的原理，我们需要首先分析一下 <code>execute</code> 方法。我们使用 <code>executor.execute(worker)</code> 来提交一个任务到线程池中去，这个方法非常重要，下面我们来看看它的源码：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">   <span style="color:#75715e">// 存放线程池的运行状态 (runState) 和线程池内有效线程的数量 (workerCount)
+</span><span style="color:#75715e"></span>   <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> AtomicInteger ctl <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> AtomicInteger<span style="color:#f92672">(</span>ctlOf<span style="color:#f92672">(</span>RUNNING<span style="color:#f92672">,</span> 0<span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">workerCountOf</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> c<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">return</span> c <span style="color:#f92672">&amp;</span> CAPACITY<span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">final</span> BlockingQueue<span style="color:#f92672">&lt;</span>Runnable<span style="color:#f92672">&gt;</span> workQueue<span style="color:#f92672">;</span>
+
+    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">execute</span><span style="color:#f92672">(</span>Runnable command<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#75715e">// 如果任务为null，则抛出异常。
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>command <span style="color:#f92672">=</span><span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">)</span>
+            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> NullPointerException<span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#75715e">// ctl 中保存的线程池当前的一些状态信息
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">int</span> c <span style="color:#f92672">=</span> ctl<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+
+        <span style="color:#75715e">//  下面会涉及到 3 步 操作
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">// 1.首先判断当前线程池中之行的任务数量是否小于 corePoolSize
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">// 如果小于的话，通过addWorker(command, true)新建一个线程，并将任务(command)添加到该线程中；然后，启动该线程从而执行任务。
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>workerCountOf<span style="color:#f92672">(</span>c<span style="color:#f92672">)</span> <span style="color:#f92672">&lt;</span> corePoolSize<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>addWorker<span style="color:#f92672">(</span>command<span style="color:#f92672">,</span> <span style="color:#66d9ef">true</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span>
+                <span style="color:#66d9ef">return</span><span style="color:#f92672">;</span>
+            c <span style="color:#f92672">=</span> ctl<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+        <span style="color:#75715e">// 2.如果当前之行的任务数量大于等于 corePoolSize 的时候就会走到这里
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">// 通过 isRunning 方法判断线程池状态，线程池处于 RUNNING 状态才会被并且队列可以加入任务，该任务才会被加入进去
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>isRunning<span style="color:#f92672">(</span>c<span style="color:#f92672">)</span> <span style="color:#f92672">&amp;</span><span style="color:#f92672">&amp;</span> workQueue<span style="color:#f92672">.</span><span style="color:#a6e22e">offer</span><span style="color:#f92672">(</span>command<span style="color:#f92672">)</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            <span style="color:#66d9ef">int</span> recheck <span style="color:#f92672">=</span> ctl<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+            <span style="color:#75715e">// 再次获取线程池状态，如果线程池状态不是 RUNNING 状态就需要从任务队列中移除任务，并尝试判断线程是否全部执行完毕。同时执行拒绝策略。
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span><span style="color:#f92672">!</span>isRunning<span style="color:#f92672">(</span>recheck<span style="color:#f92672">)</span> <span style="color:#f92672">&amp;</span><span style="color:#f92672">&amp;</span> remove<span style="color:#f92672">(</span>command<span style="color:#f92672">)</span><span style="color:#f92672">)</span>
+                reject<span style="color:#f92672">(</span>command<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+                <span style="color:#75715e">// 如果当前线程池为空就新创建一个线程并执行。
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>workerCountOf<span style="color:#f92672">(</span>recheck<span style="color:#f92672">)</span> <span style="color:#f92672">=</span><span style="color:#f92672">=</span> 0<span style="color:#f92672">)</span>
+                addWorker<span style="color:#f92672">(</span><span style="color:#66d9ef">null</span><span style="color:#f92672">,</span> <span style="color:#66d9ef">false</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+        <span style="color:#75715e">//3. 通过addWorker(command, false)新建一个线程，并将任务(command)添加到该线程中；然后，启动该线程从而执行任务。
+</span><span style="color:#75715e"></span>        <span style="color:#75715e">//如果addWorker(command, false)执行失败，则通过reject()执行相应的拒绝策略的内容。
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span><span style="color:#f92672">!</span>addWorker<span style="color:#f92672">(</span>command<span style="color:#f92672">,</span> <span style="color:#66d9ef">false</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span>
+            reject<span style="color:#f92672">(</span>command<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+</code></pre></div><p><img src="assists/thread_pool_commit_task.png" alt=""></p>
 </article>
  
 
@@ -458,9 +528,9 @@ https://github.com/alex-shpak/hugo-book
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/a4f1d5b4611ae01cfe879d1a4f49b2c8804d2ece" title='Last modified by haoyang.shi | 2020-01-19' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/9d1fc6332a0cbd3197f1af705dd5802e2d52ac68" title='Last modified by haoyang.shi | 2020-03-17' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-01-19</span>
+      <span>2020-03-17</span>
     </a>
   </div>
 
@@ -503,7 +573,11 @@ https://github.com/alex-shpak/hugo-book
     <li><a href="#java线程调度">Java线程调度</a></li>
     <li><a href="#java线程状态切换">Java线程状态切换</a></li>
     <li><a href="#线程安全">线程安全</a></li>
-    <li><a href="#java-线程池">Java 线程池</a></li>
+    <li><a href="#java-线程池">Java 线程池</a>
+      <ul>
+        <li><a href="#线程池提交任务">线程池提交任务</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
 

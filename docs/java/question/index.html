@@ -12,7 +12,7 @@ short s1 = 1; s1 = s1 &#43; 1;有错吗? short s1 = 1; s1 &#43;= 1; 有错吗？
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/java/question/" />
 <meta property="article:published_time" content="2020-03-16T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-03-17T08:52:52+08:00" />
+<meta property="article:modified_time" content="2020-03-17T09:38:29+08:00" />
 <title>Java面试题 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -20,7 +20,7 @@ short s1 = 1; s1 = s1 &#43; 1;有错吗? short s1 = 1; s1 &#43;= 1; 有错吗？
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.79d251dbde0bb088b447497ff3e292eda879506852c61fa479fd57f01e7f3e50.js" integrity="sha256-edJR294LsIi0R0l/8&#43;KS7ah5UGhSxh&#43;kef1X8B5/PlA="></script>
+<script defer src="/interview/en.search.min.40971360e363da25e0a2959a718d8622165fa3f4c7b3f316a5f7b6b429cd6561.js" integrity="sha256-QJcTYONj2iXgopWacY2GIhZfo/THs/MWpfe2tCnNZWE="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -393,14 +393,14 @@ https://github.com/alex-shpak/hugo-book
         <li><a href="#char-型变量中能不能存贮一个中文汉字为什么">char 型变量中能不能存贮一个中文汉字，为什么？</a></li>
         <li><a href="#抽象类abstract-class和接口interface有什么异同">抽象类（abstract class）和接口（interface）有什么异同？</a></li>
         <li><a href="#静态内部类static-nested-class和内部类inner-class的不同">静态内部类（Static Nested Class）和内部类（Inner Class）的不同</a></li>
-        <li><a href="#抽象的abstract方法是否可同时是静态的static是否可同时是本地方法native是否可同时被-synchronized-饰">抽象的（abstract）方法是否可同时是静态的（static），是否可同时是本地方法（native），是否可同时被 synchronized 饰？</a></li>
+        <li><a href="#抽象的abstract方法是否可同时是静态的static是否可同时是本地方法native是否可同时被-synchronized-修饰">抽象的（abstract）方法是否可同时是静态的（static），是否可同时是本地方法（native），是否可同时被 synchronized 修饰？</a></li>
         <li><a href="#阐述静态变量和实例变量的区别">阐述静态变量和实例变量的区别</a></li>
         <li><a href="#如何实现对象克隆">如何实现对象克隆？</a></li>
         <li><a href="#string-s--new-stringxyz创建了几个字符串对象">String s = new String("xyz");创建了几个字符串对象？</a></li>
         <li><a href="#接口是否可继承extends接口抽象类是否可实现implements接口抽象类是否可继承具体类concrete-class">接口是否可继承（extends）接口？抽象类是否可实现（implements）接口？抽象类是否可继承具体类（concrete class）？</a></li>
         <li><a href="#error和exception有什么区别">Error和Exception有什么区别？</a></li>
         <li><a href="#运行时异常与受检异常有何异同">运行时异常与受检异常有何异同？</a></li>
-        <li><a href="#try-里有一个-return-语句那么紧跟在这个-try-后的-finally-里的代码会不会被执行什么时候被执行在-return-前还是后如果-finally">try{} 里有一个 return 语句，那么紧跟在这个 try 后的 finally{} 里的代码会不会被执行，什么时候被执行，在 return 前还是后？如果 `finally</a></li>
+        <li><a href="#try-里有一个-return-语句那么紧跟在这个-try-后的-finally-里的代码会不会被执行如果-finally">try{} 里有一个 return 语句，那么紧跟在这个 try 后的 finally{} 里的代码会不会被执行？如果 `finally</a></li>
         <li><a href="#listsetmap是否继承自collection接口">List、Set、Map是否继承自Collection接口？</a></li>
         <li><a href="#thread类的-sleep-方法和对象的-wait-方法都可以让线程暂停执行它们有什么区别">Thread类的 sleep() 方法和对象的 wait() 方法都可以让线程暂停执行，它们有什么区别？</a></li>
         <li><a href="#线程的-sleep-方法和-yield-方法有什么区别">线程的 sleep() 方法和 yield() 方法有什么区别？</a></li>
@@ -460,7 +460,7 @@ https://github.com/alex-shpak/hugo-book
 <h3 id="switch是否能作用在-byte-上是否能作用在-long-上是否能作用在-string-上">switch是否能作用在 byte 上，是否能作用在 long 上，是否能作用在 String 上？</h3>
 <p>在 Java 5 以前， <code>switch(expr)</code> 中， <code>expr</code> 只能是 <code>byte</code> 、<code>short</code>、<code>char</code>、<code>int</code>；从 Java 5 开始，Java 中引入了枚举类型，<code>expr</code> 也可以是 enum 类型；从 Java 7 开始， <code>expr</code> 还可以是字符串 <code>String</code> ，但是长整型 <code>long</code> 在目前所有的版本中都是不可以的。</p>
 <h3 id="用最有效率的方法计算-2-乘以-8-">用最有效率的方法计算 2 乘以 8 ？</h3>
-<p>2 &laquo; 3（左移3位相当于乘以2的3次方，右移3位相当于除以2的3次方）。</p>
+<p><code>2 &lt;&lt; 3</code>（左移3位相当于乘以2的3次方，右移3位相当于除以2的3次方）。</p>
 <h3 id="数组有没有-length-方法-string-有没有-length-方法">数组有没有 <code>length()</code> 方法？ <code>String</code> 有没有 <code>length()</code> 方法？</h3>
 <p>数组没有 <code>length()</code> 方法，有length的属性。String有 <code>length()</code> 方法。</p>
 <h3 id="在java中如何跳出当前的多重嵌套循环">在Java中，如何跳出当前的多重嵌套循环？</h3>
@@ -486,7 +486,7 @@ https://github.com/alex-shpak/hugo-book
 </ul>
 <h3 id="静态内部类static-nested-class和内部类inner-class的不同">静态内部类（Static Nested Class）和内部类（Inner Class）的不同</h3>
 <p>Static Nested Class是被声明为静态（static）的内部类，它可以不依赖于外部类实例被实例化。而通常的 <strong>内部类需要在外部类实例化后才能实例化</strong>：<code>new Outer().new Inner();</code></p>
-<h3 id="抽象的abstract方法是否可同时是静态的static是否可同时是本地方法native是否可同时被-synchronized-饰">抽象的（abstract）方法是否可同时是静态的（static），是否可同时是本地方法（native），是否可同时被 synchronized 饰？</h3>
+<h3 id="抽象的abstract方法是否可同时是静态的static是否可同时是本地方法native是否可同时被-synchronized-修饰">抽象的（abstract）方法是否可同时是静态的（static），是否可同时是本地方法（native），是否可同时被 synchronized 修饰？</h3>
 <p>都不能。抽象方法需要子类重写，而静态的方法是无法被重写的，因此二者是矛盾的。</p>
 <p>本地方法是由本地代码（如C代码）实现的方法，而抽象方法是没有实现的，也是矛盾的。</p>
 <p>synchronized 和方法的实现细节有关，抽象方法不涉及实现细节，因此也是相互矛盾的。</p>
@@ -507,7 +507,7 @@ https://github.com/alex-shpak/hugo-book
 <h3 id="运行时异常与受检异常有何异同">运行时异常与受检异常有何异同？</h3>
 <p>运行时异常表示虚拟机的通常操作中可能遇到的异常，是一种常见运行错误，只要程序设计得没有问题通常就不会发生。</p>
 <p>受检异常跟程序运行的上下文环境有关，即使程序设计无误，仍然可能因使用的问题而引发。</p>
-<h3 id="try-里有一个-return-语句那么紧跟在这个-try-后的-finally-里的代码会不会被执行什么时候被执行在-return-前还是后如果-finally"><code>try{}</code> 里有一个 <code>return</code> 语句，那么紧跟在这个 <code>try</code> 后的 <code>finally{}</code> 里的代码会不会被执行，什么时候被执行，在 <code>return</code> 前还是后？如果 `finally</h3>
+<h3 id="try-里有一个-return-语句那么紧跟在这个-try-后的-finally-里的代码会不会被执行如果-finally"><code>try{}</code> 里有一个 <code>return</code> 语句，那么紧跟在这个 <code>try</code> 后的 <code>finally{}</code> 里的代码会不会被执行？如果 `finally</h3>
 <p><code>finally</code> 会执行，在方法返回调用者前执行。如果 <code>finally{}</code> 里也进行了 <code>return</code> 最终返回 <code>finally</code> 里的 <code>return</code></p>
 <h3 id="listsetmap是否继承自collection接口">List、Set、Map是否继承自Collection接口？</h3>
 <p>List、Set 是，Map 不是。Map是键值对映射容器，与List和Set有明显的区别</p>
@@ -515,10 +515,12 @@ https://github.com/alex-shpak/hugo-book
 <p><code>sleep()</code>方法是线程类（Thread）的静态方法，调用此方法会让当前线程暂停执行指定的时间，将执行机会（CPU）让给其他线程，但是对象的锁依然保持，因此休眠时间结束后会自动恢复。</p>
 <p><code>wait()</code>是Object类的方法，调用对象的 <code>wait()</code> 方法导致当前线程放弃对象的锁（线程暂停执行），进入对象的等待池（wait pool），只有调用对象的 <code>notify()</code> 方法（或 <code>notifyAll()</code> 方法）时才能唤醒等待池中的线程进入等锁池（lock pool），如果线程重新获得对象的锁就可以进入就绪状态。</p>
 <h3 id="线程的-sleep-方法和-yield-方法有什么区别">线程的 sleep() 方法和 yield() 方法有什么区别？</h3>
-<p>1、<code>sleep()</code>方法给其他线程运行机会时不考虑线程的优先级，因此会给低优先级的线程以运行的机会；<code>yield()</code>方法只会给相同优先级或更高优先级的线程以运行的机会；
-2、 线程执行sleep()方法后转入阻塞（blocked）状态，而执行yield()方法后转入就绪（ready）状态；
-3、<code>sleep()</code>方法声明抛出InterruptedException，而yield()方法没有声明任何异常；
-4、<code>sleep()</code>方法比 yield() 方法（跟操作系统CPU调度相关）具有更好的可移植性。</p>
+<ol>
+<li><code>sleep()</code>方法给其他线程运行机会时不考虑线程的优先级，因此会给低优先级的线程以运行的机会；<code>yield()</code>方法只会给相同优先级或更高优先级的线程以运行的机会；</li>
+<li>线程执行sleep()方法后转入阻塞（blocked）状态，而执行yield()方法后转入就绪（ready）状态；</li>
+<li><code>sleep()</code>方法声明抛出InterruptedException，而yield()方法没有声明任何异常；</li>
+<li><code>sleep()</code>方法比 yield() 方法（跟操作系统CPU调度相关）具有更好的可移植性。</li>
+</ol>
 </article>
  
 
@@ -530,7 +532,7 @@ https://github.com/alex-shpak/hugo-book
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/ec175f95c752f6b115dca7af1708bf8be0902136" title='Last modified by haoyang.shi | 2020-03-17' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/9d1fc6332a0cbd3197f1af705dd5802e2d52ac68" title='Last modified by haoyang.shi | 2020-03-17' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
       <span>2020-03-17</span>
     </a>
@@ -585,14 +587,14 @@ https://github.com/alex-shpak/hugo-book
         <li><a href="#char-型变量中能不能存贮一个中文汉字为什么">char 型变量中能不能存贮一个中文汉字，为什么？</a></li>
         <li><a href="#抽象类abstract-class和接口interface有什么异同">抽象类（abstract class）和接口（interface）有什么异同？</a></li>
         <li><a href="#静态内部类static-nested-class和内部类inner-class的不同">静态内部类（Static Nested Class）和内部类（Inner Class）的不同</a></li>
-        <li><a href="#抽象的abstract方法是否可同时是静态的static是否可同时是本地方法native是否可同时被-synchronized-饰">抽象的（abstract）方法是否可同时是静态的（static），是否可同时是本地方法（native），是否可同时被 synchronized 饰？</a></li>
+        <li><a href="#抽象的abstract方法是否可同时是静态的static是否可同时是本地方法native是否可同时被-synchronized-修饰">抽象的（abstract）方法是否可同时是静态的（static），是否可同时是本地方法（native），是否可同时被 synchronized 修饰？</a></li>
         <li><a href="#阐述静态变量和实例变量的区别">阐述静态变量和实例变量的区别</a></li>
         <li><a href="#如何实现对象克隆">如何实现对象克隆？</a></li>
         <li><a href="#string-s--new-stringxyz创建了几个字符串对象">String s = new String("xyz");创建了几个字符串对象？</a></li>
         <li><a href="#接口是否可继承extends接口抽象类是否可实现implements接口抽象类是否可继承具体类concrete-class">接口是否可继承（extends）接口？抽象类是否可实现（implements）接口？抽象类是否可继承具体类（concrete class）？</a></li>
         <li><a href="#error和exception有什么区别">Error和Exception有什么区别？</a></li>
         <li><a href="#运行时异常与受检异常有何异同">运行时异常与受检异常有何异同？</a></li>
-        <li><a href="#try-里有一个-return-语句那么紧跟在这个-try-后的-finally-里的代码会不会被执行什么时候被执行在-return-前还是后如果-finally">try{} 里有一个 return 语句，那么紧跟在这个 try 后的 finally{} 里的代码会不会被执行，什么时候被执行，在 return 前还是后？如果 `finally</a></li>
+        <li><a href="#try-里有一个-return-语句那么紧跟在这个-try-后的-finally-里的代码会不会被执行如果-finally">try{} 里有一个 return 语句，那么紧跟在这个 try 后的 finally{} 里的代码会不会被执行？如果 `finally</a></li>
         <li><a href="#listsetmap是否继承自collection接口">List、Set、Map是否继承自Collection接口？</a></li>
         <li><a href="#thread类的-sleep-方法和对象的-wait-方法都可以让线程暂停执行它们有什么区别">Thread类的 sleep() 方法和对象的 wait() 方法都可以让线程暂停执行，它们有什么区别？</a></li>
         <li><a href="#线程的-sleep-方法和-yield-方法有什么区别">线程的 sleep() 方法和 yield() 方法有什么区别？</a></li>
