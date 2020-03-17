@@ -57,7 +57,7 @@ public static Integer valueOf(int i) {
 }
 ```
 
-如果整型（short、int、double、byte）字面量的值在 `-128` 到 `127` 之间，那么不会 new 新的 Integer 对象，而是直接引用常量池中的 Integer 对象。
+如果整型（byte、short、int、long）字面量的值在 `-128` 到 `127` 之间，那么不会 new 新的 Integer 对象，而是直接引用常量池中的 Integer 对象。
 
 ### & 和 && 的区别？
 
