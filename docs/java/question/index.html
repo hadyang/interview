@@ -12,7 +12,7 @@ short s1 = 1; s1 = s1 &#43; 1;有错吗? short s1 = 1; s1 &#43;= 1; 有错吗？
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/java/question/" />
 <meta property="article:published_time" content="2020-03-16T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-03-16T16:39:48+08:00" />
+<meta property="article:modified_time" content="2020-03-17T08:52:52+08:00" />
 <title>Java面试题 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -20,7 +20,7 @@ short s1 = 1; s1 = s1 &#43; 1;有错吗? short s1 = 1; s1 &#43;= 1; 有错吗？
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.4ebc1a027ba8a3f5f9c45fc5346f6c5e5d1f67ccb00850111064c43e1a446e71.js" integrity="sha256-TrwaAnuoo/X5xF/FNG9sXl0fZ8ywCFAREGTEPhpEbnE="></script>
+<script defer src="/interview/en.search.min.79d251dbde0bb088b447497ff3e292eda879506852c61fa479fd57f01e7f3e50.js" integrity="sha256-edJR294LsIi0R0l/8&#43;KS7ah5UGhSxh&#43;kef1X8B5/PlA="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -448,7 +448,7 @@ https://github.com/alex-shpak/hugo-book
         <span style="color:#66d9ef">return</span> IntegerCache<span style="color:#f92672">.</span><span style="color:#a6e22e">cache</span><span style="color:#f92672">[</span>i <span style="color:#f92672">+</span> <span style="color:#f92672">(</span><span style="color:#f92672">-</span>IntegerCache<span style="color:#f92672">.</span><span style="color:#a6e22e">low</span><span style="color:#f92672">)</span><span style="color:#f92672">]</span><span style="color:#f92672">;</span>
     <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> Integer<span style="color:#f92672">(</span>i<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
 <span style="color:#f92672">}</span>
-</code></pre></div><p>如果整型（short、int、double、byte）字面量的值在 <code>-128</code> 到 <code>127</code> 之间，那么不会 new 新的 Integer 对象，而是直接引用常量池中的 Integer 对象。</p>
+</code></pre></div><p>如果整型（byte、short、int、long）字面量的值在 <code>-128</code> 到 <code>127</code> 之间，那么不会 new 新的 Integer 对象，而是直接引用常量池中的 Integer 对象。</p>
 <h3 id="-和--的区别">&amp; 和 &amp;&amp; 的区别？</h3>
 <p><code>&amp;</code> 运算符有两种用法：按位与；逻辑与。<code>&amp;&amp;</code> 运算符是短路与运算。</p>
 <p>逻辑与跟短路与的差别是非常巨大的，虽然二者都要求运算符左右两端的布尔值都是 <code>true</code> 整个表达式的值才是 <code>true</code> 。 <code>&amp;&amp;</code> 之所以称为短路运算是因为，如果 <code>&amp;&amp;</code> 左边的表达式的值是 <code>false</code> ，右边的表达式会被直接短路掉，不会进行运算。</p>
@@ -530,9 +530,9 @@ https://github.com/alex-shpak/hugo-book
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/f0836759104399b8ff562936c9669da62b6913c3" title='Last modified by haoyang.shi | 2020-03-16' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/ec175f95c752f6b115dca7af1708bf8be0902136" title='Last modified by haoyang.shi | 2020-03-17' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-03-16</span>
+      <span>2020-03-17</span>
     </a>
   </div>
 
