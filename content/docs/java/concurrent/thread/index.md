@@ -92,7 +92,7 @@ Java线程模型定义了 6 种状态，在任意一个时间点，一个线程�
 - **keepAliveTime**：当线程池中的线程数量大于 corePoolSize 的时候，如果这时没有新的任务提交，核心线程外的线程不会立即销毁，而是会等待，直到等待的时间超过了 keepAliveTime才会被回收销毁；
 - **unit** ：keepAliveTime 参数的时间单位。
 - **threadFactory** ：executor 创建新线程的时候会用到。
-- **handler** ：饱和策略。关于饱和策略下面单独介绍一下。
+- **handler** ：饱和策略。
 
 ### 线程池提交任务
 

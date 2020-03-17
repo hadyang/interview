@@ -46,7 +46,7 @@ ReentrantLock 中通过两个子类 `FairSync` 和 `NoFairSync` 继承 AQS 来�
 
 `Condition` 本质上是绑定到 `Lock`。可以通过 `Lock.newCondition()` 来获取一个 `Condition` 实例。
 
-`Condition` 的实现可以提供相比于 `Object monitor`方法不一样的行为和语义，比如：被通知调起的顺序、在通知时不需要持有锁。如果实现类提供了不一样的语义，必须在文档中进行说明。
+`Condition` 的实现可以提供相比于 `Object monitor`方法不一样的行为和语义，比如：被通知调起的顺序、在通知时不需要持有锁（**ReentrantLock 不允许**）。如果实现类提供了不一样的语义，必须在文档中进行说明。
 
 `Condition` 实例只是普通的对象，可以用在同步语句中，并且有他们自己的 `Object monitor`的`wait`和 `notification` 方法。获取 `Condition` 对象的 `Object monitor` 或者使用其 `monitor` 方法，与`Lock` 中使用 `Condition` 的 `wait` 或者 `signal` 方法没有任何关系。为了避免混淆，不建议使用 `Condition` 的 `Object monitor` 方法，除非在它自己的实现里。
 
