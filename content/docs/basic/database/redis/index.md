@@ -439,12 +439,6 @@ Redis 提供以下 BitMap 操作接口：`setBit`、`getBit`、`bitCount`、`bit
 
 在缓存失效的时候（判断拿出来的值为空），不是立即去 `load db` ，而是先使用缓存工具的某些带成功操作返回值的操作（比如Redis的 `SETNX`）去 `set` 一个 `mutex key` ，当操作返回成功时，再进行 `load db` 的操作并回设缓存；否则，就重试整个 `get` 缓存的方法。
 
-
-## Redis分布式锁
-
-  - 加锁：`Redis.set(String key, String value, String nxxx, String expx, int time)`
-  - 解锁：通过 Lua 脚本执行 `if Redis.call('get', KEYS[1]) == ARGV[1] then return Redis.call('del', KEYS[1]) else return 0 end`
-
 ## 数据淘汰机制
 
 ### 对象过期
