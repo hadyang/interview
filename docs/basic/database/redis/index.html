@@ -15,7 +15,7 @@ Redis 内部使用文件事件处理器 file event handler，这个文件事件�
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/database/redis/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-03-16T22:47:12+08:00" />
+<meta property="article:modified_time" content="2020-03-19T20:34:13+08:00" />
 <title>Redis | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -23,7 +23,7 @@ Redis 内部使用文件事件处理器 file event handler，这个文件事件�
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.838911eddfb35212a605aceff064c7dc6d88fc43b836c93a1b2e58a3221734a8.js" integrity="sha256-g4kR7d&#43;zUhKmBazv8GTH3G2I/EO4Nsk6Gy5YoyIXNKg="></script>
+<script defer src="/interview/en.search.min.a557230a98d065c1a13ca4edc23aa39807748fb226858dff91d4420c71193ed0.js" integrity="sha256-pVcjCpjQZcGhPKTtwjqjmAd0j7ImhY3/kdRCDHEZPtA="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -419,7 +419,6 @@ https://github.com/alex-shpak/hugo-book
         <li><a href="#缓存击穿">缓存击穿</a></li>
       </ul>
     </li>
-    <li><a href="#redis分布式锁">Redis分布式锁</a></li>
     <li><a href="#数据淘汰机制">数据淘汰机制</a>
       <ul>
         <li><a href="#对象过期">对象过期</a></li>
@@ -797,11 +796,6 @@ minority master：未能与大多数 master 连通的 master</p>
 <p>缓存在某个时间点过期的时候，恰好在这个时间点对这个Key有大量的并发请求过来，这些请求发现缓存过期一般都会从后端DB加载数据并回设到缓存，这个时候大并发的请求可能会瞬间把后端 DB 压垮。</p>
 <h4 id="解决方案-2">解决方案</h4>
 <p>在缓存失效的时候（判断拿出来的值为空），不是立即去 <code>load db</code> ，而是先使用缓存工具的某些带成功操作返回值的操作（比如Redis的 <code>SETNX</code>）去 <code>set</code> 一个 <code>mutex key</code> ，当操作返回成功时，再进行 <code>load db</code> 的操作并回设缓存；否则，就重试整个 <code>get</code> 缓存的方法。</p>
-<h2 id="redis分布式锁">Redis分布式锁</h2>
-<ul>
-<li>加锁：<code>Redis.set(String key, String value, String nxxx, String expx, int time)</code></li>
-<li>解锁：通过 Lua 脚本执行 <code>if Redis.call('get', KEYS[1]) == ARGV[1] then return Redis.call('del', KEYS[1]) else return 0 end</code></li>
-</ul>
 <h2 id="数据淘汰机制">数据淘汰机制</h2>
 <h3 id="对象过期">对象过期</h3>
 <p>Redis回收过期对象的策略：定期删除+惰性删除</p>
@@ -836,9 +830,9 @@ minority master：未能与大多数 master 连通的 master</p>
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/09b74e50fdb45d56734ad2556ea18c9e1f3a4ba8" title='Last modified by haoyang.shi | 2020-03-16' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/75ce8068a61c26f30a573954b0ae24cdeecf2327" title='Last modified by haoyang.shi | 2020-03-19' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-03-16</span>
+      <span>2020-03-19</span>
     </a>
   </div>
 
@@ -914,7 +908,6 @@ minority master：未能与大多数 master 连通的 master</p>
         <li><a href="#缓存击穿">缓存击穿</a></li>
       </ul>
     </li>
-    <li><a href="#redis分布式锁">Redis分布式锁</a></li>
     <li><a href="#数据淘汰机制">数据淘汰机制</a>
       <ul>
         <li><a href="#对象过期">对象过期</a></li>

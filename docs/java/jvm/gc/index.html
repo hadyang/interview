@@ -8,7 +8,7 @@
 <meta property="og:description" content="垃圾回收 对象存活检测 Java堆中存放着大量的Java对象实例，在垃圾收集器回收内存前，第一件事情就是确定哪些对象是活着的，哪些是可以回收的。
 引用计数算法 引用计数算法是判断对象是否存活的基本算法：给每个对象添加一个引用计数器，没当一个地方引用它的时候，计数器值加1；当引用失效后，计数器值减1。但是这种方法有一个致命的缺陷，当两个对象相互引用时会导致这两个都无法被回收。
 根搜索算法 引用计数是通过为堆中每个对象保存一个计数来区分活动对象和垃圾。根搜索算法实际上是追踪从根结点开始的 引用图。
-在根搜索算法追踪的过程中，起点即 GC Root，GC Root 根据 JVM 实现不同而不同，但是总会包含以下几个方面：
+在根搜索算法追踪的过程中，起点即 GC Root，GC Root 根据 JVM 实现不同而不同，但是总会包含以下几个方面（堆外引用）：
  虚拟机栈（栈帧中的本地变量表）中引用的对象。 方法区中的类静态属性引用的变量。 方法区中的常量引用的变量。 本地方法 JNI 的引用对象。  根搜索算法是从 GC Root 开始的引用图，引用图是一个有向图，其中节点是各个对象，边为引用类型。JVM 中的引用类型分为四种：强引用（StrongReference）、软引用（SoftReference）、弱引用（WeakReference） 和 虚引用（PhantomReference）。
 除强引用外，其他引用在Java 由 Reference 的子类封装了指向其他对象的连接：被指向的对象称为 引用目标。
 若一个对象的引用类型有多个，那到底如何判断它的回收策略呢？其实规则如下：
@@ -21,7 +21,7 @@ PhantomReference 垃圾收集器在 GC 不会清除 PhantomReference，所有的
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/java/jvm/gc/" />
 <meta property="article:published_time" content="2020-02-16T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-02-16T17:16:32+08:00" />
+<meta property="article:modified_time" content="2020-03-19T20:34:13+08:00" />
 <title>垃圾回收 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -29,7 +29,7 @@ PhantomReference 垃圾收集器在 GC 不会清除 PhantomReference，所有的
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.838911eddfb35212a605aceff064c7dc6d88fc43b836c93a1b2e58a3221734a8.js" integrity="sha256-g4kR7d&#43;zUhKmBazv8GTH3G2I/EO4Nsk6Gy5YoyIXNKg="></script>
+<script defer src="/interview/en.search.min.a557230a98d065c1a13ca4edc23aa39807748fb226858dff91d4420c71193ed0.js" integrity="sha256-pVcjCpjQZcGhPKTtwjqjmAd0j7ImhY3/kdRCDHEZPtA="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -430,7 +430,7 @@ https://github.com/alex-shpak/hugo-book
 <p>引用计数算法是判断对象是否存活的基本算法：给每个对象添加一个引用计数器，没当一个地方引用它的时候，计数器值加1；当引用失效后，计数器值减1。但是这种方法有一个致命的缺陷，<strong>当两个对象相互引用时会导致这两个都无法被回收</strong>。</p>
 <h3 id="根搜索算法">根搜索算法</h3>
 <p>引用计数是通过为堆中每个对象保存一个计数来区分活动对象和垃圾。根搜索算法实际上是追踪从根结点开始的 <strong>引用图</strong>。</p>
-<p>在根搜索算法追踪的过程中，起点即 <strong>GC Root</strong>，GC Root 根据 JVM 实现不同而不同，但是总会包含以下几个方面：</p>
+<p>在根搜索算法追踪的过程中，起点即 <strong>GC Root</strong>，GC Root 根据 JVM 实现不同而不同，但是总会包含以下几个方面（<strong>堆外引用</strong>）：</p>
 <ul>
 <li>虚拟机栈（栈帧中的本地变量表）中引用的对象。</li>
 <li>方法区中的类静态属性引用的变量。</li>
@@ -465,6 +465,11 @@ https://github.com/alex-shpak/hugo-book
 <p>需要程序将所拥有的内存空间分成若干分区（Region）。程序运行所需的存储对象会分布在这些分区中，每次只对其中一个分区进行回收操作，从而避免程序全部运行线程暂停来进行回收，允许部分线程在不影响回收行为而保持运行，并且降低回收时间，增加程序响应速度。</p>
 <h3 id="分代回收">分代回收</h3>
 <p>在 JVM 中不同的对象拥有不同的生命周期，因此对于不同生命周期的对象也可以采用不同的垃圾回收算法，以提高效率，这就是分代回收算法的核心思想。</p>
+<h4 id="记忆集">记忆集</h4>
+<p>上面有说到进行 GC 的时候，会从 GC Root 进行搜索，做一个引用图。现有一个对象 C 在 Young Gen，其只被一个在 Old Gen 的对象 D 引用，其引用结构如下所示：</p>
+<p><img src="assists/gc_remembered_set.png" alt=""></p>
+<p>这个时候要进行 Young GC，要确定 C 是否被堆外引用，就需要遍历 Old Gen，这样的代价太大。所以 JVM 在进行对象引用的时候，会有个 <strong>记忆集（Remembered Set）</strong> 记录从 Old Gen 到 Young Gen 的引用关系，并把记忆集里的 Old Gen 作为 GC Root 来构建引用图。这样在进行 Young GC 时就不需要遍历 Old Gen。</p>
+<p>但是使用记忆集也会有缺点：C &amp; D 其实都可以进行回收，但是由于记忆集的存在，不会将 C 回收。这里其实有一点 <strong>空间换时间</strong> 的意思。不过无论如何，它依然确保了垃圾回收所遵循的原则：<strong>垃圾回收确保回收的对象必然是不可达对象，但是不确保所有的不可达对象都会被回收</strong>。</p>
 <h2 id="垃圾回收触发条件">垃圾回收触发条件</h2>
 <h3 id="堆内内存">堆内内存</h3>
 <p>针对 HotSpot VM 的实现，它里面的 GC 其实准确分类只有两大种：</p>
@@ -516,9 +521,9 @@ https://github.com/alex-shpak/hugo-book
 <h3 id="cms-收集器">CMS 收集器</h3>
 <p>CMS（Concurrent Mark Sweep）收集器是一种以获取最短停顿时间为目标的收集器， CMS 收集器采用 <code>标记--清除</code> 算法，运行在老年代。主要包含以下几个步骤：</p>
 <ul>
-<li>初始标记</li>
+<li>初始标记（Stop the world）</li>
 <li>并发标记</li>
-<li>重新标记</li>
+<li>重新标记（Stop the world）</li>
 <li>并发清除</li>
 </ul>
 <p>其中初始标记和重新标记仍然需要 <strong>Stop the world</strong>。初始标记仅仅标记 GC Root 能直接关联的对象，并发标记就是进行 GC Root Tracing 过程，而重新标记则是为了修正并发标记期间，因用户程序继续运行而导致标记变动的那部分对象的标记记录。</p>
@@ -615,9 +620,9 @@ https://github.com/alex-shpak/hugo-book
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/d87c891b02a4575f586779f1dd582e21a44d7541" title='Last modified by haoyang.shi | 2020-02-16' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/75ce8068a61c26f30a573954b0ae24cdeecf2327" title='Last modified by haoyang.shi | 2020-03-19' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-02-16</span>
+      <span>2020-03-19</span>
     </a>
   </div>
 

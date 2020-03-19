@@ -155,7 +155,7 @@ Update 处理逻辑 这里简单的分析下 Update 的处理逻辑
       <description>垃圾回收 对象存活检测 Java堆中存放着大量的Java对象实例，在垃圾收集器回收内存前，第一件事情就是确定哪些对象是活着的，哪些是可以回收的。
 引用计数算法 引用计数算法是判断对象是否存活的基本算法：给每个对象添加一个引用计数器，没当一个地方引用它的时候，计数器值加1；当引用失效后，计数器值减1。但是这种方法有一个致命的缺陷，当两个对象相互引用时会导致这两个都无法被回收。
 根搜索算法 引用计数是通过为堆中每个对象保存一个计数来区分活动对象和垃圾。根搜索算法实际上是追踪从根结点开始的 引用图。
-在根搜索算法追踪的过程中，起点即 GC Root，GC Root 根据 JVM 实现不同而不同，但是总会包含以下几个方面：
+在根搜索算法追踪的过程中，起点即 GC Root，GC Root 根据 JVM 实现不同而不同，但是总会包含以下几个方面（堆外引用）：
  虚拟机栈（栈帧中的本地变量表）中引用的对象。 方法区中的类静态属性引用的变量。 方法区中的常量引用的变量。 本地方法 JNI 的引用对象。  根搜索算法是从 GC Root 开始的引用图，引用图是一个有向图，其中节点是各个对象，边为引用类型。JVM 中的引用类型分为四种：强引用（StrongReference）、软引用（SoftReference）、弱引用（WeakReference） 和 虚引用（PhantomReference）。
 除强引用外，其他引用在Java 由 Reference 的子类封装了指向其他对象的连接：被指向的对象称为 引用目标。
 若一个对象的引用类型有多个，那到底如何判断它的回收策略呢？其实规则如下：
@@ -347,10 +347,11 @@ BlockingQueue 的实现都是线程安全的。所有 queue 的方法都需要�
       <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
       
       <guid>https://hadyang.github.io/interview/docs/java/collection/Concurrenthashmap/</guid>
-      <description>ConcurrentHashmap JDK1.7 ConcurrentHashMap的锁分段技术：假如容器里有多把锁，每一把锁用于锁容器其中一部分数据，那么当多线程访问容器里不同数据段的数据时，线程间就不会存在锁竞争，从而可以有效的提高并发访问效率，这就是ConcurrentHashMap所使用的锁分段技术。首先将数据分成一段一段的存储，然后给每一段数据配一把锁，当一个线程占用锁访问其中一个段数据的时候，其他段的数据也能被其他线程访问。
- ConcurrentHashMap不允许Key或者Value的值为NULL。ConcurrentMaps中不允许空值的主要原因是，在非并发映射中几乎不能容忍的模糊性是无法容纳的。主要的一点是如果map.get（key）返回null，则无法检测 key 是否显式映射为 null 或者 key 未映射。 在非并发映射中，您可以通过 map.contains（key） 进行检查，但在并发映射中，映射可能在调用之间发生了变化。
- Segment类 Put 将一个HashEntry放入到该Segment中，使用自旋机制，减少了加锁的可能性。
-final V put(K key, int hash, V value, boolean onlyIfAbsent) { HashEntry&amp;lt;K,V&amp;gt; node = tryLock() ? null : scanAndLockForPut(key, hash, value); //如果加锁失败，则调用该方法 V oldValue; try { HashEntry&amp;lt;K,V&amp;gt;[] tab = table; int index = (tab.length - 1) &amp;amp; hash; //同hashMap相同的哈希定位方式 HashEntry&amp;lt;K,V&amp;gt; first = entryAt(tab, index); for (HashEntry&amp;lt;K,V&amp;gt; e = first;;) { if (e !</description>
+      <description>ConcurrentHashmap JDK1.7 ConcurrentHashMap 的锁分段技术：假如容器里有多把锁，每一把锁用于锁容器其中一部分数据，那么当多线程访问容器里不同数据段的数据时，线程间就不会存在锁竞争，从而可以有效的提高并发访问效率，这就是 ConcurrentHashMap 所使用的锁分段技术。首先将数据分成一段一段的存储，然后给每一段数据配一把锁，当一个线程占用锁访问其中一个段数据的时候，其他段的数据也能被其他线程访问。
+ConcurrentHashMap 不允许 Key 或者 Value 的值为 NULL，主要原因是：如果 map.get(key) 返回 null ，则无法检测 key 是否显式映射为 null 或者 key 未映射。 在非并发映射中，您可以通过 map.contains(key) 进行检查，但在并发映射中，映射可能在调用之间发生了变化。
+JDK1.8 在JDK1.8中对 ConcurrentHashmap 进行了改进。取消segments字段，直接采用transient volatile HashEntry&amp;lt;K,V&amp;gt;[] table保存数据，采用table数组元素作为锁，从而实现了对每一行数据进行加锁，进一步减少并发冲突的概率。
+将原先 table数组＋单向链表 的数据结构，变更为 table数组＋单向链表＋红黑树 的结构。对于 hash 表来说，最核心的能力在于将 key hash 之后能均匀的分布在数组中。如果 hash 之后散列的很均匀，那么 table 数组中的每个队列长度主要为 0 或者 1 。但实际情况并非总是如此理想，虽然 ConcurrentHashMap 类默认的加载因子为 0.75，但是在数据量过大或者运气不佳的情况下，还是会存在一些队列长度过长的情况，如果还是采用单向列表方式，那么查询某个节点的时间复杂度为   \(O(n)\)  ；因此，对于个数超过 8 (默认值)的链表，jdk1.8 中采用了红黑树的结构，那么查询的时间复杂度可以降低到 \(O(logN)\)  ，可以改进性能。
+PUT final V putVal(K key, V value, boolean onlyIfAbsent) { if (key == null || value == null) throw new NullPointerException(); // 得到 hash 值 int hash = spread(key.</description>
     </item>
     
     <item>
@@ -442,8 +443,7 @@ IO模式 刚才说了，对于一次IO访问（以read举例），数据会先�
       
       <guid>https://hadyang.github.io/interview/docs/fromwork/spring/ioc/</guid>
       <description>IOC Ioc—Inversion of Control，即“控制反转”，不是什么技术，而是一种设计思想。在Java 开发中，Ioc意味着将你设计好的对象交给容器控制，而不是传统的在你的对象内部直接控制。如何理解好Ioc呢？理解好Ioc的关键是要明确“谁控制谁，控制什么，为何是反转（有反转就应该有正转了），哪些方面反转了”，那我们来深入分析一下：
-　- 谁控制谁，控制什么：传统Java SE程序设计，我们直接在对象内部通过new进行创建对象，是程序主动去创建依赖对象；而IoC是有专门一个容器来创建这些对象，即由Ioc容器来控制对 象的创建；谁控制谁？当然是IoC 容器控制了对象；控制什么？那就是主要控制了外部资源获取（不只是对象包括比如文件等）。 - 为何是反转，哪些方面反转了：有反转就有正转，传统应用程序是由我们自己在对象中主动控制去直接获取依赖对象，也就是正转；而反转则是由容器来帮忙创建及注入依赖对象；为何是反转？因为由容器帮我们查找及注入依赖对象，对象只是被动的接受依赖对象，所以是反转；哪些方面反转了？依赖对象的获取被反转了。
-IoC能做什么 　IoC 不是一种技术，只是一种思想，一个重要的面向对象编程的法则，它能指导我们如何设计出松耦合、更优良的程序。传统应用程序都是由我们在类内部主动创建依赖对象，从而导致类与类之间高耦合，难于测试；有了IoC容器后，把创建和查找依赖对象的控制权交给了容器，由容器进行注入组合对象，所以对象与对象之间是 松散耦合，这样也方便测试，利于功能复用，更重要的是使得程序的整个体系结构变得非常灵活。
+ 谁控制谁，控制什么：传统Java SE程序设计，我们直接在对象内部通过new进行创建对象，是程序主动去创建依赖对象；而IoC是有专门一个容器来创建这些对象，即由Ioc容器来控制对象的创建；谁控制谁？当然是IoC 容器控制了对象；控制什么？那就是主要控制了外部资源获取（不只是对象包括比如文件等）。 为何是反转，哪些方面反转了：有反转就有正转，传统应用程序是由我们自己在对象中主动控制去直接获取依赖对象，也就是正转；而反转则是由容器来帮忙创建及注入依赖对象；为何是反转？因为由容器帮我们查找及注入依赖对象，对象只是被动的接受依赖对象，所以是反转；哪些方面反转了？依赖对象的获取被反转了。  IoC能做什么 IoC 不是一种技术，只是一种思想，一个重要的面向对象编程的法则，它能指导我们如何设计出松耦合、更优良的程序。传统应用程序都是由我们在类内部主动创建依赖对象，从而导致类与类之间高耦合，难于测试；有了IoC容器后，把创建和查找依赖对象的控制权交给了容器，由容器进行注入组合对象，所以对象与对象之间是 松散耦合，这样也方便测试，利于功能复用，更重要的是使得程序的整个体系结构变得非常灵活。
 IoC和DI DI—Dependency Injection，即“依赖注入”：组件之间依赖关系由容器在运行期决定，形象的说，即由容器动态的将某个依赖关系注入到组件之中。依赖注入的目的并非为软件系统带来更多功能，而是为了提升组件重用的频率，并为系统搭建一个灵活、可扩展的平台。通过依赖注入机制，我们只需要通过简单的配置，而无需任何代码就可指定目标需要的资源，完成自身的业务逻辑，而不需要关心具体的资源来自何处，由谁实现。
 理解DI的关键是：“谁依赖谁，为什么需要依赖，谁注入谁，注入了什么”，那我们来深入分析一下：
  谁依赖于谁：当然是应用程序依赖于IoC容器； 为什么需要依赖：应用程序需要IoC容器来提供对象需要的外部资源； 谁注入谁：很明显是IoC容器注入应用程序某个对象，应用程序依赖的对象； 注入了什么：就是注入某个对象所需要的外部资源（包括对象、资源、常量数据）。  IoC和DI由什么关系呢？其实它们是同一个概念的不同角度描述，由于控制反转概念比较含糊（可能只是理解为容器控制对象这一个层面，很难让人想到谁来维护对象关系），所以2004年大师级人物Martin Fowler又给出了一个新的名字：“依赖注入”，相对IoC 而言，“依赖注入”明确描述了“被注入对象依赖IoC容器配置依赖对象”。
@@ -1083,11 +1083,9 @@ TCC强一致性方案 TCC 的全称是：Try、Confirm、Cancel。
       <guid>https://hadyang.github.io/interview/docs/architecture/distributed/lock/</guid>
       <description>分布式锁 Redis 锁 单节点 Redis 锁 锁的获取：
 SET resource_name my_random_value NX PX 30000 锁释放：
-if redis.call(&amp;quot;get&amp;quot;,KEYS[1]) == ARGV[1] then return redis.call(&amp;quot;del&amp;quot;,KEYS[1]) else return 0 end RedLock 为了解决 Redis 单点的问题。 Redis 的作者提出了 RedLock 的解决方案。方案非常的巧妙和简洁。 RedLock 的核心思想就是，同时使用多个 Redis Master 来冗余，且这些节点都是完全的独立的，也不需要对这些节点之间的数据进行同步。
-假设我们有N个Redis节点，N应该是一个大于2的奇数。RedLock的实现步骤:
- 取得当前时间 使用单节点获取锁的方式，依次获取 N 个节点的 Redis 锁。 如果获取到的锁的数量大于   \(N/2+1\)  个，且获取的时间小于锁的有效时间(lock validity time)就认为获取到了一个有效的锁，锁自动释放时间就是最初的锁释放时间减去之前获取锁所消耗的时间。 如果获取锁的数量小于 \(N/2+1\)  ，或者在锁的有效时间(lock validity time)内没有获取到足够的锁，就认为获取锁失败，这个时候需要向所有节点发送释放锁的消息。  对于释放锁的实现就很简单了，向所有的 Redis 节点发起释放的操作，无论之前是否获取锁成功。
-缺陷 RedLock中，为了防止死锁，锁是具有过期时间的。
- 如果 Client 1 在持有锁的时候，发生了一次很长时间的 FGC 超过了锁的过期时间。锁就被释放了。 这个时候 Client 2 又获得了一把锁，提交数据。 这个时候 Client 1 从 FGC 中苏醒过来了，又一次提交数据。  这种情况下，数据就发生了错误。RedLock 只是保证了锁的高可用性，并没有保证锁的正确性。</description>
+if redis.call(&amp;quot;get&amp;quot;,KEYS[1]) == ARGV[1] then return redis.call(&amp;quot;del&amp;quot;,KEYS[1]) else return 0 end 缺陷 由于超时时间导致锁被多 Client 同时获取：
+ C1 获取锁 A 成功，但由于 GC 等原因线程挂起，锁 A 过期 C2 获取锁 A 成功 C1 &amp;amp; C2 同时认为自己加锁成功  异步的主从复制 &amp;amp; Master 宕机，导致锁丢失：
+ C1 获取锁 A 成功，Master 宕机，Slave 未同步到锁 A C2 获取锁 A 成功 C1 &amp;amp; C2 同时认为自己加锁成功  RedLock 为了解决 Redis 单点的问题。 Redis 的作者提出了 RedLock 的解决方案。方案非常的巧妙和简洁。 RedLock 的核心思想就是，同时使用多个 Redis Master 来冗余，且这些节点都是完全的独立的，也不需要对这些节点之间的数据进行同步。</description>
     </item>
     
     <item>

@@ -17,7 +17,7 @@ ZooKeeper 的好处：
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/architecture/distributed/zk/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-03-13T11:14:02+08:00" />
+<meta property="article:modified_time" content="2020-03-19T20:34:13+08:00" />
 <title>Zookeeper | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -25,7 +25,7 @@ ZooKeeper 的好处：
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.838911eddfb35212a605aceff064c7dc6d88fc43b836c93a1b2e58a3221734a8.js" integrity="sha256-g4kR7d&#43;zUhKmBazv8GTH3G2I/EO4Nsk6Gy5YoyIXNKg="></script>
+<script defer src="/interview/en.search.min.a557230a98d065c1a13ca4edc23aa39807748fb226858dff91d4420c71193ed0.js" integrity="sha256-pVcjCpjQZcGhPKTtwjqjmAd0j7ImhY3/kdRCDHEZPtA="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -665,7 +665,7 @@ https://github.com/alex-shpak/hugo-book
 </ol>
 <h3 id="zookeeper-并不保证读取的是最新数据">Zookeeper 并不保证读取的是最新数据</h3>
 <p>ZooKeeper 并不保证在每个实例中，两个不同的客户端将具有相同的 ZooKeeper 数据的视图。由于诸如网络延迟的因素，一个客户端可以在另一客户端被通知该改变之前执行更新，考虑两个客户端A和B的场景。如果客户端A将 <code>/a</code> 的值从 <code>0</code> 设置为 <code>1</code> ，客户端B读取 <code>/a</code> ，客户端 B 可以读取旧值 0，这取决于它连接到的服务器。如果客户端A 和客户端B 读取相同的值很重要，则客户端B应该在执行读取之前从 ZooKeeper API 方法调用 <code>sync()</code> 方法。</p>
-<p>对于 Zookeeper 来说，它实现了A可用性、P分区容错性、C中的写入强一致性，丧失的是C中的读取一致性。</p>
+<p>对于 Zookeeper 来说，它实现了A可用性（<strong>非高可用</strong>）、P分区容错性、C中的写入强一致性，丧失的是C中的读取一致性。</p>
 <h3 id="我们能做什么">我们能做什么</h3>
 <ol>
 <li>我们或者选择人工介入的强一致性，或者选择程序自动化进行的弱一致性。需要进行取舍。</li>
@@ -741,9 +741,9 @@ https://github.com/alex-shpak/hugo-book
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/9bb466d7baf7cf5a5132691f59fa681795f83b60" title='Last modified by haoyang.shi | 2020-03-13' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/75ce8068a61c26f30a573954b0ae24cdeecf2327" title='Last modified by haoyang.shi | 2020-03-19' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-03-13</span>
+      <span>2020-03-19</span>
     </a>
   </div>
 
