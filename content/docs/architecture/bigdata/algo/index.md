@@ -21,7 +21,7 @@ categories: architecture
   - Bit-Map 大小：{{<katex>}}m\ge -\frac{n\times ln^P}{(ln^2)^2}{{</katex>}}
   - Hash 函数个数：{{<katex>}}k=log_2^\frac{1}{P}{{</katex>}}
 
-> 参数在线计算工具：https://hur.st/bloomfilter
+> 参数在线计算工具：[Bloom Filter Calculator](https://hur.st/bloomfilter)
 
 举个例子我们假设 {{<katex>}}P=0.01{{</katex>}}，{{<katex>}}n=4000{{</katex>}}，则此时 m 应大概是 {{<katex>}}9.5\times n=38000{{</katex>}} bit，{{<katex>}}k=7{{</katex>}}
 
