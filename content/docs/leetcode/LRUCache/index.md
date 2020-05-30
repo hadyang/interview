@@ -44,7 +44,7 @@ class LRUCache extends LinkedHashMap<Integer, Integer>{
     private final int capacity;
 
     public LRUCache(int capacity) {
-        super(capacity*, 0.75f, true);
+        super(capacity * 0.75f, true);
         this.capacity = capacity;
     }
 
