@@ -21,7 +21,7 @@
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/os/concurrency/" />
 <meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-03-12T15:17:37+08:00" />
+<meta property="article:modified_time" content="2020-06-21T23:15:19+08:00" />
 <title>进程管理 | Interview</title>
 <link rel="icon" href="/interview/favicon.png" type="image/x-icon">
 
@@ -29,7 +29,7 @@
 <link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
 
 
-<script defer src="/interview/en.search.min.c21c91e56818eaad12b6176db4537872379bafc6b664c9361e1f9d5ac0aeed1e.js" integrity="sha256-whyR5WgY6q0SthdttFN4cjebr8a2ZMk2Hh&#43;dWsCu7R4="></script>
+<script defer src="/interview/en.search.min.eabb1f4a77371992d262207e875bf8ad7adf996d8852dd870ebd89f5385bcbd4.js" integrity="sha256-6rsfSnc3GZLSYiB&#43;h1v4rXrfmW2IUt2HDr2J9Thby9Q="></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -573,7 +573,7 @@ https://github.com/alex-shpak/hugo-book
 </li>
 </ul>
 <h4 id="死锁避免">死锁避免</h4>
-<p>银行家算法：判断此次请求是否造成死锁若会造成死锁，则拒绝该请求。</p>
+<p><strong>互斥锁的加锁规则</strong>：给定所有互斥操作一个全序，如果每个线程均按这种顺序获得互斥锁，并且按相反顺序解锁，则不会发生死锁。</p>
 <h3 id="cas">CAS</h3>
 <p><strong>比较并交换(compare and swap, CAS)</strong>，是原子操作的一种，可用于在多线程编程中实现不被打断的数据交换操作。<strong>该操作通过将内存中的值与指定数据进行比较，当数值一样时将内存中的数据替换为新的值</strong>。</p>
 <p>在使用上，通常会记录下某块内存中的旧值，通过对旧值进行一系列的操作后得到新值，然后通过CAS操作将新值与旧值进行交换。<strong>如果这块内存的值在这期间内没被修改过，则旧值会与内存中的数据相同，这时CAS操作将会成功执行使内存中的数据变为新值</strong>。如果内存中的值在这期间内被修改过，则一般来说旧值会与内存中的数据不同，这时CAS操作将会失败，新值将不会被写入内存。</p>
@@ -661,9 +661,9 @@ https://github.com/alex-shpak/hugo-book
 
   <div>
     
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/607130285b034ac4d3542ed57c5150e72b677b90" title='Last modified by haoyang.shi | 2020-03-12' target="_blank" rel="noopener">
+    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/2c7ea307f7334d5b7808d7c16ada5c5c5e309555" title='Last modified by shihaoyang | 2020-06-21' target="_blank" rel="noopener">
       <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-03-12</span>
+      <span>2020-06-21</span>
     </a>
   </div>
 
