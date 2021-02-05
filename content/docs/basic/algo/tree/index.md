@@ -57,8 +57,8 @@ Node* tree(vector<char> data, int n) {
     node = new Node;
     node->data = data[n];
 
-    node->left = tree(data, n + 1);
-    node->right = tree(data, n + 2);
+    node->left = tree(data, 2*n + 1);
+    node->right = tree(data, 2*n + 2);
     return node;
 }
 ```
