@@ -1,4 +1,4 @@
-baseURL: https://hadyang.github.io/interview/
+baseURL: https://hadyang.com/interview/
 languageCode: zh-CN
 title: Interview
 theme: hugo-book
@@ -6,8 +6,6 @@ theme: hugo-book
 # Book configuration
 disablePathToLower: true
 enableGitInfo: true
-
-googleAnalytics: UA-157595781-3
 
 # Code highlight
 # pygmentsStyle: monokailight
@@ -53,3 +51,5 @@ params:
   # (Optional, default true) Enables search function with lunr.js,
   # Index is built on fly, therefore it might slowdown your website.
   BookSearch: true
+
+  BaiduAnalytics: 76ff80292532744e661096d1fefd1f1c
