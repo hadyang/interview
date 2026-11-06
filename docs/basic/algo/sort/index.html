@@ -1,416 +1,3083 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN" dir="ltr"
+    data-theme="light"
+    data-layout="centered">
 
 <head>
-  <meta charset="UTF-8">
+  
+  <meta name="generator" content="Hugo 0.169.0">
+  <meta name="generator-theme" content="Book Theme: https://github.com/alex-shpak/hugo-book">
+
+
+
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="排序算法"><meta property="og:title" content="排序算法" />
-<meta property="og:description" content="排序算法 常见排序算法 稳定排序：  冒泡排序 — O(n²) 插入排序 — O(n²) 桶排序 — O(n); 需要 O(k) 额外空间 归并排序 — O(nlogn); 需要 O(n) 额外空间 二叉排序树排序 — O(n log n) 期望时间; O(n²)最坏时间; 需要 O(n) 额外空间 基数排序 — O(n·k); 需要 O(n) 额外空间  不稳定排序  选择排序 — O(n²) 希尔排序 — O(nlogn) 堆排序 — O(nlogn) 快速排序 — O(nlogn) 期望时间, O(n²) 最坏情况; 对于大的、乱数串行一般相信是最快的已知排序  交换排序 冒泡排序 它重复地走访过要排序的数列，一次比较两个元素，如果他们的顺序错误就把他们交换过来。走访数列的工作是重复地进行直到没有再需要交换，也就是说该数列已经排序完成。冒泡排序总的平均时间复杂度为O(n^2)。冒泡排序是一种稳定排序算法。
- 比较相邻的元素。如果第一个比第二个大，就交换他们两个。 对每一对相邻元素作同样的工作，从开始第一对到结尾的最后一对。在这一点，最后的元素应该会是最大的数。 针对所有的元素重复以上的步骤，除了最后一个。 持续每次对越来越少的元素重复上面的步骤，直到没有任何一对数字需要比较。  void bubble_sort(int a[], int n) { int i, j, temp; for (j = 0; j &lt; n - 1; j&#43;&#43;) for (i = 0; i &lt; n - 1 - j; i&#43;&#43;) { if(a[i] &gt; a[i &#43; 1]) { temp = a[i]; a[i] = a[i &#43; 1]; a[i &#43; 1] = temp; } } } 快速排序 快速排序-百度百科 快速排序是一种 不稳定 的排序算法，平均时间复杂度为 O(nlogn)。快速排序使用分治法（Divide and conquer）策略来把一个序列（list）分为两个子序列（sub-lists）。 步骤为：" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/algo/sort/" />
-<meta property="article:published_time" content="2019-08-21T11:00:41+08:00" />
-<meta property="article:modified_time" content="2020-02-29T10:22:49+08:00" />
-<title>排序算法 | Interview</title>
-<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+<meta name="description" content="排序算法 常见排序算法 稳定排序： 冒泡排序 — O(n²) 插入排序 — O(n²) 桶排序 — O(n); 需要 O(k) 额外空间 归并排序 — O(nlogn); 需要 O(n) 额外空间 二叉排序树排序 — O(n log n) 期望时间; O(n²)最坏时间; 需要 O(n) 额外空间 基数排序 — O(n·k); 需要 O(n) 额外空间 不稳定排序 选择排序 — O(n²) 希尔排序 — O(nlogn) 堆排序 — O(nlogn) 快速排序 — O(nlogn) 期望时间, O(n²) 最坏情况; 对于大的、乱数串行一般相信是最快的已知排序 交换排序 冒泡排序 它重复地走访过要排序的数列，一次比较两个元素，如果他们的顺序错误就把他们交换过来。走访数列的工作是重复地进行直到没有再需要交换，也就是说该数列已经排序完成。冒泡排序总的平均时间复杂度为O(n^2)。冒泡排序是一种稳定排序算法。
+比较相邻的元素。如果第一个比第二个大，就交换他们两个。 对每一对相邻元素作同样的工作，从开始第一对到结尾的最后一对。在这一点，最后的元素应该会是最大的数。 针对所有的元素重复以上的步骤，除了最后一个。 持续每次对越来越少的元素重复上面的步骤，直到没有任何一对数字需要比较。 void bubble_sort(int a[], int n) { int i, j, temp; for (j = 0; j &lt; n - 1; j&#43;&#43;) for (i = 0; i &lt; n - 1 - j; i&#43;&#43;) { if(a[i] &gt; a[i &#43; 1]) { temp = a[i]; a[i] = a[i &#43; 1]; a[i &#43; 1] = temp; } } } 快速排序 快速排序-百度百科 快速排序是一种 不稳定 的排序算法，平均时间复杂度为 O(nlogn)。快速排序使用分治法（Divide and conquer）策略来把一个序列（list）分为两个子序列（sub-lists）。 步骤为：
+">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#2e3440">
+<meta name="color-scheme" content="light dark">
+<meta name="format-detection" content="telephone=no"><meta property="og:url" content="https://hadyang.com/docs/basic/algo/sort/">
+	<meta property="og:site_name" content="HadYang技术分享">
+	<meta property="og:title" content="排序算法">
+	<meta property="og:description" content="排序算法 常见排序算法 稳定排序： 冒泡排序 — O(n²) 插入排序 — O(n²) 桶排序 — O(n); 需要 O(k) 额外空间 归并排序 — O(nlogn); 需要 O(n) 额外空间 二叉排序树排序 — O(n log n) 期望时间; O(n²)最坏时间; 需要 O(n) 额外空间 基数排序 — O(n·k); 需要 O(n) 额外空间 不稳定排序 选择排序 — O(n²) 希尔排序 — O(nlogn) 堆排序 — O(nlogn) 快速排序 — O(nlogn) 期望时间, O(n²) 最坏情况; 对于大的、乱数串行一般相信是最快的已知排序 交换排序 冒泡排序 它重复地走访过要排序的数列，一次比较两个元素，如果他们的顺序错误就把他们交换过来。走访数列的工作是重复地进行直到没有再需要交换，也就是说该数列已经排序完成。冒泡排序总的平均时间复杂度为O(n^2)。冒泡排序是一种稳定排序算法。
+比较相邻的元素。如果第一个比第二个大，就交换他们两个。 对每一对相邻元素作同样的工作，从开始第一对到结尾的最后一对。在这一点，最后的元素应该会是最大的数。 针对所有的元素重复以上的步骤，除了最后一个。 持续每次对越来越少的元素重复上面的步骤，直到没有任何一对数字需要比较。 void bubble_sort(int a[], int n) { int i, j, temp; for (j = 0; j &lt; n - 1; j&#43;&#43;) for (i = 0; i &lt; n - 1 - j; i&#43;&#43;) { if(a[i] &gt; a[i &#43; 1]) { temp = a[i]; a[i] = a[i &#43; 1]; a[i &#43; 1] = temp; } } } 快速排序 快速排序-百度百科 快速排序是一种 不稳定 的排序算法，平均时间复杂度为 O(nlogn)。快速排序使用分治法（Divide and conquer）策略来把一个序列（list）分为两个子序列（sub-lists）。 步骤为：">
+	<meta property="og:locale" content="zh_CN">
+	<meta property="og:type" content="article">
+		<meta property="article:section" content="docs">
+		<meta property="article:published_time" content="2019-08-21T11:00:41+08:00">
+		<meta property="article:modified_time" content="2020-02-29T10:22:49+08:00">
 
 
-<link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
+	<meta itemprop="name" content="排序算法">
+	<meta itemprop="description" content="排序算法 常见排序算法 稳定排序： 冒泡排序 — O(n²) 插入排序 — O(n²) 桶排序 — O(n); 需要 O(k) 额外空间 归并排序 — O(nlogn); 需要 O(n) 额外空间 二叉排序树排序 — O(n log n) 期望时间; O(n²)最坏时间; 需要 O(n) 额外空间 基数排序 — O(n·k); 需要 O(n) 额外空间 不稳定排序 选择排序 — O(n²) 希尔排序 — O(nlogn) 堆排序 — O(nlogn) 快速排序 — O(nlogn) 期望时间, O(n²) 最坏情况; 对于大的、乱数串行一般相信是最快的已知排序 交换排序 冒泡排序 它重复地走访过要排序的数列，一次比较两个元素，如果他们的顺序错误就把他们交换过来。走访数列的工作是重复地进行直到没有再需要交换，也就是说该数列已经排序完成。冒泡排序总的平均时间复杂度为O(n^2)。冒泡排序是一种稳定排序算法。
+比较相邻的元素。如果第一个比第二个大，就交换他们两个。 对每一对相邻元素作同样的工作，从开始第一对到结尾的最后一对。在这一点，最后的元素应该会是最大的数。 针对所有的元素重复以上的步骤，除了最后一个。 持续每次对越来越少的元素重复上面的步骤，直到没有任何一对数字需要比较。 void bubble_sort(int a[], int n) { int i, j, temp; for (j = 0; j &lt; n - 1; j&#43;&#43;) for (i = 0; i &lt; n - 1 - j; i&#43;&#43;) { if(a[i] &gt; a[i &#43; 1]) { temp = a[i]; a[i] = a[i &#43; 1]; a[i &#43; 1] = temp; } } } 快速排序 快速排序-百度百科 快速排序是一种 不稳定 的排序算法，平均时间复杂度为 O(nlogn)。快速排序使用分治法（Divide and conquer）策略来把一个序列（list）分为两个子序列（sub-lists）。 步骤为：">
+	<meta itemprop="datePublished" content="2019-08-21T11:00:41+08:00">
+	<meta itemprop="dateModified" content="2020-02-29T10:22:49+08:00">
+	<meta itemprop="wordCount" content="1050">
+	<meta itemprop="keywords" content="Algo">
+
+<title>排序算法 • HadYang技术分享</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.png" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<link rel="manifest" href="/manifest.json">
+<link rel="canonical" href="https://hadyang.com/docs/basic/algo/sort/">
+<link rel="stylesheet" href="/book.min.3b47c5c3053ddd1846b44ca0278f9365d1cc6def0c56efaee4fbb8b7a57c782b.css" integrity="sha256-O0fFwwU93RhGtEygJ4&#43;TZdHMbe8MVu&#43;u5Pu4t6V8eCs=" crossorigin="anonymous">
 
 
-<script defer src="/interview/en.search.min.51eaac1d27afa630aa5121b26a137e4a1060429577e041714b91afd0aabeecb6.js" integrity="sha256-UeqsHSevpjCqUSGyahN&#43;ShBgQpV34EFxS5Gv0Kq&#43;7LY="></script>
-
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-	ga('create', 'UA-157595781-3', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
-
-<!--
-Made with Book Theme
-https://github.com/alex-shpak/hugo-book
--->
-
+<script type="module" src="/en.search.min.b47060fc7a23e8d87f711a51b12b14f2dcc3aa45572ee4a9e1129fbbe13243de.js" integrity="sha256-tHBg/Hoj6Nh/cRpRsSsU8tzDqkVXLuSp4RKfu&#43;EyQ94=" crossorigin="anonymous"></script>
   
 </head>
 
-<body>
-  <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="container flex">
-    <aside class="book-menu">
-      
+<body dir="ltr" class="book-kind-page book-type-docs">
+  <div class="book-container flex">
+    
+<aside class="book-menu" aria-label="Menu">
+  <div class="book-menu-content">
+    
   <nav>
-<h2 class="book-brand">
-  <a href="/interview"><span>Interview</span>
+<div class="book-brand">
+  <a class="flex align-center" href="/"><span>HadYang技术分享</span>
   </a>
-</h2>
-
-
-<div class="book-search">
-  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
-  <div class="book-search-spinner spinner hidden"></div>
-  <ul id="book-search-results"></ul>
 </div>
 
-
-
-
-
-
-
-
-
-  <ul>
-<li><a href="/interview/docs/basic/">计算机基础</a>
-<ul>
-<li><a href="/interview/docs/basic/algo/">算法</a>
-<ul>
-<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
-<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
-<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
-<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
-<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
-<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
-<li><a href="/interview/docs/basic/algo/sort/"class=active>排序算法</a></li>
-<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/basic/os/">操作系统</a>
-<ul>
-<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
-<li><a href="/interview/docs/basic/os/concurrency/">进程管理</a></li>
-<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
-<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
-<li><a href="/interview/docs/basic/os/device/">设备管理</a></li>
-<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
-<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/basic/net/">计算机网络</a>
-<ul>
-<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
-<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
-<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
-<li><a href="/interview/docs/basic/net/http/">HTTP</a></li>
-<li><a href="/interview/docs/basic/net/https/">HTTPS</a></li>
-<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/basic/database/mysql/">MySQL</a>
-<ul>
-<li><a href="/interview/docs/basic/database/sql/">SQL</a></li>
-<li><a href="/interview/docs/basic/database/mysql/architecture/">MySQL架构</a></li>
-<li><a href="/interview/docs/basic/database/mysql/innodb/">InnoDB</a>
-<ul>
-<li><a href="/interview/docs/basic/database/mysql/innodb/index/">InnoDB索引</a></li>
-<li><a href="/interview/docs/basic/database/mysql/innodb/concurrent/">InnoDB并发控制</a></li>
-<li><a href="/interview/docs/basic/database/mysql/innodb/transaction/">InnoDB事务</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/basic/database/mysql/sharding/">MySQL集群</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
-<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/java/">Java</a>
-<ul>
-<li><a href="/interview/docs/java/oop/">OOP</a></li>
-<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
-<li><a href="/interview/docs/java/operator/">运算符</a></li>
-<li><a href="/interview/docs/java/exception/">异常</a></li>
-<li><a href="/interview/docs/java/generics/">泛型</a></li>
-<li><a href="/interview/docs/java/object/">Object</a></li>
-<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
-<li><a href="/interview/docs/java/proxy/">代理</a></li>
-<li><a href="/interview/docs/java/annotation/">注解</a></li>
-<li><a href="/interview/docs/java/nio/">NIO</a></li>
-<li><a href="/interview/docs/java/question/">面试题</a></li>
-<li><a href="/interview/docs/java/">集合</a>
-<ul>
-<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
-<li><a href="/interview/docs/java/collection/Concurrenthashmap/">Concurrenthashmap</a></li>
-<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/java/concurrent/">并发</a>
-<ul>
-<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
-<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
-<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
-<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
-<li><a href="/interview/docs/java/concurrent/AQS/">AQS</a></li>
-<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
-<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
-<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/java/jvm/">Java虚拟机</a>
-<ul>
-<li><a href="/interview/docs/java/jvm/architecture/">JVM架构</a></li>
-<li><a href="/interview/docs/java/jvm/classloader/">类加载器</a></li>
-<li><a href="/interview/docs/java/jvm/runtime_area/">内存模型</a></li>
-<li><a href="/interview/docs/java/jvm/gc/">垃圾收集</a></li>
-<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
-<li><a href="/interview/docs/java/jvm/string-constant-pool/">String常量池</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-object-lifecycle/">对象生命周期</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="/interview/docs/fromwork/">框架</a>
-<ul>
-<li><a href="/interview/docs/fromwork/netty/">Netty</a></li>
-<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
-<ul>
-<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
-<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
-<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/fromwork/spring/">Spring</a>
-<ul>
-<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
-<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
-<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="/interview/docs/architecture/">系统架构</a>
-<ul>
-<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
-<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
-<ul>
-<li><a href="/interview/docs/architecture/concurrent/design/">高并发系统设计</a></li>
-<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/architecture/design/">系统设计</a>
-<ul>
-<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
-<li><a href="/interview/docs/architecture/design/seckill/">秒杀系统</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/architecture/distributed/">分布式</a>
-<ul>
-<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
-<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
-<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
-<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
-<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
-<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
-<li><a href="/interview/docs/architecture/distributed/kafka/">Kafka</a></li>
-<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
-<li><a href="/interview/docs/architecture/distributed/dubbo/">Dubbo</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
-<ul>
-<li><a href="/interview/docs/architecture/bigdata/algo/">基础算法</a></li>
-<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="/interview/docs/offer/">剑指offer</a>
-<ul>
-<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
-<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
-<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
-<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
-<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
-<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
-<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
-<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
-<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
-<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
-<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
-<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
-<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
-<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
-<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
-<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
-<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
-<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
-<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
-<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
-<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
-<li><a href="/interview/docs/offer/VerifySquenceOfBST/">二叉搜索树的后序遍历序列</a></li>
-<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
-<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
-<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
-<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
-<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
-<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
-<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
-<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
-<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
-<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
-<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
-<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
-<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
-<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
-<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
-<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
-<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
-<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
-<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
-<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
-<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
-<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
-<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
-<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
-<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
-<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
-<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
-<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
-<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
-<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
-<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
-<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
-<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
-<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
-<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
-<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
-<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
-<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
-<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
-<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
-<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
-<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
-<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
-<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
-<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/leetcode/">LeetCode</a>
-<ul>
-<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
-<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
-<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
-<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
-<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
-<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
-<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
-<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
-<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
-<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
-<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
-<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
-<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
-<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
-<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
-<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
-<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
-<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
-<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
-<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
-<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
-<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
-<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
-<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
-<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
-<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
-<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
-<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
-<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
-<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
-<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
-<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
-<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
-<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
-</ul>
-</li>
-</ul>
-
-
-
-
-
-
-
-
-</nav>
-
-
-
-
-  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
-
-
- 
-    </aside>
-
-    <div class="book-page">
-      <header class="book-header">
-        
-  <div class="flex align-center justify-between">
-  <label for="menu-control">
-    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
-  </label>
-
-  <strong>排序算法</strong>
-
-  <label for="toc-control">
-    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
-  </label>
+<div class="book-search hidden">
+  <input id="book-search-input" type="text" role="searchbox" enterkeyhint="search"
+    placeholder="Search"
+    aria-label="Search"
+    maxlength="64" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results" aria-live="polite"></ul>
 </div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
 
 
   
-    <input type="checkbox" class="hidden" id="toc-control" />
-    <aside class="hidden clearfix">
-      
-  <nav id="TableOfContents">
   <ul>
-    <li><a href="#常见排序算法">常见排序算法</a>
-      <ul>
-        <li><a href="#稳定排序">稳定排序：</a></li>
-        <li><a href="#不稳定排序">不稳定排序</a></li>
-      </ul>
-    </li>
-    <li><a href="#交换排序">交换排序</a>
-      <ul>
-        <li><a href="#冒泡排序">冒泡排序</a></li>
-        <li><a href="#快速排序-快速排序-百度百科httpbaikebaiducomlinkurlhyqpclbjy1syy4esoze9kandidxorkxisfq0hzl8c5eut40dzs-fd1v0jubijsv7raogwy6haq-b1hbrghf1hq">快速排序 快速排序-百度百科</a></li>
-      </ul>
-    </li>
-    <li><a href="#插入排序">插入排序</a>
-      <ul>
-        <li><a href="#直接插入排序">直接插入排序</a></li>
-        <li><a href="#希尔排序httpszhwikipediaorgwikie5b88ce5b094e68e92e5ba8f">希尔排序</a></li>
-      </ul>
-    </li>
-    <li><a href="#选择排序">选择排序</a>
-      <ul>
-        <li><a href="#直接选择排序">直接选择排序</a></li>
-        <li><a href="#堆排序">堆排序</a></li>
-      </ul>
-    </li>
-    <li><a href="#归并排序">归并排序</a></li>
-    <li><a href="#桶排序">桶排序</a></li>
-    <li><a href="#基数排序">基数排序</a></li>
-    <li><a href="#拓扑排序">拓扑排序</a></li>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Architecture</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/base/" class="">
+      系统架构基础</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Bigdata</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/bigdata/algo/" class="">
+      大数据基础算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/bigdata/hdfs/" class="">
+      HDFS</a>
+  
+
+        </li>
+      
+    
   </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Concurrent</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/concurrent/design/" class="">
+      高并发系统设计</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/concurrent/flow-control/" class="">
+      高并发下的流量控制</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Design</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/design/seckill/" class="">
+      秒杀系统</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/design/tinyURL/" class="">
+      短链接</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Distributed</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/consensus/" class="">
+      分布式一致性和共识协议</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/dubbo/" class="">
+      Dubbo</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/kafka/" class="">
+      Kafka</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/mq/" class="">
+      MQ</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/rpc/" class="">
+      RPC</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/zk/" class="">
+      Zookeeper</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/transaction/" class="">
+      分布式事务</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/cache/" class="">
+      分布式缓存</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/lock/" class="">
+      分布式锁</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/" class="">
+      Basic</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/sql/" class="">
+      SQL</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/redis/" class="">
+      Redis</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/cryptology/" class="">
+      密码学</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/" class="">
+      操作系统基础</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/io/" class="">
+      I/O</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/memory/" class="">
+      内存管理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/disk/" class="">
+      磁盘与文件</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/arch/" class="">
+      计算机体系结构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/device/" class="">
+      设备管理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/concurrency/" class="">
+      进程管理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/questions/" class="">
+      Index</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/" class="">
+      算法</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/kmp/" class="">
+      KMP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/hash/" class="">
+      哈希</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/sort/" class="active">
+      排序算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/mst/" class="">
+      最小生成树算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/path/" class="">
+      最短路径算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/search/" class="">
+      查找算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/tree/" class="">
+      树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/skip_list/" class="">
+      跳跃表</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/" class="">
+      网络分层</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/websocket/" class="">
+      Websocket</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/http/" class="">
+      HTTP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/https/" class="">
+      HTTPS</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/ip/" class="">
+      IP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/tcp/" class="">
+      TCP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/protocol/" class="">
+      网络协议</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Mysql</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/sharding/" class="">
+      MySQL 集群</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/architecture/" class="">
+      MySQL 架构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Innodb</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/innodb/transaction/" class="">
+      InnoDB 事务</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/innodb/concurrent/" class="">
+      InnoDB 并发控制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/innodb/index/" class="">
+      InnoDB 索引</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Fromwork</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/netty/" class="">
+      Netty</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/spring/" class="">
+      Spring 基本</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/spring/aop/" class="">
+      AOP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/spring/ioc/" class="">
+      IOC</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/spring/design-partten/" class="">
+      设计模式</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Mybatis</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/mybatis/proxy/" class="">
+      Mybatis 动态代理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/mybatis/cache/" class="">
+      Mybatis 缓存机制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/mybatis/question/" class="">
+      面试题</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/" class="">
+      Java</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/question/" class="">
+      Java面试题</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/nio/" class="">
+      NIO</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/proxy/" class="">
+      Java 代理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/exception/" class="">
+      Java 异常</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/generics/" class="">
+      Java 泛型</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/object/" class="">
+      Object</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/string-builder/" class="">
+      StringBuilder</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/serilaser/" class="">
+      序列化</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/annotation/" class="">
+      注解</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/operator/" class="">
+      运算符</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/collection/" class="">
+      集合框架</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/collection/BlockQueue/" class="">
+      BlockingQueue</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/collection/Concurrenthashmap/" class="">
+      ConcurrentHashmap</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/collection/HashMap/" class="">
+      HashMap</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/oop/" class="">
+      面向对象基础</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Concurrent</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/atomic/" class="">
+      AtomicInteger</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/AQS/" class="">
+      AQS</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/count-down-latch/" class="">
+      CountDownLatch</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/thread/" class="">
+      Java线程</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/synchronized/" class="">
+      Synchronized</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/threadlocal/" class="">
+      ThreadLocal</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/volatile/" class="">
+      Volatile</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/interrupt/" class="">
+      线程中断</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Jvm</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/gc/" class="">
+      垃圾回收</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/architecture/" class="">
+      JVM 架构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/classloader/" class="">
+      类加载器</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/runtime_area/" class="">
+      运行时数据区</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/dispatcher/" class="">
+      Java 分派机制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/string-constant-pool/" class="">
+      String 常量池</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/jvm-object-lifecycle/" class="">
+      对象的生命周期</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/" class="">
+      Leetcode</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/threeSum/" class="">
+      三数之和</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/addTwoNumbers/" class="">
+      两数相加</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/maxProfit/" class="">
+      买卖股票的最佳时机</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/maxProfit2/" class="">
+      买卖股票的最佳时机</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/lowestCommonAncestor/" class="">
+      二叉树的最近公共祖先</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/AllOne/" class="">
+      全 O(1) 的数据结构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/reverseList/" class="">
+      反转链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/mergeKLists/" class="">
+      合并</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/mergeTwoLists/" class="">
+      合并两个有序链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/mergeRagen/" class="">
+      合并区间</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/restoreIpAddresses/" class="">
+      复原</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/checkInclusion/" class="">
+      字符串的排列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/StringMultiply/" class="">
+      字符串相乘</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/maxAreaOfIsland/" class="">
+      岛屿的最大面积</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/sortList/" class="">
+      排序链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/trap/" class="">
+      接雨水</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/searchRote/" class="">
+      搜索旋转排序数组</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/findKthLargest/" class="">
+      数组中的第K个最大元素</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/lengthOfLongestSubstring/" class="">
+      无重复字符的最长子串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/maxSubArray/" class="">
+      最大子序和</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/MinStack/" class="">
+      最小栈</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/longestCommonPrefix/" class="">
+      最长公共前缀</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/longestConsecutive/" class="">
+      最长连续序列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/findLengthOfLCIS/" class="">
+      最长连续递增序列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/findCircleNum/" class="">
+      朋友圈</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/detectCycle/" class="">
+      环形链表 II</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/mySqrt/" class="">
+      的平方根</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/getIntersectionNode/" class="">
+      相交链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/salary/" class="">
+      第二高的薪水</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/simplifyPath/" class="">
+      简化路径</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/LRUCache/" class="">
+      缓存机制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/validUtf8/" class="">
+      编码验证</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/reverseWords/" class="">
+      翻转字符串里的单词</a>
+  
+
+        </li>
+      
+    
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/" class="">
+      Offer</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/Add/" class="">
+      不用加减乘除做加法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetUglyNumber/" class="">
+      丑数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindFirstCommonNode/" class="">
+      两个链表的第一个公共结点</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/SumOfNDice/" class="">
+      个骰子的点数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/BST-Link-Convert/" class="">
+      二叉搜索树与双向链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/VerifySquenceOfBST/" class="">
+      二叉搜索树的后序遍历序列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/BSTKthNode/" class="">
+      二叉搜索树的第</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindPath/" class="">
+      二叉树中和为某一值的路径</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetNext/" class="">
+      二叉树的下一个结点</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/TreeDepth/" class="">
+      二叉树的深度</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/number-of-one/" class="">
+      二进制中</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/PrintFromTopToBottom/" class="">
+      从上往下打印二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/print-link-from-tail/" class="">
+      从尾到头打印链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/CutRope/" class="">
+      剪绳子</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MinStack/" class="">
+      包含</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/Singleton/" class="">
+      单例</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/revert-link/" class="">
+      反转链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/merge-sort-link/" class="">
+      合并两个排序的链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindContinuousSequence/" class="">
+      和为</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindNumbersWithSum/" class="">
+      和为</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/LastRemaining/" class="">
+      圆圈中最后剩下的数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/O1DeleteNode/" class="">
+      在</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/CountOfSortedArray/" class="">
+      在排序数组中查找数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/CloneLink/" class="">
+      复杂链表的复制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/Permutation/" class="">
+      字符串的排列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/IsSymmetrical/" class="">
+      对称的二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/LeftRotateString/" class="">
+      左旋转字符串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/SerializeTree/" class="">
+      序列化二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/isContinuous/" class="">
+      扑克牌顺子</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/printn/" class="">
+      打印最大的</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/TranslateNumToStr/" class="">
+      把数字翻译成字符串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/PrintMinNumber/" class="">
+      把数组排成最小的数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/search-a-2d-matrix/" class="">
+      搜索二维矩阵</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetNumberOfK/" class="">
+      数字在排序数组中出现的次数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/NOfNumberSerialize/" class="">
+      数字序列中的某一位的数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/StreamMid/" class="">
+      数据流中的中位数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MoreThanHalfNum/" class="">
+      数组中出现次数超过一半的数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindNumsAppearOnce/" class="">
+      数组中只出现一次的数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/InversePairs/" class="">
+      数组中的逆序对</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/Duplicate/" class="">
+      数组中重复的数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/NumberOfOneBetweenOneAndN/" class="">
+      整数中</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/fibonacci/" class="">
+      斐波纳切数列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/find-minimum-in-rotated-sorted-array/" class="">
+      旋转数组的最小数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/replay-space/" class="">
+      替换空格</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetLeastNumbers/" class="">
+      最小的</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetLeastNumbersSolution/" class="">
+      最小的</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/LongestNoRepeatSubString/" class="">
+      最长不含重复字符的子字符串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MovingCount/" class="">
+      机器人的运动范围</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/IsPopOrder/" class="">
+      栈的压入</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/HasSubtree/" class="">
+      树的子结构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/PatternMatch/" class="">
+      正则表达式匹配</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/sum/" class="">
+      求</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MaxInWindows/" class="">
+      滑动窗口的最大值</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/two-stack-fifo/" class="">
+      用两个栈实现一个队列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/hasPath/" class="">
+      矩阵中的路径</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MaxGift/" class="">
+      礼物的最大值</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FirstNotRepeatingChar/" class="">
+      第一个只出现一次的字符</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/ReverseSentence/" class="">
+      翻转单词顺序列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MaxProfit/" class="">
+      股票的最大利润</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/IsNumeric/" class="">
+      表示数值的字符串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/reOrderArray/" class="">
+      调整数组顺序使奇数位于偶数前面</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindGreatestSumOfSubArray/" class="">
+      连续子数组的最大和</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/reConstructBinaryTree/" class="">
+      重建二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindKthToTail/" class="">
+      链表中倒数第</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/EntryNodeOfLoop/" class="">
+      链表中环的入口结点</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/mirror-tree/" class="">
+      镜像二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/PrintMatrix/" class="">
+      顺时针打印矩阵</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/power/" class="">
+      题目</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </nav>
 
 
-    </aside>
-  
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+
+  </div>
+</aside>
  
-      </header>
+
+    <header class="book-header hidden">
+      
+  <div class="flex align-center justify-between gap">
+  <input type="checkbox" class="toggle" id="menu-control" />
+  <label for="menu-control" aria-label="Menu">
+    <svg class="book-icon"><use href="/iconset.min.90a7fd302dc1b9bc3c291688faee66a3e60a9209f59b89fa00669e35d6907b3f.svg#menu"></use></svg>
+  </label>
+
+  <div class="book-brand">
+  <a class="flex align-center" href="/"><span>HadYang技术分享</span>
+  </a>
+</div>
+
+
+  
+  <input type="checkbox" class="toggle" id="toc-control" />
+  <label for="toc-control" aria-label="Table of Contents">
+    <svg class="book-icon"><use href="/iconset.min.90a7fd302dc1b9bc3c291688faee66a3e60a9209f59b89fa00669e35d6907b3f.svg#toc"></use></svg>
+  </label>
+  
+</div>
+
+ 
+    </header>
+
+    <main class="book-page">
+      
+      
+  
 
       
-<article class="markdown"><h1 id="排序算法">排序算法</h1>
-<h2 id="常见排序算法">常见排序算法</h2>
-<h3 id="稳定排序">稳定排序：</h3>
+  <article class="markdown book-article"><h1 id="排序算法">排序算法<a class="anchor" href="#%e6%8e%92%e5%ba%8f%e7%ae%97%e6%b3%95" aria-label="Link"></a></h1>
+<h2 id="常见排序算法">常见排序算法<a class="anchor" href="#%e5%b8%b8%e8%a7%81%e6%8e%92%e5%ba%8f%e7%ae%97%e6%b3%95" aria-label="Link"></a></h2>
+<h3 id="稳定排序">稳定排序：<a class="anchor" href="#%e7%a8%b3%e5%ae%9a%e6%8e%92%e5%ba%8f" aria-label="Link"></a></h3>
 <ul>
 <li><code>冒泡排序</code> — O(n²)</li>
 <li><code>插入排序</code> — O(n²)</li>
@@ -419,15 +3086,15 @@ https://github.com/alex-shpak/hugo-book
 <li><code>二叉排序树排序</code>  — O(n log n) 期望时间; O(n²)最坏时间; 需要 O(n) 额外空间</li>
 <li><code>基数排序</code> — O(n·k); 需要 O(n) 额外空间</li>
 </ul>
-<h3 id="不稳定排序">不稳定排序</h3>
+<h3 id="不稳定排序">不稳定排序<a class="anchor" href="#%e4%b8%8d%e7%a8%b3%e5%ae%9a%e6%8e%92%e5%ba%8f" aria-label="Link"></a></h3>
 <ul>
 <li><code>选择排序</code> — O(n²)</li>
 <li><code>希尔排序</code> — O(nlogn)</li>
 <li><code>堆排序</code> — O(nlogn)</li>
 <li><code>快速排序</code> — O(nlogn) 期望时间, O(n²) 最坏情况; 对于大的、乱数串行一般相信是最快的已知排序</li>
 </ul>
-<h2 id="交换排序">交换排序</h2>
-<h3 id="冒泡排序">冒泡排序</h3>
+<h2 id="交换排序">交换排序<a class="anchor" href="#%e4%ba%a4%e6%8d%a2%e6%8e%92%e5%ba%8f" aria-label="Link"></a></h2>
+<h3 id="冒泡排序">冒泡排序<a class="anchor" href="#%e5%86%92%e6%b3%a1%e6%8e%92%e5%ba%8f" aria-label="Link"></a></h3>
 <p>它重复地走访过要排序的数列，一次比较两个元素，如果他们的顺序错误就把他们交换过来。走访数列的工作是重复地进行直到没有再需要交换，也就是说该数列已经排序完成。<strong>冒泡排序总的平均时间复杂度为O(n^2)。冒泡排序是一种稳定排序算法。</strong></p>
 <ul>
 <li>比较相邻的元素。如果第一个比第二个大，就交换他们两个。</li>
@@ -435,162 +3102,155 @@ https://github.com/alex-shpak/hugo-book
 <li>针对所有的元素重复以上的步骤，除了最后一个。</li>
 <li>持续每次对越来越少的元素重复上面的步骤，直到没有任何一对数字需要比较。</li>
 </ul>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">bubble_sort</span>(<span style="color:#66d9ef">int</span> a[], <span style="color:#66d9ef">int</span> n)
-{
-    <span style="color:#66d9ef">int</span> i, j, temp;
-    <span style="color:#66d9ef">for</span> (j <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; j <span style="color:#f92672">&lt;</span> n <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>; j<span style="color:#f92672">+</span><span style="color:#f92672">+</span>)
-        <span style="color:#66d9ef">for</span> (i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> n <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> j; i<span style="color:#f92672">+</span><span style="color:#f92672">+</span>)
-        {
-            <span style="color:#66d9ef">if</span>(a[i] <span style="color:#f92672">&gt;</span> a[i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>])
-            {
-                temp <span style="color:#f92672">=</span> a[i];
-                a[i] <span style="color:#f92672">=</span> a[i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>];
-                a[i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> temp;
-            }
-        }
-}
-</code></pre></div><h3 id="快速排序-快速排序-百度百科httpbaikebaiducomlinkurlhyqpclbjy1syy4esoze9kandidxorkxisfq0hzl8c5eut40dzs-fd1v0jubijsv7raogwy6haq-b1hbrghf1hq">快速排序 <a href="http://baike.baidu.com/link?url=hyQPClbJy1SYY4esOZe9kANDIDxOrKxiSfq0HZl8c5eut40dZS-fd1V0jubijSv7RAogwy6HaQ-B1HbRgHf1hq">快速排序-百度百科</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">bubble_sort</span>(<span style="color:#66d9ef">int</span> a[], <span style="color:#66d9ef">int</span> n)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> i, j, temp;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (j <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; j <span style="color:#f92672">&lt;</span> n <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>; j<span style="color:#f92672">++</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> n <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> j; i<span style="color:#f92672">++</span>)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span>(a[i] <span style="color:#f92672">&gt;</span> a[i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                temp <span style="color:#f92672">=</span> a[i];
+</span></span><span style="display:flex;"><span>                a[i] <span style="color:#f92672">=</span> a[i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>];
+</span></span><span style="display:flex;"><span>                a[i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> temp;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><h3 id="快速排序-快速排序-百度百科">快速排序 <a href="http://baike.baidu.com/link?url=hyQPClbJy1SYY4esOZe9kANDIDxOrKxiSfq0HZl8c5eut40dZS-fd1V0jubijSv7RAogwy6HaQ-B1HbRgHf1hq">快速排序-百度百科</a><a class="anchor" href="#%e5%bf%ab%e9%80%9f%e6%8e%92%e5%ba%8f-%e5%bf%ab%e9%80%9f%e6%8e%92%e5%ba%8f-%e7%99%be%e5%ba%a6%e7%99%be%e7%a7%91" aria-label="Link"></a></h3>
 <p>快速排序是一种 <strong>不稳定</strong> 的排序算法，平均时间复杂度为 <strong>O(nlogn)</strong>。<strong>快速排序使用分治法（Divide and conquer）策略来把一个序列（list）分为两个子序列（sub-lists）。</strong> 步骤为：</p>
 <ul>
-<li>从数列中挑出一个元素，称为&quot;基准&rdquo;（pivot），</li>
+<li>从数列中挑出一个元素，称为&quot;基准&quot;（pivot），</li>
 <li>重新排序数列，所有元素比基准值小的摆放在基准前面，所有元素比基准值大的摆在基准的后面（相同的数可以到任一边）。在这个分区结束之后，该基准就处于数列的中间位置。这个称为分区（partition）操作。</li>
 <li>递归地（recursive）把小于基准值元素的子数列和大于基准值元素的子数列排序。</li>
 </ul>
-<blockquote>
+<blockquote class=''>
 <p>快排的时间花费主要在划分上，所以</p>
 <ul>
 <li>最坏情况：时间复杂度为<code>O(n^2)</code>。因为最坏情况发生在每次划分过程产生的两个区间分别包含<code>n-1</code>个元素和<code>1</code>个元素的时候。</li>
 <li>最好情况：每次划分选取的基准都是当前无序区的中值。如果每次划分过程产生的区间大小都为n/2，则快速排序法运行就快得多了。</li>
 </ul>
-</blockquote>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">sort</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span><span style="color:#f92672">[</span><span style="color:#f92672">]</span> arr<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> low<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> high<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">int</span> l <span style="color:#f92672">=</span> low<span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">int</span> h <span style="color:#f92672">=</span> high<span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">int</span> povit <span style="color:#f92672">=</span> arr<span style="color:#f92672">[</span>low<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span>l <span style="color:#f92672">&lt;</span> h<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span>l <span style="color:#f92672">&lt;</span> h <span style="color:#f92672">&amp;</span><span style="color:#f92672">&amp;</span> arr<span style="color:#f92672">[</span>h<span style="color:#f92672">]</span> <span style="color:#f92672">&gt;</span><span style="color:#f92672">=</span> povit<span style="color:#f92672">)</span>
-            h<span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">;</span>
-        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>l <span style="color:#f92672">&lt;</span> h<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-            arr<span style="color:#f92672">[</span>l<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> arr<span style="color:#f92672">[</span>h<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
-            l<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">;</span>
-        <span style="color:#f92672">}</span>
-        <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span>l <span style="color:#f92672">&lt;</span> h <span style="color:#f92672">&amp;</span><span style="color:#f92672">&amp;</span> arr<span style="color:#f92672">[</span>l<span style="color:#f92672">]</span> <span style="color:#f92672">&lt;</span><span style="color:#f92672">=</span> povit<span style="color:#f92672">)</span>
-            l<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">;</span>
-        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>l <span style="color:#f92672">&lt;</span> h<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-            arr<span style="color:#f92672">[</span>h<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> arr<span style="color:#f92672">[</span>l<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
-            h<span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">;</span>
-        <span style="color:#f92672">}</span>
-    <span style="color:#f92672">}</span>
-
-    arr<span style="color:#f92672">[</span>l<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> povit<span style="color:#f92672">;</span>
-
-    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">print</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;l=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#f92672">(</span>l <span style="color:#f92672">+</span> 1<span style="color:#f92672">)</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;;h=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#f92672">(</span>h <span style="color:#f92672">+</span> 1<span style="color:#f92672">)</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;;povit=&#34;</span> <span style="color:#f92672">+</span> povit <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\n&#34;</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-    System<span style="color:#f92672">.</span><span style="color:#a6e22e">out</span><span style="color:#f92672">.</span><span style="color:#a6e22e">println</span><span style="color:#f92672">(</span>Arrays<span style="color:#f92672">.</span><span style="color:#a6e22e">toString</span><span style="color:#f92672">(</span>arr<span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>l <span style="color:#f92672">-</span> 1 <span style="color:#f92672">&gt;</span> low<span style="color:#f92672">)</span> sort<span style="color:#f92672">(</span>arr<span style="color:#f92672">,</span> low<span style="color:#f92672">,</span> l <span style="color:#f92672">-</span> 1<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>h <span style="color:#f92672">+</span> 1 <span style="color:#f92672">&lt;</span> high<span style="color:#f92672">)</span> sort<span style="color:#f92672">(</span>arr<span style="color:#f92672">,</span> h <span style="color:#f92672">+</span> 1<span style="color:#f92672">,</span> high<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-<span style="color:#f92672">}</span>
-</code></pre></div><h4 id="快排的优化">快排的优化</h4>
+</blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">sort</span>(<span style="color:#66d9ef">int</span><span style="color:#f92672">[]</span> arr, <span style="color:#66d9ef">int</span> low, <span style="color:#66d9ef">int</span> high) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> l <span style="color:#f92672">=</span> low;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> h <span style="color:#f92672">=</span> high;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> povit <span style="color:#f92672">=</span> arr<span style="color:#f92672">[</span>low<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> (l <span style="color:#f92672">&lt;</span> h) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> (l <span style="color:#f92672">&lt;</span> h <span style="color:#f92672">&amp;&amp;</span> arr<span style="color:#f92672">[</span>h<span style="color:#f92672">]</span> <span style="color:#f92672">&gt;=</span> povit)
+</span></span><span style="display:flex;"><span>            h<span style="color:#f92672">--</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (l <span style="color:#f92672">&lt;</span> h) {
+</span></span><span style="display:flex;"><span>            arr<span style="color:#f92672">[</span>l<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> arr<span style="color:#f92672">[</span>h<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>            l<span style="color:#f92672">++</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> (l <span style="color:#f92672">&lt;</span> h <span style="color:#f92672">&amp;&amp;</span> arr<span style="color:#f92672">[</span>l<span style="color:#f92672">]</span> <span style="color:#f92672">&lt;=</span> povit)
+</span></span><span style="display:flex;"><span>            l<span style="color:#f92672">++</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (l <span style="color:#f92672">&lt;</span> h) {
+</span></span><span style="display:flex;"><span>            arr<span style="color:#f92672">[</span>h<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> arr<span style="color:#f92672">[</span>l<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>            h<span style="color:#f92672">--</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    arr<span style="color:#f92672">[</span>l<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> povit;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">print</span>(<span style="color:#e6db74">&#34;l=&#34;</span> <span style="color:#f92672">+</span> (l <span style="color:#f92672">+</span> 1) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;;h=&#34;</span> <span style="color:#f92672">+</span> (h <span style="color:#f92672">+</span> 1) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;;povit=&#34;</span> <span style="color:#f92672">+</span> povit <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;\n&#34;</span>);
+</span></span><span style="display:flex;"><span>    System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(Arrays.<span style="color:#a6e22e">toString</span>(arr));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (l <span style="color:#f92672">-</span> 1 <span style="color:#f92672">&gt;</span> low) sort(arr, low, l <span style="color:#f92672">-</span> 1);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (h <span style="color:#f92672">+</span> 1 <span style="color:#f92672">&lt;</span> high) sort(arr, h <span style="color:#f92672">+</span> 1, high);
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><h4 id="快排的优化">快排的优化<a class="anchor" href="#%e5%bf%ab%e6%8e%92%e7%9a%84%e4%bc%98%e5%8c%96" aria-label="Link"></a></h4>
 <ol>
 <li>当待排序序列的长度分割到一定大小后，使用插入排序。</li>
 <li>快排函数在函数尾部有两次递归操作，我们可以对其使用尾递归优化。优化后，可以缩减堆栈深度，由原来的O(n)缩减为O(logn)，将会提高性能。</li>
 <li>从左、中、右三个数中取中间值。</li>
 </ol>
-<h2 id="插入排序">插入排序</h2>
-<h3 id="直接插入排序">直接插入排序</h3>
+<h2 id="插入排序">插入排序<a class="anchor" href="#%e6%8f%92%e5%85%a5%e6%8e%92%e5%ba%8f" aria-label="Link"></a></h2>
+<h3 id="直接插入排序">直接插入排序<a class="anchor" href="#%e7%9b%b4%e6%8e%a5%e6%8f%92%e5%85%a5%e6%8e%92%e5%ba%8f" aria-label="Link"></a></h3>
 <p>插入排序的基本操作就是将一个数据插入到已经排好序的有序数据中，从而得到一个新的、个数加一的有序数据，算法适用于少量数据的排序，<strong>时间复杂度为O(n^2)。是稳定的排序方法。</strong> <strong>插入算法把要排序的数组分成两部分</strong>：第一部分包含了这个数组的所有元素，但将最后一个元素除外（让数组多一个空间才有插入的位置），而第二部分就只包含这一个元素（即待插入元素）。在第一部分排序完成后，再将这个最后元素插入到已排好序的第一部分中。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">insert_sort</span>(<span style="color:#66d9ef">int</span><span style="color:#f92672">*</span> a, <span style="color:#66d9ef">int</span> len) {
-    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>; i <span style="color:#f92672">&lt;</span> len; <span style="color:#f92672">+</span><span style="color:#f92672">+</span>i) {
-        <span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> i <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>;
-        <span style="color:#66d9ef">int</span> temp <span style="color:#f92672">=</span> a[i];
-        <span style="color:#66d9ef">while</span> (j <span style="color:#f92672">&gt;</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;</span><span style="color:#f92672">&amp;</span> temp <span style="color:#f92672">&lt;</span> a[j]) {
-            a[j <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> a[j];
-            j<span style="color:#f92672">-</span><span style="color:#f92672">-</span>;
-        }
-        a[j <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> temp;
-    }
-}
-</code></pre></div><h3 id="希尔排序httpszhwikipediaorgwikie5b88ce5b094e68e92e5ba8f"><a href="https://zh.wikipedia.org/wiki/%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F">希尔排序</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">insert_sort</span>(<span style="color:#66d9ef">int</span><span style="color:#f92672">*</span> a, <span style="color:#66d9ef">int</span> len) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>; i <span style="color:#f92672">&lt;</span> len; <span style="color:#f92672">++</span>i) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> i <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> temp <span style="color:#f92672">=</span> a[i];
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> (j <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> temp <span style="color:#f92672">&lt;</span> a[j]) {
+</span></span><span style="display:flex;"><span>            a[j <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> a[j];
+</span></span><span style="display:flex;"><span>            j<span style="color:#f92672">--</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        a[j <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> temp;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><h3 id="希尔排序"><a href="https://zh.wikipedia.org/wiki/%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F">希尔排序</a><a class="anchor" href="#%e5%b8%8c%e5%b0%94%e6%8e%92%e5%ba%8f" aria-label="Link"></a></h3>
 <p>也称缩小增量排序，是直接插入排序算法的一种更高效的改进版本。<strong>希尔排序是非稳定排序算法。</strong></p>
 <p>希尔排序是把记录按下标的一定增量分组，对每组使用直接插入排序算法排序；随着增量逐渐减少，每组包含的关键词越来越多，当增量减至1时，整个文件恰被分成一组，算法便终止。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">shell_sort</span>(<span style="color:#66d9ef">int</span><span style="color:#f92672">*</span> a, <span style="color:#66d9ef">int</span> len) {
-    <span style="color:#66d9ef">int</span> step <span style="color:#f92672">=</span> len <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>;
-    <span style="color:#66d9ef">int</span> temp;
-
-    <span style="color:#66d9ef">while</span> (step <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
-        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> step; i <span style="color:#f92672">&lt;</span> len; <span style="color:#f92672">+</span><span style="color:#f92672">+</span>i) {
-            temp <span style="color:#f92672">=</span> a[i];
-            <span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> i <span style="color:#f92672">-</span> step;
-            <span style="color:#66d9ef">while</span> (j <span style="color:#f92672">&gt;</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;</span><span style="color:#f92672">&amp;</span> temp <span style="color:#f92672">&lt;</span> a[j]) {
-                a[j <span style="color:#f92672">+</span> step] <span style="color:#f92672">=</span> a[j];
-                j <span style="color:#f92672">-</span><span style="color:#f92672">=</span> step;
-            }
-            a[j <span style="color:#f92672">+</span> step] <span style="color:#f92672">=</span> temp;
-        }
-        step <span style="color:#f92672">/</span><span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>;
-    }
-}
-</code></pre></div><h2 id="选择排序">选择排序</h2>
-<h3 id="直接选择排序">直接选择排序</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">shell_sort</span>(<span style="color:#66d9ef">int</span><span style="color:#f92672">*</span> a, <span style="color:#66d9ef">int</span> len) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> step <span style="color:#f92672">=</span> len <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> temp;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> (step <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> step; i <span style="color:#f92672">&lt;</span> len; <span style="color:#f92672">++</span>i) {
+</span></span><span style="display:flex;"><span>            temp <span style="color:#f92672">=</span> a[i];
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> i <span style="color:#f92672">-</span> step;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> (j <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> temp <span style="color:#f92672">&lt;</span> a[j]) {
+</span></span><span style="display:flex;"><span>                a[j <span style="color:#f92672">+</span> step] <span style="color:#f92672">=</span> a[j];
+</span></span><span style="display:flex;"><span>                j <span style="color:#f92672">-=</span> step;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            a[j <span style="color:#f92672">+</span> step] <span style="color:#f92672">=</span> temp;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        step <span style="color:#f92672">/=</span> <span style="color:#ae81ff">2</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><h2 id="选择排序">选择排序<a class="anchor" href="#%e9%80%89%e6%8b%a9%e6%8e%92%e5%ba%8f" aria-label="Link"></a></h2>
+<h3 id="直接选择排序">直接选择排序<a class="anchor" href="#%e7%9b%b4%e6%8e%a5%e9%80%89%e6%8b%a9%e6%8e%92%e5%ba%8f" aria-label="Link"></a></h3>
 <p>首先在未排序序列中找到最小（大）元素，存放到排序序列的起始位置，然后，再从剩余未排序元素中继续寻找最小（大）元素，然后放到已排序序列的末尾。<strong>实际适用的场合非常罕见。</strong></p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">selection_sort</span>(<span style="color:#66d9ef">int</span> arr[], <span style="color:#66d9ef">int</span> len) {
-	<span style="color:#66d9ef">int</span> i, j, min, temp;
-	<span style="color:#66d9ef">for</span> (i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> len <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>; i<span style="color:#f92672">+</span><span style="color:#f92672">+</span>) {
-		min <span style="color:#f92672">=</span> i;
-		<span style="color:#66d9ef">for</span> (j <span style="color:#f92672">=</span> i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>; j <span style="color:#f92672">&lt;</span> len; j<span style="color:#f92672">+</span><span style="color:#f92672">+</span>)
-			<span style="color:#66d9ef">if</span> (arr[min] <span style="color:#f92672">&gt;</span> arr[j])
-				min <span style="color:#f92672">=</span> j;
-	   	temp <span style="color:#f92672">=</span> arr[min];
-		arr[min] <span style="color:#f92672">=</span> arr[i];
-		arr[i] <span style="color:#f92672">=</span> temp;
-	}
-}
-</code></pre></div><h3 id="堆排序">堆排序</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">selection_sort</span>(<span style="color:#66d9ef">int</span> arr[], <span style="color:#66d9ef">int</span> len) {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">int</span> i, j, min, temp;
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> (i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> len <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>; i<span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>		min <span style="color:#f92672">=</span> i;
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">for</span> (j <span style="color:#f92672">=</span> i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>; j <span style="color:#f92672">&lt;</span> len; j<span style="color:#f92672">++</span>)
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">if</span> (arr[min] <span style="color:#f92672">&gt;</span> arr[j])
+</span></span><span style="display:flex;"><span>				min <span style="color:#f92672">=</span> j;
+</span></span><span style="display:flex;"><span>	   	temp <span style="color:#f92672">=</span> arr[min];
+</span></span><span style="display:flex;"><span>		arr[min] <span style="color:#f92672">=</span> arr[i];
+</span></span><span style="display:flex;"><span>		arr[i] <span style="color:#f92672">=</span> temp;
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><h3 id="堆排序">堆排序<a class="anchor" href="#%e5%a0%86%e6%8e%92%e5%ba%8f" aria-label="Link"></a></h3>
 <p>堆排序利用了大根堆（或小根堆）堆顶记录的关键字最大（或最小）这一特征，使得在当前无序区中选取最大（或最小）关键字的记录变得简单。</p>
 <ol>
 <li>将数组分为有序区和无序区，在无序区中建立最大堆</li>
 <li>将堆顶的数据与无序区末尾的数据交换</li>
 <li>从后往前，直到所有数据排序完成</li>
 </ol>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">heapSort</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span><span style="color:#f92672">[</span><span style="color:#f92672">]</span> nums<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> nums<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> 1<span style="color:#f92672">;</span> i <span style="color:#f92672">&gt;</span><span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i<span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        maxHeap<span style="color:#f92672">(</span>nums<span style="color:#f92672">,</span> 0<span style="color:#f92672">,</span> i<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-
-        swap<span style="color:#f92672">(</span>nums<span style="color:#f92672">,</span> 0<span style="color:#f92672">,</span> i<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-    <span style="color:#f92672">}</span>
-<span style="color:#f92672">}</span>
-
-<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">maxHeap</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span><span style="color:#f92672">[</span><span style="color:#f92672">]</span> heap<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> start<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> end<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>start <span style="color:#f92672">=</span><span style="color:#f92672">=</span> end<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        <span style="color:#66d9ef">return</span><span style="color:#f92672">;</span>
-    <span style="color:#f92672">}</span>
-
-    <span style="color:#66d9ef">int</span> parent <span style="color:#f92672">=</span> start<span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">int</span> childLeft <span style="color:#f92672">=</span> start <span style="color:#f92672">*</span> 2 <span style="color:#f92672">+</span> 1<span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">int</span> childRight <span style="color:#f92672">=</span> childLeft <span style="color:#f92672">+</span> 1<span style="color:#f92672">;</span>
-
-    <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>childLeft <span style="color:#f92672">&lt;</span><span style="color:#f92672">=</span> end<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        maxHeap<span style="color:#f92672">(</span>heap<span style="color:#f92672">,</span> childLeft<span style="color:#f92672">,</span> end<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-
-        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>heap<span style="color:#f92672">[</span>childLeft<span style="color:#f92672">]</span> <span style="color:#f92672">&gt;</span> heap<span style="color:#f92672">[</span>parent<span style="color:#f92672">]</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-            swap<span style="color:#f92672">(</span>heap<span style="color:#f92672">,</span> parent<span style="color:#f92672">,</span> childLeft<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-        <span style="color:#f92672">}</span>
-    <span style="color:#f92672">}</span>
-
-    <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>childRight <span style="color:#f92672">&lt;</span><span style="color:#f92672">=</span> end<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        maxHeap<span style="color:#f92672">(</span>heap<span style="color:#f92672">,</span> childRight<span style="color:#f92672">,</span> end<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-
-        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>heap<span style="color:#f92672">[</span>childRight<span style="color:#f92672">]</span> <span style="color:#f92672">&gt;</span> heap<span style="color:#f92672">[</span>parent<span style="color:#f92672">]</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-            swap<span style="color:#f92672">(</span>heap<span style="color:#f92672">,</span> parent<span style="color:#f92672">,</span> childRight<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-        <span style="color:#f92672">}</span>
-    <span style="color:#f92672">}</span>
-<span style="color:#f92672">}</span>
-
-<span style="color:#66d9ef">private</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">swap</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span><span style="color:#f92672">[</span><span style="color:#f92672">]</span> nums<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> a<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> b<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">int</span> t <span style="color:#f92672">=</span> nums<span style="color:#f92672">[</span>a<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
-    nums<span style="color:#f92672">[</span>a<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> nums<span style="color:#f92672">[</span>b<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
-    nums<span style="color:#f92672">[</span>b<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> t<span style="color:#f92672">;</span>
-<span style="color:#f92672">}</span>
-</code></pre></div><h2 id="归并排序">归并排序</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">heapSort</span>(<span style="color:#66d9ef">int</span><span style="color:#f92672">[]</span> nums) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> nums.<span style="color:#a6e22e">length</span> <span style="color:#f92672">-</span> 1; i <span style="color:#f92672">&gt;=</span> 0; i<span style="color:#f92672">--</span>) {
+</span></span><span style="display:flex;"><span>        maxHeap(nums, 0, i);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        swap(nums, 0, i);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">maxHeap</span>(<span style="color:#66d9ef">int</span><span style="color:#f92672">[]</span> heap, <span style="color:#66d9ef">int</span> start, <span style="color:#66d9ef">int</span> end) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (start <span style="color:#f92672">==</span> end) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> parent <span style="color:#f92672">=</span> start;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> childLeft <span style="color:#f92672">=</span> start <span style="color:#f92672">*</span> 2 <span style="color:#f92672">+</span> 1;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> childRight <span style="color:#f92672">=</span> childLeft <span style="color:#f92672">+</span> 1;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (childLeft <span style="color:#f92672">&lt;=</span> end) {
+</span></span><span style="display:flex;"><span>        maxHeap(heap, childLeft, end);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (heap<span style="color:#f92672">[</span>childLeft<span style="color:#f92672">]</span> <span style="color:#f92672">&gt;</span> heap<span style="color:#f92672">[</span>parent<span style="color:#f92672">]</span>) {
+</span></span><span style="display:flex;"><span>            swap(heap, parent, childLeft);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (childRight <span style="color:#f92672">&lt;=</span> end) {
+</span></span><span style="display:flex;"><span>        maxHeap(heap, childRight, end);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (heap<span style="color:#f92672">[</span>childRight<span style="color:#f92672">]</span> <span style="color:#f92672">&gt;</span> heap<span style="color:#f92672">[</span>parent<span style="color:#f92672">]</span>) {
+</span></span><span style="display:flex;"><span>            swap(heap, parent, childRight);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">swap</span>(<span style="color:#66d9ef">int</span><span style="color:#f92672">[]</span> nums, <span style="color:#66d9ef">int</span> a, <span style="color:#66d9ef">int</span> b) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> t <span style="color:#f92672">=</span> nums<span style="color:#f92672">[</span>a<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>    nums<span style="color:#f92672">[</span>a<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> nums<span style="color:#f92672">[</span>b<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>    nums<span style="color:#f92672">[</span>b<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> t;
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><h2 id="归并排序">归并排序<a class="anchor" href="#%e5%bd%92%e5%b9%b6%e6%8e%92%e5%ba%8f" aria-label="Link"></a></h2>
 <p>归并排序采用分治的思想：</p>
 <ul>
 <li>Divide：将n个元素平均划分为各含n/2个元素的子序列；</li>
@@ -598,57 +3258,39 @@ https://github.com/alex-shpak/hugo-book
 <li>Combine：合并俩个已排序的子序列。</li>
 </ul>
 <p>性能：时间复杂度总是为O(NlogN)，空间复杂度也总为为O(N)，算法与初始序列无关，排序是稳定的。</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">mergeSort</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span><span style="color:#f92672">[</span><span style="color:#f92672">]</span> array<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> start<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> end<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">[</span><span style="color:#f92672">]</span> temp<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>start <span style="color:#f92672">&gt;</span><span style="color:#f92672">=</span> end<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        <span style="color:#66d9ef">return</span><span style="color:#f92672">;</span>
-    <span style="color:#f92672">}</span>
-
-    <span style="color:#66d9ef">int</span> mid <span style="color:#f92672">=</span> <span style="color:#f92672">(</span>start <span style="color:#f92672">+</span> end<span style="color:#f92672">)</span> <span style="color:#f92672">/</span> 2<span style="color:#f92672">;</span>
-
-    mergeSort<span style="color:#f92672">(</span>array<span style="color:#f92672">,</span> start<span style="color:#f92672">,</span> mid<span style="color:#f92672">,</span> temp<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-    mergeSort<span style="color:#f92672">(</span>array<span style="color:#f92672">,</span> mid <span style="color:#f92672">+</span> 1<span style="color:#f92672">,</span> end<span style="color:#f92672">,</span> temp<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-
-    <span style="color:#66d9ef">int</span> f <span style="color:#f92672">=</span> start<span style="color:#f92672">,</span> s <span style="color:#f92672">=</span> mid <span style="color:#f92672">+</span> 1<span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">int</span> t <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span>f <span style="color:#f92672">&lt;</span><span style="color:#f92672">=</span> mid <span style="color:#f92672">&amp;</span><span style="color:#f92672">&amp;</span> s <span style="color:#f92672">&lt;</span><span style="color:#f92672">=</span> end<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>array<span style="color:#f92672">[</span>f<span style="color:#f92672">]</span> <span style="color:#f92672">&lt;</span> array<span style="color:#f92672">[</span>s<span style="color:#f92672">]</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-            temp<span style="color:#f92672">[</span>t<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> array<span style="color:#f92672">[</span>f<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">]</span><span style="color:#f92672">;</span>
-        <span style="color:#f92672">}</span> <span style="color:#66d9ef">else</span> <span style="color:#f92672">{</span>
-            temp<span style="color:#f92672">[</span>t<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> array<span style="color:#f92672">[</span>s<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">]</span><span style="color:#f92672">;</span>
-        <span style="color:#f92672">}</span>
-    <span style="color:#f92672">}</span>
-
-    <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span>f <span style="color:#f92672">&lt;</span><span style="color:#f92672">=</span> mid<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        temp<span style="color:#f92672">[</span>t<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> array<span style="color:#f92672">[</span>f<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">]</span><span style="color:#f92672">;</span>
-    <span style="color:#f92672">}</span>
-
-    <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span>s <span style="color:#f92672">&lt;</span><span style="color:#f92672">=</span> end<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        temp<span style="color:#f92672">[</span>t<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> array<span style="color:#f92672">[</span>s<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">]</span><span style="color:#f92672">;</span>
-    <span style="color:#f92672">}</span>
-
-    <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0<span style="color:#f92672">,</span> j <span style="color:#f92672">=</span> start<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> t<span style="color:#f92672">;</span> i<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        array<span style="color:#f92672">[</span>j<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> temp<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
-    <span style="color:#f92672">}</span>
-<span style="color:#f92672">}</span>
-</code></pre></div><h2 id="桶排序">桶排序</h2>
-<p>桶排序工作的原理是将 <strong>数组分到有限数量的桶</strong> 里。每个桶再个别排序（有可能再使用别的排序算法或是以递归方式继续使用桶排序进行排序）。当要被排序的数组内的数值是均匀分配的时候，桶排序使用线性时间 
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
-        onload="renderMathInElement(document.body);"></script>
-
-
-
-<span class="katex">
-  \(O(n)\)
-</span>
-。由于桶排序不是比较排序，他不受到 
-
-<span class="katex">
-  \(O(n\log n)\)
-</span>
- 下限的影响。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">mergeSort</span>(<span style="color:#66d9ef">int</span><span style="color:#f92672">[]</span> array, <span style="color:#66d9ef">int</span> start, <span style="color:#66d9ef">int</span> end, <span style="color:#66d9ef">int</span><span style="color:#f92672">[]</span> temp) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (start <span style="color:#f92672">&gt;=</span> end) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> mid <span style="color:#f92672">=</span> (start <span style="color:#f92672">+</span> end) <span style="color:#f92672">/</span> 2;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    mergeSort(array, start, mid, temp);
+</span></span><span style="display:flex;"><span>    mergeSort(array, mid <span style="color:#f92672">+</span> 1, end, temp);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> f <span style="color:#f92672">=</span> start, s <span style="color:#f92672">=</span> mid <span style="color:#f92672">+</span> 1;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> t <span style="color:#f92672">=</span> 0;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> (f <span style="color:#f92672">&lt;=</span> mid <span style="color:#f92672">&amp;&amp;</span> s <span style="color:#f92672">&lt;=</span> end) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (array<span style="color:#f92672">[</span>f<span style="color:#f92672">]</span> <span style="color:#f92672">&lt;</span> array<span style="color:#f92672">[</span>s<span style="color:#f92672">]</span>) {
+</span></span><span style="display:flex;"><span>            temp<span style="color:#f92672">[</span>t<span style="color:#f92672">++]</span> <span style="color:#f92672">=</span> array<span style="color:#f92672">[</span>f<span style="color:#f92672">++]</span>;
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>            temp<span style="color:#f92672">[</span>t<span style="color:#f92672">++]</span> <span style="color:#f92672">=</span> array<span style="color:#f92672">[</span>s<span style="color:#f92672">++]</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> (f <span style="color:#f92672">&lt;=</span> mid) {
+</span></span><span style="display:flex;"><span>        temp<span style="color:#f92672">[</span>t<span style="color:#f92672">++]</span> <span style="color:#f92672">=</span> array<span style="color:#f92672">[</span>f<span style="color:#f92672">++]</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> (s <span style="color:#f92672">&lt;=</span> end) {
+</span></span><span style="display:flex;"><span>        temp<span style="color:#f92672">[</span>t<span style="color:#f92672">++]</span> <span style="color:#f92672">=</span> array<span style="color:#f92672">[</span>s<span style="color:#f92672">++]</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0, j <span style="color:#f92672">=</span> start; i <span style="color:#f92672">&lt;</span> t; i<span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>        array<span style="color:#f92672">[</span>j<span style="color:#f92672">++]</span> <span style="color:#f92672">=</span> temp<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><h2 id="桶排序">桶排序<a class="anchor" href="#%e6%a1%b6%e6%8e%92%e5%ba%8f" aria-label="Link"></a></h2>
+<p>桶排序工作的原理是将 <strong>数组分到有限数量的桶</strong> 里。每个桶再个别排序（有可能再使用别的排序算法或是以递归方式继续使用桶排序进行排序）。当要被排序的数组内的数值是均匀分配的时候，桶排序使用线性时间 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n)</annotation></semantics></math></span><link rel="stylesheet" href="/katex/katex.min.css" />。由于桶排序不是比较排序，他不受到 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mi>log</mi><mo>⁡</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n\log n)</annotation></semantics></math></span> 下限的影响。</p>
 <p>桶排序以下列程序进行：</p>
 <ul>
 <li>设置一个定量的数组当作空桶子。</li>
@@ -656,171 +3298,184 @@ https://github.com/alex-shpak/hugo-book
 <li>对每个不是空的桶子进行排序。</li>
 <li>从不是空的桶子里把项目再放回原来的序列中。</li>
 </ul>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">indexFor</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> a<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> min<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> step<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-	<span style="color:#66d9ef">return</span> <span style="color:#f92672">(</span>a <span style="color:#f92672">-</span> min<span style="color:#f92672">)</span> <span style="color:#f92672">/</span> step<span style="color:#f92672">;</span>
-<span style="color:#f92672">}</span>
-
-<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">bucketSort</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span><span style="color:#f92672">[</span><span style="color:#f92672">]</span> arr<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-	<span style="color:#66d9ef">int</span> max <span style="color:#f92672">=</span> arr<span style="color:#f92672">[</span>0<span style="color:#f92672">]</span><span style="color:#f92672">,</span> min <span style="color:#f92672">=</span> arr<span style="color:#f92672">[</span>0<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
-	<span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> a <span style="color:#f92672">:</span> arr<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-		<span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>max <span style="color:#f92672">&lt;</span> a<span style="color:#f92672">)</span>
-			max <span style="color:#f92672">=</span> a<span style="color:#f92672">;</span>
-		<span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>min <span style="color:#f92672">&gt;</span> a<span style="color:#f92672">)</span>
-			min <span style="color:#f92672">=</span> a<span style="color:#f92672">;</span>
-	<span style="color:#f92672">}</span>
-	<span style="color:#75715e">// 该值可根据实际情况选择
-</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">int</span> bucketNum <span style="color:#f92672">=</span> max <span style="color:#f92672">/</span> 10 <span style="color:#f92672">-</span> min <span style="color:#f92672">/</span> 10 <span style="color:#f92672">+</span> 1<span style="color:#f92672">;</span>
-	List buckList <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;</span>List<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-	<span style="color:#75715e">// create bucket
-</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 1<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span><span style="color:#f92672">=</span> bucketNum<span style="color:#f92672">;</span> i<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-		buckList<span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-	<span style="color:#f92672">}</span>
-	<span style="color:#75715e">// push into the bucket
-</span><span style="color:#75715e"></span>	<span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> arr<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">;</span> i<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-		<span style="color:#66d9ef">int</span> index <span style="color:#f92672">=</span> indexFor<span style="color:#f92672">(</span>arr<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span><span style="color:#f92672">,</span> min<span style="color:#f92672">,</span> 10<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-		<span style="color:#f92672">(</span><span style="color:#f92672">(</span>ArrayList<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">)</span> buckList<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>index<span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">.</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span>arr<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-	<span style="color:#f92672">}</span>
-	ArrayList<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> bucket <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">;</span>
-	<span style="color:#66d9ef">int</span> index <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span>
-	<span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> bucketNum<span style="color:#f92672">;</span> i<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-		bucket <span style="color:#f92672">=</span> <span style="color:#f92672">(</span>ArrayList<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span><span style="color:#f92672">)</span> buckList<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>i<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-		insertSort<span style="color:#f92672">(</span>bucket<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-		<span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> k <span style="color:#f92672">:</span> bucket<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-			arr<span style="color:#f92672">[</span>index<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> k<span style="color:#f92672">;</span>
-		<span style="color:#f92672">}</span>
-	<span style="color:#f92672">}</span>
-<span style="color:#f92672">}</span>
-
-<span style="color:#75715e">// 把桶內元素插入排序
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">insertSort</span><span style="color:#f92672">(</span>List<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> bucket<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-	<span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 1<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> bucket<span style="color:#f92672">.</span><span style="color:#a6e22e">size</span><span style="color:#f92672">(</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span> i<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-		<span style="color:#66d9ef">int</span> temp <span style="color:#f92672">=</span> bucket<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>i<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-		<span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> i <span style="color:#f92672">-</span> 1<span style="color:#f92672">;</span>
-		<span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#f92672">;</span> j <span style="color:#f92672">&gt;</span><span style="color:#f92672">=</span> 0 <span style="color:#f92672">&amp;</span><span style="color:#f92672">&amp;</span> bucket<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>j<span style="color:#f92672">)</span> <span style="color:#f92672">&gt;</span> temp<span style="color:#f92672">;</span> j<span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-			bucket<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>j <span style="color:#f92672">+</span> 1<span style="color:#f92672">,</span> bucket<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>j<span style="color:#f92672">)</span><span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-		<span style="color:#f92672">}</span>
-		bucket<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>j <span style="color:#f92672">+</span> 1<span style="color:#f92672">,</span> temp<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-	<span style="color:#f92672">}</span>
-<span style="color:#f92672">}</span>
-</code></pre></div><h2 id="基数排序">基数排序</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">indexFor</span>(<span style="color:#66d9ef">int</span> a, <span style="color:#66d9ef">int</span> min, <span style="color:#66d9ef">int</span> step) {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> (a <span style="color:#f92672">-</span> min) <span style="color:#f92672">/</span> step;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">bucketSort</span>(<span style="color:#66d9ef">int</span><span style="color:#f92672">[]</span> arr) {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">int</span> max <span style="color:#f92672">=</span> arr<span style="color:#f92672">[</span>0<span style="color:#f92672">]</span>, min <span style="color:#f92672">=</span> arr<span style="color:#f92672">[</span>0<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> a : arr) {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> (max <span style="color:#f92672">&lt;</span> a)
+</span></span><span style="display:flex;"><span>			max <span style="color:#f92672">=</span> a;
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> (min <span style="color:#f92672">&gt;</span> a)
+</span></span><span style="display:flex;"><span>			min <span style="color:#f92672">=</span> a;
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// 该值可根据实际情况选择</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">int</span> bucketNum <span style="color:#f92672">=</span> max <span style="color:#f92672">/</span> 10 <span style="color:#f92672">-</span> min <span style="color:#f92672">/</span> 10 <span style="color:#f92672">+</span> 1;
+</span></span><span style="display:flex;"><span>	List buckList <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;</span>List<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;&gt;</span>();
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// create bucket</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 1; i <span style="color:#f92672">&lt;=</span> bucketNum; i<span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>		buckList.<span style="color:#a6e22e">add</span>(<span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span>());
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// push into the bucket</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0; i <span style="color:#f92672">&lt;</span> arr.<span style="color:#a6e22e">length</span>; i<span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">int</span> index <span style="color:#f92672">=</span> indexFor(arr<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span>, min, 10);
+</span></span><span style="display:flex;"><span>		((ArrayList<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span>) buckList.<span style="color:#a6e22e">get</span>(index)).<span style="color:#a6e22e">add</span>(arr<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span>);
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	ArrayList<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> bucket <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">int</span> index <span style="color:#f92672">=</span> 0;
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0; i <span style="color:#f92672">&lt;</span> bucketNum; i<span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>		bucket <span style="color:#f92672">=</span> (ArrayList<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span>) buckList.<span style="color:#a6e22e">get</span>(i);
+</span></span><span style="display:flex;"><span>		insertSort(bucket);
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> k : bucket) {
+</span></span><span style="display:flex;"><span>			arr<span style="color:#f92672">[</span>index<span style="color:#f92672">++]</span> <span style="color:#f92672">=</span> k;
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 把桶內元素插入排序</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">insertSort</span>(List<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;</span> bucket) {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 1; i <span style="color:#f92672">&lt;</span> bucket.<span style="color:#a6e22e">size</span>(); i<span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">int</span> temp <span style="color:#f92672">=</span> bucket.<span style="color:#a6e22e">get</span>(i);
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> i <span style="color:#f92672">-</span> 1;
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">for</span> (; j <span style="color:#f92672">&gt;=</span> 0 <span style="color:#f92672">&amp;&amp;</span> bucket.<span style="color:#a6e22e">get</span>(j) <span style="color:#f92672">&gt;</span> temp; j<span style="color:#f92672">--</span>) {
+</span></span><span style="display:flex;"><span>			bucket.<span style="color:#a6e22e">set</span>(j <span style="color:#f92672">+</span> 1, bucket.<span style="color:#a6e22e">get</span>(j));
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		bucket.<span style="color:#a6e22e">set</span>(j <span style="color:#f92672">+</span> 1, temp);
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><h2 id="基数排序">基数排序<a class="anchor" href="#%e5%9f%ba%e6%95%b0%e6%8e%92%e5%ba%8f" aria-label="Link"></a></h2>
 <p>对于有d个关键字时，可以分别按关键字进行排序。有俩种方法：</p>
 <ul>
 <li>MSD：先从高位开始进行排序，在每个关键字上，可采用基数排序</li>
 <li>LSD：先从低位开始进行排序，在每个关键字上，可采用桶排序</li>
 </ul>
-<blockquote>
+<blockquote class=''>
 <p>即通过每个数的每位数字的大小来比较</p>
-</blockquote>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java"><span style="color:#75715e">//找出最大数字的位数
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">maxNum</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> arr<span style="color:#f92672">[</span><span style="color:#f92672">]</span><span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> len<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">int</span> _max <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span>
-
-    <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> len<span style="color:#f92672">;</span> <span style="color:#f92672">+</span><span style="color:#f92672">+</span>i<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        <span style="color:#66d9ef">int</span> d <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span>
-        <span style="color:#66d9ef">int</span> a <span style="color:#f92672">=</span> arr<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
-
-        <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span>a<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-            a <span style="color:#f92672">/</span><span style="color:#f92672">=</span> 10<span style="color:#f92672">;</span>
-            d<span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">;</span>
-        <span style="color:#f92672">}</span>
-
-        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>_max <span style="color:#f92672">&lt;</span> d<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-            _max <span style="color:#f92672">=</span> d<span style="color:#f92672">;</span>
-        <span style="color:#f92672">}</span>
-    <span style="color:#f92672">}</span>
-    <span style="color:#66d9ef">return</span> _max<span style="color:#f92672">;</span>
-<span style="color:#f92672">}</span>
-
-
-<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">radixSort</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>arr<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> len<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">int</span> d <span style="color:#f92672">=</span> maxNum<span style="color:#f92672">(</span>arr<span style="color:#f92672">,</span> len<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>temp <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">[</span>len<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">int</span> count<span style="color:#f92672">[</span>10<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">int</span> radix <span style="color:#f92672">=</span> 1<span style="color:#f92672">;</span>
-
-    <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> d<span style="color:#f92672">;</span> <span style="color:#f92672">+</span><span style="color:#f92672">+</span>i<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> j <span style="color:#f92672">&lt;</span> 10<span style="color:#f92672">;</span> <span style="color:#f92672">+</span><span style="color:#f92672">+</span>j<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-            count<span style="color:#f92672">[</span>j<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span>
-        <span style="color:#f92672">}</span>
-
-        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> k <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> k <span style="color:#f92672">&lt;</span> len<span style="color:#f92672">;</span> <span style="color:#f92672">+</span><span style="color:#f92672">+</span>k<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-            count<span style="color:#f92672">[</span><span style="color:#f92672">(</span>arr<span style="color:#f92672">[</span>k<span style="color:#f92672">]</span> <span style="color:#f92672">/</span> radix<span style="color:#f92672">)</span> <span style="color:#f92672">%</span> 10<span style="color:#f92672">]</span><span style="color:#f92672">+</span><span style="color:#f92672">+</span><span style="color:#f92672">;</span>
-        <span style="color:#f92672">}</span>
-
-        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> l <span style="color:#f92672">=</span> 1<span style="color:#f92672">;</span> l <span style="color:#f92672">&lt;</span> 10<span style="color:#f92672">;</span> <span style="color:#f92672">+</span><span style="color:#f92672">+</span>l<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-            count<span style="color:#f92672">[</span>l<span style="color:#f92672">]</span> <span style="color:#f92672">+</span><span style="color:#f92672">=</span> count<span style="color:#f92672">[</span>l <span style="color:#f92672">-</span> 1<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
-        <span style="color:#f92672">}</span>
-
-        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> m <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> m <span style="color:#f92672">&lt;</span> len<span style="color:#f92672">;</span> <span style="color:#f92672">+</span><span style="color:#f92672">+</span>m<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-            <span style="color:#66d9ef">int</span> index <span style="color:#f92672">=</span> <span style="color:#f92672">(</span>arr<span style="color:#f92672">[</span>m<span style="color:#f92672">]</span> <span style="color:#f92672">/</span> radix<span style="color:#f92672">)</span> <span style="color:#f92672">%</span> 10<span style="color:#f92672">;</span>
-            temp<span style="color:#f92672">[</span>count<span style="color:#f92672">[</span>index<span style="color:#f92672">]</span> <span style="color:#f92672">-</span> 1<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> arr<span style="color:#f92672">[</span>m<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
-            count<span style="color:#f92672">[</span>index<span style="color:#f92672">]</span><span style="color:#f92672">-</span><span style="color:#f92672">-</span><span style="color:#f92672">;</span>
-        <span style="color:#f92672">}</span>
-
-        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> n <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> n <span style="color:#f92672">&lt;</span> len<span style="color:#f92672">;</span> <span style="color:#f92672">+</span><span style="color:#f92672">+</span>n<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-            arr<span style="color:#f92672">[</span>n<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> temp<span style="color:#f92672">[</span>n<span style="color:#f92672">]</span><span style="color:#f92672">;</span>
-        <span style="color:#f92672">}</span>
-        radix <span style="color:#f92672">*</span><span style="color:#f92672">=</span> 10<span style="color:#f92672">;</span>
-
-    <span style="color:#f92672">}</span>
-
-    delete <span style="color:#f92672">(</span>temp<span style="color:#f92672">)</span><span style="color:#f92672">;</span>
-<span style="color:#f92672">}</span>
-
-</code></pre></div><h2 id="拓扑排序">拓扑排序</h2>
+</blockquote><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">//找出最大数字的位数</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">maxNum</span>(<span style="color:#66d9ef">int</span> arr<span style="color:#f92672">[]</span>, <span style="color:#66d9ef">int</span> len) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> _max <span style="color:#f92672">=</span> 0;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0; i <span style="color:#f92672">&lt;</span> len; <span style="color:#f92672">++</span>i) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> d <span style="color:#f92672">=</span> 0;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> a <span style="color:#f92672">=</span> arr<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> (a) {
+</span></span><span style="display:flex;"><span>            a <span style="color:#f92672">/=</span> 10;
+</span></span><span style="display:flex;"><span>            d<span style="color:#f92672">++</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (_max <span style="color:#f92672">&lt;</span> d) {
+</span></span><span style="display:flex;"><span>            _max <span style="color:#f92672">=</span> d;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> _max;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">radixSort</span>(<span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>arr, <span style="color:#66d9ef">int</span> len) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> d <span style="color:#f92672">=</span> maxNum(arr, len);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>temp <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">[</span>len<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> count<span style="color:#f92672">[</span>10<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> radix <span style="color:#f92672">=</span> 1;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0; i <span style="color:#f92672">&lt;</span> d; <span style="color:#f92672">++</span>i) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> 0; j <span style="color:#f92672">&lt;</span> 10; <span style="color:#f92672">++</span>j) {
+</span></span><span style="display:flex;"><span>            count<span style="color:#f92672">[</span>j<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> 0;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> k <span style="color:#f92672">=</span> 0; k <span style="color:#f92672">&lt;</span> len; <span style="color:#f92672">++</span>k) {
+</span></span><span style="display:flex;"><span>            count<span style="color:#f92672">[</span>(arr<span style="color:#f92672">[</span>k<span style="color:#f92672">]</span> <span style="color:#f92672">/</span> radix) <span style="color:#f92672">%</span> 10<span style="color:#f92672">]++</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> l <span style="color:#f92672">=</span> 1; l <span style="color:#f92672">&lt;</span> 10; <span style="color:#f92672">++</span>l) {
+</span></span><span style="display:flex;"><span>            count<span style="color:#f92672">[</span>l<span style="color:#f92672">]</span> <span style="color:#f92672">+=</span> count<span style="color:#f92672">[</span>l <span style="color:#f92672">-</span> 1<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> m <span style="color:#f92672">=</span> 0; m <span style="color:#f92672">&lt;</span> len; <span style="color:#f92672">++</span>m) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">int</span> index <span style="color:#f92672">=</span> (arr<span style="color:#f92672">[</span>m<span style="color:#f92672">]</span> <span style="color:#f92672">/</span> radix) <span style="color:#f92672">%</span> 10;
+</span></span><span style="display:flex;"><span>            temp<span style="color:#f92672">[</span>count<span style="color:#f92672">[</span>index<span style="color:#f92672">]</span> <span style="color:#f92672">-</span> 1<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> arr<span style="color:#f92672">[</span>m<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>            count<span style="color:#f92672">[</span>index<span style="color:#f92672">]--</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> n <span style="color:#f92672">=</span> 0; n <span style="color:#f92672">&lt;</span> len; <span style="color:#f92672">++</span>n) {
+</span></span><span style="display:flex;"><span>            arr<span style="color:#f92672">[</span>n<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> temp<span style="color:#f92672">[</span>n<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        radix <span style="color:#f92672">*=</span> 10;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    delete (temp);
+</span></span><span style="display:flex;"><span>}</span></span></code></pre></div><h2 id="拓扑排序">拓扑排序<a class="anchor" href="#%e6%8b%93%e6%89%91%e6%8e%92%e5%ba%8f" aria-label="Link"></a></h2>
 <p>在有向图中找拓扑序列的过程，就是拓扑排序。<strong>拓扑序列常常用于判定图是否有环</strong>。</p>
 <ul>
 <li>从有向图中选择一个入度为0的结点，输出它。</li>
 <li>将这个结点以及该结点出发的所有边从图中删除。</li>
 <li>重复前两步，直到没有入度为0的点。</li>
 </ul>
-<blockquote>
+<blockquote class=''>
 <p>如果所有点都被输出，即存在一个拓扑序列，则图没有环。</p>
-</blockquote>
-</article>
+</blockquote></article>
  
+      
 
       <footer class="book-footer">
         
-  <div class="flex justify-between">
+  <div class="flex flex-wrap justify-between">
 
-
-
-  <div>
-    
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/e319857618099d1274e9280d88b7d02a514b63ca" title='Last modified by haoyang.shi | 2020-02-29' target="_blank" rel="noopener">
-      <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-02-29</span>
-    </a>
-  </div>
-
-
-
-  <div>
-    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/basic/algo/sort/index.md" target="_blank" rel="noopener">
-      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
-      <span>Edit this page</span>
-    </a>
-  </div>
+<div>
 
 </div>
+
+<div>
+
+</div>
+
+</div>
+
+<div class="flex flex-wrap justify-between">
+    <span>
+    
+      <a href="/docs/basic/algo/hash/" class="flex align-center">
+        <svg class="book-icon" aria-hidden="true"><use href="/iconset.min.90a7fd302dc1b9bc3c291688faee66a3e60a9209f59b89fa00669e35d6907b3f.svg#backward"></use></svg>
+        <span>哈希</span>
+      </a>
+    
+    </span>
+    <span>
+    
+      <a href="/docs/basic/algo/mst/" class="flex align-center">
+        <span>最小生成树算法</span>
+        <svg class="book-icon" aria-hidden="true"><use href="/iconset.min.90a7fd302dc1b9bc3c291688faee66a3e60a9209f59b89fa00669e35d6907b3f.svg#forward"></use></svg>
+      </a>
+    
+    </span>
+  </div>
 
  
         
   
-  <div class="book-comments">
-
-</div>
+ 
+        
+        
   
  
+        
+  
+    <script>(function(){document.querySelectorAll("pre:has(code)").forEach(e=>{e.addEventListener("click",e.focus),e.addEventListener("copy",function(t){if(t.preventDefault(),navigator.clipboard){const t=window.getSelection().toString()||e.textContent;navigator.clipboard.writeText(t)}})})})()</script>
+  
+
       </footer>
-      
-    </div>
+
+      <label for="menu-control" class="hidden book-menu-overlay" aria-hidden="true"></label>
+    </main>
 
     
-    <aside class="book-toc">
+  
+  <aside class="book-toc" aria-label="Table of Contents">
+    <div class="book-toc-content">
       
-  <nav id="TableOfContents">
+  
+<nav id="TableOfContents">
   <ul>
     <li><a href="#常见排序算法">常见排序算法</a>
       <ul>
@@ -831,13 +3486,13 @@ https://github.com/alex-shpak/hugo-book
     <li><a href="#交换排序">交换排序</a>
       <ul>
         <li><a href="#冒泡排序">冒泡排序</a></li>
-        <li><a href="#快速排序-快速排序-百度百科httpbaikebaiducomlinkurlhyqpclbjy1syy4esoze9kandidxorkxisfq0hzl8c5eut40dzs-fd1v0jubijsv7raogwy6haq-b1hbrghf1hq">快速排序 快速排序-百度百科</a></li>
+        <li><a href="#快速排序-快速排序-百度百科">快速排序 快速排序-百度百科</a></li>
       </ul>
     </li>
     <li><a href="#插入排序">插入排序</a>
       <ul>
         <li><a href="#直接插入排序">直接插入排序</a></li>
-        <li><a href="#希尔排序httpszhwikipediaorgwikie5b88ce5b094e68e92e5ba8f">希尔排序</a></li>
+        <li><a href="#希尔排序">希尔排序</a></li>
       </ul>
     </li>
     <li><a href="#选择排序">选择排序</a>
@@ -853,15 +3508,31 @@ https://github.com/alex-shpak/hugo-book
   </ul>
 </nav>
 
+
+
+
+
+
+
+    </div>
+  </aside>
+  
  
-    </aside>
-    
-  </main>
+  </div>
 
   
 </body>
-
 </html>
+
+
+
+
+
+
+
+
+
+
 
 
 

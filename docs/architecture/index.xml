@@ -1,32 +1,22 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Interview</title>
-    <link>https://hadyang.github.io/interview/docs/architecture/</link>
-    <description>Recent content on Interview</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>zh-CN</language>
-    <lastBuildDate>Wed, 21 Aug 2019 11:00:41 +0800</lastBuildDate>
-    
-	<atom:link href="https://hadyang.github.io/interview/docs/architecture/index.xml" rel="self" type="application/rss+xml" />
-    
-    
-    <item>
-      <title>系统架构基础</title>
-      <link>https://hadyang.github.io/interview/docs/architecture/base/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/architecture/base/</guid>
-      <description>系统架构基础 分布式系统的最大难点，就是各个节点的状态如何同步。CAP 定理是这方面的基本定理，也是理解分布式系统的起点。
-1998年，加州大学的计算机科学家 Eric Brewer 提出，分布式系统有三个指标。
-Consistency Availability Partition tolerance 它们的第一个字母分别是 C、A、P。Eric Brewer 说，这三个指标不可能同时做到。这个结论就叫做 CAP 定理。
-CAP 它指出对于一个分布式计算系统来说，不可能同时满足以下三点：
- 一致性（Consistency） （等同于所有节点访问同一份最新的数据副本） 可用性（Availability）（每次请求都能获取到非错的响应——但是不保证获取的数据为最新数据） 分区容错性（Partition tolerance）（以实际效果而言，分区相当于对通信的时限要求。系统如果不能在时限内达成数据一致性，就意味着发生了分区的情况，必须就当前操作在C和A之间做出选择。）  数据一致性模型 一些分布式系统通过复制数据来提高系统的可靠性和容错性，并且将数据的不同的副本存放在不同的机器，由于维护数据副本的一致性代价高，因此许多系统采用弱一致性来提高性能，一些不同的一致性模型也相继被提出。
- 强一致性： 要求无论更新操作实在哪一个副本执行，之后所有的读操作都要能获得最新的数据。 弱一致性：用户读到某一操作对系统特定数据的更新需要一段时间，我们称这段时间为“不一致性窗口”。 最终一致性：是弱一致性的一种特例，保证用户最终能够读取到某操作对系统特定数据的更新。  一致性解决方案  分布式事务：两段提交 分布式锁 MQ 消息持久化 重试 幂等 Paxos 算法  服务可用性 可用性，意思是只要收到用户的请求，服务器就必须给出回应。
-高可用解决方案  负载均衡： 降级：当服务器压力剧增的情况下，根据当前业务情况及流量对一些服务和页面有策略的降级，以此释放服务器资源以保证核心任务的正常运行。 熔断：对于目标服务的请求和调用大量超时或失败，这时应该熔断该服务的所有调用，并且对于后续调用应直接返回，从而快速释放资源，确保在目标服务不可用的这段时间内，所有对它的调用都是立即返回，不会阻塞的。再等到目标服务好转后进行接口恢复。 流量控制： 异地多活：  熔断是减少由于下游服务故障对自己的影响；而降级则是在整个系统的角度上，考虑业务整体流量，保护核心业务稳定。
-分区容错性 大多数分布式系统都分布在多个子网络。每个子网络就叫做一个区（partition）。分区容错的意思是，区间通信可能失败。比如，一台服务器放在中国，另一台服务器放在美国，这就是两个区，它们之间可能无法通信。
-般来说，分区容错无法避免，因此可以认为 CAP 的 P 总是成立。CAP 定理告诉我们，剩下的 C 和 A 无法同时做到。</description>
-    </item>
-    
-  </channel>
+	<channel>
+		<title>HadYang技术分享</title>
+		<link>https://hadyang.com/docs/architecture/</link>
+		<description>Recent content on HadYang技术分享</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<atom:link href="https://hadyang.com/docs/architecture/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>系统架构基础</title>
+				<link>https://hadyang.com/docs/architecture/base/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/architecture/base/</guid>
+				<description>&lt;h1 id=&#34;系统架构基础&#34;&gt;系统架构基础&lt;a class=&#34;anchor&#34; href=&#34;#%e7%b3%bb%e7%bb%9f%e6%9e%b6%e6%9e%84%e5%9f%ba%e7%a1%80&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h1&gt;&#xA;&lt;p&gt;分布式系统的最大难点，就是各个节点的状态如何同步。CAP 定理是这方面的基本定理，也是理解分布式系统的起点。&lt;/p&gt;&#xA;&lt;p&gt;1998年，加州大学的计算机科学家 Eric Brewer 提出，分布式系统有三个指标。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;Consistency&#xA;Availability&#xA;Partition tolerance&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;它们的第一个字母分别是 &lt;code&gt;C&lt;/code&gt;、&lt;code&gt;A&lt;/code&gt;、&lt;code&gt;P&lt;/code&gt;。Eric Brewer 说，这三个指标不可能同时做到。这个结论就叫做 &lt;code&gt;CAP&lt;/code&gt; 定理。&lt;/p&gt;&#xA;&lt;h2 id=&#34;cap&#34;&gt;CAP&lt;a class=&#34;anchor&#34; href=&#34;#cap&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;它指出对于一个分布式计算系统来说，不可能同时满足以下三点：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;一致性（Consistency） （等同于所有节点访问同一份最新的数据副本）&lt;/li&gt;&#xA;&lt;li&gt;可用性（Availability）（每次请求都能获取到非错的响应——但是不保证获取的数据为最新数据）&lt;/li&gt;&#xA;&lt;li&gt;分区容错性（Partition tolerance）（以实际效果而言，分区相当于对通信的时限要求。系统如果不能在时限内达成数据一致性，就意味着发生了分区的情况，必须就当前操作在C和A之间做出选择。）&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h3 id=&#34;数据一致性模型&#34;&gt;数据一致性模型&lt;a class=&#34;anchor&#34; href=&#34;#%e6%95%b0%e6%8d%ae%e4%b8%80%e8%87%b4%e6%80%a7%e6%a8%a1%e5%9e%8b&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&#xA;&lt;p&gt;一些分布式系统通过复制数据来提高系统的可靠性和容错性，并且将数据的不同的副本存放在不同的机器，由于维护数据副本的一致性代价高，因此许多系统采用弱一致性来提高性能，一些不同的一致性模型也相继被提出。&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;强一致性&lt;/strong&gt;： 要求无论更新操作实在哪一个副本执行，之后所有的读操作都要能获得最新的数据。&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;弱一致性&lt;/strong&gt;：用户读到某一操作对系统特定数据的更新需要一段时间，我们称这段时间为“不一致性窗口”。&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;最终一致性&lt;/strong&gt;：是弱一致性的一种特例，保证用户最终能够读取到某操作对系统特定数据的更新。&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h4 id=&#34;一致性解决方案&#34;&gt;一致性解决方案&lt;a class=&#34;anchor&#34; href=&#34;#%e4%b8%80%e8%87%b4%e6%80%a7%e8%a7%a3%e5%86%b3%e6%96%b9%e6%a1%88&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h4&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;分布式事务：两段提交&lt;/li&gt;&#xA;&lt;li&gt;分布式锁&lt;/li&gt;&#xA;&lt;li&gt;MQ 消息持久化 重试 幂等&lt;/li&gt;&#xA;&lt;li&gt;Paxos 算法&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;h3 id=&#34;服务可用性&#34;&gt;服务可用性&lt;a class=&#34;anchor&#34; href=&#34;#%e6%9c%8d%e5%8a%a1%e5%8f%af%e7%94%a8%e6%80%a7&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&#xA;&lt;p&gt;可用性，意思是只要收到用户的请求，服务器就必须给出回应。&lt;/p&gt;&#xA;&lt;h4 id=&#34;高可用解决方案&#34;&gt;高可用解决方案&lt;a class=&#34;anchor&#34; href=&#34;#%e9%ab%98%e5%8f%af%e7%94%a8%e8%a7%a3%e5%86%b3%e6%96%b9%e6%a1%88&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h4&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;负载均衡&lt;/strong&gt;：&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;降级&lt;/strong&gt;：当服务器压力剧增的情况下，根据当前业务情况及流量对一些服务和页面有策略的降级，以此释放服务器资源以保证核心任务的正常运行。&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;熔断&lt;/strong&gt;：对于目标服务的请求和调用大量超时或失败，这时应该熔断该服务的所有调用，并且对于后续调用应直接返回，从而快速释放资源，确保在目标服务不可用的这段时间内，所有对它的调用都是立即返回，不会阻塞的。再等到目标服务好转后进行接口恢复。&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;流量控制&lt;/strong&gt;：&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;异地多活&lt;/strong&gt;：&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;熔断是减少由于下游服务故障对自己的影响；而降级则是在整个系统的角度上，考虑业务整体流量，保护核心业务稳定。&lt;/p&gt;&#xA;&lt;h3 id=&#34;分区容错性&#34;&gt;分区容错性&lt;a class=&#34;anchor&#34; href=&#34;#%e5%88%86%e5%8c%ba%e5%ae%b9%e9%94%99%e6%80%a7&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&#xA;&lt;p&gt;大多数分布式系统都分布在多个子网络。每个子网络就叫做一个区（partition）。分区容错的意思是，区间通信可能失败。比如，一台服务器放在中国，另一台服务器放在美国，这就是两个区，它们之间可能无法通信。&lt;/p&gt;&#xA;&lt;p&gt;般来说，分区容错无法避免，因此可以认为 CAP 的 &lt;code&gt;P&lt;/code&gt; 总是成立。CAP 定理告诉我们，剩下的 &lt;code&gt;C&lt;/code&gt; 和 &lt;code&gt;A&lt;/code&gt; 无法同时做到。&lt;/p&gt;</description>
+			</item>
+	</channel>
 </rss>

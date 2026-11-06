@@ -1,408 +1,253 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Interview</title>
-    <link>https://hadyang.github.io/interview/docs/leetcode/</link>
-    <description>Recent content on Interview</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>zh-CN</language>
-    <lastBuildDate>Wed, 21 Aug 2019 11:00:41 +0800</lastBuildDate>
-    
-	<atom:link href="https://hadyang.github.io/interview/docs/leetcode/index.xml" rel="self" type="application/rss+xml" />
-    
-    
-    <item>
-      <title>三数之和</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/threeSum/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/threeSum/</guid>
-      <description>头条重点
-题目 给定一个包含 n 个整数的数组 nums ，判断 nums 中是否存在三个元素 a，b，c ，使得 a + b + c = 0 ？找出所有满足条件且不重复的三元组。
-注意：答案中不可以包含重复的三元组。
-例如, 给定数组 nums = [-1, 0, 1, 2, -1, -4]， 满足要求的三元组集合为： [ [-1, 0, 1], [-1, -1, 2] ] 解题思路  将数组排序 固定一位数，然后通过两个指针对撞，寻找总和为 0 的三个数  public static List&amp;lt;List&amp;lt;Integer&amp;gt;&amp;gt; threeSum(int[] nums) { if (nums.length &amp;lt; 3) { return Collections.emptyList(); } Set&amp;lt;List&amp;lt;Integer&amp;gt;&amp;gt; res = new HashSet&amp;lt;&amp;gt;(); Arrays.sort(nums); int zCount = 0; for (int num : nums) { if (num == 0) { zCount++; } } for (int i = 0; i &amp;lt; nums.</description>
-    </item>
-    
-    <item>
-      <title>两数相加</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/addTwoNumbers/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/addTwoNumbers/</guid>
-      <description>两数相加 头条重点
-题目 给出两个 非空 的链表用来表示两个非负的整数。其中，它们各自的位数是按照 逆序 的方式存储的，并且它们的每个节点只能存储 一位 数字。
-如果，我们将这两个数相加起来，则会返回一个新的链表来表示它们的和。
-您可以假设除了数字 0 之外，这两个数都不会以 0 开头。
-示例： 输入：(2 -&amp;gt; 4 -&amp;gt; 3) + (5 -&amp;gt; 6 -&amp;gt; 4) 输出：7 -&amp;gt; 0 -&amp;gt; 8 原因：342 + 465 = 807 解题思路 public ListNode addTwoNumbers(ListNode l1, ListNode l2) { if (l1 == null || l2 == null) { return null; } StringBuilder builder1 = new StringBuilder(); while (l1 != null) { builder1.append(l1.val); l1 = l1.</description>
-    </item>
-    
-    <item>
-      <title>买卖股票的最佳时机</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/maxProfit/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/maxProfit/</guid>
-      <description>头条重点
-题目 给定一个数组，它的第 i 个元素是一支给定股票第 i 天的价格。如果你最多只允许完成一笔交易（即买入和卖出一支股票），设计一个算法来计算你所能获取的最大利润。
-注意你不能在买入股票前卖出股票。
-示例 1: 输入: [7,1,5,3,6,4] 输出: 5 解释: 在第 2 天（股票价格 = 1）的时候买入，在第 5 天（股票价格 = 6）的时候卖出，最大利润 = 6-1 = 5 。 注意利润不能是 7-1 = 6, 因为卖出价格需要大于买入价格。 示例 2: 输入: [7,6,4,3,1] 输出: 0 解释: 在这种情况下, 没有交易完成, 所以最大利润为 0。 解题思路  要先买入才能卖出，先找最低价格点 再找最低价格之后的最高价格，用 res 表示最大利润  public int maxProfit(int[] prices) { if (prices.length &amp;lt;= 1) { return 0; } int res = 0; int minBuy = prices[0]; for (int price : prices) { res = Math.</description>
-    </item>
-    
-    <item>
-      <title>买卖股票的最佳时机</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/maxProfit2/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/maxProfit2/</guid>
-      <description>头条重点
-题目 给定一个数组，它的第 i 个元素是一支给定股票第 i 天的价格。设计一个算法来计算你所能获取的最大利润。你可以尽可能地完成更多的交易（多次买卖一支股票）。
-注意：你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）。
-示例 1: 输入: [7,1,5,3,6,4] 输出: 7 解释: 在第 2 天（股票价格 = 1）的时候买入，在第 3 天（股票价格 = 5）的时候卖出, 这笔交易所能获得利润 = 5-1 = 4 。 随后，在第 4 天（股票价格 = 3）的时候买入，在第 5 天（股票价格 = 6）的时候卖出, 这笔交易所能获得利润 = 6-3 = 3 。 示例 2: 输入: [1,2,3,4,5] 输出: 4 解释: 在第 1 天（股票价格 = 1）的时候买入，在第 5 天 （股票价格 = 5）的时候卖出, 这笔交易所能获得利润 = 5-1 = 4 。 注意你不能在第 1 天和第 2 天接连购买股票，之后再将它们卖出。 因为这样属于同时参与了多笔交易，你必须在再次购买前出售掉之前的股票。 示例 3: 输入: [7,6,4,3,1] 输出: 0 解释: 在这种情况下, 没有交易完成, 所以最大利润为 0。 解题思路  贪心算法，尽可能的多进行交易  public int maxProfit(int[] prices) { if (prices.</description>
-    </item>
-    
-    <item>
-      <title>二叉树的最近公共祖先</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/lowestCommonAncestor/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/lowestCommonAncestor/</guid>
-      <description>题目 给定一个二叉树, 找到该树中两个指定节点的最近公共祖先。
-百度百科中最近公共祖先的定义为：“对于有根树 T 的两个结点 p、q，最近公共祖先表示为一个结点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大（一个节点也可以是它自己的祖先）。”
-示例 1: 输入: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1 输出: 3 解释: 节点 5 和节点 1 的最近公共祖先是节点 3。 解题思路  通过 DFS 找到节点的路径 从头开始遍历两个节点的路径，找到最后一个相等的节点  public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) { LinkedList&amp;lt;TreeNode&amp;gt; pathP = new LinkedList&amp;lt;&amp;gt;(); LinkedList&amp;lt;TreeNode&amp;gt; pathQ = new LinkedList&amp;lt;&amp;gt;(); findNodePath(pathP, root, p); findNodePath(pathQ, root, q); TreeNode last = null; while (!</description>
-    </item>
-    
-    <item>
-      <title>全 O(1) 的数据结构</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/AllOne/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/AllOne/</guid>
-      <description>全 O(1) 的数据结构 题目 实现一个数据结构支持以下操作：
- Inc(key) - 插入一个新的值为 1 的 key。或者使一个存在的 key 增加一，保证 key 不为空字符串。 Dec(key) - 如果这个 key 的值是 1，那么把他从数据结构中移除掉。否者使一个存在的 key 值减一。如果这个 key 不存在，这个函数不做任何事情。key 保证不为空字符串。 GetMaxKey() - 返回 key 中值最大的任意一个。如果没有元素存在，返回一个空字符串&amp;rdquo;&amp;quot;。 GetMinKey() - 返回 key 中值最小的任意一个。如果没有元素存在，返回一个空字符串&amp;rdquo;&amp;quot;。  挑战：以 O(1) 的时间复杂度实现所有操作。
-解题思路  设计一个 Bucket 保存所有值为 value 的 key 并且有临近 value 的 Bucket 指针  class AllOne { /** Initialize your data structure here. */ public AllOne() { } private static class Bucket { private int value; private Set&amp;lt;String&amp;gt; keys = new HashSet&amp;lt;&amp;gt;(); private Bucket next; private Bucket pre; public Bucket(int value) { this.</description>
-    </item>
-    
-    <item>
-      <title>反转链表</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/reverseList/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/reverseList/</guid>
-      <description>头条重点
-题目 反转一个单链表。
-示例: 输入: 1-&amp;gt;2-&amp;gt;3-&amp;gt;4-&amp;gt;5-&amp;gt;NULL 输出: 5-&amp;gt;4-&amp;gt;3-&amp;gt;2-&amp;gt;1-&amp;gt;NULL 解题思路  三个指针进行反转  public ListNode reverseList(ListNode head) { if (head == null) { return head; } if (head.next == null) { return head; } ListNode pre = head; ListNode cur = head.next; while (cur != null) { ListNode next = cur.next; cur.next = pre; pre = cur; cur = next; } head.next = null; return pre; } </description>
-    </item>
-    
-    <item>
-      <title>合并</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/mergeKLists/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/mergeKLists/</guid>
-      <description>头条重点
-题目 合并 k 个排序链表，返回合并后的排序链表。请分析和描述算法的复杂度。
-示例: 输入: [ 1-&amp;gt;4-&amp;gt;5, 1-&amp;gt;3-&amp;gt;4, 2-&amp;gt;6 ] 输出: 1-&amp;gt;1-&amp;gt;2-&amp;gt;3-&amp;gt;4-&amp;gt;4-&amp;gt;5-&amp;gt;6 解题思路  通过小根堆，将所有元素放入小根堆 从小根堆依次取出数据  public ListNode mergeKLists(ListNode[] lists) { if (lists == null) { return null; } Queue&amp;lt;ListNode&amp;gt; set = new PriorityQueue&amp;lt;&amp;gt;(Comparator.comparingInt(o -&amp;gt; o.val)); for (ListNode node : lists) { while (node != null) { set.add(node); node = node.next; } } ListNode head = new ListNode(-1); ListNode res = head; ListNode cur; while ((cur = set.</description>
-    </item>
-    
-    <item>
-      <title>合并两个有序链表</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/mergeTwoLists/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/mergeTwoLists/</guid>
-      <description>题目 将两个有序链表合并为一个新的有序链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。
-示例： 输入：1-&amp;gt;2-&amp;gt;4, 1-&amp;gt;3-&amp;gt;4 输出：1-&amp;gt;1-&amp;gt;2-&amp;gt;3-&amp;gt;4-&amp;gt;4 解题思路 public ListNode mergeTwoLists(ListNode l1, ListNode l2) { if (l1 == null &amp;amp;&amp;amp; l2 == null) { return null; } if (l1 == null) { return l2; } if (l2 == null) { return l1; } ListNode head; if (l1.val &amp;gt; l2.val) { head = l2; l2 = l2.next; } else { head = l1; l1 = l1.next; } ListNode res = head; while (true) { ListNode cur; if (l1 == null &amp;amp;&amp;amp; l2 == null) { break; } if (l1 == null) { cur = l2; l2 = l2.</description>
-    </item>
-    
-    <item>
-      <title>合并区间</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/mergeRagen/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/mergeRagen/</guid>
-      <description>题目 给出一个区间的集合，请合并所有重叠的区间。
-示例 1: 输入: [[1,3],[2,6],[8,10],[15,18]] 输出: [[1,6],[8,10],[15,18]] 解释: 区间 [1,3] 和 [2,6] 重叠, 将它们合并为 [1,6]. 示例 2: 输入: [[1,4],[4,5]] 输出: [[1,5]] 解释: 区间 [1,4] 和 [4,5] 可被视为重叠区间。 解题思路  将区间按起始地址排序 遍历所有区间，如果 Last 与当前区间没有重合，则将当前区间加入结果集合。 如果重合，并且 last.end &amp;lt; t.end，修改 Last 的边界  public List&amp;lt;Interval&amp;gt; merge(List&amp;lt;Interval&amp;gt; intervals) { if (intervals.size() &amp;lt;= 1) { return intervals; } intervals.sort(Comparator.comparingInt(o -&amp;gt; o.start)); List&amp;lt;Interval&amp;gt; res = new ArrayList&amp;lt;&amp;gt;(); res.add(intervals.get(0)); for (int i = 1; i &amp;lt; intervals.</description>
-    </item>
-    
-    <item>
-      <title>复原</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/restoreIpAddresses/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/restoreIpAddresses/</guid>
-      <description>头条重点
-题目 给定一个只包含数字的字符串，复原它并返回所有可能的 IP 地址格式。
-示例: 输入: &amp;quot;25525511135&amp;quot; 输出: [&amp;quot;255.255.11.135&amp;quot;, &amp;quot;255.255.111.35&amp;quot;] 解题思路  利用回溯法，遍历所有可能的 IP  public static List&amp;lt;String&amp;gt; restoreIpAddresses(String s) { if (s.length() &amp;gt; 12 || s.length() &amp;lt; 4) { return Collections.emptyList(); } List&amp;lt;String&amp;gt; res = new ArrayList&amp;lt;&amp;gt;(); ArrayList&amp;lt;String&amp;gt; ip = new ArrayList&amp;lt;&amp;gt;(); for (int i = 0; i &amp;lt; 4; i++) { ip.add(&amp;quot;&amp;quot;); } p(res, s.toCharArray(), 0, ip, 0); return res; } private static void p(List&amp;lt;String&amp;gt; res, char[] chars, int startIndex, List&amp;lt;String&amp;gt; ip, int segmentIndex) { StringBuilder builder = new StringBuilder(); for (int i = startIndex; i &amp;lt; chars.</description>
-    </item>
-    
-    <item>
-      <title>字符串的排列</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/checkInclusion/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/checkInclusion/</guid>
-      <description>字符串的排列 题目 给定两个字符串 s1 和 s2，写一个函数来判断 s2 是否包含 s1 的排列。
-换句话说，第一个字符串的排列之一是第二个字符串的子串。
-示例1: 输入: s1 = &amp;quot;ab&amp;quot; s2 = &amp;quot;eidbaooo&amp;quot; 输出: True 解释: s2 包含 s1 的排列之一 (&amp;quot;ba&amp;quot;). 解题思路  这道题，我们用到的算法是 滑动窗口 首先字符串s1的排列的可能性应该是它的长度的阶乘，因为字符串长度可能为10000，所以找出所有排列情况是不太可能。 我们可以转换思路，不要关注排列的形式，而是关注排列中元素的数量关系 比如 aab，那么，转换为数量关系就是{a:2,b:1}，因为 S1 长度为 3，所以我们的窗口长度也为3 如果我们在 S2 的找到了这样一个窗口符合出现 a 的次数是两个， b 是一个，那么 S2 就是包含 S1 的排列的  public boolean checkInclusion(String s1, String s2) { int len1 = s1.length(); int len2 = s2.length(); int[] c1 = new int[26]; int[] c2 = new int[26]; for (char c : s1.</description>
-    </item>
-    
-    <item>
-      <title>字符串相乘</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/StringMultiply/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/StringMultiply/</guid>
-      <description>题目 给定两个以字符串形式表示的非负整数 num1 和 num2，返回 num1 和 num2 的乘积，它们的乘积也表示为字符串形式。
-示例 1: 输入: num1 = &amp;quot;2&amp;quot;, num2 = &amp;quot;3&amp;quot; 输出: &amp;quot;6&amp;quot;  num1 和 num2 的长度小于110。 num1 和 num2 只包含数字 0-9。 num1 和 num2 均不以零开头，除非是数字 0 本身。 不能使用任何标准库的大数类型（比如 BigInteger）或直接将输入转换为整数来处理。  解题思路   对于字符串 num2 中的每一位数与字符串 num1 相乘所得的结果，不再分开计算最后相加，而是先全部累加，最后再考虑进位的影响。
-  对于最终结果的第i + j位数，可以由 num1 数组的第 i 位数和 num2 数组的第 j 位数组成。
-  public String multiply(String num1, String num2) { if (num1.</description>
-    </item>
-    
-    <item>
-      <title>岛屿的最大面积</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/maxAreaOfIsland/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/maxAreaOfIsland/</guid>
-      <description>头条重点
-题目 给定一个包含了一些 0 和 1的非空二维数组 grid , 一个 岛屿 是由四个方向 (水平或垂直) 的 1 (代表土地) 构成的组合。你可以假设二维矩阵的四个边缘都被水包围着。
-找到给定的二维数组中最大的岛屿面积。(如果没有岛屿，则返回面积为0。)
-示例 1: [[0,0,1,0,0,0,0,1,0,0,0,0,0], [0,0,0,0,0,0,0,1,1,1,0,0,0], [0,1,1,0,1,0,0,0,0,0,0,0,0], [0,1,0,0,1,1,0,0,1,0,1,0,0], [0,1,0,0,1,1,0,0,1,1,1,0,0], [0,0,0,0,0,0,0,0,0,0,1,0,0], [0,0,0,0,0,0,0,1,1,1,0,0,0], [0,0,0,0,0,0,0,1,1,0,0,0,0]] 对于上面这个给定矩阵应返回 6。注意答案不应该是11，因为岛屿只能包含水平或垂直的四个方向的‘1’。 示例 2: [[0,0,0,0,0,0,0,0]] 对于上面这个给定的矩阵, 返回 0。 注意: 给定的矩阵 grid 的长度和宽度都不超过 50。 解题思路  通过循环遍历，找到 1 再通过递归遍历该 1 临近的所有 1，并计算总面积  private static int[][] steps = new int[][]{{1, 0}, {0, 1}, {-1, 0}, {0, -1}}; /** * 上学时做过，属于图的 DFS * @param grid * @return */ public static int maxAreaOfIsland(int[][] grid) { if (grid.</description>
-    </item>
-    
-    <item>
-      <title>排序链表</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/sortList/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/sortList/</guid>
-      <description>头条重点
-题目 在 O(n log n) 时间复杂度和常数级空间复杂度下，对链表进行排序。
-示例 1: 输入: 4-&amp;gt;2-&amp;gt;1-&amp;gt;3 输出: 1-&amp;gt;2-&amp;gt;3-&amp;gt;4 示例 2: 输入: -1-&amp;gt;5-&amp;gt;3-&amp;gt;4-&amp;gt;0 输出: -1-&amp;gt;0-&amp;gt;3-&amp;gt;4-&amp;gt;5 解题思路  通过快慢指针将链表拆分 递归进行拆分，再通过合并两个排序链表的方式进行合并 类似于归并排序  public ListNode sortList(ListNode head) { if (head == null || head.next == null) { return head; } ListNode slow = head, fast = head; while (fast.next != null &amp;amp;&amp;amp; fast.next.next != null) { fast = fast.next.next; slow = slow.next; } ListNode mid = slow.next; slow.next = null; ListNode l1 = sortList(head); ListNode l2 = sortList(mid); return merge(l1, l2); } private ListNode merge(ListNode l1, ListNode l2) { if (l1 == null) { return l2; } if (l2 == null) { return l1; } ListNode head,res; if (l1.</description>
-    </item>
-    
-    <item>
-      <title>接雨水</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/trap/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/trap/</guid>
-      <description>头条重点
-题目 给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。
-上面是由数组 [0,1,0,2,1,0,1,3,2,1,2,1] 表示的高度图，在这种情况下，可以接 6 个单位的雨水（蓝色部分表示雨水）。 感谢 Marcos 贡献此图。
-示例: 输入: [0,1,0,2,1,0,1,3,2,1,2,1] 输出: 6 解题思路  首先找到最高点，然后从首尾向中间遍历，找到局部高点，然后就可以计算总量  public int trap(int[] height) { if (height.length &amp;lt;= 2) { return 0; } int max = 0, maxIndex = 0; for (int i = 0; i &amp;lt; height.length; i++) { if (height[i] &amp;gt; max) { max = height[i]; maxIndex = i; } } int total = 0; int topIndex = 0;//局部最高点 for (int i = 0; i &amp;lt; maxIndex; i++) { if (height[topIndex] &amp;lt; height[i]) { topIndex = i; } else { total += height[topIndex] - height[i]; } } topIndex = height.</description>
-    </item>
-    
-    <item>
-      <title>搜索旋转排序数组</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/searchRote/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/searchRote/</guid>
-      <description>头条重点
-题目 假设按照升序排序的数组在预先未知的某个点上进行了旋转。( 例如，数组 [0,1,2,4,5,6,7] 可能变为 [4,5,6,7,0,1,2] )。
-搜索一个给定的目标值，如果数组中存在这个目标值，则返回它的索引，否则返回 -1 。
-你可以假设数组中不存在重复的元素。
-你的算法时间复杂度必须是 O(log n) 级别。
-示例 1: 输入: nums = [4,5,6,7,0,1,2], target = 0 输出: 4 示例 2: 输入: nums = [4,5,6,7,0,1,2], target = 3 输出: -1 解题思路  旋转数组是分为两段有序，主要得注意 mid 落在哪个段上  public static int search(int[] nums, int target) { int start = 0, end = nums.length - 1; while (start &amp;lt;= end) { int mid = (start + end) / 2; if (nums[mid]==target) return mid; if (nums[mid] &amp;gt;= nums[start]) { if (target &amp;lt; nums[mid] &amp;amp;&amp;amp; target &amp;gt;= nums[start]) { end = mid - 1; } else { start = mid + 1; } } if (nums[mid] &amp;lt;= nums[end]) { if (target &amp;gt; nums[mid] &amp;amp;&amp;amp; target &amp;lt;= nums[end]) { start = mid + 1; } else { end = mid - 1; } } } return -1; } </description>
-    </item>
-    
-    <item>
-      <title>数组中的第K个最大元素</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/findKthLargest/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/findKthLargest/</guid>
-      <description>数组中的第K个最大元素 题目 在未排序的数组中找到第 k 个最大的元素。请注意，你需要找的是数组排序后的第 k 个最大的元素，而不是第 k 个不同的元素。
-示例 1: 输入: [3,2,1,5,6,4] 和 k = 2 输出: 5 示例 2: 输入: [3,2,3,1,2,4,5,5,6] 和 k = 4 输出: 4 解题思路  利用快排的思想，当排序到 k 后，停止排序，输出结果  public static int findKthLargest(int[] nums, int k) { fastSort(nums, 0, nums.length - 1); return nums[nums.length - k]; } public static void fastSort(int[] nums, int start, int end) { if (nums.length &amp;lt;= 1) { return; } if (start &amp;gt; end) { return; } if (end &amp;lt; 0 || start &amp;lt; 0 || end &amp;gt; nums.</description>
-    </item>
-    
-    <item>
-      <title>无重复字符的最长子串</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/lengthOfLongestSubstring/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/lengthOfLongestSubstring/</guid>
-      <description>头条重点
-题目 给定一个字符串，请你找出其中不含有重复字符的 最长子串 的长度。
-输入: &amp;quot;abcabcbb&amp;quot; 输出: 3 解释: 因为无重复字符的最长子串是 &amp;quot;abc&amp;quot;，所以其长度为 3。 解题思路  用 Map 记录字符所在位置，当遇到重复字符时，移动 start 指针 替换 Map 中下标，并计算子串长度  public int lengthOfLongestSubstring(String str) { if (str == null || str.length() == 0) return 0; HashMap&amp;lt;Character, Integer&amp;gt; temp = new HashMap&amp;lt;&amp;gt;(); char[] chars = str.toCharArray(); int res = 0, start = 0; for (int i = 0; i &amp;lt; chars.length; i++) { if (temp.containsKey(chars[i])) { start = Math.</description>
-    </item>
-    
-    <item>
-      <title>最大子序和</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/maxSubArray/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/maxSubArray/</guid>
-      <description>头条重点
-题目 给定一个整数数组 nums ，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
-示例: 输入: [-2,1,-3,4,-1,2,1,-5,4], 输出: 6 解释: 连续子数组 [4,-1,2,1] 的和最大，为 6。 进阶: 如果你已经实现复杂度为 O(n) 的解法，尝试使用更为精妙的分治法求解。
-解题思路   动态规划：   \(f(i)=\begin{cases}num[i]&amp;f(i-1)+num[i]num[i]\end{cases}\)    用result[i]保存以数字nums[i]结尾的最大子序和，然后不断更新result数组的最大值即可。总的时间复杂度O(n)
-  public int maxSubArray(int[] nums) { if (nums.length == 0) { return 0; } if (nums.length == 1) { return nums[0]; } int[] res = new int[nums.length]; res[0] = nums[0]; int max = res[0]; for (int i = 1; i &amp;lt; nums.</description>
-    </item>
-    
-    <item>
-      <title>最小栈</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/MinStack/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/MinStack/</guid>
-      <description>头条重点
-题目 设计一个支持 push，pop，top 操作，并能在常数时间内检索到最小元素的栈。
-push(x) &amp;ndash; 将元素 x 推入栈中。 pop() &amp;ndash; 删除栈顶的元素。 top() &amp;ndash; 获取栈顶元素。 getMin() &amp;ndash; 检索栈中的最小元素。
-示例: MinStack minStack = new MinStack(); minStack.push(-2); minStack.push(0); minStack.push(-3); minStack.getMin(); --&amp;gt; 返回 -3. minStack.pop(); minStack.top(); --&amp;gt; 返回 0. minStack.getMin(); --&amp;gt; 返回 -2. 解题思路 class MinStack { /** initialize your data structure here. */ public MinStack() { } private LinkedList&amp;lt;Integer&amp;gt; stack = new LinkedList&amp;lt;&amp;gt;(); private Queue&amp;lt;Integer&amp;gt; minStack = new PriorityQueue&amp;lt;&amp;gt;(); public void push(int x) { stack.</description>
-    </item>
-    
-    <item>
-      <title>最长公共前缀</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/longestCommonPrefix/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/longestCommonPrefix/</guid>
-      <description>题目 编写一个函数来查找字符串数组中的最长公共前缀。
-如果不存在公共前缀，返回空字符串 &amp;ldquo;&amp;quot;。
-示例 1: 输入: [&amp;quot;flower&amp;quot;,&amp;quot;flow&amp;quot;,&amp;quot;flight&amp;quot;] 输出: &amp;quot;fl&amp;quot; 解题思路  找到最短字符串 多个字符串逐个字符比较  public String longestCommonPrefix(String[] strs) { if (strs.length == 0) { return &amp;quot;&amp;quot;; } int minLen = strs[0].length(); for (String str : strs) { minLen = Math.min(minLen, str.length()); } char[][] data = new char[strs.length][minLen]; for (int i = 0; i &amp;lt; strs.length; i++) { char[] chars = strs[i].toCharArray(); System.arraycopy(chars, 0, data[i], 0, minLen); } StringBuilder res = new StringBuilder(); for (int i = 0; i &amp;lt; minLen; i++) { for (int j = 1; j &amp;lt; data.</description>
-    </item>
-    
-    <item>
-      <title>最长连续序列</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/longestConsecutive/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/longestConsecutive/</guid>
-      <description>题目 给定一个未排序的整数数组，找出最长连续序列的长度。
-要求算法的时间复杂度为 O(n)。
-示例: 输入: [100, 4, 200, 1, 3, 2] 输出: 4 解释: 最长连续序列是 [1, 2, 3, 4]。它的长度为 4。 解题思路  用 Set 保存所有数字 遍历数组，查找当前数字之前、之后的数，并计算个数  public static int longestConsecutive(int[] nums) { if (nums.length &amp;lt;= 1) { return nums.length; } Set&amp;lt;Integer&amp;gt; set = new HashSet&amp;lt;&amp;gt;(); for (int num : nums) { set.add(num); } int pre, after, max = 0; for (int num : nums) { int temp = 1; set.</description>
-    </item>
-    
-    <item>
-      <title>最长连续递增序列</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/findLengthOfLCIS/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/findLengthOfLCIS/</guid>
-      <description>题目 给定一个未经排序的整数数组，找到最长且连续的的递增序列。
-示例 1: 输入: [1,3,5,4,7] 输出: 3 解释: 最长连续递增序列是 [1,3,5], 长度为3。 尽管 [1,3,5,7] 也是升序的子序列, 但它不是连续的，因为5和7在原数组里被4隔开。 示例 2: 输入: [2,2,2,2,2] 输出: 1 解释: 最长连续递增序列是 [2], 长度为1。 解题思路  用两个变量记录序列开始和结束的下标 从左到右遍历，如果下一个节点小当前节点则移动 start，否则移动end，并更新 max  public static int findLengthOfLCIS(int[] nums) { if (nums.length == 0) { return 0; } if (nums.length == 1) { return 1; } int start = 0, end = 0; int max = 1; for (int i = 1; i &amp;lt; nums.</description>
-    </item>
-    
-    <item>
-      <title>朋友圈</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/findCircleNum/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/findCircleNum/</guid>
-      <description>朋友圈 头条重点
-题目 班上有 N 名学生。其中有些人是朋友，有些则不是。他们的友谊具有是传递性。如果已知 A 是 B 的朋友，B 是 C 的朋友，那么我们可以认为 A 也是 C 的朋友。所谓的朋友圈，是指所有朋友的集合。
-给定一个 N * N 的矩阵 M，表示班级中学生之间的朋友关系。如果M[i][j] = 1，表示已知第 i 个和 j 个学生互为朋友关系，否则为不知道。你必须输出所有学生中的已知的朋友圈总数。
-示例 1: 输入: [[1,1,0], [1,1,0], [0,0,1]] 输出: 2 说明：已知学生0和学生1互为朋友，他们在一个朋友圈。 第2个学生自己在一个朋友圈。所以返回2。 示例 2: 输入: [[1,1,0], [1,1,1], [0,1,1]] 输出: 1 说明：已知学生0和学生1互为朋友，学生1和学生2互为朋友，所以学生0和学生2也是朋友，所以他们三个在一个朋友圈，返回1。 注意：
- N 在[1,200]的范围内。 对于所有学生，有M[i][i] = 1。 如果有M[i][j] = 1，则有M[j][i] = 1。  解题思路  逐个遍历所有学生，将他所有朋友标记  public int findCircleNum(int[][] M) { if (M.</description>
-    </item>
-    
-    <item>
-      <title>环形链表 II</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/detectCycle/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/detectCycle/</guid>
-      <description>环形链表 II 题目 给定一个链表，返回链表开始入环的第一个节点。 如果链表无环，则返回 null。
-为了表示给定链表中的环，我们使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。 如果 pos 是 -1，则在该链表中没有环。
-解题思路  首先通过快慢指针确定链表是否有环 再使用一个指针从头节点与快慢指针相遇节点同步长前进，最终找到环的入口  public ListNode detectCycle(ListNode head) { ListNode fast = head, slow = head; ListNode meetNode = null; while (fast != null &amp;amp;&amp;amp; fast.next != null) { fast = fast.next.next; slow = slow.next; if (fast == slow) { meetNode = fast; break; } } if (meetNode == null) { return meetNode; } while (head !</description>
-    </item>
-    
-    <item>
-      <title>的平方根</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/mySqrt/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/mySqrt/</guid>
-      <description>头条重点
-题目 实现 int sqrt(int x) 函数。
-计算并返回 x 的平方根，其中 x 是非负整数。
-由于返回类型是整数，结果只保留整数的部分，小数部分将被舍去。
-示例 1: 输入: 4 输出: 2 示例 2: 输入: 8 输出: 2 说明: 8 的平方根是 2.82842...,由于返回类型是整数，小数部分将被舍去。 解题思路  牛顿迭代法：   \(a_{i}=(x/a_{i-1}+a_{i-1})/2\)    public int mySqrt(int x) { double a = 1, diff = 0; do { a = (x / a + a) / 2.0; diff = Math.abs(a * a - x); } while (diff &amp;gt; 0.</description>
-    </item>
-    
-    <item>
-      <title>相交链表</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/getIntersectionNode/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/getIntersectionNode/</guid>
-      <description>题目 编写一个程序，找到两个单链表相交的起始节点。
-解题思路  首先将两个链表中长的一个向前遍历，直到两个链表长度一致 两个链表同时向前遍历，便可找到交点  public ListNode getIntersectionNode(ListNode headA, ListNode headB) { if (headA == null || headB == null) { return null; } if (headA == headB) { return headA; } int lenA = 1; int lenB = 1; ListNode temp = headA; while (temp.next != null) { temp = temp.next; lenA++; } ListNode tailA = temp; temp = headB; while (temp.next != null) { temp = temp.</description>
-    </item>
-    
-    <item>
-      <title>第二高的薪水</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/salary/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/salary/</guid>
-      <description>头条重点
-题目 编写一个 SQL 查询，获取 Employee 表中第二高的薪水（Salary） 。
-+----+--------+ | Id | Salary | +----+--------+ | 1 | 100 | | 2 | 200 | | 3 | 300 | +----+--------+ 例如上述 Employee 表，SQL查询应该返回 200 作为第二高的薪水。如果不存在第二高的薪水，那么查询应返回 null。
-+---------------------+ | SecondHighestSalary | +---------------------+ | 200 | +---------------------+ 解题思路  子查询  select IFNULL((select Distinct Salary from Employee order by Salary DESC limit 1,1),null) as SecondHighestSalary </description>
-    </item>
-    
-    <item>
-      <title>简化路径</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/simplifyPath/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/simplifyPath/</guid>
-      <description>头条重点
-题目 以 Unix 风格给出一个文件的绝对路径，你需要简化它。或者换句话说，将其转换为规范路径。
-在 Unix 风格的文件系统中，一个点（.）表示当前目录本身；此外，两个点 （..） 表示将目录切换到上一级（指向父目录）；两者都可以是复杂相对路径的组成部分。
-请注意，返回的规范路径必须始终以斜杠 / 开头，并且两个目录名之间必须只有一个斜杠 /。最后一个目录名（如果存在）不能以 / 结尾。此外，规范路径必须是表示绝对路径的最短字符串。
-示例 1： 输入：&amp;quot;/home/&amp;quot; 输出：&amp;quot;/home&amp;quot; 解释：注意，最后一个目录名后面没有斜杠。 示例 2： 输入：&amp;quot;/../&amp;quot; 输出：&amp;quot;/&amp;quot; 解释：从根目录向上一级是不可行的，因为根是你可以到达的最高级。 示例 3： 输入：&amp;quot;/home//foo/&amp;quot; 输出：&amp;quot;/home/foo&amp;quot; 解释：在规范路径中，多个连续斜杠需要用一个斜杠替换。 示例 4： 输入：&amp;quot;/a/./b/../../c/&amp;quot; 输出：&amp;quot;/c&amp;quot; 示例 5： 输入：&amp;quot;/a/../../b/../c//.//&amp;quot; 输出：&amp;quot;/c&amp;quot; 示例 6： 输入：&amp;quot;/a//b////c/d//././/..&amp;quot; 输出：&amp;quot;/a/b/c&amp;quot; 解题思路  利用栈的特性，将有效路径名压入 当遇到 .. 时 pop 栈 最后按顺序 pop 组成最终路径  public static String simplifyPath(String path) { ArrayDeque&amp;lt;String&amp;gt; stack = new ArrayDeque&amp;lt;&amp;gt;(); String[] split = path.split(&amp;quot;/&amp;quot;); for (String s : split) { if (s.</description>
-    </item>
-    
-    <item>
-      <title>缓存机制</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/LRUCache/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/LRUCache/</guid>
-      <description>头条重点
-题目 运用你所掌握的数据结构，设计和实现一个 LRU (最近最少使用) 缓存机制。它应该支持以下操作： 获取数据 get 和 写入数据 put 。
-获取数据 get(key) - 如果密钥 (key) 存在于缓存中，则获取密钥的值（总是正数），否则返回 -1。 写入数据 put(key, value) - 如果密钥不存在，则写入其数据值。当缓存容量达到上限时，它应该在写入新数据之前删除最近最少使用的数据值，从而为新的数据值留出空间。
-进阶:
-你是否可以在 O(1) 时间复杂度内完成这两种操作？
-示例: LRUCache cache = new LRUCache( 2 /* 缓存容量 */ ); cache.put(1, 1); cache.put(2, 2); cache.get(1); // 返回 1 cache.put(3, 3); // 该操作会使得密钥 2 作废 cache.get(2); // 返回 -1 (未找到) cache.put(4, 4); // 该操作会使得密钥 1 作废 cache.get(1); // 返回 -1 (未找到) cache.get(3); // 返回 3 cache.</description>
-    </item>
-    
-    <item>
-      <title>编码验证</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/validUtf8/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/validUtf8/</guid>
-      <description>头条重点
-题目 UTF-8 中的一个字符可能的长度为 1 到 4 字节，遵循以下的规则：
- 对于 1 字节的字符，字节的第一位设为0，后面7位为这个符号的unicode码。 对于 n 字节的字符 (n &amp;gt; 1)，第一个字节的前 n 位都设为1，第 n+1 位设为0，后面字节的前两位一律设为10。剩下的没有提及的二进制位，全部为这个符号的unicode码。  这是 UTF-8 编码的工作方式：
- Char. number range | UTF-8 octet sequence (hexadecimal) | (binary) --------------------+--------------------------------------------- 0000 0000-0000 007F | 0xxxxxxx 0000 0080-0000 07FF | 110xxxxx 10xxxxxx 0000 0800-0000 FFFF | 1110xxxx 10xxxxxx 10xxxxxx 0001 0000-0010 FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx 给定一个表示数据的整数数组，返回它是否为有效的 utf-8 编码。
-注意：输入是整数数组。只有每个整数的最低 8 个有效位用来存储数据。这意味着每个整数只表示 1 字节的数据。</description>
-    </item>
-    
-    <item>
-      <title>翻转字符串里的单词</title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/reverseWords/</link>
-      <pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/reverseWords/</guid>
-      <description>题目 给定一个字符串，逐个翻转字符串中的每个单词。
-示例 1： 输入: &amp;quot;the sky is blue&amp;quot; 输出: &amp;quot;blue is sky the&amp;quot; 说明：
- 无空格字符构成一个单词。 输入字符串可以在前面或者后面包含多余的空格，但是反转后的字符不能包括。 如果两个单词间有多余的空格，将反转后单词间的空格减少到只含一个。  解题思路  按空格拆分字符串为字符串数组 t 逆序遍历字符串数组 t，并组成新的字符串  public String reverseWords(String s) { String trimed = s.trim(); String[] split = trimed.split(&amp;quot; &amp;quot;); StringBuilder builder = new StringBuilder(); for (int i = split.length - 1; i &amp;gt;= 0; i--) { String t = split[i]; if (t.trim().isEmpty()) { continue; } builder.append(t).append(&amp;quot; &amp;quot;); } return builder.</description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>https://hadyang.github.io/interview/docs/leetcode/zigzagLevelOrder/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/leetcode/zigzagLevelOrder/</guid>
-      <description></description>
-    </item>
-    
-  </channel>
+	<channel>
+		<title>HadYang技术分享</title>
+		<link>https://hadyang.com/docs/leetcode/</link>
+		<description>Recent content on HadYang技术分享</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<atom:link href="https://hadyang.com/docs/leetcode/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>三数之和</title>
+				<link>https://hadyang.com/docs/leetcode/threeSum/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/threeSum/</guid>
+				<description>&lt;p&gt;&lt;strong&gt;头条重点&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;给定一个包含 &lt;code&gt;n&lt;/code&gt; 个整数的数组 &lt;code&gt;nums&lt;/code&gt; ，判断 &lt;code&gt;nums&lt;/code&gt; 中是否存在三个元素 &lt;code&gt;a，b，c&lt;/code&gt; ，使得 &lt;code&gt;a + b + c = 0&lt;/code&gt; ？找出所有满足条件且不重复的三元组。&lt;/p&gt;&#xA;&lt;p&gt;注意：答案中不可以包含重复的三元组。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;例如, 给定数组 nums = [-1, 0, 1, 2, -1, -4]，&#xA;&#xA;满足要求的三元组集合为：&#xA;[&#xA;  [-1, 0, 1],&#xA;  [-1, -1, 2]&#xA;]&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;将数组排序&lt;/li&gt;&#xA;&lt;li&gt;固定一位数，然后通过两个指针对撞，寻找总和为 0 的三个数&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public static List&amp;lt;List&amp;lt;Integer&amp;gt;&amp;gt; threeSum(int[] nums) {&#xA;    if (nums.length &amp;lt; 3) {&#xA;        return Collections.emptyList();&#xA;    }&#xA;&#xA;    Set&amp;lt;List&amp;lt;Integer&amp;gt;&amp;gt; res = new HashSet&amp;lt;&amp;gt;();&#xA;    Arrays.sort(nums);&#xA;&#xA;    int zCount = 0;&#xA;    for (int num : nums) {&#xA;        if (num == 0) {&#xA;            zCount++;&#xA;        }&#xA;    }&#xA;&#xA;    for (int i = 0; i &amp;lt; nums.length &amp;amp;&amp;amp; nums[i] &amp;lt; 0; i++) {&#xA;        int first = nums[i];&#xA;        int j = i + 1;&#xA;        int k = nums.length - 1;&#xA;        while (j &amp;lt; k) {&#xA;            int t = nums[j] + nums[k] + first;&#xA;            if (t == 0) {&#xA;                List&amp;lt;Integer&amp;gt; list = new ArrayList&amp;lt;&amp;gt;();&#xA;                list.add(first);&#xA;                list.add(nums[j]);&#xA;                list.add(nums[k]);&#xA;&#xA;                res.add(list);&#xA;                j++;&#xA;                k--;&#xA;            } else if (t &amp;gt; 0) {&#xA;                k--;&#xA;            } else {&#xA;                j++;&#xA;            }&#xA;        }&#xA;&#xA;    }&#xA;&#xA;    if (zCount &amp;gt;= 3) {&#xA;        List&amp;lt;Integer&amp;gt; list = new ArrayList&amp;lt;&amp;gt;();&#xA;        list.add(0);&#xA;        list.add(0);&#xA;        list.add(0);&#xA;        res.add(list);&#xA;    }&#xA;    return new ArrayList&amp;lt;&amp;gt;(res);&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>两数相加</title>
+				<link>https://hadyang.com/docs/leetcode/addTwoNumbers/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/addTwoNumbers/</guid>
+				<description>&lt;h1 id=&#34;两数相加&#34;&gt;&lt;a href=&#34;https://leetcode-cn.com/explore/interview/card/bytedance/244/linked-list-and-tree/1022/&#34;&gt;两数相加&lt;/a&gt;&lt;a class=&#34;anchor&#34; href=&#34;#%e4%b8%a4%e6%95%b0%e7%9b%b8%e5%8a%a0&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h1&gt;&#xA;&lt;p&gt;&lt;strong&gt;头条重点&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;给出两个 非空 的链表用来表示两个非负的整数。其中，它们各自的位数是按照 逆序 的方式存储的，并且它们的每个节点只能存储 一位 数字。&lt;/p&gt;&#xA;&lt;p&gt;如果，我们将这两个数相加起来，则会返回一个新的链表来表示它们的和。&lt;/p&gt;&#xA;&lt;p&gt;您可以假设除了数字 0 之外，这两个数都不会以 0 开头。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例：&#xA;&#xA;输入：(2 -&amp;gt; 4 -&amp;gt; 3) + (5 -&amp;gt; 6 -&amp;gt; 4)&#xA;输出：7 -&amp;gt; 0 -&amp;gt; 8&#xA;原因：342 + 465 = 807&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public ListNode addTwoNumbers(ListNode l1, ListNode l2) {&#xA;    if (l1 == null || l2 == null) {&#xA;        return null;&#xA;    }&#xA;&#xA;    StringBuilder builder1 = new StringBuilder();&#xA;    while (l1 != null) {&#xA;        builder1.append(l1.val);&#xA;        l1 = l1.next;&#xA;    }&#xA;&#xA;    StringBuilder builder2 = new StringBuilder();&#xA;    while (l2 != null) {&#xA;        builder2.append(l2.val);&#xA;        l2 = l2.next;&#xA;    }&#xA;&#xA;    BigDecimal bigDecimal1 = new BigDecimal(builder1.reverse().toString());&#xA;    BigDecimal bigDecimal2 = new BigDecimal(builder2.reverse().toString());&#xA;&#xA;    String resStr = bigDecimal1.add(bigDecimal2).toPlainString();&#xA;&#xA;    ListNode head = new ListNode(Integer.parseInt(String.valueOf(resStr.charAt(resStr.length() - 1))));&#xA;    ListNode cur = head;&#xA;    for (int i = resStr.length() - 2; i &amp;gt;= 0; i--) {&#xA;        cur.next = new ListNode(Integer.parseInt(String.valueOf(resStr.charAt(i))));&#xA;        cur = cur.next;&#xA;    }&#xA;&#xA;    return head;&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>买卖股票的最佳时机</title>
+				<link>https://hadyang.com/docs/leetcode/maxProfit/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/maxProfit/</guid>
+				<description>&lt;p&gt;&lt;strong&gt;头条重点&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;给定一个数组，它的第 i 个元素是一支给定股票第 i 天的价格。如果你最多只允许完成一笔交易（即买入和卖出一支股票），设计一个算法来计算你所能获取的最大利润。&lt;/p&gt;&#xA;&lt;p&gt;注意你不能在买入股票前卖出股票。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例 1:&#xA;&#xA;输入: [7,1,5,3,6,4]&#xA;输出: 5&#xA;解释: 在第 2 天（股票价格 = 1）的时候买入，在第 5 天（股票价格 = 6）的时候卖出，最大利润 = 6-1 = 5 。&#xA;     注意利润不能是 7-1 = 6, 因为卖出价格需要大于买入价格。&#xA;示例 2:&#xA;&#xA;输入: [7,6,4,3,1]&#xA;输出: 0&#xA;解释: 在这种情况下, 没有交易完成, 所以最大利润为 0。&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;要先买入才能卖出，先找最低价格点&lt;/li&gt;&#xA;&lt;li&gt;再找最低价格之后的最高价格，用 &lt;code&gt;res&lt;/code&gt; 表示最大利润&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public int maxProfit(int[] prices) {&#xA;    if (prices.length &amp;lt;= 1) {&#xA;        return 0;&#xA;    }&#xA;&#xA;    int res = 0;&#xA;    int minBuy = prices[0];&#xA;    for (int price : prices) {&#xA;        res = Math.max(res, price - minBuy);&#xA;        minBuy = Math.min(minBuy, price);&#xA;    }&#xA;&#xA;    return res;&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>买卖股票的最佳时机</title>
+				<link>https://hadyang.com/docs/leetcode/maxProfit2/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/maxProfit2/</guid>
+				<description>&lt;p&gt;&lt;strong&gt;头条重点&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;给定一个数组，它的第 i 个元素是一支给定股票第 i 天的价格。设计一个算法来计算你所能获取的最大利润。你可以尽可能地完成更多的交易（多次买卖一支股票）。&lt;/p&gt;&#xA;&lt;p&gt;注意：你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例 1:&#xA;&#xA;输入: [7,1,5,3,6,4]&#xA;输出: 7&#xA;解释: 在第 2 天（股票价格 = 1）的时候买入，在第 3 天（股票价格 = 5）的时候卖出, 这笔交易所能获得利润 = 5-1 = 4 。&#xA;     随后，在第 4 天（股票价格 = 3）的时候买入，在第 5 天（股票价格 = 6）的时候卖出, 这笔交易所能获得利润 = 6-3 = 3 。&#xA;示例 2:&#xA;&#xA;输入: [1,2,3,4,5]&#xA;输出: 4&#xA;解释: 在第 1 天（股票价格 = 1）的时候买入，在第 5 天 （股票价格 = 5）的时候卖出, 这笔交易所能获得利润 = 5-1 = 4 。&#xA;     注意你不能在第 1 天和第 2 天接连购买股票，之后再将它们卖出。&#xA;     因为这样属于同时参与了多笔交易，你必须在再次购买前出售掉之前的股票。&#xA;示例 3:&#xA;&#xA;输入: [7,6,4,3,1]&#xA;输出: 0&#xA;解释: 在这种情况下, 没有交易完成, 所以最大利润为 0。&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;贪心算法，尽可能的多进行交易&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public int maxProfit(int[] prices) {&#xA;    if (prices.length &amp;lt;= 1) {&#xA;        return 0;&#xA;    }&#xA;&#xA;    int res = 0;&#xA;    for (int i = 1; i &amp;lt; prices.length; i++) {&#xA;        int profit = prices[i] - prices[i - 1];&#xA;        if (profit &amp;gt; 0) {&#xA;            res += profit;&#xA;        }&#xA;    }&#xA;    return res;&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>二叉树的最近公共祖先</title>
+				<link>https://hadyang.com/docs/leetcode/lowestCommonAncestor/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/lowestCommonAncestor/</guid>
+				<description>&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;给定一个二叉树, 找到该树中两个指定节点的最近公共祖先。&lt;/p&gt;&#xA;&lt;p&gt;百度百科中最近公共祖先的定义为：“对于有根树 T 的两个结点 p、q，最近公共祖先表示为一个结点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大（一个节点也可以是它自己的祖先）。”&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例 1:&#xA;&#xA;输入: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1&#xA;输出: 3&#xA;解释: 节点 5 和节点 1 的最近公共祖先是节点 3。&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;通过 DFS 找到节点的路径&lt;/li&gt;&#xA;&lt;li&gt;从头开始遍历两个节点的路径，找到最后一个相等的节点&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {&#xA;    LinkedList&amp;lt;TreeNode&amp;gt; pathP = new LinkedList&amp;lt;&amp;gt;();&#xA;    LinkedList&amp;lt;TreeNode&amp;gt; pathQ = new LinkedList&amp;lt;&amp;gt;();&#xA;&#xA;    findNodePath(pathP, root, p);&#xA;    findNodePath(pathQ, root, q);&#xA;&#xA;    TreeNode last = null;&#xA;    while (!pathP.isEmpty() &amp;amp;&amp;amp; !pathQ.isEmpty()) {&#xA;        TreeNode pi = pathP.pollFirst();&#xA;        TreeNode qi = pathQ.pollFirst();&#xA;&#xA;        if (qi==pi) {&#xA;            last = pi;&#xA;        }else break;&#xA;&#xA;    }&#xA;&#xA;    return last;&#xA;}&#xA;&#xA;private void findNodePath(LinkedList&amp;lt;TreeNode&amp;gt; path, TreeNode root, TreeNode target) {&#xA;    if (root == null) {&#xA;        return;&#xA;    }&#xA;&#xA;    if (!path.isEmpty() &amp;amp;&amp;amp; path.getLast().val == target.val) {&#xA;        return;&#xA;    }&#xA;&#xA;    path.addLast(root);&#xA;&#xA;    findNodePath(path, root.left, target);&#xA;    if (!path.isEmpty() &amp;amp;&amp;amp; path.getLast().val == target.val) {&#xA;        return;&#xA;    }&#xA;&#xA;    findNodePath(path, root.right, target);&#xA;&#xA;    if (!path.isEmpty() &amp;amp;&amp;amp; path.getLast().val != target.val) {&#xA;        path.removeLast();&#xA;    }&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>全 O(1) 的数据结构</title>
+				<link>https://hadyang.com/docs/leetcode/AllOne/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/AllOne/</guid>
+				<description>&lt;h1 id=&#34;全-o1-的数据结构&#34;&gt;&lt;a href=&#34;https://leetcode-cn.com/explore/interview/card/bytedance/245/data-structure/1033/&#34;&gt;全 O(1) 的数据结构&lt;/a&gt;&lt;a class=&#34;anchor&#34; href=&#34;#%e5%85%a8-o1-%e7%9a%84%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h1&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;实现一个数据结构支持以下操作：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Inc(key) - 插入一个新的值为 1 的 key。或者使一个存在的 key 增加一，保证 key 不为空字符串。&lt;/li&gt;&#xA;&lt;li&gt;Dec(key) - 如果这个 key 的值是 1，那么把他从数据结构中移除掉。否者使一个存在的 key 值减一。如果这个 key 不存在，这个函数不做任何事情。key 保证不为空字符串。&lt;/li&gt;&#xA;&lt;li&gt;GetMaxKey() - 返回 key 中值最大的任意一个。如果没有元素存在，返回一个空字符串&amp;quot;&amp;quot;。&lt;/li&gt;&#xA;&lt;li&gt;GetMinKey() - 返回 key 中值最小的任意一个。如果没有元素存在，返回一个空字符串&amp;quot;&amp;quot;。&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;挑战：以 O(1) 的时间复杂度实现所有操作。&lt;/p&gt;&#xA;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;设计一个 &lt;code&gt;Bucket&lt;/code&gt; 保存所有值为 &lt;code&gt;value&lt;/code&gt; 的 &lt;code&gt;key&lt;/code&gt;&lt;/li&gt;&#xA;&lt;li&gt;并且有临近 &lt;code&gt;value&lt;/code&gt; 的 &lt;code&gt;Bucket&lt;/code&gt; 指针&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;class AllOne {&#xA;&#xA;    /** Initialize your data structure here. */&#xA;    public AllOne() {&#xA;&#xA;    }&#xA;&#xA;    private static class Bucket {&#xA;        private int value;&#xA;        private Set&amp;lt;String&amp;gt; keys = new HashSet&amp;lt;&amp;gt;();&#xA;        private Bucket next;&#xA;        private Bucket pre;&#xA;&#xA;        public Bucket(int value) {&#xA;            this.value = value;&#xA;        }&#xA;&#xA;        @Override&#xA;        public String toString() {&#xA;            return &amp;#34;Bucket{&amp;#34; +&#xA;                    &amp;#34;value=&amp;#34; + value +&#xA;                    &amp;#34;, keys=&amp;#34; + keys +&#xA;                    &amp;#39;}&amp;#39;;&#xA;        }&#xA;    }&#xA;&#xA;    private Map&amp;lt;String, Bucket&amp;gt; data = new HashMap&amp;lt;&amp;gt;();&#xA;    private List&amp;lt;Bucket&amp;gt; bucketList = new ArrayList&amp;lt;&amp;gt;();&#xA;&#xA;    /**&#xA;     * Inserts a new key &amp;lt;Key&amp;gt; with value 1. Or increments an existing key by 1.&#xA;     */&#xA;    public void inc(String key) {&#xA;        if (data.containsKey(key)) {&#xA;            Bucket bucket = data.get(key);&#xA;            bucket.keys.remove(key);&#xA;&#xA;            if (bucket.next == null) {&#xA;                bucket.next = new Bucket(bucket.value + 1);&#xA;                bucket.next.pre = bucket;&#xA;                bucketList.add(bucket.next);&#xA;            }&#xA;&#xA;            bucket.next.keys.add(key);&#xA;            data.put(key, bucket.next);&#xA;        } else {&#xA;            if (bucketList.size() == 0) {&#xA;                bucketList.add(new Bucket(1));&#xA;            }&#xA;&#xA;            Bucket bucket = bucketList.get(0);&#xA;            bucket.keys.add(key);&#xA;            data.put(key, bucket);&#xA;        }&#xA;    }&#xA;&#xA;    /**&#xA;     * Decrements an existing key by 1. If Key&amp;#39;s value is 1, remove it from the data structure.&#xA;     */&#xA;    public void dec(String key) {&#xA;        if (!data.containsKey(key)) {&#xA;            return;&#xA;        }&#xA;&#xA;        Bucket bucket = data.get(key);&#xA;        if (bucket.pre == null) {&#xA;            bucket.keys.remove(key);&#xA;            data.remove(key);&#xA;        } else {&#xA;            bucket.keys.remove(key);&#xA;            bucket.pre.keys.add(key);&#xA;            data.put(key, bucket.pre);&#xA;        }&#xA;    }&#xA;&#xA;    /**&#xA;     * Returns one of the keys with maximal value.&#xA;     */&#xA;    public String getMaxKey() {&#xA;        if (bucketList.size() == 0) {&#xA;            return &amp;#34;&amp;#34;;&#xA;        }&#xA;&#xA;        for (int i = bucketList.size() - 1; i &amp;gt;= 0; i--) {&#xA;            Bucket bucket = bucketList.get(i);&#xA;&#xA;            if (!bucket.keys.isEmpty()) {&#xA;                Iterator&amp;lt;String&amp;gt; iterator = bucket.keys.iterator();&#xA;                if (iterator.hasNext()) {&#xA;                    return iterator.next();&#xA;                } else {&#xA;                    return &amp;#34;&amp;#34;;&#xA;                }&#xA;            }&#xA;        }&#xA;&#xA;        return &amp;#34;&amp;#34;;&#xA;    }&#xA;&#xA;    /**&#xA;     * Returns one of the keys with Minimal value.&#xA;     */&#xA;    public String getMinKey() {&#xA;        if (bucketList.size() == 0) {&#xA;            return &amp;#34;&amp;#34;;&#xA;        }&#xA;&#xA;        for (Bucket bucket : bucketList) {&#xA;            if (!bucket.keys.isEmpty()) {&#xA;                Iterator&amp;lt;String&amp;gt; iterator = bucket.keys.iterator();&#xA;                if (iterator.hasNext()) {&#xA;                    return iterator.next();&#xA;                } else {&#xA;                    return &amp;#34;&amp;#34;;&#xA;                }&#xA;            }&#xA;        }&#xA;&#xA;        return &amp;#34;&amp;#34;;&#xA;    }&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>反转链表</title>
+				<link>https://hadyang.com/docs/leetcode/reverseList/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/reverseList/</guid>
+				<description>&lt;p&gt;&lt;strong&gt;头条重点&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;反转一个单链表。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例:&#xA;&#xA;输入: 1-&amp;gt;2-&amp;gt;3-&amp;gt;4-&amp;gt;5-&amp;gt;NULL&#xA;输出: 5-&amp;gt;4-&amp;gt;3-&amp;gt;2-&amp;gt;1-&amp;gt;NULL&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;三个指针进行反转&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public ListNode reverseList(ListNode head) {&#xA;    if (head == null) {&#xA;        return head;&#xA;    }&#xA;&#xA;    if (head.next == null) {&#xA;        return head;&#xA;    }&#xA;&#xA;    ListNode pre = head;&#xA;    ListNode cur = head.next;&#xA;&#xA;    while (cur != null) {&#xA;        ListNode next = cur.next;&#xA;        cur.next = pre;&#xA;&#xA;        pre = cur;&#xA;        cur = next;&#xA;    }&#xA;&#xA;    head.next = null;&#xA;&#xA;    return pre;&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>合并</title>
+				<link>https://hadyang.com/docs/leetcode/mergeKLists/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/mergeKLists/</guid>
+				<description>&lt;p&gt;&lt;strong&gt;头条重点&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;合并 k 个排序链表，返回合并后的排序链表。请分析和描述算法的复杂度。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例:&#xA;&#xA;输入:&#xA;[&#xA;  1-&amp;gt;4-&amp;gt;5,&#xA;  1-&amp;gt;3-&amp;gt;4,&#xA;  2-&amp;gt;6&#xA;]&#xA;输出: 1-&amp;gt;1-&amp;gt;2-&amp;gt;3-&amp;gt;4-&amp;gt;4-&amp;gt;5-&amp;gt;6&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;通过小根堆，将所有元素放入小根堆&lt;/li&gt;&#xA;&lt;li&gt;从小根堆依次取出数据&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public ListNode mergeKLists(ListNode[] lists) {&#xA;    if (lists == null) {&#xA;        return null;&#xA;    }&#xA;&#xA;    Queue&amp;lt;ListNode&amp;gt; set = new PriorityQueue&amp;lt;&amp;gt;(Comparator.comparingInt(o -&amp;gt; o.val));&#xA;&#xA;    for (ListNode node : lists) {&#xA;        while (node != null) {&#xA;            set.add(node);&#xA;            node = node.next;&#xA;        }&#xA;    }&#xA;&#xA;    ListNode head = new ListNode(-1);&#xA;    ListNode res = head;&#xA;    ListNode cur;&#xA;    while ((cur = set.poll()) != null) {&#xA;        head.next = cur;&#xA;        head = head.next;&#xA;    }&#xA;&#xA;    head.next = null;&#xA;    return res.next;&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>合并两个有序链表</title>
+				<link>https://hadyang.com/docs/leetcode/mergeTwoLists/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/mergeTwoLists/</guid>
+				<description>&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;将两个有序链表合并为一个新的有序链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例：&#xA;&#xA;输入：1-&amp;gt;2-&amp;gt;4, 1-&amp;gt;3-&amp;gt;4&#xA;输出：1-&amp;gt;1-&amp;gt;2-&amp;gt;3-&amp;gt;4-&amp;gt;4&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public ListNode mergeTwoLists(ListNode l1, ListNode l2) {&#xA;    if (l1 == null &amp;amp;&amp;amp; l2 == null) {&#xA;        return null;&#xA;    }&#xA;&#xA;    if (l1 == null) {&#xA;        return l2;&#xA;    }&#xA;&#xA;    if (l2 == null) {&#xA;        return l1;&#xA;    }&#xA;&#xA;    ListNode head;&#xA;&#xA;    if (l1.val &amp;gt; l2.val) {&#xA;        head = l2;&#xA;        l2 = l2.next;&#xA;    } else {&#xA;        head = l1;&#xA;        l1 = l1.next;&#xA;    }&#xA;&#xA;    ListNode res = head;&#xA;    while (true) {&#xA;        ListNode cur;&#xA;        if (l1 == null &amp;amp;&amp;amp; l2 == null) {&#xA;            break;&#xA;        }&#xA;&#xA;        if (l1 == null) {&#xA;            cur = l2;&#xA;            l2 = l2.next;&#xA;        } else if (l2 == null) {&#xA;            cur = l1;&#xA;            l1 = l1.next;&#xA;        } else if (l1.val &amp;gt; l2.val) {&#xA;            cur = l2;&#xA;            l2 = l2.next;&#xA;        } else {&#xA;            cur = l1;&#xA;            l1 = l1.next;&#xA;        }&#xA;&#xA;        head.next = cur;&#xA;        head = head.next;&#xA;    }&#xA;&#xA;    return res;&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>合并区间</title>
+				<link>https://hadyang.com/docs/leetcode/mergeRagen/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/mergeRagen/</guid>
+				<description>&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;给出一个区间的集合，请合并所有重叠的区间。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例 1:&#xA;&#xA;输入: [[1,3],[2,6],[8,10],[15,18]]&#xA;输出: [[1,6],[8,10],[15,18]]&#xA;解释: 区间 [1,3] 和 [2,6] 重叠, 将它们合并为 [1,6].&#xA;示例 2:&#xA;&#xA;输入: [[1,4],[4,5]]&#xA;输出: [[1,5]]&#xA;解释: 区间 [1,4] 和 [4,5] 可被视为重叠区间。&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;将区间按起始地址排序&lt;/li&gt;&#xA;&lt;li&gt;遍历所有区间，如果 &lt;code&gt;Last&lt;/code&gt; 与当前区间没有重合，则将当前区间加入结果集合。&lt;/li&gt;&#xA;&lt;li&gt;如果重合，并且 &lt;code&gt;last.end &amp;lt; t.end&lt;/code&gt;，修改 &lt;code&gt;Last&lt;/code&gt; 的边界&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public List&amp;lt;Interval&amp;gt; merge(List&amp;lt;Interval&amp;gt; intervals) {&#xA;    if (intervals.size() &amp;lt;= 1) {&#xA;        return intervals;&#xA;    }&#xA;&#xA;    intervals.sort(Comparator.comparingInt(o -&amp;gt; o.start));&#xA;&#xA;    List&amp;lt;Interval&amp;gt; res = new ArrayList&amp;lt;&amp;gt;();&#xA;    res.add(intervals.get(0));&#xA;&#xA;    for (int i = 1; i &amp;lt; intervals.size(); i++) {&#xA;        Interval t = intervals.get(i);&#xA;        Interval last = res.get(res.size() - 1);&#xA;        if (last.end &amp;gt;= t.start) {&#xA;            if (last.end &amp;lt; t.end) last.end = t.end;&#xA;        } else {&#xA;            res.add(t);&#xA;        }&#xA;    }&#xA;&#xA;    return res;&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>复原</title>
+				<link>https://hadyang.com/docs/leetcode/restoreIpAddresses/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/restoreIpAddresses/</guid>
+				<description>&lt;p&gt;&lt;strong&gt;头条重点&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;给定一个只包含数字的字符串，复原它并返回所有可能的 IP 地址格式。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例:&#xA;&#xA;输入: &amp;#34;25525511135&amp;#34;&#xA;输出: [&amp;#34;255.255.11.135&amp;#34;, &amp;#34;255.255.111.35&amp;#34;]&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;利用回溯法，遍历所有可能的 IP&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public static List&amp;lt;String&amp;gt; restoreIpAddresses(String s) {&#xA;    if (s.length() &amp;gt; 12 || s.length() &amp;lt; 4) {&#xA;        return Collections.emptyList();&#xA;    }&#xA;&#xA;    List&amp;lt;String&amp;gt; res = new ArrayList&amp;lt;&amp;gt;();&#xA;    ArrayList&amp;lt;String&amp;gt; ip = new ArrayList&amp;lt;&amp;gt;();&#xA;    for (int i = 0; i &amp;lt; 4; i++) {&#xA;        ip.add(&amp;#34;&amp;#34;);&#xA;    }&#xA;    p(res, s.toCharArray(), 0, ip, 0);&#xA;&#xA;    return res;&#xA;}&#xA;&#xA;private static void p(List&amp;lt;String&amp;gt; res, char[] chars, int startIndex, List&amp;lt;String&amp;gt; ip, int segmentIndex) {&#xA;    StringBuilder builder = new StringBuilder();&#xA;    for (int i = startIndex; i &amp;lt; chars.length; i++) {&#xA;        builder.append(chars[i]);&#xA;        String ipStr = builder.toString();&#xA;        int parseInt = Integer.parseInt(ipStr);&#xA;        if (parseInt &amp;gt; 255) {&#xA;            return;&#xA;        }&#xA;        if (ipStr.length() &amp;gt; 1 &amp;amp;&amp;amp; ipStr.startsWith(&amp;#34;0&amp;#34;)) {&#xA;            return;&#xA;        }&#xA;&#xA;        ip.set(segmentIndex, ipStr);&#xA;        if (segmentIndex == 3 &amp;amp;&amp;amp; i == chars.length - 1) {&#xA;            res.add(String.join(&amp;#34;.&amp;#34;, ip));&#xA;        }&#xA;&#xA;        if (segmentIndex &amp;lt; 3) {&#xA;            p(res, chars, i + 1, ip, segmentIndex + 1);&#xA;        }&#xA;    }&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>字符串的排列</title>
+				<link>https://hadyang.com/docs/leetcode/checkInclusion/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/checkInclusion/</guid>
+				<description>&lt;h1 id=&#34;字符串的排列&#34;&gt;&lt;a href=&#34;https://leetcode-cn.com/explore/interview/card/bytedance/242/string/1016/&#34;&gt;字符串的排列&lt;/a&gt;&lt;a class=&#34;anchor&#34; href=&#34;#%e5%ad%97%e7%ac%a6%e4%b8%b2%e7%9a%84%e6%8e%92%e5%88%97&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h1&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;给定两个字符串 s1 和 s2，写一个函数来判断 s2 是否包含 s1 的排列。&lt;/p&gt;&#xA;&lt;p&gt;换句话说，第一个字符串的排列之一是第二个字符串的子串。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例1:&#xA;&#xA;输入: s1 = &amp;#34;ab&amp;#34; s2 = &amp;#34;eidbaooo&amp;#34;&#xA;输出: True&#xA;解释: s2 包含 s1 的排列之一 (&amp;#34;ba&amp;#34;).&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;这道题，我们用到的算法是 &lt;strong&gt;滑动窗口&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;首先字符串s1的排列的可能性应该是它的长度的阶乘，因为字符串长度可能为10000，所以找出所有排列情况是不太可能。&lt;/li&gt;&#xA;&lt;li&gt;我们可以转换思路，&lt;strong&gt;不要关注排列的形式，而是关注排列中元素的数量关系&lt;/strong&gt;&lt;/li&gt;&#xA;&lt;li&gt;比如 &lt;code&gt;aab&lt;/code&gt;，那么，转换为数量关系就是&lt;code&gt;{a:2,b:1}&lt;/code&gt;，因为 S1 长度为 3，所以我们的窗口长度也为3&lt;/li&gt;&#xA;&lt;li&gt;如果我们在 S2 的找到了这样一个窗口符合出现 &lt;code&gt;a&lt;/code&gt; 的次数是两个， &lt;code&gt;b&lt;/code&gt; 是一个，那么 S2 就是包含 S1 的排列的&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public boolean checkInclusion(String s1, String s2) {&#xA;    int len1 = s1.length();&#xA;    int len2 = s2.length();&#xA;    int[] c1 = new int[26];&#xA;    int[] c2 = new int[26];&#xA;&#xA;    for (char c : s1.toCharArray()) {&#xA;        c1[c - &amp;#39;a&amp;#39;]++;&#xA;    }&#xA;&#xA;    for (int i = 0; i &amp;lt; len2; i++) {&#xA;        if (i &amp;gt;= len1)&#xA;            --c2[s2.charAt(i - len1) - &amp;#39;a&amp;#39;];//先把坐标查过的减掉&#xA;        c2[s2.charAt(i) - &amp;#39;a&amp;#39;]++;&#xA;        if (Arrays.equals(c1, c2))&#xA;            return true;&#xA;    }&#xA;&#xA;    return false;&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>字符串相乘</title>
+				<link>https://hadyang.com/docs/leetcode/StringMultiply/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/StringMultiply/</guid>
+				<description>&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;给定两个以字符串形式表示的非负整数 &lt;code&gt;num1&lt;/code&gt; 和 &lt;code&gt;num2&lt;/code&gt;，返回 &lt;code&gt;num1&lt;/code&gt; 和 &lt;code&gt;num2&lt;/code&gt; 的乘积，它们的乘积也表示为字符串形式。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例 1:&#xA;&#xA;输入: num1 = &amp;#34;2&amp;#34;, num2 = &amp;#34;3&amp;#34;&#xA;输出: &amp;#34;6&amp;#34;&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;&#xA;&lt;li&gt;num1 和 num2 的长度小于110。&lt;/li&gt;&#xA;&lt;li&gt;num1 和 num2 只包含数字 0-9。&lt;/li&gt;&#xA;&lt;li&gt;num1 和 num2 均不以零开头，除非是数字 0 本身。&lt;/li&gt;&#xA;&lt;li&gt;不能使用任何标准库的大数类型（比如 BigInteger）或直接将输入转换为整数来处理。&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;对于字符串 &lt;code&gt;num2&lt;/code&gt; 中的每一位数与字符串 &lt;code&gt;num1&lt;/code&gt; 相乘所得的结果，不再分开计算最后相加，而是先全部累加，最后再考虑进位的影响。&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;对于最终结果的第&lt;code&gt;i + j&lt;/code&gt;位数，可以由 &lt;code&gt;num1&lt;/code&gt; 数组的第 &lt;code&gt;i&lt;/code&gt; 位数和 &lt;code&gt;num2&lt;/code&gt; 数组的第 &lt;code&gt;j&lt;/code&gt; 位数组成。&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public String multiply(String num1, String num2) {&#xA;    if (num1.length() == 0 || num2.length() == 0) {&#xA;        return ZEO;&#xA;    }&#xA;&#xA;    if (num1.equals(ZEO) || num2.equals(ZEO)) {&#xA;        return ZEO;&#xA;    }&#xA;&#xA;    if (num1.equals(ONE)) {&#xA;        return num2;&#xA;    }&#xA;&#xA;    if (num2.equals(ONE)) {&#xA;        return num1;&#xA;    }&#xA;&#xA;    int[] num = new int[num1.length() + num2.length() - 1];&#xA;    Arrays.fill(num, 0);&#xA;    for (int i = 0; i &amp;lt; num1.length(); i++) {&#xA;        for (int j = 0; j &amp;lt; num2.length(); j++) {&#xA;            num[i + j] += (num1.charAt(i) - &amp;#39;0&amp;#39;) * (num2.charAt(j) - &amp;#39;0&amp;#39;);&#xA;        }&#xA;    }&#xA;&#xA;    StringBuilder res = new StringBuilder();&#xA;    int addIn = 0;&#xA;    for (int i = num.length - 1; i &amp;gt;= 0; i--) {&#xA;        int t = num[i] + addIn;&#xA;        addIn = t / 10;&#xA;        res.append(t % 10);&#xA;    }&#xA;&#xA;    if (addIn &amp;gt; 0) {&#xA;        res.append(addIn);&#xA;    }&#xA;    return res.reverse().toString();&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>岛屿的最大面积</title>
+				<link>https://hadyang.com/docs/leetcode/maxAreaOfIsland/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/maxAreaOfIsland/</guid>
+				<description>&lt;p&gt;&lt;strong&gt;头条重点&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;给定一个包含了一些 0 和 1的非空二维数组 &lt;code&gt;grid&lt;/code&gt; , 一个 岛屿 是由四个方向 (水平或垂直) 的 1 (代表土地) 构成的组合。你可以假设二维矩阵的四个边缘都被水包围着。&lt;/p&gt;&#xA;&lt;p&gt;找到给定的二维数组中最大的岛屿面积。(如果没有岛屿，则返回面积为0。)&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例 1:&#xA;&#xA;[[0,0,1,0,0,0,0,1,0,0,0,0,0],&#xA; [0,0,0,0,0,0,0,1,1,1,0,0,0],&#xA; [0,1,1,0,1,0,0,0,0,0,0,0,0],&#xA; [0,1,0,0,1,1,0,0,1,0,1,0,0],&#xA; [0,1,0,0,1,1,0,0,1,1,1,0,0],&#xA; [0,0,0,0,0,0,0,0,0,0,1,0,0],&#xA; [0,0,0,0,0,0,0,1,1,1,0,0,0],&#xA; [0,0,0,0,0,0,0,1,1,0,0,0,0]]&#xA;对于上面这个给定矩阵应返回 6。注意答案不应该是11，因为岛屿只能包含水平或垂直的四个方向的‘1’。&#xA;&#xA;示例 2:&#xA;&#xA;[[0,0,0,0,0,0,0,0]]&#xA;对于上面这个给定的矩阵, 返回 0。&#xA;&#xA;注意: 给定的矩阵 grid 的长度和宽度都不超过 50。&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;通过循环遍历，找到 &lt;code&gt;1&lt;/code&gt;&lt;/li&gt;&#xA;&lt;li&gt;再通过递归遍历该 &lt;code&gt;1&lt;/code&gt; 临近的所有 &lt;code&gt;1&lt;/code&gt;，并计算总面积&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;private static int[][] steps = new int[][]{{1, 0}, {0, 1}, {-1, 0}, {0, -1}};&#xA;&#xA;/**&#xA; * 上学时做过，属于图的 DFS&#xA; * @param grid&#xA; * @return&#xA; */&#xA;public static int maxAreaOfIsland(int[][] grid) {&#xA;    if (grid.length == 0) {&#xA;        return 0;&#xA;    }&#xA;&#xA;    int[][] marks = new int[grid.length][grid[0].length];&#xA;    for (int[] mark : marks) {&#xA;        Arrays.fill(mark, 0);&#xA;    }&#xA;&#xA;    Wrapper&amp;lt;Integer&amp;gt; maxArea = new Wrapper&amp;lt;&amp;gt;(0);&#xA;&#xA;    for (int i = 0; i &amp;lt; grid.length; i++) {&#xA;        for (int j = 0; j &amp;lt; grid[i].length; j++) {&#xA;            p(grid, marks, i, j, new Wrapper&amp;lt;&amp;gt;(0), maxArea);&#xA;        }&#xA;    }&#xA;    return maxArea.v;&#xA;}&#xA;&#xA;private static void p(int[][] grid, int[][] mark,&#xA;                      int i, int j, Wrapper&amp;lt;Integer&amp;gt; curArea,&#xA;                      Wrapper&amp;lt;Integer&amp;gt; maxArea) {&#xA;    if (i &amp;lt; 0 || j &amp;lt; 0 || i &amp;gt;= grid.length || j &amp;gt;= grid[0].length) {&#xA;        return;&#xA;    }&#xA;&#xA;    if (grid[i][j] == 1 &amp;amp;&amp;amp; mark[i][j] == 0) {&#xA;        curArea.v++;&#xA;        maxArea.v = Math.max(maxArea.v, curArea.v);&#xA;    } else {&#xA;        return;&#xA;    }&#xA;&#xA;    for (int[] step : steps) {&#xA;        mark[i][j] = 1;&#xA;        p(grid, mark, i + step[0], j + step[1], curArea, maxArea);&#xA;//            mark[i][j] = 0;&#xA;    }&#xA;&#xA;}&#xA;&#xA;private static final class Wrapper&amp;lt;V&amp;gt; {&#xA;    V v;&#xA;&#xA;    public Wrapper(V v) {&#xA;        this.v = v;&#xA;    }&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>排序链表</title>
+				<link>https://hadyang.com/docs/leetcode/sortList/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/sortList/</guid>
+				<description>&lt;p&gt;&lt;strong&gt;头条重点&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;在 O(n log n) 时间复杂度和常数级空间复杂度下，对链表进行排序。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例 1:&#xA;&#xA;输入: 4-&amp;gt;2-&amp;gt;1-&amp;gt;3&#xA;输出: 1-&amp;gt;2-&amp;gt;3-&amp;gt;4&#xA;示例 2:&#xA;&#xA;输入: -1-&amp;gt;5-&amp;gt;3-&amp;gt;4-&amp;gt;0&#xA;输出: -1-&amp;gt;0-&amp;gt;3-&amp;gt;4-&amp;gt;5&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;通过快慢指针将链表拆分&lt;/li&gt;&#xA;&lt;li&gt;递归进行拆分，再通过合并两个排序链表的方式进行合并&lt;/li&gt;&#xA;&lt;li&gt;类似于归并排序&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public ListNode sortList(ListNode head) {&#xA;    if (head == null || head.next == null) {&#xA;        return head;&#xA;    }&#xA;&#xA;    ListNode slow = head, fast = head;&#xA;    while (fast.next != null &amp;amp;&amp;amp; fast.next.next != null) {&#xA;        fast = fast.next.next;&#xA;        slow = slow.next;&#xA;    }&#xA;&#xA;    ListNode mid = slow.next;&#xA;    slow.next = null;&#xA;&#xA;    ListNode l1 = sortList(head);&#xA;    ListNode l2 = sortList(mid);&#xA;&#xA;    return merge(l1, l2);&#xA;}&#xA;&#xA;private ListNode merge(ListNode l1, ListNode l2) {&#xA;    if (l1 == null) {&#xA;        return l2;&#xA;    }&#xA;&#xA;    if (l2 == null) {&#xA;        return l1;&#xA;    }&#xA;&#xA;    ListNode head,res;&#xA;    if (l1.val &amp;gt; l2.val) {&#xA;        head = l2;&#xA;        l2 = l2.next;&#xA;    } else {&#xA;        head = l1;&#xA;        l1 = l1.next;&#xA;    }&#xA;    res = head;&#xA;//        head.next = null;&#xA;&#xA;    while (l1 != null || l2 != null) {&#xA;        if (l1 == null) {&#xA;            head.next = l2;&#xA;            l2 = l2.next;&#xA;        } else if (l2 == null) {&#xA;            head.next = l1;&#xA;            l1 = l1.next;&#xA;        } else {&#xA;            if (l1.val &amp;gt; l2.val) {&#xA;                head.next = l2;&#xA;                l2 = l2.next;&#xA;            } else {&#xA;                head.next = l1;&#xA;                l1 = l1.next;&#xA;            }&#xA;        }&#xA;        head = head.next;&#xA;    }&#xA;&#xA;    return res;&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>接雨水</title>
+				<link>https://hadyang.com/docs/leetcode/trap/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/trap/</guid>
+				<description>&lt;p&gt;&lt;strong&gt;头条重点&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;assists/trap.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;&#xA;&lt;p&gt;上面是由数组 [0,1,0,2,1,0,1,3,2,1,2,1] 表示的高度图，在这种情况下，可以接 6 个单位的雨水（蓝色部分表示雨水）。 感谢 Marcos 贡献此图。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例:&#xA;&#xA;输入: [0,1,0,2,1,0,1,3,2,1,2,1]&#xA;输出: 6&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;首先找到最高点，然后从首尾向中间遍历，找到局部高点，然后就可以计算总量&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public int trap(int[] height) {&#xA;    if (height.length &amp;lt;= 2) {&#xA;        return 0;&#xA;    }&#xA;&#xA;    int max = 0, maxIndex = 0;&#xA;    for (int i = 0; i &amp;lt; height.length; i++) {&#xA;        if (height[i] &amp;gt; max) {&#xA;            max = height[i];&#xA;            maxIndex = i;&#xA;        }&#xA;    }&#xA;&#xA;    int total = 0;&#xA;    int topIndex = 0;//局部最高点&#xA;    for (int i = 0; i &amp;lt; maxIndex; i++) {&#xA;        if (height[topIndex] &amp;lt; height[i]) {&#xA;            topIndex = i;&#xA;        } else {&#xA;            total += height[topIndex] - height[i];&#xA;        }&#xA;    }&#xA;&#xA;    topIndex = height.length - 1;&#xA;    for (int i = height.length - 1; i &amp;gt; maxIndex; i--) {&#xA;        if (height[topIndex] &amp;lt; height[i]) {&#xA;            topIndex = i;&#xA;        } else {&#xA;            total += height[topIndex] - height[i];&#xA;        }&#xA;    }&#xA;&#xA;&#xA;    return total;&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>搜索旋转排序数组</title>
+				<link>https://hadyang.com/docs/leetcode/searchRote/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/searchRote/</guid>
+				<description>&lt;p&gt;&lt;strong&gt;头条重点&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;假设按照升序排序的数组在预先未知的某个点上进行了旋转。( 例如，数组 &lt;code&gt;[0,1,2,4,5,6,7]&lt;/code&gt; 可能变为 &lt;code&gt;[4,5,6,7,0,1,2]&lt;/code&gt; )。&lt;/p&gt;&#xA;&lt;p&gt;搜索一个给定的目标值，如果数组中存在这个目标值，则返回它的索引，否则返回 -1 。&lt;/p&gt;&#xA;&lt;p&gt;你可以假设数组中不存在重复的元素。&lt;/p&gt;&#xA;&lt;p&gt;你的算法时间复杂度必须是 O(log n) 级别。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例 1:&#xA;&#xA;输入: nums = [4,5,6,7,0,1,2], target = 0&#xA;输出: 4&#xA;示例 2:&#xA;&#xA;输入: nums = [4,5,6,7,0,1,2], target = 3&#xA;输出: -1&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;旋转数组是分为两段有序，主要得注意 &lt;code&gt;mid&lt;/code&gt; 落在哪个段上&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public static int search(int[] nums, int target) {&#xA;    int start = 0, end = nums.length - 1;&#xA;&#xA;    while (start &amp;lt;= end) {&#xA;        int mid = (start + end) / 2;&#xA;        if (nums[mid]==target) return mid;&#xA;&#xA;        if (nums[mid] &amp;gt;= nums[start]) {&#xA;            if (target &amp;lt; nums[mid] &amp;amp;&amp;amp; target &amp;gt;= nums[start]) {&#xA;                end = mid - 1;&#xA;            } else {&#xA;                start = mid + 1;&#xA;            }&#xA;&#xA;        }&#xA;&#xA;        if (nums[mid] &amp;lt;= nums[end]) {&#xA;            if (target &amp;gt; nums[mid] &amp;amp;&amp;amp; target &amp;lt;= nums[end]) {&#xA;                start = mid + 1;&#xA;            } else {&#xA;                end = mid - 1;&#xA;            }&#xA;        }&#xA;    }&#xA;&#xA;    return -1;&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>数组中的第K个最大元素</title>
+				<link>https://hadyang.com/docs/leetcode/findKthLargest/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/findKthLargest/</guid>
+				<description>&lt;h1 id=&#34;数组中的第k个最大元素&#34;&gt;&lt;a href=&#34;https://leetcode-cn.com/explore/interview/card/bytedance/243/array-and-sorting/1018/&#34;&gt;数组中的第K个最大元素&lt;/a&gt;&lt;a class=&#34;anchor&#34; href=&#34;#%e6%95%b0%e7%bb%84%e4%b8%ad%e7%9a%84%e7%ac%ack%e4%b8%aa%e6%9c%80%e5%a4%a7%e5%85%83%e7%b4%a0&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h1&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;在未排序的数组中找到第 k 个最大的元素。请注意，你需要找的是数组排序后的第 k 个最大的元素，而不是第 k 个不同的元素。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例 1:&#xA;&#xA;输入: [3,2,1,5,6,4] 和 k = 2&#xA;输出: 5&#xA;示例 2:&#xA;&#xA;输入: [3,2,3,1,2,4,5,5,6] 和 k = 4&#xA;输出: 4&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;利用快排的思想，当排序到 &lt;code&gt;k&lt;/code&gt; 后，停止排序，输出结果&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public static int findKthLargest(int[] nums, int k) {&#xA;    fastSort(nums, 0, nums.length - 1);&#xA;    return nums[nums.length - k];&#xA;}&#xA;&#xA;public static void fastSort(int[] nums, int start, int end) {&#xA;    if (nums.length &amp;lt;= 1) {&#xA;        return;&#xA;    }&#xA;&#xA;    if (start &amp;gt; end) {&#xA;        return;&#xA;    }&#xA;&#xA;    if (end &amp;lt; 0 || start &amp;lt; 0 || end &amp;gt; nums.length - 1 || start &amp;gt; nums.length - 1) {&#xA;        return;&#xA;    }&#xA;&#xA;    int left = start, right = end;&#xA;    int keyIndex = (left + right) / 2;&#xA;&#xA;    while (left &amp;lt; right) {&#xA;        while (right &amp;gt; keyIndex &amp;amp;&amp;amp; nums[right] &amp;gt; nums[keyIndex]) {&#xA;            right--;&#xA;        }&#xA;&#xA;        if (right &amp;gt; keyIndex) {&#xA;            swap(nums, keyIndex, right);&#xA;            keyIndex = right;&#xA;        }&#xA;&#xA;        while (left &amp;lt; keyIndex &amp;amp;&amp;amp; nums[left] &amp;lt; nums[keyIndex]) {&#xA;            left++;&#xA;        }&#xA;&#xA;        if (left &amp;lt; keyIndex) {&#xA;            swap(nums, left, keyIndex);&#xA;            keyIndex = left;&#xA;        }&#xA;        left++;&#xA;    }&#xA;&#xA;    fastSort(nums, keyIndex + 1, end);&#xA;    fastSort(nums, start, keyIndex - 1);&#xA;&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>无重复字符的最长子串</title>
+				<link>https://hadyang.com/docs/leetcode/lengthOfLongestSubstring/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/lengthOfLongestSubstring/</guid>
+				<description>&lt;p&gt;&lt;strong&gt;头条重点&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;给定一个字符串，请你找出其中不含有重复字符的 &lt;strong&gt;最长子串&lt;/strong&gt; 的长度。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;输入: &amp;#34;abcabcbb&amp;#34;&#xA;输出: 3&#xA;解释: 因为无重复字符的最长子串是 &amp;#34;abc&amp;#34;，所以其长度为 3。&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;用 Map 记录字符所在位置，当遇到重复字符时，移动 &lt;code&gt;start&lt;/code&gt; 指针&lt;/li&gt;&#xA;&lt;li&gt;替换 Map 中下标，并计算子串长度&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public int lengthOfLongestSubstring(String str) {&#xA;    if (str == null || str.length() == 0) return 0;&#xA;&#xA;    HashMap&amp;lt;Character, Integer&amp;gt; temp = new HashMap&amp;lt;&amp;gt;();&#xA;    char[] chars = str.toCharArray();&#xA;&#xA;    int res = 0, start = 0;&#xA;    for (int i = 0; i &amp;lt; chars.length; i++) {&#xA;        if (temp.containsKey(chars[i])) {&#xA;            start = Math.max(temp.put(chars[i], i) + 1, start);&#xA;        }&#xA;&#xA;        temp.put(chars[i], i);&#xA;        res = Math.max(res, i - start + 1);&#xA;&#xA;    }&#xA;&#xA;    return res;&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>最大子序和</title>
+				<link>https://hadyang.com/docs/leetcode/maxSubArray/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/maxSubArray/</guid>
+				<description>&lt;p&gt;&lt;strong&gt;头条重点&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;给定一个整数数组 nums ，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例:&#xA;&#xA;输入: [-2,1,-3,4,-1,2,1,-5,4],&#xA;输出: 6&#xA;解释: 连续子数组 [4,-1,2,1] 的和最大，为 6。&#xA;进阶:&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;如果你已经实现复杂度为 O(n) 的解法，尝试使用更为精妙的分治法求解。&lt;/p&gt;&#xA;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;动态规划：&lt;span class=&#34;katex&#34;&gt;&lt;math xmlns=&#34;http://www.w3.org/1998/Math/MathML&#34;&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;f&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;(&lt;/mo&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;)&lt;/mo&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mrow&gt;&lt;mo fence=&#34;true&#34;&gt;{&lt;/mo&gt;&lt;mtable rowspacing=&#34;0.36em&#34; columnalign=&#34;left left&#34; columnspacing=&#34;1em&#34;&gt;&lt;mtr&gt;&lt;mtd&gt;&lt;mstyle scriptlevel=&#34;0&#34; displaystyle=&#34;false&#34;&gt;&lt;mrow&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mi&gt;u&lt;/mi&gt;&lt;mi&gt;m&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;[&lt;/mo&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;]&lt;/mo&gt;&lt;/mrow&gt;&lt;/mstyle&gt;&lt;/mtd&gt;&lt;mtd&gt;&lt;mstyle scriptlevel=&#34;0&#34; displaystyle=&#34;false&#34;&gt;&lt;mrow&gt;&lt;mi&gt;f&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;(&lt;/mo&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo stretchy=&#34;false&#34;&gt;)&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mi&gt;u&lt;/mi&gt;&lt;mi&gt;m&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;[&lt;/mo&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;]&lt;/mo&gt;&lt;mo&gt;&amp;lt;&lt;/mo&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mi&gt;u&lt;/mi&gt;&lt;mi&gt;m&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;[&lt;/mo&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;]&lt;/mo&gt;&lt;/mrow&gt;&lt;/mstyle&gt;&lt;/mtd&gt;&lt;/mtr&gt;&lt;mtr&gt;&lt;mtd&gt;&lt;mstyle scriptlevel=&#34;0&#34; displaystyle=&#34;false&#34;&gt;&lt;mrow&gt;&lt;mi&gt;f&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;(&lt;/mo&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo stretchy=&#34;false&#34;&gt;)&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mi&gt;u&lt;/mi&gt;&lt;mi&gt;m&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;[&lt;/mo&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;]&lt;/mo&gt;&lt;/mrow&gt;&lt;/mstyle&gt;&lt;/mtd&gt;&lt;mtd&gt;&lt;mstyle scriptlevel=&#34;0&#34; displaystyle=&#34;false&#34;&gt;&lt;mrow&gt;&lt;mi&gt;f&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;(&lt;/mo&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo stretchy=&#34;false&#34;&gt;)&lt;/mo&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mi&gt;u&lt;/mi&gt;&lt;mi&gt;m&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;[&lt;/mo&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;]&lt;/mo&gt;&lt;mo&gt;&amp;gt;&lt;/mo&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mi&gt;u&lt;/mi&gt;&lt;mi&gt;m&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;[&lt;/mo&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;]&lt;/mo&gt;&lt;/mrow&gt;&lt;/mstyle&gt;&lt;/mtd&gt;&lt;/mtr&gt;&lt;/mtable&gt;&lt;/mrow&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;f(i)=\begin{cases}num[i]&amp;amp;f(i-1)+num[i]&amp;lt;num[i]\\f(i-1)+num[i] &amp;amp;f(i-1)+num[i]&amp;gt;num[i]\end{cases}&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;用&lt;code&gt;result[i]&lt;/code&gt;保存以数字&lt;code&gt;nums[i]&lt;/code&gt;结尾的最大子序和，然后不断更新&lt;code&gt;result&lt;/code&gt;数组的最大值即可。总的时间复杂度O(n)&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public int maxSubArray(int[] nums) {&#xA;    if (nums.length == 0) {&#xA;        return 0;&#xA;    }&#xA;&#xA;    if (nums.length == 1) {&#xA;        return nums[0];&#xA;    }&#xA;&#xA;    int[] res = new int[nums.length];&#xA;    res[0] = nums[0];&#xA;&#xA;    int max = res[0];&#xA;    for (int i = 1; i &amp;lt; nums.length; i++) {&#xA;        int curMax = nums[i] + res[i - 1];&#xA;        if (curMax &amp;gt; nums[i]) {&#xA;            res[i] = curMax;&#xA;        } else {&#xA;            res[i] = nums[i];&#xA;        }&#xA;        max = Math.max(max, res[i]);&#xA;    }&#xA;&#xA;&#xA;    return max;&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>最小栈</title>
+				<link>https://hadyang.com/docs/leetcode/MinStack/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/MinStack/</guid>
+				<description>&lt;p&gt;&lt;strong&gt;头条重点&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;设计一个支持 push，pop，top 操作，并能在常数时间内检索到最小元素的栈。&lt;/p&gt;&#xA;&lt;p&gt;push(x) &amp;ndash; 将元素 x 推入栈中。&#xA;pop() &amp;ndash; 删除栈顶的元素。&#xA;top() &amp;ndash; 获取栈顶元素。&#xA;getMin() &amp;ndash; 检索栈中的最小元素。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例:&#xA;&#xA;MinStack minStack = new MinStack();&#xA;minStack.push(-2);&#xA;minStack.push(0);&#xA;minStack.push(-3);&#xA;minStack.getMin();   --&amp;gt; 返回 -3.&#xA;minStack.pop();&#xA;minStack.top();      --&amp;gt; 返回 0.&#xA;minStack.getMin();   --&amp;gt; 返回 -2.&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;class MinStack {&#xA;&#xA;    /** initialize your data structure here. */&#xA;    public MinStack() {&#xA;&#xA;    }&#xA;&#xA;    private LinkedList&amp;lt;Integer&amp;gt; stack = new LinkedList&amp;lt;&amp;gt;();&#xA;    private Queue&amp;lt;Integer&amp;gt; minStack = new PriorityQueue&amp;lt;&amp;gt;();&#xA;&#xA;&#xA;&#xA;    public void push(int x) {&#xA;        stack.offerFirst(x);&#xA;        minStack.offer(x);&#xA;    }&#xA;&#xA;    public void pop() {&#xA;        Integer poll = stack.pollFirst();&#xA;        if (poll != null) {&#xA;            minStack.remove(poll);&#xA;        }&#xA;    }&#xA;&#xA;    public int top() {&#xA;        Integer first = stack.peekFirst();&#xA;        return first == null ? 0 : first;&#xA;    }&#xA;&#xA;    public int getMin() {&#xA;        Integer first = minStack.peek();&#xA;        return first == null ? 0 : first;&#xA;    }&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>最长公共前缀</title>
+				<link>https://hadyang.com/docs/leetcode/longestCommonPrefix/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/longestCommonPrefix/</guid>
+				<description>&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;编写一个函数来查找字符串数组中的最长公共前缀。&lt;/p&gt;&#xA;&lt;p&gt;如果不存在公共前缀，返回空字符串 &amp;ldquo;&amp;quot;。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例 1:&#xA;输入: [&amp;#34;flower&amp;#34;,&amp;#34;flow&amp;#34;,&amp;#34;flight&amp;#34;]&#xA;输出: &amp;#34;fl&amp;#34;&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;找到最短字符串&lt;/li&gt;&#xA;&lt;li&gt;多个字符串逐个字符比较&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public String longestCommonPrefix(String[] strs) {&#xA;    if (strs.length == 0) {&#xA;        return &amp;#34;&amp;#34;;&#xA;    }&#xA;&#xA;    int minLen = strs[0].length();&#xA;    for (String str : strs) {&#xA;        minLen = Math.min(minLen, str.length());&#xA;    }&#xA;&#xA;    char[][] data = new char[strs.length][minLen];&#xA;    for (int i = 0; i &amp;lt; strs.length; i++) {&#xA;        char[] chars = strs[i].toCharArray();&#xA;        System.arraycopy(chars, 0, data[i], 0, minLen);&#xA;    }&#xA;&#xA;    StringBuilder res = new StringBuilder();&#xA;    for (int i = 0; i &amp;lt; minLen; i++) {&#xA;        for (int j = 1; j &amp;lt; data.length; j++) {&#xA;            if (data[j - 1][i] != data[j][i]) {&#xA;                return res.toString();&#xA;            }&#xA;        }&#xA;        res.append(data[0][i]);&#xA;    }&#xA;    return res.toString();&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>最长连续序列</title>
+				<link>https://hadyang.com/docs/leetcode/longestConsecutive/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/longestConsecutive/</guid>
+				<description>&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;给定一个未排序的整数数组，找出最长连续序列的长度。&lt;/p&gt;&#xA;&lt;p&gt;要求算法的时间复杂度为 O(n)。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例:&#xA;&#xA;输入: [100, 4, 200, 1, 3, 2]&#xA;输出: 4&#xA;解释: 最长连续序列是 [1, 2, 3, 4]。它的长度为 4。&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;用 &lt;code&gt;Set&lt;/code&gt; 保存所有数字&lt;/li&gt;&#xA;&lt;li&gt;遍历数组，查找当前数字之前、之后的数，并计算个数&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public static int longestConsecutive(int[] nums) {&#xA;    if (nums.length &amp;lt;= 1) {&#xA;        return nums.length;&#xA;    }&#xA;&#xA;    Set&amp;lt;Integer&amp;gt; set = new HashSet&amp;lt;&amp;gt;();&#xA;&#xA;    for (int num : nums) {&#xA;        set.add(num);&#xA;    }&#xA;&#xA;    int pre, after, max = 0;&#xA;    for (int num : nums) {&#xA;        int temp = 1;&#xA;        set.remove(num);&#xA;&#xA;        pre = num;&#xA;        after = num;&#xA;&#xA;        while (set.contains(--pre)) {&#xA;            temp++;&#xA;            set.remove(pre);&#xA;        }&#xA;&#xA;        while (set.contains(++after)) {&#xA;            temp++;&#xA;            set.remove(after);&#xA;        }&#xA;&#xA;        max = Math.max(max, temp);&#xA;        if (max &amp;gt; nums.length / 2) {&#xA;            return max;&#xA;        }&#xA;    }&#xA;&#xA;    return max;&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>最长连续递增序列</title>
+				<link>https://hadyang.com/docs/leetcode/findLengthOfLCIS/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/findLengthOfLCIS/</guid>
+				<description>&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;给定一个未经排序的整数数组，找到最长且连续的的递增序列。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例 1:&#xA;&#xA;输入: [1,3,5,4,7]&#xA;输出: 3&#xA;解释: 最长连续递增序列是 [1,3,5], 长度为3。&#xA;尽管 [1,3,5,7] 也是升序的子序列, 但它不是连续的，因为5和7在原数组里被4隔开。&#xA;示例 2:&#xA;&#xA;输入: [2,2,2,2,2]&#xA;输出: 1&#xA;解释: 最长连续递增序列是 [2], 长度为1。&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;用两个变量记录序列开始和结束的下标&lt;/li&gt;&#xA;&lt;li&gt;从左到右遍历，如果下一个节点小当前节点则移动 &lt;code&gt;start&lt;/code&gt;，否则移动&lt;code&gt;end&lt;/code&gt;，并更新 &lt;code&gt;max&lt;/code&gt;&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public static int findLengthOfLCIS(int[] nums) {&#xA;    if (nums.length == 0) {&#xA;        return 0;&#xA;    }&#xA;&#xA;    if (nums.length == 1) {&#xA;        return 1;&#xA;    }&#xA;&#xA;    int start = 0, end = 0;&#xA;    int max = 1;&#xA;&#xA;    for (int i = 1; i &amp;lt; nums.length; i++) {&#xA;        if (nums[i] &amp;gt; nums[i - 1]) {&#xA;            end = i;&#xA;            max = Math.max(max, end - start + 1);&#xA;        } else {&#xA;            start = i;&#xA;        }&#xA;    }&#xA;&#xA;    return max;&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>朋友圈</title>
+				<link>https://hadyang.com/docs/leetcode/findCircleNum/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/findCircleNum/</guid>
+				<description>&lt;h1 id=&#34;朋友圈&#34;&gt;&lt;a href=&#34;https://leetcode-cn.com/explore/interview/card/bytedance/243/array-and-sorting/1036/&#34;&gt;朋友圈&lt;/a&gt;&lt;a class=&#34;anchor&#34; href=&#34;#%e6%9c%8b%e5%8f%8b%e5%9c%88&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h1&gt;&#xA;&lt;p&gt;&lt;strong&gt;头条重点&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;班上有 N 名学生。其中有些人是朋友，有些则不是。他们的友谊具有是传递性。如果已知 A 是 B 的朋友，B 是 C 的朋友，那么我们可以认为 A 也是 C 的朋友。所谓的朋友圈，是指所有朋友的集合。&lt;/p&gt;&#xA;&lt;p&gt;给定一个 &lt;code&gt;N * N&lt;/code&gt; 的矩阵 M，表示班级中学生之间的朋友关系。如果&lt;code&gt;M[i][j] = 1&lt;/code&gt;，表示已知第 i 个和 j 个学生互为朋友关系，否则为不知道。你必须输出所有学生中的已知的朋友圈总数。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例 1:&#xA;&#xA;输入:&#xA;[[1,1,0],&#xA; [1,1,0],&#xA; [0,0,1]]&#xA;输出: 2&#xA;说明：已知学生0和学生1互为朋友，他们在一个朋友圈。&#xA;第2个学生自己在一个朋友圈。所以返回2。&lt;/code&gt;&lt;/pre&gt;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例 2:&#xA;&#xA;输入:&#xA;[[1,1,0],&#xA; [1,1,1],&#xA; [0,1,1]]&#xA;输出: 1&#xA;说明：已知学生0和学生1互为朋友，学生1和学生2互为朋友，所以学生0和学生2也是朋友，所以他们三个在一个朋友圈，返回1。&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;注意：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;N 在[1,200]的范围内。&lt;/li&gt;&#xA;&lt;li&gt;对于所有学生，有&lt;code&gt;M[i][i] = 1&lt;/code&gt;。&lt;/li&gt;&#xA;&lt;li&gt;如果有&lt;code&gt;M[i][j] = 1&lt;/code&gt;，则有&lt;code&gt;M[j][i] = 1&lt;/code&gt;。&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;逐个遍历所有学生，将他所有朋友标记&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public int findCircleNum(int[][] M) {&#xA;    if (M.length == 0) {&#xA;        return 0;&#xA;    }&#xA;&#xA;    int[] marks = new int[M.length];&#xA;&#xA;&#xA;    int total = 0;&#xA;    for (int i = 0; i &amp;lt; M.length; i++) {&#xA;        if (marks[i] != 1) {&#xA;            total++;&#xA;&#xA;            dfs(M, marks, i);&#xA;        }&#xA;    }&#xA;    return total;&#xA;}&#xA;&#xA;private void dfs(int[][] M, int[] marks, int i) {&#xA;    marks[i] = 1;&#xA;&#xA;    for (int j = 0; j &amp;lt; M[i].length; j++) {&#xA;        if (M[i][j] == 1 &amp;amp;&amp;amp; marks[j] != 1) {&#xA;            dfs(M, marks, j);&#xA;        }&#xA;    }&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>环形链表 II</title>
+				<link>https://hadyang.com/docs/leetcode/detectCycle/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/detectCycle/</guid>
+				<description>&lt;h1 id=&#34;环形链表-ii&#34;&gt;&lt;a href=&#34;https://leetcode-cn.com/explore/interview/card/bytedance/244/linked-list-and-tree/1023/&#34;&gt;环形链表 II&lt;/a&gt;&lt;a class=&#34;anchor&#34; href=&#34;#%e7%8e%af%e5%bd%a2%e9%93%be%e8%a1%a8-ii&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h1&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;给定一个链表，返回链表开始入环的第一个节点。 如果链表无环，则返回 null。&lt;/p&gt;&#xA;&lt;p&gt;为了表示给定链表中的环，我们使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。 如果 pos 是 -1，则在该链表中没有环。&lt;/p&gt;&#xA;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;首先通过快慢指针确定链表是否有环&lt;/li&gt;&#xA;&lt;li&gt;再使用一个指针从头节点与快慢指针相遇节点同步长前进，最终找到环的入口&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public ListNode detectCycle(ListNode head) {&#xA;    ListNode fast = head, slow = head;&#xA;&#xA;    ListNode meetNode = null;&#xA;    while (fast != null &amp;amp;&amp;amp; fast.next != null) {&#xA;        fast = fast.next.next;&#xA;        slow = slow.next;&#xA;&#xA;        if (fast == slow) {&#xA;            meetNode = fast;&#xA;            break;&#xA;        }&#xA;    }&#xA;&#xA;    if (meetNode == null) {&#xA;        return meetNode;&#xA;    }&#xA;&#xA;    while (head != meetNode) {&#xA;        head = head.next;&#xA;        if (head == meetNode) {&#xA;            break;&#xA;        }&#xA;&#xA;        meetNode = meetNode.next;&#xA;    }&#xA;&#xA;    return meetNode;&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>的平方根</title>
+				<link>https://hadyang.com/docs/leetcode/mySqrt/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/mySqrt/</guid>
+				<description>&lt;p&gt;&lt;strong&gt;头条重点&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;实现 int sqrt(int x) 函数。&lt;/p&gt;&#xA;&lt;p&gt;计算并返回 x 的平方根，其中 x 是非负整数。&lt;/p&gt;&#xA;&lt;p&gt;由于返回类型是整数，结果只保留整数的部分，小数部分将被舍去。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例 1:&#xA;&#xA;输入: 4&#xA;输出: 2&#xA;示例 2:&#xA;&#xA;输入: 8&#xA;输出: 2&#xA;说明: 8 的平方根是 2.82842...,由于返回类型是整数，小数部分将被舍去。&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;牛顿迭代法：&lt;span class=&#34;katex&#34;&gt;&lt;math xmlns=&#34;http://www.w3.org/1998/Math/MathML&#34;&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;msub&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;/msub&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mo stretchy=&#34;false&#34;&gt;(&lt;/mo&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mi mathvariant=&#34;normal&#34;&gt;/&lt;/mi&gt;&lt;msub&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mrow&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;/mrow&gt;&lt;/msub&gt;&lt;mo&gt;+&lt;/mo&gt;&lt;msub&gt;&lt;mi&gt;a&lt;/mi&gt;&lt;mrow&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;/mrow&gt;&lt;/msub&gt;&lt;mo stretchy=&#34;false&#34;&gt;)&lt;/mo&gt;&lt;mi mathvariant=&#34;normal&#34;&gt;/&lt;/mi&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;a_{i}=(x/a_{i-1}+a_{i-1})/2&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public int mySqrt(int x) {&#xA;    double a = 1, diff = 0;&#xA;&#xA;    do {&#xA;        a = (x / a + a) / 2.0;&#xA;        diff = Math.abs(a * a - x);&#xA;    } while (diff &amp;gt; 0.1);&#xA;&#xA;    return (int) a;&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>相交链表</title>
+				<link>https://hadyang.com/docs/leetcode/getIntersectionNode/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/getIntersectionNode/</guid>
+				<description>&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;编写一个程序，找到两个单链表相交的起始节点。&lt;/p&gt;&#xA;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;首先将两个链表中长的一个向前遍历，直到两个链表长度一致&lt;/li&gt;&#xA;&lt;li&gt;两个链表同时向前遍历，便可找到交点&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public ListNode getIntersectionNode(ListNode headA, ListNode headB) {&#xA;    if (headA == null || headB == null) {&#xA;        return null;&#xA;    }&#xA;&#xA;    if (headA == headB) {&#xA;        return headA;&#xA;    }&#xA;&#xA;    int lenA = 1;&#xA;    int lenB = 1;&#xA;    ListNode temp = headA;&#xA;    while (temp.next != null) {&#xA;        temp = temp.next;&#xA;        lenA++;&#xA;    }&#xA;&#xA;    ListNode tailA = temp;&#xA;&#xA;    temp = headB;&#xA;    while (temp.next != null) {&#xA;        temp = temp.next;&#xA;        lenB++;&#xA;    }&#xA;&#xA;    ListNode tailB = temp;&#xA;    if (tailB != tailA) {&#xA;        return null;&#xA;    }&#xA;&#xA;    if (lenA &amp;gt; lenB) {&#xA;        for (int i = 0; i &amp;lt; lenA - lenB &amp;amp;&amp;amp; headA != null; i++) {&#xA;            headA = headA.next;&#xA;        }&#xA;&#xA;    } else if (lenA &amp;lt; lenB) {&#xA;        for (int i = 0; i &amp;lt; lenB - lenA &amp;amp;&amp;amp; headB != null; i++) {&#xA;            headB = headB.next;&#xA;        }&#xA;    }&#xA;&#xA;    while (!headA.equals(headB)) {&#xA;        headA = headA.next;&#xA;        headB = headB.next;&#xA;    }&#xA;&#xA;    return headA;&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>第二高的薪水</title>
+				<link>https://hadyang.com/docs/leetcode/salary/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/salary/</guid>
+				<description>&lt;p&gt;&lt;strong&gt;头条重点&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;编写一个 SQL 查询，获取 Employee 表中第二高的薪水（Salary） 。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;+----+--------+&#xA;| Id | Salary |&#xA;+----+--------+&#xA;| 1  | 100    |&#xA;| 2  | 200    |&#xA;| 3  | 300    |&#xA;+----+--------+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;例如上述 Employee 表，SQL查询应该返回 200 作为第二高的薪水。如果不存在第二高的薪水，那么查询应返回 null。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;+---------------------+&#xA;| SecondHighestSalary |&#xA;+---------------------+&#xA;| 200                 |&#xA;+---------------------+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;子查询&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;select IFNULL((select Distinct Salary from Employee order by Salary DESC limit 1,1),null)&#xA;as SecondHighestSalary&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>简化路径</title>
+				<link>https://hadyang.com/docs/leetcode/simplifyPath/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/simplifyPath/</guid>
+				<description>&lt;p&gt;&lt;strong&gt;头条重点&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;以 Unix 风格给出一个文件的绝对路径，你需要简化它。或者换句话说，将其转换为规范路径。&lt;/p&gt;&#xA;&lt;p&gt;在 Unix 风格的文件系统中，一个点（.）表示当前目录本身；此外，两个点 （..） 表示将目录切换到上一级（指向父目录）；两者都可以是复杂相对路径的组成部分。&lt;/p&gt;&#xA;&lt;p&gt;请注意，返回的规范路径必须始终以斜杠 / 开头，并且两个目录名之间必须只有一个斜杠 /。最后一个目录名（如果存在）不能以 / 结尾。此外，规范路径必须是表示绝对路径的最短字符串。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例 1：&#xA;&#xA;输入：&amp;#34;/home/&amp;#34;&#xA;输出：&amp;#34;/home&amp;#34;&#xA;解释：注意，最后一个目录名后面没有斜杠。&#xA;&#xA;示例 2：&#xA;&#xA;输入：&amp;#34;/../&amp;#34;&#xA;输出：&amp;#34;/&amp;#34;&#xA;解释：从根目录向上一级是不可行的，因为根是你可以到达的最高级。&#xA;示例 3：&#xA;&#xA;输入：&amp;#34;/home//foo/&amp;#34;&#xA;输出：&amp;#34;/home/foo&amp;#34;&#xA;解释：在规范路径中，多个连续斜杠需要用一个斜杠替换。&#xA;示例 4：&#xA;&#xA;输入：&amp;#34;/a/./b/../../c/&amp;#34;&#xA;输出：&amp;#34;/c&amp;#34;&#xA;示例 5：&#xA;&#xA;输入：&amp;#34;/a/../../b/../c//.//&amp;#34;&#xA;输出：&amp;#34;/c&amp;#34;&#xA;示例 6：&#xA;&#xA;输入：&amp;#34;/a//b////c/d//././/..&amp;#34;&#xA;输出：&amp;#34;/a/b/c&amp;#34;&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;利用栈的特性，将有效路径名压入&lt;/li&gt;&#xA;&lt;li&gt;当遇到 &lt;code&gt;..&lt;/code&gt; 时 &lt;code&gt;pop&lt;/code&gt; 栈&lt;/li&gt;&#xA;&lt;li&gt;最后按顺序 &lt;code&gt;pop&lt;/code&gt; 组成最终路径&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public static String simplifyPath(String path) {&#xA;    ArrayDeque&amp;lt;String&amp;gt; stack = new ArrayDeque&amp;lt;&amp;gt;();&#xA;    String[] split = path.split(&amp;#34;/&amp;#34;);&#xA;    for (String s : split) {&#xA;        if (s.isEmpty()) {&#xA;            continue;&#xA;        }&#xA;&#xA;        switch (s) {&#xA;            case &amp;#34;..&amp;#34;:&#xA;                stack.pollLast();&#xA;                break;&#xA;            case &amp;#34;.&amp;#34;:&#xA;                break;&#xA;            default:&#xA;                stack.offerLast(s);&#xA;        }&#xA;    }&#xA;&#xA;    StringBuilder builder = new StringBuilder(&amp;#34;/&amp;#34;);&#xA;    for (String s : stack) {&#xA;        builder.append(s);&#xA;        builder.append(&amp;#34;/&amp;#34;);&#xA;    }&#xA;&#xA;    if (builder.length() &amp;gt; 1) {&#xA;        builder.deleteCharAt(builder.length() - 1);&#xA;    }&#xA;    return builder.toString();&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>缓存机制</title>
+				<link>https://hadyang.com/docs/leetcode/LRUCache/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/LRUCache/</guid>
+				<description>&lt;p&gt;&lt;strong&gt;头条重点&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;运用你所掌握的数据结构，设计和实现一个  LRU (最近最少使用) 缓存机制。它应该支持以下操作： 获取数据 get 和 写入数据 put 。&lt;/p&gt;&#xA;&lt;p&gt;获取数据 get(key) - 如果密钥 (key) 存在于缓存中，则获取密钥的值（总是正数），否则返回 -1。&#xA;写入数据 put(key, value) - 如果密钥不存在，则写入其数据值。当缓存容量达到上限时，它应该在写入新数据之前删除最近最少使用的数据值，从而为新的数据值留出空间。&lt;/p&gt;&#xA;&lt;p&gt;进阶:&lt;/p&gt;&#xA;&lt;p&gt;你是否可以在 O(1) 时间复杂度内完成这两种操作？&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例:&#xA;&#xA;LRUCache cache = new LRUCache( 2 /* 缓存容量 */ );&#xA;&#xA;cache.put(1, 1);&#xA;cache.put(2, 2);&#xA;cache.get(1);       // 返回  1&#xA;cache.put(3, 3);    // 该操作会使得密钥 2 作废&#xA;cache.get(2);       // 返回 -1 (未找到)&#xA;cache.put(4, 4);    // 该操作会使得密钥 1 作废&#xA;cache.get(1);       // 返回 -1 (未找到)&#xA;cache.get(3);       // 返回  3&#xA;cache.get(4);       // 返回  4&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;class LRUCache extends LinkedHashMap&amp;lt;Integer, Integer&amp;gt;{&#xA;&#xA;    private final int capacity;&#xA;&#xA;    public LRUCache(int capacity) {&#xA;        super(capacity * 0.75f, true);&#xA;        this.capacity = capacity;&#xA;    }&#xA;&#xA;    public int get(int key) {&#xA;        Integer integer = super.get(key);&#xA;&#xA;        return integer == null ? -1 : integer;&#xA;    }&#xA;&#xA;    public void put(int key, int value) {&#xA;&#xA;        super.put(key, value);&#xA;    }&#xA;&#xA;    @Override&#xA;    protected boolean removeEldestEntry(Map.Entry&amp;lt;Integer, Integer&amp;gt; eldest) {&#xA;        return size() &amp;gt; this.capacity;&#xA;    }&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>编码验证</title>
+				<link>https://hadyang.com/docs/leetcode/validUtf8/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/validUtf8/</guid>
+				<description>&lt;p&gt;&lt;strong&gt;头条重点&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;UTF-8 中的一个字符可能的长度为 1 到 4 字节，遵循以下的规则：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;对于 1 字节的字符，字节的第一位设为0，后面7位为这个符号的unicode码。&lt;/li&gt;&#xA;&lt;li&gt;对于 n 字节的字符 (n &amp;gt; 1)，第一个字节的前 n 位都设为1，第 n+1 位设为0，后面字节的前两位一律设为10。剩下的没有提及的二进制位，全部为这个符号的unicode码。&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;这是 UTF-8 编码的工作方式：&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;   Char. number range  |        UTF-8 octet sequence&#xA;      (hexadecimal)    |              (binary)&#xA;   --------------------+---------------------------------------------&#xA;   0000 0000-0000 007F | 0xxxxxxx&#xA;   0000 0080-0000 07FF | 110xxxxx 10xxxxxx&#xA;   0000 0800-0000 FFFF | 1110xxxx 10xxxxxx 10xxxxxx&#xA;   0001 0000-0010 FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;给定一个表示数据的整数数组，返回它是否为有效的 utf-8 编码。&lt;/p&gt;&#xA;&lt;p&gt;注意：输入是整数数组。只有每个整数的最低 8 个有效位用来存储数据。这意味着每个整数只表示 1 字节的数据。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例 1:&#xA;&#xA;data = [197, 130, 1], 表示 8 位的序列: 11000101 10000010 00000001.&#xA;&#xA;返回 true 。&#xA;这是有效的 utf-8 编码，为一个2字节字符，跟着一个1字节字符。&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;class Solution {&#xA;    public boolean validUtf8(int[] data) {&#xA;        int totalByteCount = 0;&#xA;        for (int item : data) {&#xA;&#xA;            if (totalByteCount == 0) {&#xA;                totalByteCount = totalByteCount(item);&#xA;                if (totalByteCount == -1) {&#xA;                    return false;&#xA;                }&#xA;&#xA;                totalByteCount--;&#xA;                continue;&#xA;            }&#xA;&#xA;&#xA;            //10xxxxxx检查&#xA;            if ((item &amp;amp; 0xC0) != 0x80) {&#xA;                return false;&#xA;            }&#xA;&#xA;            totalByteCount--;&#xA;        }&#xA;&#xA;        return totalByteCount == 0;&#xA;    }&#xA;&#xA;&#xA;    private int totalByteCount(int i) {&#xA;        if ((i &amp;amp; 0x80) == 0) {&#xA;            return 1;&#xA;        }&#xA;&#xA;        if ((i &amp;amp; 0xE0) == 0xC0) {&#xA;            return 2;&#xA;        }&#xA;&#xA;        if ((i &amp;amp; 0xF0) == 0xE0) {&#xA;            return 3;&#xA;        }&#xA;&#xA;        if ((i &amp;amp; 0xF8) == 0xF0) {&#xA;            return 4;&#xA;        }&#xA;&#xA;        return -1;&#xA;    }&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title>翻转字符串里的单词</title>
+				<link>https://hadyang.com/docs/leetcode/reverseWords/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/reverseWords/</guid>
+				<description>&lt;h2 id=&#34;题目&#34;&gt;题目&lt;a class=&#34;anchor&#34; href=&#34;#%e9%a2%98%e7%9b%ae&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;给定一个字符串，逐个翻转字符串中的每个单词。&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;示例 1：&#xA;&#xA;输入: &amp;#34;the sky is blue&amp;#34;&#xA;输出: &amp;#34;blue is sky the&amp;#34;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;说明：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;无空格字符构成一个单词。&lt;/li&gt;&#xA;&lt;li&gt;输入字符串可以在前面或者后面包含多余的空格，但是反转后的字符不能包括。&lt;/li&gt;&#xA;&lt;li&gt;如果两个单词间有多余的空格，将反转后单词间的空格减少到只含一个。&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;解题思路&#34;&gt;解题思路&lt;a class=&#34;anchor&#34; href=&#34;#%e8%a7%a3%e9%a2%98%e6%80%9d%e8%b7%af&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;按空格拆分字符串为字符串数组 &lt;code&gt;t&lt;/code&gt;&lt;/li&gt;&#xA;&lt;li&gt;逆序遍历字符串数组 &lt;code&gt;t&lt;/code&gt;，并组成新的字符串&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;public String reverseWords(String s) {&#xA;    String trimed = s.trim();&#xA;&#xA;    String[] split = trimed.split(&amp;#34; &amp;#34;);&#xA;&#xA;    StringBuilder builder = new StringBuilder();&#xA;    for (int i = split.length - 1; i &amp;gt;= 0; i--) {&#xA;        String t = split[i];&#xA;        if (t.trim().isEmpty()) {&#xA;            continue;&#xA;        }&#xA;&#xA;        builder.append(t).append(&amp;#34; &amp;#34;);&#xA;    }&#xA;&#xA;    return builder.toString().trim();&#xA;}&lt;/code&gt;&lt;/pre&gt;</description>
+			</item>
+			<item>
+				<title></title>
+				<link>https://hadyang.com/docs/leetcode/zigzagLevelOrder/</link>
+				<pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+				<guid>https://hadyang.com/docs/leetcode/zigzagLevelOrder/</guid>
+				<description></description>
+			</item>
+	</channel>
 </rss>

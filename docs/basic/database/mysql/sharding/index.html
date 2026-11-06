@@ -1,420 +1,3116 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN" dir="ltr"
+    data-theme="light"
+    data-layout="centered">
 
 <head>
-  <meta charset="UTF-8">
+  
+  <meta name="generator" content="Hugo 0.169.0">
+  <meta name="generator-theme" content="Book Theme: https://github.com/alex-shpak/hugo-book">
+
+
+
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="MySQL 集群"><meta property="og:title" content="MySQL 集群" />
-<meta property="og:description" content="分库分表 垂直拆分 垂直分表 也就是 大表拆小表，基于列字段进行的。一般是表中的字段较多，将不常用的， 数据较大，长度较长（比如text类型字段）的拆分到 扩展表。 一般是针对那种几百列的大表，也避免查询时，数据量太大造成的 off-page 问题。
+<meta name="description" content="分库分表 垂直拆分 垂直分表 也就是 大表拆小表，基于列字段进行的。一般是表中的字段较多，将不常用的， 数据较大，长度较长（比如text类型字段）的拆分到 扩展表。 一般是针对那种几百列的大表，也避免查询时，数据量太大造成的 off-page 问题。
 垂直分库 针对的是一个系统中的不同业务进行拆分。将多个业务系统的数据放在单个数据库中（服务化拆分），这会让数据库的单库处理能力成为瓶颈。将单个数据库，按业务进行拆分，同一业务领域的数据表放到同一数据库中。并且多个数据库分布在多个机器上，防止由于单机的磁盘、内存、IO等资源造成 MySQL 性能下降。
 数据库的连接资源比较宝贵且单机处理能力也有限，在高并发场景下，垂直分库一定程度上能够突破 IO、连接数等单机硬件资源的瓶颈。
 水平拆分 目前绝大多数应用采取的两种分库分表规则
- 离散映射：如 mod 或 dayofweek ， 这种类型的映射能够很好的解决热点问题，但带来了数据迁移和历史数据问题。 连续映射；如按 id 或 gmt_create_time 的连续范围做映射。这种类型的映射可以避免数据迁移，但又带来热点问题。  随着数据量的增大，每个表或库的数据量都是各自增长。当一个表或库的数据量增长到了一个极限，要加库或加表的时候，介于这种分库分表算法的离散性，必需要做 数据迁移 才能完成。
+离散映射：如 mod 或 dayofweek ， 这种类型的映射能够很好的解决热点问题，但带来了数据迁移和历史数据问题。 连续映射；如按 id 或 gmt_create_time 的连续范围做映射。这种类型的映射可以避免数据迁移，但又带来热点问题。 随着数据量的增大，每个表或库的数据量都是各自增长。当一个表或库的数据量增长到了一个极限，要加库或加表的时候，介于这种分库分表算法的离散性，必需要做 数据迁移 才能完成。
 考虑到数据增长的特点，如果我们以代表时间增长的字段，按递增的范围分库，则可以避免数据迁移。这样的方式下，在数据量再增加达到前几个库/表的上限时，则继续水平增加库表，原先的数据就不需要迁移了。但是这样的方式会带来一个 热点问题：当前的数据量达到某个库表的范围时，所有的插入操作，都集中在这个库/表了。
 结合离散分库/分表和连续分库/分表的优点，可使要热点和新数据均匀分配在每个库，同时又保证易于水平扩展。分库分表的主要经历以下三个阶段：
 阶段一 一个数据库，两个表，rule0 = id % 2
-分库规则dbRule: “DB0″ 分表规则tbRule: “t” &#43; (id % 2) 阶段二 当单库的数据量接近 1千万，单表的数据量接近 500 万时，进行扩容（数据量只是举例，具体扩容量要根据数据库和实际压力状况决定）：增加一个数据库 DB1，将 DB0.t0 整表迁移到新库 DB1.t1。每个库各增加1个表，未来10M-20M的数据mod2分别写入这2个表：t0_1，t1_1：
+分库规则dbRule: “DB0″ 分表规则tbRule: “t” &#43; (id % 2)
+阶段二 当单库的数据量接近 1千万，单表的数据量接近 500 万时，进行扩容（数据量只是举例，具体扩容量要根据数据库和实际压力状况决定）：增加一个数据库 DB1，将 DB0.t0 整表迁移到新库 DB1.t1。每个库各增加1个表，未来10M-20M的数据mod2分别写入这2个表：t0_1，t1_1：
 分库规则dbRule:
 “DB” &#43; (id % 2) 分表规则tbRule:
- if(id &lt; 1千万){ return &quot;t&quot;&#43; (id % 2); //1千万之前的数据，仍然放在t0和t1表。t1表从DB0搬迁到DB1库 }else if(id &lt; 2千万){ return &quot;t&quot;&#43; (id % 2) &#43;&quot;_1&quot;; //1千万之后的数据，各放到两个库的两个表中: t0_1,t1_1 }else{ throw new IllegalArgumentException(&quot;id outof range[20000000]:&quot; &#43; id); } 这样 10M 以后的新生数据会均匀分布在 DB0 和 DB1; 插入更新和查询热点仍然能够在每个库中均匀分布。每个库中同时有老数据和不断增长的新数据。每表的数据仍然控制在 500万 以下。" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/database/mysql/sharding/" />
-<meta property="article:published_time" content="2020-02-19T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-03-14T22:12:11+08:00" />
-<title>MySQL 集群 | Interview</title>
-<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#2e3440">
+<meta name="color-scheme" content="light dark">
+<meta name="format-detection" content="telephone=no"><meta property="og:url" content="https://hadyang.com/docs/basic/database/mysql/sharding/">
+	<meta property="og:site_name" content="HadYang技术分享">
+	<meta property="og:title" content="MySQL 集群">
+	<meta property="og:description" content="分库分表 垂直拆分 垂直分表 也就是 大表拆小表，基于列字段进行的。一般是表中的字段较多，将不常用的， 数据较大，长度较长（比如text类型字段）的拆分到 扩展表。 一般是针对那种几百列的大表，也避免查询时，数据量太大造成的 off-page 问题。
+垂直分库 针对的是一个系统中的不同业务进行拆分。将多个业务系统的数据放在单个数据库中（服务化拆分），这会让数据库的单库处理能力成为瓶颈。将单个数据库，按业务进行拆分，同一业务领域的数据表放到同一数据库中。并且多个数据库分布在多个机器上，防止由于单机的磁盘、内存、IO等资源造成 MySQL 性能下降。
+数据库的连接资源比较宝贵且单机处理能力也有限，在高并发场景下，垂直分库一定程度上能够突破 IO、连接数等单机硬件资源的瓶颈。
+水平拆分 目前绝大多数应用采取的两种分库分表规则
+离散映射：如 mod 或 dayofweek ， 这种类型的映射能够很好的解决热点问题，但带来了数据迁移和历史数据问题。 连续映射；如按 id 或 gmt_create_time 的连续范围做映射。这种类型的映射可以避免数据迁移，但又带来热点问题。 随着数据量的增大，每个表或库的数据量都是各自增长。当一个表或库的数据量增长到了一个极限，要加库或加表的时候，介于这种分库分表算法的离散性，必需要做 数据迁移 才能完成。
+考虑到数据增长的特点，如果我们以代表时间增长的字段，按递增的范围分库，则可以避免数据迁移。这样的方式下，在数据量再增加达到前几个库/表的上限时，则继续水平增加库表，原先的数据就不需要迁移了。但是这样的方式会带来一个 热点问题：当前的数据量达到某个库表的范围时，所有的插入操作，都集中在这个库/表了。
+结合离散分库/分表和连续分库/分表的优点，可使要热点和新数据均匀分配在每个库，同时又保证易于水平扩展。分库分表的主要经历以下三个阶段：
+阶段一 一个数据库，两个表，rule0 = id % 2
+分库规则dbRule: “DB0″ 分表规则tbRule: “t” &#43; (id % 2)
+阶段二 当单库的数据量接近 1千万，单表的数据量接近 500 万时，进行扩容（数据量只是举例，具体扩容量要根据数据库和实际压力状况决定）：增加一个数据库 DB1，将 DB0.t0 整表迁移到新库 DB1.t1。每个库各增加1个表，未来10M-20M的数据mod2分别写入这2个表：t0_1，t1_1：
+分库规则dbRule:
+“DB” &#43; (id % 2) 分表规则tbRule:">
+	<meta property="og:locale" content="zh_CN">
+	<meta property="og:type" content="article">
+		<meta property="article:section" content="docs">
+		<meta property="article:published_time" content="2020-02-19T00:00:00+00:00">
+		<meta property="article:modified_time" content="2020-03-14T22:12:11+08:00">
 
 
-<link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
+	<meta itemprop="name" content="MySQL 集群">
+	<meta itemprop="description" content="分库分表 垂直拆分 垂直分表 也就是 大表拆小表，基于列字段进行的。一般是表中的字段较多，将不常用的， 数据较大，长度较长（比如text类型字段）的拆分到 扩展表。 一般是针对那种几百列的大表，也避免查询时，数据量太大造成的 off-page 问题。
+垂直分库 针对的是一个系统中的不同业务进行拆分。将多个业务系统的数据放在单个数据库中（服务化拆分），这会让数据库的单库处理能力成为瓶颈。将单个数据库，按业务进行拆分，同一业务领域的数据表放到同一数据库中。并且多个数据库分布在多个机器上，防止由于单机的磁盘、内存、IO等资源造成 MySQL 性能下降。
+数据库的连接资源比较宝贵且单机处理能力也有限，在高并发场景下，垂直分库一定程度上能够突破 IO、连接数等单机硬件资源的瓶颈。
+水平拆分 目前绝大多数应用采取的两种分库分表规则
+离散映射：如 mod 或 dayofweek ， 这种类型的映射能够很好的解决热点问题，但带来了数据迁移和历史数据问题。 连续映射；如按 id 或 gmt_create_time 的连续范围做映射。这种类型的映射可以避免数据迁移，但又带来热点问题。 随着数据量的增大，每个表或库的数据量都是各自增长。当一个表或库的数据量增长到了一个极限，要加库或加表的时候，介于这种分库分表算法的离散性，必需要做 数据迁移 才能完成。
+考虑到数据增长的特点，如果我们以代表时间增长的字段，按递增的范围分库，则可以避免数据迁移。这样的方式下，在数据量再增加达到前几个库/表的上限时，则继续水平增加库表，原先的数据就不需要迁移了。但是这样的方式会带来一个 热点问题：当前的数据量达到某个库表的范围时，所有的插入操作，都集中在这个库/表了。
+结合离散分库/分表和连续分库/分表的优点，可使要热点和新数据均匀分配在每个库，同时又保证易于水平扩展。分库分表的主要经历以下三个阶段：
+阶段一 一个数据库，两个表，rule0 = id % 2
+分库规则dbRule: “DB0″ 分表规则tbRule: “t” &#43; (id % 2)
+阶段二 当单库的数据量接近 1千万，单表的数据量接近 500 万时，进行扩容（数据量只是举例，具体扩容量要根据数据库和实际压力状况决定）：增加一个数据库 DB1，将 DB0.t0 整表迁移到新库 DB1.t1。每个库各增加1个表，未来10M-20M的数据mod2分别写入这2个表：t0_1，t1_1：
+分库规则dbRule:
+“DB” &#43; (id % 2) 分表规则tbRule:">
+	<meta itemprop="datePublished" content="2020-02-19T00:00:00+00:00">
+	<meta itemprop="dateModified" content="2020-03-14T22:12:11+08:00">
+	<meta itemprop="wordCount" content="475">
+	<meta itemprop="keywords" content="Database">
+
+<title>MySQL 集群 • HadYang技术分享</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.png" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<link rel="manifest" href="/manifest.json">
+<link rel="canonical" href="https://hadyang.com/docs/basic/database/mysql/sharding/">
+<link rel="stylesheet" href="/book.min.3b47c5c3053ddd1846b44ca0278f9365d1cc6def0c56efaee4fbb8b7a57c782b.css" integrity="sha256-O0fFwwU93RhGtEygJ4&#43;TZdHMbe8MVu&#43;u5Pu4t6V8eCs=" crossorigin="anonymous">
 
 
-<script defer src="/interview/en.search.min.51eaac1d27afa630aa5121b26a137e4a1060429577e041714b91afd0aabeecb6.js" integrity="sha256-UeqsHSevpjCqUSGyahN&#43;ShBgQpV34EFxS5Gv0Kq&#43;7LY="></script>
-
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-	ga('create', 'UA-157595781-3', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
-
-<!--
-Made with Book Theme
-https://github.com/alex-shpak/hugo-book
--->
-
+<script type="module" src="/en.search.min.b47060fc7a23e8d87f711a51b12b14f2dcc3aa45572ee4a9e1129fbbe13243de.js" integrity="sha256-tHBg/Hoj6Nh/cRpRsSsU8tzDqkVXLuSp4RKfu&#43;EyQ94=" crossorigin="anonymous"></script>
   
 </head>
 
-<body>
-  <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="container flex">
-    <aside class="book-menu">
-      
+<body dir="ltr" class="book-kind-page book-type-docs">
+  <div class="book-container flex">
+    
+<aside class="book-menu" aria-label="Menu">
+  <div class="book-menu-content">
+    
   <nav>
-<h2 class="book-brand">
-  <a href="/interview"><span>Interview</span>
+<div class="book-brand">
+  <a class="flex align-center" href="/"><span>HadYang技术分享</span>
   </a>
-</h2>
-
-
-<div class="book-search">
-  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
-  <div class="book-search-spinner spinner hidden"></div>
-  <ul id="book-search-results"></ul>
 </div>
 
-
-
-
-
-
-
-
-
-  <ul>
-<li><a href="/interview/docs/basic/">计算机基础</a>
-<ul>
-<li><a href="/interview/docs/basic/algo/">算法</a>
-<ul>
-<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
-<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
-<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
-<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
-<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
-<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
-<li><a href="/interview/docs/basic/algo/sort/">排序算法</a></li>
-<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/basic/os/">操作系统</a>
-<ul>
-<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
-<li><a href="/interview/docs/basic/os/concurrency/">进程管理</a></li>
-<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
-<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
-<li><a href="/interview/docs/basic/os/device/">设备管理</a></li>
-<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
-<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/basic/net/">计算机网络</a>
-<ul>
-<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
-<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
-<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
-<li><a href="/interview/docs/basic/net/http/">HTTP</a></li>
-<li><a href="/interview/docs/basic/net/https/">HTTPS</a></li>
-<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/basic/database/mysql/">MySQL</a>
-<ul>
-<li><a href="/interview/docs/basic/database/sql/">SQL</a></li>
-<li><a href="/interview/docs/basic/database/mysql/architecture/">MySQL架构</a></li>
-<li><a href="/interview/docs/basic/database/mysql/innodb/">InnoDB</a>
-<ul>
-<li><a href="/interview/docs/basic/database/mysql/innodb/index/">InnoDB索引</a></li>
-<li><a href="/interview/docs/basic/database/mysql/innodb/concurrent/">InnoDB并发控制</a></li>
-<li><a href="/interview/docs/basic/database/mysql/innodb/transaction/">InnoDB事务</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/basic/database/mysql/sharding/"class=active>MySQL集群</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
-<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/java/">Java</a>
-<ul>
-<li><a href="/interview/docs/java/oop/">OOP</a></li>
-<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
-<li><a href="/interview/docs/java/operator/">运算符</a></li>
-<li><a href="/interview/docs/java/exception/">异常</a></li>
-<li><a href="/interview/docs/java/generics/">泛型</a></li>
-<li><a href="/interview/docs/java/object/">Object</a></li>
-<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
-<li><a href="/interview/docs/java/proxy/">代理</a></li>
-<li><a href="/interview/docs/java/annotation/">注解</a></li>
-<li><a href="/interview/docs/java/nio/">NIO</a></li>
-<li><a href="/interview/docs/java/question/">面试题</a></li>
-<li><a href="/interview/docs/java/">集合</a>
-<ul>
-<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
-<li><a href="/interview/docs/java/collection/Concurrenthashmap/">Concurrenthashmap</a></li>
-<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/java/concurrent/">并发</a>
-<ul>
-<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
-<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
-<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
-<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
-<li><a href="/interview/docs/java/concurrent/AQS/">AQS</a></li>
-<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
-<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
-<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/java/jvm/">Java虚拟机</a>
-<ul>
-<li><a href="/interview/docs/java/jvm/architecture/">JVM架构</a></li>
-<li><a href="/interview/docs/java/jvm/classloader/">类加载器</a></li>
-<li><a href="/interview/docs/java/jvm/runtime_area/">内存模型</a></li>
-<li><a href="/interview/docs/java/jvm/gc/">垃圾收集</a></li>
-<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
-<li><a href="/interview/docs/java/jvm/string-constant-pool/">String常量池</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-object-lifecycle/">对象生命周期</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="/interview/docs/fromwork/">框架</a>
-<ul>
-<li><a href="/interview/docs/fromwork/netty/">Netty</a></li>
-<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
-<ul>
-<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
-<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
-<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/fromwork/spring/">Spring</a>
-<ul>
-<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
-<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
-<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="/interview/docs/architecture/">系统架构</a>
-<ul>
-<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
-<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
-<ul>
-<li><a href="/interview/docs/architecture/concurrent/design/">高并发系统设计</a></li>
-<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/architecture/design/">系统设计</a>
-<ul>
-<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
-<li><a href="/interview/docs/architecture/design/seckill/">秒杀系统</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/architecture/distributed/">分布式</a>
-<ul>
-<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
-<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
-<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
-<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
-<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
-<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
-<li><a href="/interview/docs/architecture/distributed/kafka/">Kafka</a></li>
-<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
-<li><a href="/interview/docs/architecture/distributed/dubbo/">Dubbo</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
-<ul>
-<li><a href="/interview/docs/architecture/bigdata/algo/">基础算法</a></li>
-<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="/interview/docs/offer/">剑指offer</a>
-<ul>
-<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
-<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
-<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
-<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
-<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
-<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
-<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
-<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
-<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
-<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
-<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
-<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
-<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
-<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
-<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
-<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
-<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
-<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
-<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
-<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
-<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
-<li><a href="/interview/docs/offer/VerifySquenceOfBST/">二叉搜索树的后序遍历序列</a></li>
-<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
-<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
-<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
-<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
-<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
-<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
-<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
-<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
-<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
-<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
-<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
-<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
-<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
-<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
-<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
-<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
-<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
-<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
-<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
-<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
-<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
-<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
-<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
-<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
-<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
-<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
-<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
-<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
-<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
-<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
-<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
-<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
-<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
-<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
-<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
-<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
-<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
-<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
-<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
-<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
-<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
-<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
-<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
-<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
-<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/leetcode/">LeetCode</a>
-<ul>
-<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
-<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
-<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
-<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
-<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
-<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
-<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
-<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
-<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
-<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
-<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
-<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
-<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
-<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
-<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
-<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
-<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
-<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
-<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
-<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
-<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
-<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
-<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
-<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
-<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
-<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
-<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
-<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
-<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
-<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
-<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
-<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
-<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
-<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
-</ul>
-</li>
-</ul>
-
-
-
-
-
-
-
-
-</nav>
-
-
-
-
-  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
-
-
- 
-    </aside>
-
-    <div class="book-page">
-      <header class="book-header">
-        
-  <div class="flex align-center justify-between">
-  <label for="menu-control">
-    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
-  </label>
-
-  <strong>MySQL 集群</strong>
-
-  <label for="toc-control">
-    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
-  </label>
+<div class="book-search hidden">
+  <input id="book-search-input" type="text" role="searchbox" enterkeyhint="search"
+    placeholder="Search"
+    aria-label="Search"
+    maxlength="64" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results" aria-live="polite"></ul>
 </div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
 
 
   
-    <input type="checkbox" class="hidden" id="toc-control" />
-    <aside class="hidden clearfix">
-      
-  <nav id="TableOfContents">
   <ul>
-    <li><a href="#分库分表">分库分表</a>
-      <ul>
-        <li><a href="#垂直拆分">垂直拆分</a></li>
-        <li><a href="#水平拆分">水平拆分</a></li>
-        <li><a href="#数据迁移">数据迁移</a></li>
-        <li><a href="#join">Join</a></li>
-      </ul>
-    </li>
-    <li><a href="#主从复制">主从复制</a>
-      <ul>
-        <li><a href="#同步模式">同步模式</a></li>
-        <li><a href="#主从复制的延迟问题">主从复制的延迟问题</a></li>
-      </ul>
-    </li>
-    <li><a href="#全局id">全局ID</a>
-      <ul>
-        <li><a href="#snowflake">Snowflake</a></li>
-      </ul>
-    </li>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Architecture</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/base/" class="">
+      系统架构基础</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Bigdata</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/bigdata/algo/" class="">
+      大数据基础算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/bigdata/hdfs/" class="">
+      HDFS</a>
+  
+
+        </li>
+      
+    
   </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Concurrent</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/concurrent/design/" class="">
+      高并发系统设计</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/concurrent/flow-control/" class="">
+      高并发下的流量控制</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Design</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/design/seckill/" class="">
+      秒杀系统</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/design/tinyURL/" class="">
+      短链接</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Distributed</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/consensus/" class="">
+      分布式一致性和共识协议</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/dubbo/" class="">
+      Dubbo</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/kafka/" class="">
+      Kafka</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/mq/" class="">
+      MQ</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/rpc/" class="">
+      RPC</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/zk/" class="">
+      Zookeeper</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/transaction/" class="">
+      分布式事务</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/cache/" class="">
+      分布式缓存</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/lock/" class="">
+      分布式锁</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/" class="">
+      Basic</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/sql/" class="">
+      SQL</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/redis/" class="">
+      Redis</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/cryptology/" class="">
+      密码学</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/" class="">
+      操作系统基础</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/io/" class="">
+      I/O</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/memory/" class="">
+      内存管理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/disk/" class="">
+      磁盘与文件</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/arch/" class="">
+      计算机体系结构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/device/" class="">
+      设备管理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/concurrency/" class="">
+      进程管理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/questions/" class="">
+      Index</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/" class="">
+      算法</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/kmp/" class="">
+      KMP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/hash/" class="">
+      哈希</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/sort/" class="">
+      排序算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/mst/" class="">
+      最小生成树算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/path/" class="">
+      最短路径算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/search/" class="">
+      查找算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/tree/" class="">
+      树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/skip_list/" class="">
+      跳跃表</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/" class="">
+      网络分层</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/websocket/" class="">
+      Websocket</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/http/" class="">
+      HTTP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/https/" class="">
+      HTTPS</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/ip/" class="">
+      IP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/tcp/" class="">
+      TCP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/protocol/" class="">
+      网络协议</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Mysql</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/sharding/" class="active">
+      MySQL 集群</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/architecture/" class="">
+      MySQL 架构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Innodb</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/innodb/transaction/" class="">
+      InnoDB 事务</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/innodb/concurrent/" class="">
+      InnoDB 并发控制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/innodb/index/" class="">
+      InnoDB 索引</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Fromwork</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/netty/" class="">
+      Netty</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/spring/" class="">
+      Spring 基本</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/spring/aop/" class="">
+      AOP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/spring/ioc/" class="">
+      IOC</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/spring/design-partten/" class="">
+      设计模式</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Mybatis</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/mybatis/proxy/" class="">
+      Mybatis 动态代理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/mybatis/cache/" class="">
+      Mybatis 缓存机制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/mybatis/question/" class="">
+      面试题</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/" class="">
+      Java</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/question/" class="">
+      Java面试题</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/nio/" class="">
+      NIO</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/proxy/" class="">
+      Java 代理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/exception/" class="">
+      Java 异常</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/generics/" class="">
+      Java 泛型</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/object/" class="">
+      Object</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/string-builder/" class="">
+      StringBuilder</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/serilaser/" class="">
+      序列化</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/annotation/" class="">
+      注解</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/operator/" class="">
+      运算符</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/collection/" class="">
+      集合框架</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/collection/BlockQueue/" class="">
+      BlockingQueue</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/collection/Concurrenthashmap/" class="">
+      ConcurrentHashmap</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/collection/HashMap/" class="">
+      HashMap</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/oop/" class="">
+      面向对象基础</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Concurrent</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/atomic/" class="">
+      AtomicInteger</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/AQS/" class="">
+      AQS</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/count-down-latch/" class="">
+      CountDownLatch</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/thread/" class="">
+      Java线程</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/synchronized/" class="">
+      Synchronized</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/threadlocal/" class="">
+      ThreadLocal</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/volatile/" class="">
+      Volatile</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/interrupt/" class="">
+      线程中断</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Jvm</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/gc/" class="">
+      垃圾回收</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/architecture/" class="">
+      JVM 架构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/classloader/" class="">
+      类加载器</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/runtime_area/" class="">
+      运行时数据区</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/dispatcher/" class="">
+      Java 分派机制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/string-constant-pool/" class="">
+      String 常量池</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/jvm-object-lifecycle/" class="">
+      对象的生命周期</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/" class="">
+      Leetcode</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/threeSum/" class="">
+      三数之和</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/addTwoNumbers/" class="">
+      两数相加</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/maxProfit/" class="">
+      买卖股票的最佳时机</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/maxProfit2/" class="">
+      买卖股票的最佳时机</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/lowestCommonAncestor/" class="">
+      二叉树的最近公共祖先</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/AllOne/" class="">
+      全 O(1) 的数据结构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/reverseList/" class="">
+      反转链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/mergeKLists/" class="">
+      合并</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/mergeTwoLists/" class="">
+      合并两个有序链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/mergeRagen/" class="">
+      合并区间</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/restoreIpAddresses/" class="">
+      复原</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/checkInclusion/" class="">
+      字符串的排列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/StringMultiply/" class="">
+      字符串相乘</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/maxAreaOfIsland/" class="">
+      岛屿的最大面积</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/sortList/" class="">
+      排序链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/trap/" class="">
+      接雨水</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/searchRote/" class="">
+      搜索旋转排序数组</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/findKthLargest/" class="">
+      数组中的第K个最大元素</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/lengthOfLongestSubstring/" class="">
+      无重复字符的最长子串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/maxSubArray/" class="">
+      最大子序和</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/MinStack/" class="">
+      最小栈</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/longestCommonPrefix/" class="">
+      最长公共前缀</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/longestConsecutive/" class="">
+      最长连续序列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/findLengthOfLCIS/" class="">
+      最长连续递增序列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/findCircleNum/" class="">
+      朋友圈</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/detectCycle/" class="">
+      环形链表 II</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/mySqrt/" class="">
+      的平方根</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/getIntersectionNode/" class="">
+      相交链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/salary/" class="">
+      第二高的薪水</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/simplifyPath/" class="">
+      简化路径</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/LRUCache/" class="">
+      缓存机制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/validUtf8/" class="">
+      编码验证</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/reverseWords/" class="">
+      翻转字符串里的单词</a>
+  
+
+        </li>
+      
+    
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/" class="">
+      Offer</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/Add/" class="">
+      不用加减乘除做加法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetUglyNumber/" class="">
+      丑数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindFirstCommonNode/" class="">
+      两个链表的第一个公共结点</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/SumOfNDice/" class="">
+      个骰子的点数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/BST-Link-Convert/" class="">
+      二叉搜索树与双向链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/VerifySquenceOfBST/" class="">
+      二叉搜索树的后序遍历序列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/BSTKthNode/" class="">
+      二叉搜索树的第</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindPath/" class="">
+      二叉树中和为某一值的路径</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetNext/" class="">
+      二叉树的下一个结点</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/TreeDepth/" class="">
+      二叉树的深度</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/number-of-one/" class="">
+      二进制中</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/PrintFromTopToBottom/" class="">
+      从上往下打印二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/print-link-from-tail/" class="">
+      从尾到头打印链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/CutRope/" class="">
+      剪绳子</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MinStack/" class="">
+      包含</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/Singleton/" class="">
+      单例</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/revert-link/" class="">
+      反转链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/merge-sort-link/" class="">
+      合并两个排序的链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindContinuousSequence/" class="">
+      和为</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindNumbersWithSum/" class="">
+      和为</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/LastRemaining/" class="">
+      圆圈中最后剩下的数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/O1DeleteNode/" class="">
+      在</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/CountOfSortedArray/" class="">
+      在排序数组中查找数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/CloneLink/" class="">
+      复杂链表的复制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/Permutation/" class="">
+      字符串的排列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/IsSymmetrical/" class="">
+      对称的二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/LeftRotateString/" class="">
+      左旋转字符串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/SerializeTree/" class="">
+      序列化二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/isContinuous/" class="">
+      扑克牌顺子</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/printn/" class="">
+      打印最大的</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/TranslateNumToStr/" class="">
+      把数字翻译成字符串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/PrintMinNumber/" class="">
+      把数组排成最小的数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/search-a-2d-matrix/" class="">
+      搜索二维矩阵</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetNumberOfK/" class="">
+      数字在排序数组中出现的次数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/NOfNumberSerialize/" class="">
+      数字序列中的某一位的数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/StreamMid/" class="">
+      数据流中的中位数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MoreThanHalfNum/" class="">
+      数组中出现次数超过一半的数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindNumsAppearOnce/" class="">
+      数组中只出现一次的数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/InversePairs/" class="">
+      数组中的逆序对</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/Duplicate/" class="">
+      数组中重复的数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/NumberOfOneBetweenOneAndN/" class="">
+      整数中</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/fibonacci/" class="">
+      斐波纳切数列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/find-minimum-in-rotated-sorted-array/" class="">
+      旋转数组的最小数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/replay-space/" class="">
+      替换空格</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetLeastNumbers/" class="">
+      最小的</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetLeastNumbersSolution/" class="">
+      最小的</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/LongestNoRepeatSubString/" class="">
+      最长不含重复字符的子字符串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MovingCount/" class="">
+      机器人的运动范围</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/IsPopOrder/" class="">
+      栈的压入</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/HasSubtree/" class="">
+      树的子结构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/PatternMatch/" class="">
+      正则表达式匹配</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/sum/" class="">
+      求</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MaxInWindows/" class="">
+      滑动窗口的最大值</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/two-stack-fifo/" class="">
+      用两个栈实现一个队列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/hasPath/" class="">
+      矩阵中的路径</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MaxGift/" class="">
+      礼物的最大值</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FirstNotRepeatingChar/" class="">
+      第一个只出现一次的字符</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/ReverseSentence/" class="">
+      翻转单词顺序列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MaxProfit/" class="">
+      股票的最大利润</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/IsNumeric/" class="">
+      表示数值的字符串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/reOrderArray/" class="">
+      调整数组顺序使奇数位于偶数前面</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindGreatestSumOfSubArray/" class="">
+      连续子数组的最大和</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/reConstructBinaryTree/" class="">
+      重建二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindKthToTail/" class="">
+      链表中倒数第</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/EntryNodeOfLoop/" class="">
+      链表中环的入口结点</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/mirror-tree/" class="">
+      镜像二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/PrintMatrix/" class="">
+      顺时针打印矩阵</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/power/" class="">
+      题目</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </nav>
 
 
-    </aside>
-  
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+
+  </div>
+</aside>
  
-      </header>
+
+    <header class="book-header hidden">
+      
+  <div class="flex align-center justify-between gap">
+  <input type="checkbox" class="toggle" id="menu-control" />
+  <label for="menu-control" aria-label="Menu">
+    <svg class="book-icon"><use href="/iconset.min.90a7fd302dc1b9bc3c291688faee66a3e60a9209f59b89fa00669e35d6907b3f.svg#menu"></use></svg>
+  </label>
+
+  <div class="book-brand">
+  <a class="flex align-center" href="/"><span>HadYang技术分享</span>
+  </a>
+</div>
+
+
+  
+  <input type="checkbox" class="toggle" id="toc-control" />
+  <label for="toc-control" aria-label="Table of Contents">
+    <svg class="book-icon"><use href="/iconset.min.90a7fd302dc1b9bc3c291688faee66a3e60a9209f59b89fa00669e35d6907b3f.svg#toc"></use></svg>
+  </label>
+  
+</div>
+
+ 
+    </header>
+
+    <main class="book-page">
+      
+      
+  
 
       
-<article class="markdown"><h2 id="分库分表">分库分表</h2>
-<h3 id="垂直拆分">垂直拆分</h3>
+  <article class="markdown book-article"><h2 id="分库分表">分库分表<a class="anchor" href="#%e5%88%86%e5%ba%93%e5%88%86%e8%a1%a8" aria-label="Link"></a></h2>
+<h3 id="垂直拆分">垂直拆分<a class="anchor" href="#%e5%9e%82%e7%9b%b4%e6%8b%86%e5%88%86" aria-label="Link"></a></h3>
 <p><strong>垂直分表</strong> 也就是 <em>大表拆小表</em>，基于列字段进行的。一般是表中的字段较多，将不常用的， 数据较大，长度较长（比如text类型字段）的拆分到 <em>扩展表</em>。 一般是针对那种几百列的大表，也避免查询时，数据量太大造成的 off-page 问题。</p>
 <p><strong>垂直分库</strong> 针对的是一个系统中的不同业务进行拆分。将多个业务系统的数据放在单个数据库中（<strong>服务化</strong>拆分），这会让数据库的单库处理能力成为瓶颈。将单个数据库，按业务进行拆分，同一业务领域的数据表放到同一数据库中。并且多个数据库分布在多个机器上，防止由于单机的磁盘、内存、IO等资源造成 MySQL 性能下降。</p>
 <p>数据库的连接资源比较宝贵且单机处理能力也有限，在高并发场景下，垂直分库一定程度上能够突破 IO、连接数等单机硬件资源的瓶颈。</p>
-<h3 id="水平拆分">水平拆分</h3>
+<h3 id="水平拆分">水平拆分<a class="anchor" href="#%e6%b0%b4%e5%b9%b3%e6%8b%86%e5%88%86" aria-label="Link"></a></h3>
 <p>目前绝大多数应用采取的两种分库分表规则</p>
 <ul>
 <li><code>离散映射</code>：如 mod 或 dayofweek ， 这种类型的映射能够很好的解决热点问题，但带来了数据迁移和历史数据问题。</li>
@@ -423,67 +3119,62 @@ https://github.com/alex-shpak/hugo-book
 <p>随着数据量的增大，每个表或库的数据量都是各自增长。当一个表或库的数据量增长到了一个极限，要加库或加表的时候，介于这种分库分表算法的离散性，必需要做 <strong>数据迁移</strong> 才能完成。</p>
 <p>考虑到数据增长的特点，如果我们以代表时间增长的字段，按递增的范围分库，则可以避免数据迁移。这样的方式下，在数据量再增加达到前几个库/表的上限时，则继续水平增加库表，原先的数据就不需要迁移了。但是这样的方式会带来一个 <strong>热点问题</strong>：当前的数据量达到某个库表的范围时，所有的插入操作，都集中在这个库/表了。</p>
 <p>结合离散分库/分表和连续分库/分表的优点，可使要热点和新数据均匀分配在每个库，同时又保证易于水平扩展。分库分表的主要经历以下三个阶段：</p>
-<h4 id="阶段一">阶段一</h4>
+<h4 id="阶段一">阶段一<a class="anchor" href="#%e9%98%b6%e6%ae%b5%e4%b8%80" aria-label="Link"></a></h4>
 <p>一个数据库，两个表，<code>rule0 = id % 2</code></p>
-<pre><code>分库规则dbRule: “DB0″
-分表规则tbRule: “t” + (id % 2)
-</code></pre><p><img src="images/5-mysql-3a686.png" alt=""></p>
-<h4 id="阶段二">阶段二</h4>
+<pre tabindex="0"><code>分库规则dbRule: “DB0″
+分表规则tbRule: “t” + (id % 2)</code></pre><p><img src="images/5-mysql-3a686.png" alt="" /></p>
+<h4 id="阶段二">阶段二<a class="anchor" href="#%e9%98%b6%e6%ae%b5%e4%ba%8c" aria-label="Link"></a></h4>
 <p>当单库的数据量接近 1千万，单表的数据量接近 500 万时，进行扩容（数据量只是举例，具体扩容量要根据数据库和实际压力状况决定）：增加一个数据库 <code>DB1</code>，将 <code>DB0.t0</code> 整表迁移到新库 <code>DB1.t1</code>。每个库各增加1个表，未来10M-20M的数据mod2分别写入这2个表：<code>t0_1，t1_1</code>：</p>
-<p><img src="images/5-mysql-6885c.png" alt=""></p>
+<p><img src="images/5-mysql-6885c.png" alt="" /></p>
 <p>分库规则dbRule:</p>
-<pre><code>“DB” + (id % 2)
-</code></pre><p>分表规则tbRule:</p>
-<pre><code>    if(id &lt; 1千万){
-        return &quot;t&quot;+ (id % 2);   //1千万之前的数据，仍然放在t0和t1表。t1表从DB0搬迁到DB1库
+<pre tabindex="0"><code>“DB” + (id % 2)</code></pre><p>分表规则tbRule:</p>
+<pre tabindex="0"><code>    if(id &lt; 1千万){
+        return &#34;t&#34;+ (id % 2);   //1千万之前的数据，仍然放在t0和t1表。t1表从DB0搬迁到DB1库
     }else if(id &lt; 2千万){
-        return &quot;t&quot;+ (id % 2) +&quot;_1&quot;; //1千万之后的数据，各放到两个库的两个表中: t0_1,t1_1
+        return &#34;t&#34;+ (id % 2) +&#34;_1&#34;; //1千万之后的数据，各放到两个库的两个表中: t0_1,t1_1
     }else{
-        throw new IllegalArgumentException(&quot;id outof range[20000000]:&quot; + id);
-    }
-</code></pre><p>这样 <code>10M</code> 以后的新生数据会均匀分布在 <code>DB0</code> 和 <code>DB1</code>; 插入更新和查询热点仍然能够在每个库中均匀分布。每个库中同时有老数据和不断增长的新数据。每表的数据仍然控制在 <code>500万</code> 以下。</p>
-<h4 id="阶段三">阶段三</h4>
+        throw new IllegalArgumentException(&#34;id outof range[20000000]:&#34; + id);
+    }</code></pre><p>这样 <code>10M</code> 以后的新生数据会均匀分布在 <code>DB0</code> 和 <code>DB1</code>; 插入更新和查询热点仍然能够在每个库中均匀分布。每个库中同时有老数据和不断增长的新数据。每表的数据仍然控制在 <code>500万</code> 以下。</p>
+<h4 id="阶段三">阶段三<a class="anchor" href="#%e9%98%b6%e6%ae%b5%e4%b8%89" aria-label="Link"></a></h4>
 <p>当两个库的容量接近上限继续水平扩展时，进行如下操作：</p>
 <ul>
 <li>新增加两个库：<code>DB2</code>和<code>DB3</code>，以<code>id % 4</code>分库。余数<code>0、1、2、3</code>分别对应<code>DB</code>的下标. <code>t0</code>和<code>t1</code>不变，</li>
 <li>将<code>DB0.t0_1</code>整表迁移到<code>DB2</code>; 将<code>DB1.t1_1</code>整表迁移到<code>DB3</code></li>
 </ul>
 <p><code>20M-40M</code>的数据 mod4 分为 4 个表：<code>t0_2，t1_2，t2_2，t3_2</code>，分别放到4个库中：</p>
-<p><img src="images/5-mysql-3f186.png" alt=""></p>
+<p><img src="images/5-mysql-3f186.png" alt="" /></p>
 <p>新的分库分表规则如下：</p>
 <p>分库规则dbRule:</p>
-<pre><code>  if(id &lt; 2千万){
+<pre tabindex="0"><code>  if(id &lt; 2千万){
       //2千万之前的数据，4个表分别放到4个库
       if(id &lt; 1千万){
-          return &quot;db&quot;+  (id % 2);     //原t0表仍在db0, t1表仍在db1
+          return &#34;db&#34;+  (id % 2);     //原t0表仍在db0, t1表仍在db1
       }else{
-          return &quot;db&quot;+ ((id % 2) +2); //原t0_1表从db0搬迁到db2; t1_1表从db1搬迁到db3
+          return &#34;db&#34;+ ((id % 2) +2); //原t0_1表从db0搬迁到db2; t1_1表从db1搬迁到db3
       }
   }else if(id &lt; 4千万){
-      return &quot;db&quot;+ (id % 4);          //超过2千万的数据，平均分到4个库
+      return &#34;db&#34;+ (id % 4);          //超过2千万的数据，平均分到4个库
   }else{
-      throw new IllegalArgumentException(&quot;id out of range. id:&quot;+id);
-  }
-</code></pre><p>分表规则tbRule:</p>
-<pre><code>  if(id &lt; 2千万){        //2千万之前的数据，表规则和原先完全一样，参见阶段二
+      throw new IllegalArgumentException(&#34;id out of range. id:&#34;+id);
+  }</code></pre><p>分表规则tbRule:</p>
+<pre tabindex="0"><code>  if(id &lt; 2千万){        //2千万之前的数据，表规则和原先完全一样，参见阶段二
       if(id &lt; 1千万){
-          return &quot;t&quot;+ (id % 2);       //1千万之前的数据，仍然放在t0和t1表
+          return &#34;t&#34;+ (id % 2);       //1千万之前的数据，仍然放在t0和t1表
       }else{
-          return &quot;t&quot;+ (id % 2) +&quot;_1&quot;; //1千万之后的数据，仍然放在t0_1和t1_1表
+          return &#34;t&#34;+ (id % 2) +&#34;_1&#34;; //1千万之后的数据，仍然放在t0_1和t1_1表
       }
   }else if(id &lt; 4千万){
-      return &quot;t&quot;+ (id % 4)+&quot;_2&quot;;      //超过2千万的数据分为4个表t0_2，t1_2，t2_2，t3_2
+      return &#34;t&#34;+ (id % 4)+&#34;_2&#34;;      //超过2千万的数据分为4个表t0_2，t1_2，t2_2，t3_2
   }else{
-      throw new IllegalArgumentException(&quot;id out of range. id:&quot;+id);
-  }
-</code></pre><p>随着时间的推移，当第一阶段的<code>t0/t1</code>，第二阶段的<code>t0_1/t1_1</code>逐渐成为历史数据，不再使用时，可以直接<code>truncate</code>掉整个表。省去了历史数据迁移的麻烦。</p>
+      throw new IllegalArgumentException(&#34;id out of range. id:&#34;+id);
+  }</code></pre><p>随着时间的推移，当第一阶段的<code>t0/t1</code>，第二阶段的<code>t0_1/t1_1</code>逐渐成为历史数据，不再使用时，可以直接<code>truncate</code>掉整个表。省去了历史数据迁移的麻烦。</p>
 <p>分库分表规则的设计和配置，长远说来必须满足以下要求</p>
 <ul>
 <li>可以动态推送修改</li>
 <li><strong>规则可以分层级叠加</strong>，旧规则可以在新规则下继续使用，新规则是旧规则在更宽尺度上的拓展，以此支持新旧规则的兼容，避免数据迁移</li>
 <li>用 <code>mod</code> 方式时，最好选 2 的指数级倍分库分表，这样方便以后切割。</li>
 </ul>
-<h3 id="数据迁移">数据迁移</h3>
+<h3 id="数据迁移">数据迁移<a class="anchor" href="#%e6%95%b0%e6%8d%ae%e8%bf%81%e7%a7%bb" aria-label="Link"></a></h3>
 <p>在上述的水平扩容方案中，如何进行数据迁移，是在扩容中需要考虑的问题。一般情况下，数据迁移分为：停机迁移、双写迁移。</p>
 <p><strong>停机迁移</strong> 是最简单、最安全、最快速的迁移方案，但一般线上业务系统很少允许停机迁移。在停机迁移中，首先停掉数据库 A 的写入请求，复制 A 数据到 B，待复制完成后，切换线上数据源。</p>
 <p><strong>双写迁移</strong> 方案就是同时写两个库，一个是老库，一个是新库。也就是在线上系统里面，除了对所有老库的增删改地方，同时对新库同样执行增删改。主要经历以下三个阶段：</p>
@@ -492,14 +3183,14 @@ https://github.com/alex-shpak/hugo-book
 <li>新老数据无差异，依旧双写（事务成功以新数据源为准），查询走新数据源</li>
 <li>稳定运行无误后，下线老数据源</li>
 </ol>
-<h3 id="join">Join</h3>
+<h3 id="join">Join<a class="anchor" href="#join" aria-label="Link"></a></h3>
 <p>在拆分之前，系统中很多列表和详情页所需的数据是可以通过 Join 来完成的。而拆分后，数据库可能是分布式在不同实例和不同的主机上，Join 将变得非常麻烦。首先要考虑下垂直分库的设计问题，如果可以调整，那就优先调整。如果无法调整的情况，可以考虑以下解决方案：</p>
 <ul>
 <li><strong>全局表</strong>：就是有可能系统中所有模块都可能会依赖到的一些表。为了避免跨库 join 查询，我们可以将这类表在其他每个数据库中均保存一份。同时，这类数据通常也很少发生修改（甚至几乎不会），所以也不用太担心 <em>一致性</em> 问题；</li>
 <li><strong>字段冗余</strong>：字段冗余能带来便利，是一种 <em>空间换时间</em> 的体现。但其适用场景也比较有限，比较适合依赖字段较少的情况。最复杂的还是数据一致性问题，这点很难保证；</li>
 <li><strong>系统层组装</strong>：在系统层面，通过调用不同模块的组件或者服务，获取到数据并进行字段拼装；</li>
 </ul>
-<h2 id="主从复制">主从复制</h2>
+<h2 id="主从复制">主从复制<a class="anchor" href="#%e4%b8%bb%e4%bb%8e%e5%a4%8d%e5%88%b6" aria-label="Link"></a></h2>
 <p>MySQL 主从复制涉及到三个线程，一个运行在主节点（log dump thread），其余两个(I/O thread, SQL thread)运行在从节点。</p>
 <ul>
 <li>
@@ -513,11 +3204,11 @@ https://github.com/alex-shpak/hugo-book
 </li>
 </ul>
 <p>一个 slave 节点可同时从多个 master 进行数据复制，在这种情况下，不同 master 的 bin-log 存储在不同的 relay log中。</p>
-<h3 id="同步模式">同步模式</h3>
+<h3 id="同步模式">同步模式<a class="anchor" href="#%e5%90%8c%e6%ad%a5%e6%a8%a1%e5%bc%8f" aria-label="Link"></a></h3>
 <p><strong>异步模式（mysql async-mode）</strong>：MySQL增删改操作会全部记录在 binary log 中，当 slave 节点连接 master 时，会主动从 master 处获取最新的 bin log 文件。</p>
 <p><strong>半同步模式(mysql semi-sync)</strong>：这种模式下主节点只需要接收到其中一台从节点的返回信息，就会 <code>commit</code> ；否则需要等待直到超时时间然后切换成异步模式再提交；这样做的目的可以使主从数据库的数据延迟缩小，可以提高数据安全性，确保了事务提交后，binlog 至少传输到了一个从节点上，不能保证从节点将此事务更新到 db 中。性能上会有一定的降低，响应时间会变长。</p>
 <p><strong>全同步模式</strong> 是指主节点和从节点全部执行了commit并确认才会向客户端返回成功。</p>
-<h3 id="主从复制的延迟问题">主从复制的延迟问题</h3>
+<h3 id="主从复制的延迟问题">主从复制的延迟问题<a class="anchor" href="#%e4%b8%bb%e4%bb%8e%e5%a4%8d%e5%88%b6%e7%9a%84%e5%bb%b6%e8%bf%9f%e9%97%ae%e9%a2%98" aria-label="Link"></a></h3>
 <p>进行主从同步的过程中，如果使用异步或半异步模式，均会有主从节点数据不一致的窗口时间。同时，从节点上的 <code>SQL Thread</code> 只能串行执行 <code>relay-log</code> 中的记录，当某条 DDL/DML 耗时较长时，会加剧这个窗口时间；再者在某些场景下会使用 slave 节点进行数据读取，这也可能导致数据加锁等待。基于以上原因在处理主从复制延迟问题上有以下几种方向：</p>
 <ol>
 <li>优化主从节点之间的网络延迟</li>
@@ -526,14 +3217,14 @@ https://github.com/alex-shpak/hugo-book
 <li>调整 slave 参数：关闭 slave bin-log 等</li>
 <li>多线程的主从复制：不同 schema 下的表并发提交时的数据不会相互影响，即 slave 节点可以用对 relay log 中不同的 schema 各分配一个SQL Thread，来重放 relay log 中主库已经提交的事务</li>
 </ol>
-<h2 id="全局id">全局ID</h2>
+<h2 id="全局id">全局ID<a class="anchor" href="#%e5%85%a8%e5%b1%80id" aria-label="Link"></a></h2>
 <ul>
 <li>数据库自增 id</li>
 <li>设置数据库 sequence 或者表自增字段步长</li>
 <li>UUID</li>
 <li>Snowflake 算法</li>
 </ul>
-<h3 id="snowflake">Snowflake</h3>
+<h3 id="snowflake">Snowflake<a class="anchor" href="#snowflake" aria-label="Link"></a></h3>
 <p>twitter 开源的分布式 id 生成算法，采用 <code>Scala</code> 语言实现，是把一个 <code>64</code> 位的 <code>long</code> 型的 <code>id</code> ，<code>1</code> 个 <code>bit</code> 是不用的，用其中的 <code>41</code> <code>bit</code> 作为毫秒数，用 <code>10</code> <code>bit</code> 作为工作机器 <code>id</code> ，<code>12</code> <code>bit</code> 作为序列号。</p>
 <p><code>|–1位符号位–|--41位时间戳–|--10位机器ID–|--12位序列号–|</code></p>
 <ul>
@@ -542,7 +3233,7 @@ https://github.com/alex-shpak/hugo-book
 <li><strong>10 bit</strong>：记录工作机器 <code>id</code>，代表的是这个服务最多可以部署在 <code>2^10</code>台机器上哪，也就是<code>1024</code>台机器。但是 10 bit 里 5 个 bit 代表机房 id，5 个 bit 代表机器 id。意思就是最多代表 <code>2^5</code>个机房（32个机房），每个机房里可以代表 <code>2^5</code> 个机器（32台机器）。</li>
 <li><strong>12 bit</strong>：这个是用来记录同一个毫秒内产生的不同 id，<code>12 bit</code> 可以代表的最大正整数是 <code>2^12 - 1 = 4096</code>，也就是说可以用这个 <code>12 bit</code> 代表的数字来区分同一个毫秒内的 <code>4096</code> 个不同的 id。</li>
 </ul>
-<h4 id="snowflake-的问题">Snowflake 的问题</h4>
+<h4 id="snowflake-的问题">Snowflake 的问题<a class="anchor" href="#snowflake-%e7%9a%84%e9%97%ae%e9%a2%98" aria-label="Link"></a></h4>
 <p>Snowflake 这样依赖时间的 ID 生成算法注定存在一个问题：<strong>时间的准确度问题</strong>。这一算法有一个默认前提：分布式环境下时间获取总是准确的，即时间总是递增的。而现实环境中，这样的条件很难满足。总会因为硬件、软件、人的原因造成时间变化。如果你的硬件时间本身就比正常时间快，而你接入了一个 NTP 服务，每当进行 NTP 时间校准时，你的机器时间总会向后 <strong>回拨</strong> 一段时间，这时悲剧就来了：有极大可能性生成重复ID。</p>
 <p>针对上面提到的两个问题，可如下改进：</p>
 <ol>
@@ -552,53 +3243,70 @@ https://github.com/alex-shpak/hugo-book
 </ol>
 <p>为了 <strong>缓解</strong> 时钟回拨问题，对之前的序列进行缓存，而原生算法很显然是不利于缓存的，最坏的情况下每秒需要缓存 1000 个值，这显然对内存很不友好。于是我将时间戳改为秒为单位，同时可以把省出来的位交给序列。此时缓存一个小时的数据（即可以容忍一个小时的时钟回拨）也就只需要缓存 3600 个序列，完全可以接受。改进后的 Snowflake 生成的ID是这样组成的：</p>
 <p><code>|–1位符号位–|--32位时间戳–|--10位机器ID–|--21位序列号–|</code></p>
-<blockquote>
+<blockquote class=''>
 <p>环形列表：即整个列表的容量是一定的，当列表满了以后再加入的元素会按照入列的先后顺序覆盖之前的元素。</p>
-</blockquote>
-</article>
+</blockquote></article>
  
+      
 
       <footer class="book-footer">
         
-  <div class="flex justify-between">
+  <div class="flex flex-wrap justify-between">
 
-
-
-  <div>
-    
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/e96329092285ef34f30e451b50014d4dd0ec6dd3" title='Last modified by haoyang.shi | 2020-03-14' target="_blank" rel="noopener">
-      <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-03-14</span>
-    </a>
-  </div>
-
-
-
-  <div>
-    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/basic/database/mysql/sharding/index.md" target="_blank" rel="noopener">
-      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
-      <span>Edit this page</span>
-    </a>
-  </div>
+<div>
 
 </div>
+
+<div>
+
+</div>
+
+</div>
+
+<div class="flex flex-wrap justify-between">
+    <span>
+    
+      <a href="/docs/basic/net/protocol/" class="flex align-center">
+        <svg class="book-icon" aria-hidden="true"><use href="/iconset.min.90a7fd302dc1b9bc3c291688faee66a3e60a9209f59b89fa00669e35d6907b3f.svg#backward"></use></svg>
+        <span>网络协议</span>
+      </a>
+    
+    </span>
+    <span>
+    
+      <a href="/docs/basic/database/mysql/architecture/" class="flex align-center">
+        <span>MySQL 架构</span>
+        <svg class="book-icon" aria-hidden="true"><use href="/iconset.min.90a7fd302dc1b9bc3c291688faee66a3e60a9209f59b89fa00669e35d6907b3f.svg#forward"></use></svg>
+      </a>
+    
+    </span>
+  </div>
 
  
         
   
-  <div class="book-comments">
-
-</div>
+ 
+        
+        
   
  
+        
+  
+    <script>(function(){document.querySelectorAll("pre:has(code)").forEach(e=>{e.addEventListener("click",e.focus),e.addEventListener("copy",function(t){if(t.preventDefault(),navigator.clipboard){const t=window.getSelection().toString()||e.textContent;navigator.clipboard.writeText(t)}})})})()</script>
+  
+
       </footer>
-      
-    </div>
+
+      <label for="menu-control" class="hidden book-menu-overlay" aria-hidden="true"></label>
+    </main>
 
     
-    <aside class="book-toc">
+  
+  <aside class="book-toc" aria-label="Table of Contents">
+    <div class="book-toc-content">
       
-  <nav id="TableOfContents">
+  
+<nav id="TableOfContents">
   <ul>
     <li><a href="#分库分表">分库分表</a>
       <ul>
@@ -622,15 +3330,31 @@ https://github.com/alex-shpak/hugo-book
   </ul>
 </nav>
 
+
+
+
+
+
+
+    </div>
+  </aside>
+  
  
-    </aside>
-    
-  </main>
+  </div>
 
   
 </body>
-
 </html>
+
+
+
+
+
+
+
+
+
+
 
 
 

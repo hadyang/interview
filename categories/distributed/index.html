@@ -1,0 +1,3312 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dir="ltr"
+    data-theme="light"
+    data-layout="centered">
+
+<head>
+  
+  <meta name="generator" content="Hugo 0.169.0">
+  <meta name="generator-theme" content="Book Theme: https://github.com/alex-shpak/hugo-book">
+
+
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#2e3440">
+<meta name="color-scheme" content="light dark">
+<meta name="format-detection" content="telephone=no"><meta property="og:url" content="https://hadyang.com/categories/distributed/">
+	<meta property="og:site_name" content="HadYang技术分享">
+	<meta property="og:title" content="Distributed">
+	<meta property="og:locale" content="zh_CN">
+	<meta property="og:type" content="website">
+
+
+	<meta itemprop="name" content="Distributed">
+	<meta itemprop="datePublished" content="2020-01-16T00:00:00+00:00">
+	<meta itemprop="dateModified" content="2020-01-19T16:59:43+08:00">
+
+<title>Distributed • HadYang技术分享</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.png" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<link rel="manifest" href="/manifest.json">
+<link rel="canonical" href="https://hadyang.com/categories/distributed/">
+<link rel="stylesheet" href="/book.min.3b47c5c3053ddd1846b44ca0278f9365d1cc6def0c56efaee4fbb8b7a57c782b.css" integrity="sha256-O0fFwwU93RhGtEygJ4&#43;TZdHMbe8MVu&#43;u5Pu4t6V8eCs=" crossorigin="anonymous">
+
+
+<script type="module" src="/en.search.min.b47060fc7a23e8d87f711a51b12b14f2dcc3aa45572ee4a9e1129fbbe13243de.js" integrity="sha256-tHBg/Hoj6Nh/cRpRsSsU8tzDqkVXLuSp4RKfu&#43;EyQ94=" crossorigin="anonymous"></script><link rel="alternate" type="application/rss+xml" href="https://hadyang.com/categories/distributed/index.xml" title="Distributed" />
+
+  
+</head>
+
+<body dir="ltr" class="book-kind-term book-type-categories">
+  <div class="book-container flex">
+    
+<aside class="book-menu" aria-label="Menu">
+  <div class="book-menu-content">
+    
+  <nav>
+<div class="book-brand">
+  <a class="flex align-center" href="/"><span>HadYang技术分享</span>
+  </a>
+</div>
+
+<div class="book-search hidden">
+  <input id="book-search-input" type="text" role="searchbox" enterkeyhint="search"
+    placeholder="Search"
+    aria-label="Search"
+    maxlength="64" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results" aria-live="polite"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+  
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Architecture</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/base/" class="">
+      系统架构基础</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Bigdata</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/bigdata/algo/" class="">
+      大数据基础算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/bigdata/hdfs/" class="">
+      HDFS</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Concurrent</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/concurrent/design/" class="">
+      高并发系统设计</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/concurrent/flow-control/" class="">
+      高并发下的流量控制</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Design</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/design/seckill/" class="">
+      秒杀系统</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/design/tinyURL/" class="">
+      短链接</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Distributed</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/consensus/" class="">
+      分布式一致性和共识协议</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/dubbo/" class="">
+      Dubbo</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/kafka/" class="">
+      Kafka</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/mq/" class="">
+      MQ</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/rpc/" class="">
+      RPC</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/zk/" class="">
+      Zookeeper</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/transaction/" class="">
+      分布式事务</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/cache/" class="">
+      分布式缓存</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/lock/" class="">
+      分布式锁</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/" class="">
+      Basic</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/sql/" class="">
+      SQL</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/redis/" class="">
+      Redis</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/cryptology/" class="">
+      密码学</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/" class="">
+      操作系统基础</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/io/" class="">
+      I/O</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/memory/" class="">
+      内存管理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/disk/" class="">
+      磁盘与文件</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/arch/" class="">
+      计算机体系结构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/device/" class="">
+      设备管理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/concurrency/" class="">
+      进程管理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/questions/" class="">
+      Index</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/" class="">
+      算法</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/kmp/" class="">
+      KMP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/hash/" class="">
+      哈希</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/sort/" class="">
+      排序算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/mst/" class="">
+      最小生成树算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/path/" class="">
+      最短路径算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/search/" class="">
+      查找算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/tree/" class="">
+      树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/skip_list/" class="">
+      跳跃表</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/" class="">
+      网络分层</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/websocket/" class="">
+      Websocket</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/http/" class="">
+      HTTP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/https/" class="">
+      HTTPS</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/ip/" class="">
+      IP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/tcp/" class="">
+      TCP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/protocol/" class="">
+      网络协议</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Mysql</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/sharding/" class="">
+      MySQL 集群</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/architecture/" class="">
+      MySQL 架构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Innodb</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/innodb/transaction/" class="">
+      InnoDB 事务</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/innodb/concurrent/" class="">
+      InnoDB 并发控制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/innodb/index/" class="">
+      InnoDB 索引</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Fromwork</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/netty/" class="">
+      Netty</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/spring/" class="">
+      Spring 基本</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/spring/aop/" class="">
+      AOP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/spring/ioc/" class="">
+      IOC</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/spring/design-partten/" class="">
+      设计模式</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Mybatis</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/mybatis/proxy/" class="">
+      Mybatis 动态代理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/mybatis/cache/" class="">
+      Mybatis 缓存机制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/mybatis/question/" class="">
+      面试题</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/" class="">
+      Java</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/question/" class="">
+      Java面试题</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/nio/" class="">
+      NIO</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/proxy/" class="">
+      Java 代理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/exception/" class="">
+      Java 异常</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/generics/" class="">
+      Java 泛型</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/object/" class="">
+      Object</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/string-builder/" class="">
+      StringBuilder</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/serilaser/" class="">
+      序列化</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/annotation/" class="">
+      注解</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/operator/" class="">
+      运算符</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/collection/" class="">
+      集合框架</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/collection/BlockQueue/" class="">
+      BlockingQueue</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/collection/Concurrenthashmap/" class="">
+      ConcurrentHashmap</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/collection/HashMap/" class="">
+      HashMap</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/oop/" class="">
+      面向对象基础</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Concurrent</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/atomic/" class="">
+      AtomicInteger</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/AQS/" class="">
+      AQS</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/count-down-latch/" class="">
+      CountDownLatch</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/thread/" class="">
+      Java线程</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/synchronized/" class="">
+      Synchronized</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/threadlocal/" class="">
+      ThreadLocal</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/volatile/" class="">
+      Volatile</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/interrupt/" class="">
+      线程中断</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Jvm</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/gc/" class="">
+      垃圾回收</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/architecture/" class="">
+      JVM 架构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/classloader/" class="">
+      类加载器</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/runtime_area/" class="">
+      运行时数据区</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/dispatcher/" class="">
+      Java 分派机制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/string-constant-pool/" class="">
+      String 常量池</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/jvm-object-lifecycle/" class="">
+      对象的生命周期</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/" class="">
+      Leetcode</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/threeSum/" class="">
+      三数之和</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/addTwoNumbers/" class="">
+      两数相加</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/maxProfit/" class="">
+      买卖股票的最佳时机</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/maxProfit2/" class="">
+      买卖股票的最佳时机</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/lowestCommonAncestor/" class="">
+      二叉树的最近公共祖先</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/AllOne/" class="">
+      全 O(1) 的数据结构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/reverseList/" class="">
+      反转链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/mergeKLists/" class="">
+      合并</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/mergeTwoLists/" class="">
+      合并两个有序链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/mergeRagen/" class="">
+      合并区间</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/restoreIpAddresses/" class="">
+      复原</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/checkInclusion/" class="">
+      字符串的排列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/StringMultiply/" class="">
+      字符串相乘</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/maxAreaOfIsland/" class="">
+      岛屿的最大面积</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/sortList/" class="">
+      排序链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/trap/" class="">
+      接雨水</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/searchRote/" class="">
+      搜索旋转排序数组</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/findKthLargest/" class="">
+      数组中的第K个最大元素</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/lengthOfLongestSubstring/" class="">
+      无重复字符的最长子串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/maxSubArray/" class="">
+      最大子序和</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/MinStack/" class="">
+      最小栈</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/longestCommonPrefix/" class="">
+      最长公共前缀</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/longestConsecutive/" class="">
+      最长连续序列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/findLengthOfLCIS/" class="">
+      最长连续递增序列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/findCircleNum/" class="">
+      朋友圈</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/detectCycle/" class="">
+      环形链表 II</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/mySqrt/" class="">
+      的平方根</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/getIntersectionNode/" class="">
+      相交链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/salary/" class="">
+      第二高的薪水</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/simplifyPath/" class="">
+      简化路径</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/LRUCache/" class="">
+      缓存机制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/validUtf8/" class="">
+      编码验证</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/reverseWords/" class="">
+      翻转字符串里的单词</a>
+  
+
+        </li>
+      
+    
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/" class="">
+      Offer</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/Add/" class="">
+      不用加减乘除做加法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetUglyNumber/" class="">
+      丑数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindFirstCommonNode/" class="">
+      两个链表的第一个公共结点</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/SumOfNDice/" class="">
+      个骰子的点数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/BST-Link-Convert/" class="">
+      二叉搜索树与双向链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/VerifySquenceOfBST/" class="">
+      二叉搜索树的后序遍历序列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/BSTKthNode/" class="">
+      二叉搜索树的第</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindPath/" class="">
+      二叉树中和为某一值的路径</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetNext/" class="">
+      二叉树的下一个结点</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/TreeDepth/" class="">
+      二叉树的深度</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/number-of-one/" class="">
+      二进制中</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/PrintFromTopToBottom/" class="">
+      从上往下打印二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/print-link-from-tail/" class="">
+      从尾到头打印链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/CutRope/" class="">
+      剪绳子</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MinStack/" class="">
+      包含</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/Singleton/" class="">
+      单例</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/revert-link/" class="">
+      反转链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/merge-sort-link/" class="">
+      合并两个排序的链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindContinuousSequence/" class="">
+      和为</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindNumbersWithSum/" class="">
+      和为</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/LastRemaining/" class="">
+      圆圈中最后剩下的数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/O1DeleteNode/" class="">
+      在</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/CountOfSortedArray/" class="">
+      在排序数组中查找数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/CloneLink/" class="">
+      复杂链表的复制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/Permutation/" class="">
+      字符串的排列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/IsSymmetrical/" class="">
+      对称的二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/LeftRotateString/" class="">
+      左旋转字符串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/SerializeTree/" class="">
+      序列化二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/isContinuous/" class="">
+      扑克牌顺子</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/printn/" class="">
+      打印最大的</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/TranslateNumToStr/" class="">
+      把数字翻译成字符串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/PrintMinNumber/" class="">
+      把数组排成最小的数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/search-a-2d-matrix/" class="">
+      搜索二维矩阵</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetNumberOfK/" class="">
+      数字在排序数组中出现的次数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/NOfNumberSerialize/" class="">
+      数字序列中的某一位的数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/StreamMid/" class="">
+      数据流中的中位数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MoreThanHalfNum/" class="">
+      数组中出现次数超过一半的数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindNumsAppearOnce/" class="">
+      数组中只出现一次的数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/InversePairs/" class="">
+      数组中的逆序对</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/Duplicate/" class="">
+      数组中重复的数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/NumberOfOneBetweenOneAndN/" class="">
+      整数中</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/fibonacci/" class="">
+      斐波纳切数列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/find-minimum-in-rotated-sorted-array/" class="">
+      旋转数组的最小数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/replay-space/" class="">
+      替换空格</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetLeastNumbers/" class="">
+      最小的</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetLeastNumbersSolution/" class="">
+      最小的</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/LongestNoRepeatSubString/" class="">
+      最长不含重复字符的子字符串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MovingCount/" class="">
+      机器人的运动范围</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/IsPopOrder/" class="">
+      栈的压入</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/HasSubtree/" class="">
+      树的子结构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/PatternMatch/" class="">
+      正则表达式匹配</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/sum/" class="">
+      求</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MaxInWindows/" class="">
+      滑动窗口的最大值</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/two-stack-fifo/" class="">
+      用两个栈实现一个队列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/hasPath/" class="">
+      矩阵中的路径</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MaxGift/" class="">
+      礼物的最大值</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FirstNotRepeatingChar/" class="">
+      第一个只出现一次的字符</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/ReverseSentence/" class="">
+      翻转单词顺序列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MaxProfit/" class="">
+      股票的最大利润</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/IsNumeric/" class="">
+      表示数值的字符串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/reOrderArray/" class="">
+      调整数组顺序使奇数位于偶数前面</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindGreatestSumOfSubArray/" class="">
+      连续子数组的最大和</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/reConstructBinaryTree/" class="">
+      重建二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindKthToTail/" class="">
+      链表中倒数第</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/EntryNodeOfLoop/" class="">
+      链表中环的入口结点</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/mirror-tree/" class="">
+      镜像二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/PrintMatrix/" class="">
+      顺时针打印矩阵</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/power/" class="">
+      题目</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+
+  </div>
+</aside>
+ 
+
+    <header class="book-header hidden">
+      
+  <div class="flex align-center justify-between gap">
+  <input type="checkbox" class="toggle" id="menu-control" />
+  <label for="menu-control" aria-label="Menu">
+    <svg class="book-icon"><use href="/iconset.min.90a7fd302dc1b9bc3c291688faee66a3e60a9209f59b89fa00669e35d6907b3f.svg#menu"></use></svg>
+  </label>
+
+  <div class="book-brand">
+  <a class="flex align-center" href="/"><span>HadYang技术分享</span>
+  </a>
+</div>
+
+
+  
+  <input type="checkbox" class="toggle" id="toc-control" />
+  <label for="toc-control" aria-label="Table of Contents">
+    <svg class="book-icon"><use href="/iconset.min.90a7fd302dc1b9bc3c291688faee66a3e60a9209f59b89fa00669e35d6907b3f.svg#toc"></use></svg>
+  </label>
+  
+</div>
+
+ 
+    </header>
+
+    <main class="book-page">
+      
+      
+
+
+      
+  
+  <article class="markdown book-post">
+    <h2>
+      <a href="/docs/architecture/distributed/consensus/">分布式一致性和共识协议</a>
+    </h2>
+    
+  <a class="flex align-center text-small book-post-date">
+    <svg class="book-icon" aria-hidden="true"><use href="/iconset.min.90a7fd302dc1b9bc3c291688faee66a3e60a9209f59b89fa00669e35d6907b3f.svg#calendar"></use></svg>
+    <span>2020-01-16</span>
+  </a>
+
+
+
+  
+  <div class="text-small">
+    
+      <a href="/categories/distributed/">Distributed</a>
+  </div>
+  
+
+  
+
+
+    <div class="book-post-content"><h2 id="一致性">一致性<a class="anchor" href="#%e4%b8%80%e8%87%b4%e6%80%a7" aria-label="Link"></a></h2>
+<p>在分布式系统中，一致性(Consistency，早期也叫 Agreement)是指对于系统中的多个服务节点，给定一系列操作，在协议（往往通过某种共识算法）保障下，试图使得它们对处理结果达成某种程度的一致。</p>
+<blockquote class=''>
+<p>一致性并不代表结果正确与否，而是系统对外呈现的状态一致与否，例如，所有节点都达成失败状态也是一种一致。</p>
+</blockquote><h3 id="分布式的挑战">分布式的挑战<a class="anchor" href="#%e5%88%86%e5%b8%83%e5%bc%8f%e7%9a%84%e6%8c%91%e6%88%98" aria-label="Link"></a></h3>
+<p>在实际的计算机集群系统（看似强大的计算机系统，很多地方都比人类世界要脆弱的多）中，存在如下的问题：</p>
+<ol>
+<li>节点之间的网络通讯是不可靠的，包括任意延迟和内容故障；</li>
+<li>节点的处理可能是错误的，甚至节点自身随时可能宕机；</li>
+<li>同步调用会让系统变得不具备可扩展性。</li>
+</ol>
+<p>要解决这些挑战，愿意动脑筋的读者可能会很快想出一些不错的思路。为了简化理解，仍然以两个电影院一起卖票的例子。可能有如下的解决思路：</p>
+<ol>
+<li>每次要卖一张票前打电话给另外一家电影院，确认下当前票数并没超售；</li>
+<li>两家电影院提前约好，奇数小时内一家可以卖票，偶数小时内另外一家可以卖；</li>
+<li>成立一个第三方的存票机构，票都放到他那里，每次卖票找他询问；</li>
+</ol>
+<p>这些思路大致都是可行的。实际上，这些方法背后的思想，<strong>将可能引发不一致的并行操作进行串行化</strong>，就是现在计算机系统里处理分布式一致性问题的基础思路和唯一秘诀。只是因为计算机系统比较傻，需要考虑得更全面一些；而人们又希望计算机系统能工作的更快更稳定，所以算法需要设计得再精巧一些。</p>
+<p>规范的说，理想的分布式系统一致性应该满足：</p>
+<ol>
+<li>可终止性（Termination）：一致的结果在有限时间内能完成；</li>
+<li>共识性（Consensus）：不同节点最终完成决策的结果应该相同；</li>
+<li>合法性（Validity）：决策的结果必须是其它进程提出的提案。</li>
+</ol>
+<p>第一点很容易理解，这是计算机系统可以被使用的前提。需要注意，在现实生活中这点并不是总能得到保障的，例如取款机有时候会是 <code>服务中断</code> 状态，电话有时候是 <code>无法连通</code> 的。</p>
+<p>第二点看似容易，但是隐藏了一些潜在信息。算法考虑的是任意的情形，凡事一旦推广到任意情形，就往往有一些惊人的结果。例如现在就剩一张票了，中关村和西单的电影院也分别刚确认过这张票的存在，然后两个电影院同时来了一个顾客要买票，从各自观察看来，自己的顾客都是第一个到的……怎么能达成结果的共识呢？记住我们的唯一秘诀：<strong>核心在于需要把两件事情进行排序，而且这个顺序还得是大家都认可的</strong>。</p>
+<p>第三点看似绕口，但是其实比较容易理解，即达成的结果必须是节点执行操作的结果。仍以卖票为例，如果两个影院各自卖出去一千张，那么达成的结果就是还剩八千张，决不能认为票售光了。</p>
+<h3 id="强一致性">强一致性<a class="anchor" href="#%e5%bc%ba%e4%b8%80%e8%87%b4%e6%80%a7" aria-label="Link"></a></h3>
+<h4 id="线性一致性">线性一致性<a class="anchor" href="#%e7%ba%bf%e6%80%a7%e4%b8%80%e8%87%b4%e6%80%a7" aria-label="Link"></a></h4>
+<p>线性一致性或称 <strong>原子一致性</strong> 或 <strong>严格一致性</strong> 指的是程序在执行的历史中在存在可线性化点P的执行模型，这意味着一个操作将在程序的调用和返回之间的某个点P起作用。这里“起作用”的意思是被系统中并发运行的所有其他线程所感知。要求如下：</p>
+<ol>
+<li><strong>写后读</strong> 这里写和读是两个操作，如果写操作在完成之后，读才开始，读要能读到最新的数据，而且保证以后也能读操作也都能读到这个最新的数据。</li>
+<li><strong>所有操作的时序与真实物理时间一致</strong>，要求即使不相关的两个操作，如果执行有先后顺序，线性一致性要求最终执行的结果也需要满足这个先后顺序。比如，操作序列(写A，读A，写B，读B)，那么不仅，读A，读B能读到最新A值和B值；而且要保证，如果读B读到最新值时，读A一定也能读到最新值，也就是需要保证执行时序与真实时序相同。</li>
+<li>如果两个操作是并发的(比如读A没有结束时，写B开始了)，那么这个并发时序不确定，但从最终执行的结果来看，要确保所有线程(进程，节点)看到的执行序列是一致的。</li>
+</ol>
+<h4 id="顺序一致性">顺序一致性<a class="anchor" href="#%e9%a1%ba%e5%ba%8f%e4%b8%80%e8%87%b4%e6%80%a7" aria-label="Link"></a></h4>
+<p>相比线性一致性，主要区别在于，<strong>对于物理上有先后顺序的操作，不保证这个时序</strong>。具体而言，对于单个线程，操作的顺序仍然要保留，对于多个线程(进程，节点)，执行的事件的先后顺序与物理时钟顺序不保证。但是要求，从执行结果来看，所有线程(进程，节点)看到的执行序列是一样的。</p>
+<h4 id="线性一致性和顺序一致性">线性一致性和顺序一致性。<a class="anchor" href="#%e7%ba%bf%e6%80%a7%e4%b8%80%e8%87%b4%e6%80%a7%e5%92%8c%e9%a1%ba%e5%ba%8f%e4%b8%80%e8%87%b4%e6%80%a7" aria-label="Link"></a></h4>
+<p><img src="assists/consenus_linearizability_sequential.png" alt="" /></p>
+<ol>
+<li>图1 是顺序一致性：从这两个进程的角度来看，顺序应该是这样的 <code>write(y,2) -&gt; read(x,0) -&gt; write(x,4) -&gt; read(y,2)</code> ，每个进程内部的读写顺序都是合理的，但是这个顺序与全局时钟下看到的顺序并不一样，<code>write(x,4)</code> 先于 <code>read(x,0)</code> 执行，但是 read 却没有读到最新值。</li>
+<li>图2 是线性一致性：每个读操作都读到了该变量的最新写的结果，同时 <strong>两个进程看到的操作顺序与全局时钟的顺序一样</strong>，都是 <code>write(y,2) -&gt; write(x,4) -&gt; read(x,4) -&gt; read(y,2)</code>。</li>
+<li>图3 不符合顺序一致性，更加不符合线性一致性，两个进程内部的顺序可能是：<code>write(x,4) -&gt; read(y,0) -&gt; write(y,2) -&gt; read(x,0)</code>、或者：<code>write(y,2) -&gt; read(x,0) -&gt; write(x,4) -&gt; read(y,0)</code> 显然两个顺序又不能同时被 P1、P2 满足，因此这个顺序是有冲突的，不满足顺序一致性。</li>
+</ol>
+<h4 id="因果一致性">因果一致性<a class="anchor" href="#%e5%9b%a0%e6%9e%9c%e4%b8%80%e8%87%b4%e6%80%a7" aria-label="Link"></a></h4>
+<p>因果一致性，被认为是比 顺序一致性 更弱的一致性，在因果一致性中，只对有因果关系的事件有顺序要求。</p></div>
+  </article>
+  
+
+  <div class="flex flex-wrap justify-between">
+  <span>
+  </span>
+  
+  <span>
+  </span>
+</div>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+<div>
+
+</div>
+
+<div>
+
+</div>
+
+</div>
+
+
+
+ 
+        
+  
+ 
+        
+        
+  
+ 
+        
+  
+    <script>(function(){document.querySelectorAll("pre:has(code)").forEach(e=>{e.addEventListener("click",e.focus),e.addEventListener("copy",function(t){if(t.preventDefault(),navigator.clipboard){const t=window.getSelection().toString()||e.textContent;navigator.clipboard.writeText(t)}})})})()</script>
+  
+
+      </footer>
+
+      <label for="menu-control" class="hidden book-menu-overlay" aria-hidden="true"></label>
+    </main>
+
+    
+<aside class="book-toc">
+  <div class="book-toc-content">
+    
+  <nav>
+  <ul>
+  
+    
+    <li class="book-section-flat">
+      <a>Categories</a>
+      <ul>
+      
+        <li class="flex align-center">
+          <a href="/categories/architecture/">Architecture</a>
+          <span>15</span>
+        </li>
+      
+        <li class="flex align-center">
+          <a href="/categories/java/">Java</a>
+          <span>31</span>
+        </li>
+      
+        <li class="flex align-center">
+          <a href="/categories/database/">Database</a>
+          <span>7</span>
+        </li>
+      
+        <li class="flex align-center">
+          <a href="/categories/net/">Net</a>
+          <span>7</span>
+        </li>
+      
+        <li class="flex align-center">
+          <a href="/categories/distributed/">Distributed</a>
+          <span>1</span>
+        </li>
+      
+        <li class="flex align-center">
+          <a href="/categories/algo/">Algo</a>
+          <span>8</span>
+        </li>
+      
+        <li class="flex align-center">
+          <a href="/categories/basic/">Basic</a>
+          <span>1</span>
+        </li>
+      
+        <li class="flex align-center">
+          <a href="/categories/crypotology/">Crypotology</a>
+          <span>1</span>
+        </li>
+      
+        <li class="flex align-center">
+          <a href="/categories/leetcode/">Leetcode</a>
+          <span>32</span>
+        </li>
+      
+        <li class="flex align-center">
+          <a href="/categories/mybatis/">Mybatis</a>
+          <span>3</span>
+        </li>
+      
+        <li class="flex align-center">
+          <a href="/categories/netty/">Netty</a>
+          <span>1</span>
+        </li>
+      
+        <li class="flex align-center">
+          <a href="/categories/offer/">Offer</a>
+          <span>68</span>
+        </li>
+      
+        <li class="flex align-center">
+          <a href="/categories/os/">Os</a>
+          <span>7</span>
+        </li>
+      
+        <li class="flex align-center">
+          <a href="/categories/spring/">Spring</a>
+          <span>4</span>
+        </li>
+      
+      </ul>
+    </li>
+    
+  
+    
+    <li class="book-section-flat">
+      <a>Tags</a>
+      <ul>
+      
+      </ul>
+    </li>
+    
+  
+  </ul>
+</nav>
+
+
+  </div>
+</aside>
+ 
+  </div>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

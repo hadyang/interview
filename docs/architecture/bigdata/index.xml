@@ -1,43 +1,29 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Interview</title>
-    <link>https://hadyang.github.io/interview/docs/architecture/bigdata/</link>
-    <description>Recent content on Interview</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>zh-CN</language>
-    <lastBuildDate>Wed, 22 Jan 2020 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://hadyang.github.io/interview/docs/architecture/bigdata/index.xml" rel="self" type="application/rss+xml" />
-    
-    
-    <item>
-      <title>大数据基础算法</title>
-      <link>https://hadyang.github.io/interview/docs/architecture/bigdata/algo/</link>
-      <pubDate>Wed, 22 Jan 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/architecture/bigdata/algo/</guid>
-      <description>Bloom filter 适用范围 实现数据字典，进行数据的判重，或者集合求交集
-基本原理 　对于原理来说很简单，Bit-Map + K个独立 Hash 函数。将 Hash 函数对应的值的位数组置1，查找时如果发现所有 Hash 函数对应位都是1说明存在。很明显这个过程并不保证查找的结果是 100% 正确的。同时也不支持删除一个已经插入的关键字，因为该关键字对应的位会牵动到其他的关键字。所以一个简单的改进就是 Counting Bloom filter，用一个 Counter 数组代替位数组，就可以支持删除了。
-对于元素个数：   \(n\)  ，错误率（假阳率）： \(P\)  。我们可以计算：
- Bit-Map 大小： \(m\ge -\frac{n\times ln^P}{(ln^2)^2}\)   Hash 函数个数： \(k=log_2^\frac{1}{P}\)     参数在线计算工具：Bloom Filter Calculator
- 举个例子我们假设 \(P=0.01\)  ， \(n=4000\)  ，则此时 m 应大概是 \(9.5\times n=38000\)  bit， \(k=7\)  注意这里 m 与 n 的单位不同，m是 bit 为单位，而n则是以元素个数为单位(准确的说是不同元素的个数)。通常单个元素的长度都是有很多 bit 的。所以使用bloom filter内存上通常都是节省的。</description>
-    </item>
-    
-    <item>
-      <title>HDFS</title>
-      <link>https://hadyang.github.io/interview/docs/architecture/bigdata/hdfs/</link>
-      <pubDate>Tue, 14 Jan 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://hadyang.github.io/interview/docs/architecture/bigdata/hdfs/</guid>
-      <description>HDFS 相关概念 HDFS要实现有以下优势：
- 兼容廉价硬件设备 流数据读写 大数据集 简单的文件模型 强大的跨平台兼容性  HDFS 在满足上述优势的同时，也不可避免的有一些自身的局限性，主要包括以下几个方面：
- 不适合低延时的数据访问 无法高效的存储大量小文件 不支持多用户写入及任意修改文件  块 HDFS 同计算机系统一样，有一个存储块的概念，默认大小为 64M，一个文件被分成多个块存储。块的大小远远大于计算机文件系统，可以减小寻址开销。其优势有：
- 支持大规模文件存储：以块为单位进行存储，一个大文件可被分割为多个块，并分发到不同节点，因此单个节点的存储容量不会限制存储文件的上限 简化系统设计：首先简化了存储管理，因为文件块大小固定，这样很容易计算节点可存储文件块的数量；其次，方便了元数据管理，元数据不与文件块存储，可由其他系统负责管理元数据。 适合数据备份：每个文件块都可冗余存储到多个节点，大大提高了系统的容错性和可用性。  名称节点（NameNode）和数据节点（DataNode）    NameNode DataNode     存储元数据 存储文件内容   元数据存储在内存 文件内容存储在磁盘   保存文件、block、 DataNode 之间的映射关系 维护block、本地文件系统的映射关系    名称节点（NameNode）数据结构 在 HDFS 中，名称节点复杂管理分布式文件系统的命名空间（NameSpace），保存两大核心数据结构：FSImage 和 EditLog。名称节点中还记录了每个文件中各个块所在的数据节点的位置信息。
-FSImage 文件用于维护文件系统树以及文件树中所有文件和文件夹的元数据。FSImage 文件中包含文件系统所有目录和文件 inode 的序列化形式，每个 inode 是一个文件或目录的元数据表示，包含：文件复制等级、修改和访问时间、访问权限、块大小以及组成文件的块。
-FSImage 中并没有记录块存储在哪个数据节点。而是由名称节点把这些映射保存在内存中，当数据节点加入 HDFS 集群时，数据节点会报告自己所包含的数据块给名称节点，并定期执行告知，以确保名称节点的映射关系是正确的。
-EditLog 记录了所有针对文件的创建、删除、重命名等操作。</description>
-    </item>
-    
-  </channel>
+	<channel>
+		<title>HadYang技术分享</title>
+		<link>https://hadyang.com/docs/architecture/bigdata/</link>
+		<description>Recent content on HadYang技术分享</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<atom:link href="https://hadyang.com/docs/architecture/bigdata/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>大数据基础算法</title>
+				<link>https://hadyang.com/docs/architecture/bigdata/algo/</link>
+				<pubDate>Wed, 22 Jan 2020 00:00:00 +0000</pubDate>
+				<guid>https://hadyang.com/docs/architecture/bigdata/algo/</guid>
+				<description>&lt;h2 id=&#34;bloom-filter&#34;&gt;Bloom filter&lt;a class=&#34;anchor&#34; href=&#34;#bloom-filter&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;h3 id=&#34;适用范围&#34;&gt;适用范围&lt;a class=&#34;anchor&#34; href=&#34;#%e9%80%82%e7%94%a8%e8%8c%83%e5%9b%b4&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&#xA;&lt;p&gt;实现数据字典，进行数据的判重，或者集合求交集&lt;/p&gt;&#xA;&lt;h3 id=&#34;基本原理&#34;&gt;基本原理&lt;a class=&#34;anchor&#34; href=&#34;#%e5%9f%ba%e6%9c%ac%e5%8e%9f%e7%90%86&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&#xA;&lt;p&gt;　　对于原理来说很简单，&lt;strong&gt;Bit-Map + K个独立 Hash 函数&lt;/strong&gt;。将 Hash 函数对应的值的位数组置&lt;code&gt;1&lt;/code&gt;，&lt;strong&gt;查找时如果发现所有 Hash 函数对应位都是&lt;code&gt;1&lt;/code&gt;说明存在&lt;/strong&gt;。很明显这个过程并不保证查找的结果是 100% 正确的。同时也不支持删除一个已经插入的关键字，因为该关键字对应的位会牵动到其他的关键字。所以一个简单的改进就是 &lt;strong&gt;Counting Bloom filter&lt;/strong&gt;，用一个 Counter 数组代替位数组，就可以支持删除了。&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;./assists/Bloom_Filter.png&#34; alt=&#34;Bloom_Filter&#34; /&gt;&lt;/p&gt;&#xA;&lt;p&gt;对于元素个数：&lt;span class=&#34;katex&#34;&gt;&lt;math xmlns=&#34;http://www.w3.org/1998/Math/MathML&#34;&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;n&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;，错误率（假阳率）：&lt;span class=&#34;katex&#34;&gt;&lt;math xmlns=&#34;http://www.w3.org/1998/Math/MathML&#34;&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;P&lt;/mi&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;P&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;。我们可以计算：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Bit-Map 大小：&lt;span class=&#34;katex&#34;&gt;&lt;math xmlns=&#34;http://www.w3.org/1998/Math/MathML&#34;&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;m&lt;/mi&gt;&lt;mo&gt;≥&lt;/mo&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mfrac&gt;&lt;mrow&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mi&gt;l&lt;/mi&gt;&lt;msup&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mi&gt;P&lt;/mi&gt;&lt;/msup&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mo stretchy=&#34;false&#34;&gt;(&lt;/mo&gt;&lt;mi&gt;l&lt;/mi&gt;&lt;msup&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/msup&gt;&lt;msup&gt;&lt;mo stretchy=&#34;false&#34;&gt;)&lt;/mo&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/msup&gt;&lt;/mrow&gt;&lt;/mfrac&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;m\ge -\frac{n\times ln^P}{(ln^2)^2}&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;/li&gt;&#xA;&lt;li&gt;Hash 函数个数：&lt;span class=&#34;katex&#34;&gt;&lt;math xmlns=&#34;http://www.w3.org/1998/Math/MathML&#34;&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;k&lt;/mi&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mi&gt;l&lt;/mi&gt;&lt;mi&gt;o&lt;/mi&gt;&lt;msubsup&gt;&lt;mi&gt;g&lt;/mi&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;mfrac&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mi&gt;P&lt;/mi&gt;&lt;/mfrac&gt;&lt;/msubsup&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;k=log_2^\frac{1}{P}&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;blockquote class=&#39;&#39;&gt;&#xA;&lt;p&gt;参数在线计算工具：&lt;a href=&#34;https://hur.st/bloomfilter&#34;&gt;Bloom Filter Calculator&lt;/a&gt;&lt;/p&gt;&#xA;&lt;/blockquote&gt;&lt;p&gt;举个例子我们假设 &lt;span class=&#34;katex&#34;&gt;&lt;math xmlns=&#34;http://www.w3.org/1998/Math/MathML&#34;&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;P&lt;/mi&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mn&gt;0.01&lt;/mn&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;P=0.01&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;，&lt;span class=&#34;katex&#34;&gt;&lt;math xmlns=&#34;http://www.w3.org/1998/Math/MathML&#34;&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mn&gt;4000&lt;/mn&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;n=4000&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;，则此时 m 应大概是 &lt;span class=&#34;katex&#34;&gt;&lt;math xmlns=&#34;http://www.w3.org/1998/Math/MathML&#34;&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mn&gt;9.5&lt;/mn&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mn&gt;38000&lt;/mn&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;9.5\times n=38000&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt; bit，&lt;span class=&#34;katex&#34;&gt;&lt;math xmlns=&#34;http://www.w3.org/1998/Math/MathML&#34;&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;k&lt;/mi&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mn&gt;7&lt;/mn&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;k=7&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;/p&gt;&#xA;&lt;p&gt;注意这里 m 与 n 的单位不同，m是 &lt;code&gt;bit&lt;/code&gt; 为单位，而n则是以元素个数为单位(准确的说是不同元素的个数)。通常单个元素的长度都是有很多 &lt;code&gt;bit&lt;/code&gt; 的。所以使用bloom filter内存上通常都是节省的。&lt;/p&gt;&#xA;&lt;h3 id=&#34;扩展&#34;&gt;扩展&lt;a class=&#34;anchor&#34; href=&#34;#%e6%89%a9%e5%b1%95&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&#xA;&lt;p&gt;　　Bloom filter 将集合中的元素映射到位数组中，用 k 个映射位是否全1表示元素在不在这个集合中。&lt;code&gt;Counting bloom filter（CBF）&lt;/code&gt;将 &lt;strong&gt;位数组中的每一位扩展为一个 Counter&lt;/strong&gt;，从而支持了元素的删除操作。&lt;code&gt;Spectral Bloom Filter（SBF）&lt;/code&gt;将其与集合元素的出现次数关联。&lt;strong&gt;&lt;code&gt;SBF&lt;/code&gt;采用 Counter 中的最小值来近似表示元素的出现频率&lt;/strong&gt;。&lt;/p&gt;&#xA;&lt;h3 id=&#34;问题实例&#34;&gt;问题实例&lt;a class=&#34;anchor&#34; href=&#34;#%e9%97%ae%e9%a2%98%e5%ae%9e%e4%be%8b&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&#xA;&lt;p&gt;给你A,B两个文件，各存放50亿条URL，每条URL占用64字节，内存限制是4G，让你找出A,B文件共同的URL。如果是三个乃至n个文件呢？&lt;/p&gt;&#xA;&lt;p&gt;答：根据这个问题我们来计算下内存的占用，&lt;code&gt;4G=2^32&lt;/code&gt;大概是40亿*8大概是 340亿，n=50亿，如果按出错率 0.01 算需要的大概是 475 亿个bit。现在可用的是 340 亿，相差并不多，这样可能会使出错率上升些。另外如果这些url ip是一一对应的，就可以转换成ip，则大大简单了。&lt;/p&gt;</description>
+			</item>
+			<item>
+				<title>HDFS</title>
+				<link>https://hadyang.com/docs/architecture/bigdata/hdfs/</link>
+				<pubDate>Tue, 14 Jan 2020 00:00:00 +0000</pubDate>
+				<guid>https://hadyang.com/docs/architecture/bigdata/hdfs/</guid>
+				<description>&lt;h2 id=&#34;hdfs-相关概念&#34;&gt;HDFS 相关概念&lt;a class=&#34;anchor&#34; href=&#34;#hdfs-%e7%9b%b8%e5%85%b3%e6%a6%82%e5%bf%b5&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;HDFS要实现有以下优势：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;兼容廉价硬件设备&lt;/li&gt;&#xA;&lt;li&gt;流数据读写&lt;/li&gt;&#xA;&lt;li&gt;大数据集&lt;/li&gt;&#xA;&lt;li&gt;简单的文件模型&lt;/li&gt;&#xA;&lt;li&gt;强大的跨平台兼容性&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;HDFS 在满足上述优势的同时，也不可避免的有一些自身的局限性，主要包括以下几个方面：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;不适合低延时的数据访问&lt;/li&gt;&#xA;&lt;li&gt;无法高效的存储大量小文件&lt;/li&gt;&#xA;&lt;li&gt;不支持多用户写入及任意修改文件&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h3 id=&#34;块&#34;&gt;块&lt;a class=&#34;anchor&#34; href=&#34;#%e5%9d%97&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&#xA;&lt;p&gt;HDFS 同计算机系统一样，有一个存储块的概念，默认大小为 64M，一个文件被分成多个块存储。块的大小远远大于计算机文件系统，可以减小寻址开销。其优势有：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;支持大规模文件存储：以块为单位进行存储，一个大文件可被分割为多个块，并分发到不同节点，因此单个节点的存储容量不会限制存储文件的上限&lt;/li&gt;&#xA;&lt;li&gt;简化系统设计：首先简化了存储管理，因为文件块大小固定，这样很容易计算节点可存储文件块的数量；其次，方便了元数据管理，元数据不与文件块存储，可由其他系统负责管理元数据。&lt;/li&gt;&#xA;&lt;li&gt;适合数据备份：每个文件块都可冗余存储到多个节点，大大提高了系统的容错性和可用性。&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h3 id=&#34;名称节点namenode和数据节点datanode&#34;&gt;名称节点（NameNode）和数据节点（DataNode）&lt;a class=&#34;anchor&#34; href=&#34;#%e5%90%8d%e7%a7%b0%e8%8a%82%e7%82%b9namenode%e5%92%8c%e6%95%b0%e6%8d%ae%e8%8a%82%e7%82%b9datanode&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h3&gt;&#xA;&lt;table&gt;&#xA;&#x9;&lt;thead&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th style=&#34;text-align: left&#34;&gt;NameNode&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;th style=&#34;text-align: left&#34;&gt;DataNode&lt;/th&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/thead&gt;&#xA;&#x9;&lt;tbody&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td style=&#34;text-align: left&#34;&gt;存储元数据&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td style=&#34;text-align: left&#34;&gt;存储文件内容&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td style=&#34;text-align: left&#34;&gt;元数据存储在内存&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td style=&#34;text-align: left&#34;&gt;文件内容存储在磁盘&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&#x9;&#x9;&lt;tr&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td style=&#34;text-align: left&#34;&gt;保存文件、block、 DataNode 之间的映射关系&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&#x9;&#x9;&lt;td style=&#34;text-align: left&#34;&gt;维护block、本地文件系统的映射关系&lt;/td&gt;&#xA;&#x9;&#x9;&#x9;&lt;/tr&gt;&#xA;&#x9;&lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;h4 id=&#34;名称节点namenode数据结构&#34;&gt;名称节点（NameNode）数据结构&lt;a class=&#34;anchor&#34; href=&#34;#%e5%90%8d%e7%a7%b0%e8%8a%82%e7%82%b9namenode%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h4&gt;&#xA;&lt;p&gt;在 HDFS 中，名称节点复杂管理分布式文件系统的命名空间（NameSpace），保存两大核心数据结构：&lt;strong&gt;FSImage&lt;/strong&gt; 和 &lt;strong&gt;EditLog&lt;/strong&gt;。名称节点中还记录了每个文件中各个块所在的数据节点的位置信息。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;FSImage 文件用于维护文件系统树以及文件树中所有文件和文件夹的元数据&lt;/strong&gt;。FSImage 文件中包含文件系统所有目录和文件 &lt;code&gt;inode&lt;/code&gt; 的序列化形式，每个 &lt;code&gt;inode&lt;/code&gt; 是一个文件或目录的元数据表示，包含：文件复制等级、修改和访问时间、访问权限、块大小以及组成文件的块。&lt;/p&gt;&#xA;&lt;p&gt;FSImage 中并没有记录块存储在哪个数据节点。而是由名称节点把这些映射保存在内存中，当数据节点加入 HDFS 集群时，数据节点会报告自己所包含的数据块给名称节点，并定期执行告知，以确保名称节点的映射关系是正确的。&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;EditLog 记录了所有针对文件的创建、删除、重命名等操作&lt;/strong&gt;。&lt;/p&gt;&#xA;&lt;p&gt;NameNode 将对文件系统的改动追加保存到本地文件系统上的一个日志文件（EditLog）。当一个 NameNode 启动时，它首先从一个映像文件（FSImage）中读取 HDFS 的状态，接着应用日志文件中的 EditLog 操作。然后它将新的HDFS状态写入（FSImage）中，并使用一个空的 EditLog 文件开始正常操作。因为NameNode只有在启动阶段才合并 FSImage 和 EditLog ，所以久而久之日志文件可能会变得非常庞大，特别是对大型的集群。日志文件太大的另一个副作用是下一次 NameNode 启动会花很长时间。&lt;/p&gt;</description>
+			</item>
+	</channel>
 </rss>

@@ -1,595 +1,3144 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN" dir="ltr"
+    data-theme="light"
+    data-layout="centered">
 
 <head>
-  <meta charset="UTF-8">
+  
+  <meta name="generator" content="Hugo 0.169.0">
+  <meta name="generator-theme" content="Book Theme: https://github.com/alex-shpak/hugo-book">
+
+
+
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="大数据基础算法"><meta property="og:title" content="大数据基础算法" />
-<meta property="og:description" content="Bloom filter 适用范围 实现数据字典，进行数据的判重，或者集合求交集
-基本原理 　对于原理来说很简单，Bit-Map &#43; K个独立 Hash 函数。将 Hash 函数对应的值的位数组置1，查找时如果发现所有 Hash 函数对应位都是1说明存在。很明显这个过程并不保证查找的结果是 100% 正确的。同时也不支持删除一个已经插入的关键字，因为该关键字对应的位会牵动到其他的关键字。所以一个简单的改进就是 Counting Bloom filter，用一个 Counter 数组代替位数组，就可以支持删除了。
-对于元素个数：   \(n\)  ，错误率（假阳率）： \(P\)  。我们可以计算：
- Bit-Map 大小： \(m\ge -\frac{n\times ln^P}{(ln^2)^2}\)   Hash 函数个数： \(k=log_2^\frac{1}{P}\)     参数在线计算工具：Bloom Filter Calculator
- 举个例子我们假设 \(P=0.01\)  ， \(n=4000\)  ，则此时 m 应大概是 \(9.5\times n=38000\)  bit， \(k=7\)  注意这里 m 与 n 的单位不同，m是 bit 为单位，而n则是以元素个数为单位(准确的说是不同元素的个数)。通常单个元素的长度都是有很多 bit 的。所以使用bloom filter内存上通常都是节省的。" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://hadyang.github.io/interview/docs/architecture/bigdata/algo/" />
-<meta property="article:published_time" content="2020-01-22T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-04-22T13:59:45+08:00" />
-<title>大数据基础算法 | Interview</title>
-<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+<meta name="description" content="Bloom filter 适用范围 实现数据字典，进行数据的判重，或者集合求交集
+基本原理 对于原理来说很简单，Bit-Map &#43; K个独立 Hash 函数。将 Hash 函数对应的值的位数组置1，查找时如果发现所有 Hash 函数对应位都是1说明存在。很明显这个过程并不保证查找的结果是 100% 正确的。同时也不支持删除一个已经插入的关键字，因为该关键字对应的位会牵动到其他的关键字。所以一个简单的改进就是 Counting Bloom filter，用一个 Counter 数组代替位数组，就可以支持删除了。
+对于元素个数：nn，错误率（假阳率）：PP。我们可以计算：
+Bit-Map 大小：m≥−n×lnP(ln2)2m\ge -\frac{n\times ln^P}{(ln^2)^2} Hash 函数个数：k=log21Pk=log_2^\frac{1}{P} 参数在线计算工具：Bloom Filter Calculator
+举个例子我们假设 P=0.01P=0.01，n=4000n=4000，则此时 m 应大概是 9.5×n=380009.5\times n=38000 bit，k=7k=7
+注意这里 m 与 n 的单位不同，m是 bit 为单位，而n则是以元素个数为单位(准确的说是不同元素的个数)。通常单个元素的长度都是有很多 bit 的。所以使用bloom filter内存上通常都是节省的。
+扩展 Bloom filter 将集合中的元素映射到位数组中，用 k 个映射位是否全1表示元素在不在这个集合中。Counting bloom filter（CBF）将 位数组中的每一位扩展为一个 Counter，从而支持了元素的删除操作。Spectral Bloom Filter（SBF）将其与集合元素的出现次数关联。SBF采用 Counter 中的最小值来近似表示元素的出现频率。
+问题实例 给你A,B两个文件，各存放50亿条URL，每条URL占用64字节，内存限制是4G，让你找出A,B文件共同的URL。如果是三个乃至n个文件呢？
+">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#2e3440">
+<meta name="color-scheme" content="light dark">
+<meta name="format-detection" content="telephone=no"><meta property="og:url" content="https://hadyang.com/docs/architecture/bigdata/algo/">
+	<meta property="og:site_name" content="HadYang技术分享">
+	<meta property="og:title" content="大数据基础算法">
+	<meta property="og:description" content="Bloom filter 适用范围 实现数据字典，进行数据的判重，或者集合求交集
+基本原理 对于原理来说很简单，Bit-Map &#43; K个独立 Hash 函数。将 Hash 函数对应的值的位数组置1，查找时如果发现所有 Hash 函数对应位都是1说明存在。很明显这个过程并不保证查找的结果是 100% 正确的。同时也不支持删除一个已经插入的关键字，因为该关键字对应的位会牵动到其他的关键字。所以一个简单的改进就是 Counting Bloom filter，用一个 Counter 数组代替位数组，就可以支持删除了。
+对于元素个数：nn，错误率（假阳率）：PP。我们可以计算：
+Bit-Map 大小：m≥−n×lnP(ln2)2m\ge -\frac{n\times ln^P}{(ln^2)^2} Hash 函数个数：k=log21Pk=log_2^\frac{1}{P} 参数在线计算工具：Bloom Filter Calculator
+举个例子我们假设 P=0.01P=0.01，n=4000n=4000，则此时 m 应大概是 9.5×n=380009.5\times n=38000 bit，k=7k=7
+注意这里 m 与 n 的单位不同，m是 bit 为单位，而n则是以元素个数为单位(准确的说是不同元素的个数)。通常单个元素的长度都是有很多 bit 的。所以使用bloom filter内存上通常都是节省的。
+扩展 Bloom filter 将集合中的元素映射到位数组中，用 k 个映射位是否全1表示元素在不在这个集合中。Counting bloom filter（CBF）将 位数组中的每一位扩展为一个 Counter，从而支持了元素的删除操作。Spectral Bloom Filter（SBF）将其与集合元素的出现次数关联。SBF采用 Counter 中的最小值来近似表示元素的出现频率。
+问题实例 给你A,B两个文件，各存放50亿条URL，每条URL占用64字节，内存限制是4G，让你找出A,B文件共同的URL。如果是三个乃至n个文件呢？">
+	<meta property="og:locale" content="zh_CN">
+	<meta property="og:type" content="article">
+		<meta property="article:section" content="docs">
+		<meta property="article:published_time" content="2020-01-22T00:00:00+00:00">
+		<meta property="article:modified_time" content="2020-04-22T13:59:45+08:00">
 
 
-<link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
+	<meta itemprop="name" content="大数据基础算法">
+	<meta itemprop="description" content="Bloom filter 适用范围 实现数据字典，进行数据的判重，或者集合求交集
+基本原理 对于原理来说很简单，Bit-Map &#43; K个独立 Hash 函数。将 Hash 函数对应的值的位数组置1，查找时如果发现所有 Hash 函数对应位都是1说明存在。很明显这个过程并不保证查找的结果是 100% 正确的。同时也不支持删除一个已经插入的关键字，因为该关键字对应的位会牵动到其他的关键字。所以一个简单的改进就是 Counting Bloom filter，用一个 Counter 数组代替位数组，就可以支持删除了。
+对于元素个数：nn，错误率（假阳率）：PP。我们可以计算：
+Bit-Map 大小：m≥−n×lnP(ln2)2m\ge -\frac{n\times ln^P}{(ln^2)^2} Hash 函数个数：k=log21Pk=log_2^\frac{1}{P} 参数在线计算工具：Bloom Filter Calculator
+举个例子我们假设 P=0.01P=0.01，n=4000n=4000，则此时 m 应大概是 9.5×n=380009.5\times n=38000 bit，k=7k=7
+注意这里 m 与 n 的单位不同，m是 bit 为单位，而n则是以元素个数为单位(准确的说是不同元素的个数)。通常单个元素的长度都是有很多 bit 的。所以使用bloom filter内存上通常都是节省的。
+扩展 Bloom filter 将集合中的元素映射到位数组中，用 k 个映射位是否全1表示元素在不在这个集合中。Counting bloom filter（CBF）将 位数组中的每一位扩展为一个 Counter，从而支持了元素的删除操作。Spectral Bloom Filter（SBF）将其与集合元素的出现次数关联。SBF采用 Counter 中的最小值来近似表示元素的出现频率。
+问题实例 给你A,B两个文件，各存放50亿条URL，每条URL占用64字节，内存限制是4G，让你找出A,B文件共同的URL。如果是三个乃至n个文件呢？">
+	<meta itemprop="datePublished" content="2020-01-22T00:00:00+00:00">
+	<meta itemprop="dateModified" content="2020-04-22T13:59:45+08:00">
+	<meta itemprop="wordCount" content="733">
+	<meta itemprop="keywords" content="Architecture">
+
+<title>大数据基础算法 • HadYang技术分享</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.png" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<link rel="manifest" href="/manifest.json">
+<link rel="canonical" href="https://hadyang.com/docs/architecture/bigdata/algo/">
+<link rel="stylesheet" href="/book.min.3b47c5c3053ddd1846b44ca0278f9365d1cc6def0c56efaee4fbb8b7a57c782b.css" integrity="sha256-O0fFwwU93RhGtEygJ4&#43;TZdHMbe8MVu&#43;u5Pu4t6V8eCs=" crossorigin="anonymous">
 
 
-<script defer src="/interview/en.search.min.51eaac1d27afa630aa5121b26a137e4a1060429577e041714b91afd0aabeecb6.js" integrity="sha256-UeqsHSevpjCqUSGyahN&#43;ShBgQpV34EFxS5Gv0Kq&#43;7LY="></script>
-
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-	ga('create', 'UA-157595781-3', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
-
-<!--
-Made with Book Theme
-https://github.com/alex-shpak/hugo-book
--->
-
+<script type="module" src="/en.search.min.b47060fc7a23e8d87f711a51b12b14f2dcc3aa45572ee4a9e1129fbbe13243de.js" integrity="sha256-tHBg/Hoj6Nh/cRpRsSsU8tzDqkVXLuSp4RKfu&#43;EyQ94=" crossorigin="anonymous"></script>
   
 </head>
 
-<body>
-  <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="container flex">
-    <aside class="book-menu">
-      
+<body dir="ltr" class="book-kind-page book-type-docs">
+  <div class="book-container flex">
+    
+<aside class="book-menu" aria-label="Menu">
+  <div class="book-menu-content">
+    
   <nav>
-<h2 class="book-brand">
-  <a href="/interview"><span>Interview</span>
+<div class="book-brand">
+  <a class="flex align-center" href="/"><span>HadYang技术分享</span>
   </a>
-</h2>
-
-
-<div class="book-search">
-  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
-  <div class="book-search-spinner spinner hidden"></div>
-  <ul id="book-search-results"></ul>
 </div>
 
-
-
-
-
-
-
-
-
-  <ul>
-<li><a href="/interview/docs/basic/">计算机基础</a>
-<ul>
-<li><a href="/interview/docs/basic/algo/">算法</a>
-<ul>
-<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
-<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
-<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
-<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
-<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
-<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
-<li><a href="/interview/docs/basic/algo/sort/">排序算法</a></li>
-<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/basic/os/">操作系统</a>
-<ul>
-<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
-<li><a href="/interview/docs/basic/os/concurrency/">进程管理</a></li>
-<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
-<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
-<li><a href="/interview/docs/basic/os/device/">设备管理</a></li>
-<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
-<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/basic/net/">计算机网络</a>
-<ul>
-<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
-<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
-<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
-<li><a href="/interview/docs/basic/net/http/">HTTP</a></li>
-<li><a href="/interview/docs/basic/net/https/">HTTPS</a></li>
-<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/basic/database/mysql/">MySQL</a>
-<ul>
-<li><a href="/interview/docs/basic/database/sql/">SQL</a></li>
-<li><a href="/interview/docs/basic/database/mysql/architecture/">MySQL架构</a></li>
-<li><a href="/interview/docs/basic/database/mysql/innodb/">InnoDB</a>
-<ul>
-<li><a href="/interview/docs/basic/database/mysql/innodb/index/">InnoDB索引</a></li>
-<li><a href="/interview/docs/basic/database/mysql/innodb/concurrent/">InnoDB并发控制</a></li>
-<li><a href="/interview/docs/basic/database/mysql/innodb/transaction/">InnoDB事务</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/basic/database/mysql/sharding/">MySQL集群</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
-<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/java/">Java</a>
-<ul>
-<li><a href="/interview/docs/java/oop/">OOP</a></li>
-<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
-<li><a href="/interview/docs/java/operator/">运算符</a></li>
-<li><a href="/interview/docs/java/exception/">异常</a></li>
-<li><a href="/interview/docs/java/generics/">泛型</a></li>
-<li><a href="/interview/docs/java/object/">Object</a></li>
-<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
-<li><a href="/interview/docs/java/proxy/">代理</a></li>
-<li><a href="/interview/docs/java/annotation/">注解</a></li>
-<li><a href="/interview/docs/java/nio/">NIO</a></li>
-<li><a href="/interview/docs/java/question/">面试题</a></li>
-<li><a href="/interview/docs/java/">集合</a>
-<ul>
-<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
-<li><a href="/interview/docs/java/collection/Concurrenthashmap/">Concurrenthashmap</a></li>
-<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/java/concurrent/">并发</a>
-<ul>
-<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
-<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
-<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
-<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
-<li><a href="/interview/docs/java/concurrent/AQS/">AQS</a></li>
-<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
-<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
-<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/java/jvm/">Java虚拟机</a>
-<ul>
-<li><a href="/interview/docs/java/jvm/architecture/">JVM架构</a></li>
-<li><a href="/interview/docs/java/jvm/classloader/">类加载器</a></li>
-<li><a href="/interview/docs/java/jvm/runtime_area/">内存模型</a></li>
-<li><a href="/interview/docs/java/jvm/gc/">垃圾收集</a></li>
-<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
-<li><a href="/interview/docs/java/jvm/string-constant-pool/">String常量池</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-object-lifecycle/">对象生命周期</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="/interview/docs/fromwork/">框架</a>
-<ul>
-<li><a href="/interview/docs/fromwork/netty/">Netty</a></li>
-<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
-<ul>
-<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
-<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
-<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/fromwork/spring/">Spring</a>
-<ul>
-<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
-<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
-<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="/interview/docs/architecture/">系统架构</a>
-<ul>
-<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
-<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
-<ul>
-<li><a href="/interview/docs/architecture/concurrent/design/">高并发系统设计</a></li>
-<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/architecture/design/">系统设计</a>
-<ul>
-<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
-<li><a href="/interview/docs/architecture/design/seckill/">秒杀系统</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/architecture/distributed/">分布式</a>
-<ul>
-<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
-<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
-<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
-<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
-<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
-<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
-<li><a href="/interview/docs/architecture/distributed/kafka/">Kafka</a></li>
-<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
-<li><a href="/interview/docs/architecture/distributed/dubbo/">Dubbo</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
-<ul>
-<li><a href="/interview/docs/architecture/bigdata/algo/"class=active>基础算法</a></li>
-<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="/interview/docs/offer/">剑指offer</a>
-<ul>
-<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
-<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
-<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
-<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
-<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
-<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
-<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
-<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
-<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
-<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
-<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
-<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
-<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
-<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
-<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
-<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
-<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
-<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
-<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
-<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
-<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
-<li><a href="/interview/docs/offer/VerifySquenceOfBST/">二叉搜索树的后序遍历序列</a></li>
-<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
-<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
-<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
-<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
-<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
-<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
-<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
-<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
-<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
-<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
-<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
-<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
-<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
-<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
-<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
-<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
-<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
-<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
-<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
-<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
-<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
-<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
-<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
-<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
-<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
-<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
-<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
-<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
-<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
-<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
-<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
-<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
-<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
-<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
-<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
-<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
-<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
-<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
-<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
-<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
-<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
-<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
-<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
-<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
-<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/leetcode/">LeetCode</a>
-<ul>
-<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
-<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
-<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
-<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
-<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
-<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
-<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
-<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
-<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
-<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
-<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
-<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
-<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
-<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
-<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
-<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
-<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
-<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
-<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
-<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
-<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
-<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
-<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
-<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
-<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
-<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
-<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
-<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
-<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
-<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
-<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
-<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
-<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
-<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
-</ul>
-</li>
-</ul>
-
-
-
-
-
-
-
-
-</nav>
-
-
-
-
-  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
-
-
- 
-    </aside>
-
-    <div class="book-page">
-      <header class="book-header">
-        
-  <div class="flex align-center justify-between">
-  <label for="menu-control">
-    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
-  </label>
-
-  <strong>大数据基础算法</strong>
-
-  <label for="toc-control">
-    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
-  </label>
+<div class="book-search hidden">
+  <input id="book-search-input" type="text" role="searchbox" enterkeyhint="search"
+    placeholder="Search"
+    aria-label="Search"
+    maxlength="64" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results" aria-live="polite"></ul>
 </div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
 
 
   
-    <input type="checkbox" class="hidden" id="toc-control" />
-    <aside class="hidden clearfix">
-      
-  <nav id="TableOfContents">
   <ul>
-    <li><a href="#bloom-filter">Bloom filter</a>
-      <ul>
-        <li><a href="#适用范围">适用范围</a></li>
-        <li><a href="#基本原理">基本原理</a></li>
-        <li><a href="#扩展">扩展</a></li>
-        <li><a href="#问题实例">问题实例</a></li>
-      </ul>
-    </li>
-    <li><a href="#hashing">Hashing</a>
-      <ul>
-        <li><a href="#适用范围-1">适用范围</a></li>
-        <li><a href="#基本原理-1">基本原理</a></li>
-        <li><a href="#扩展-1">扩展</a></li>
-        <li><a href="#问题实例-1">问题实例：</a></li>
-      </ul>
-    </li>
-    <li><a href="#bit-map">bit-map</a>
-      <ul>
-        <li><a href="#适用范围-2">适用范围</a></li>
-        <li><a href="#基本原理-2">基本原理</a></li>
-        <li><a href="#扩展-2">扩展</a></li>
-        <li><a href="#问题实例-2">问题实例</a></li>
-      </ul>
-    </li>
-    <li><a href="#hyperloglog">HyperLogLog</a>
-      <ul>
-        <li><a href="#原理">原理</a></li>
-      </ul>
-    </li>
-    <li><a href="#simhash">Simhash</a></li>
-    <li><a href="#堆">堆</a>
-      <ul>
-        <li><a href="#适用范围-3">适用范围</a></li>
-        <li><a href="#基本原理-3">基本原理</a></li>
-        <li><a href="#扩展-3">扩展</a></li>
-        <li><a href="#问题实例-3">问题实例：</a></li>
-      </ul>
-    </li>
-    <li><a href="#双层桶划分">双层桶划分</a>
-      <ul>
-        <li><a href="#适用范围-4">适用范围</a></li>
-        <li><a href="#基本原理-4">基本原理</a></li>
-        <li><a href="#扩展-4">扩展</a></li>
-        <li><a href="#问题实例-4">问题实例</a></li>
-      </ul>
-    </li>
-    <li><a href="#数据库索引">数据库索引</a>
-      <ul>
-        <li><a href="#适用范围-5">适用范围</a></li>
-        <li><a href="#基本原理-5">基本原理</a></li>
-      </ul>
-    </li>
-    <li><a href="#倒排索引inverted-index">倒排索引(Inverted index)</a>
-      <ul>
-        <li><a href="#适用范围-6">适用范围</a></li>
-        <li><a href="#基本原理-6">基本原理</a></li>
-        <li><a href="#扩展-5">扩展</a></li>
-        <li><a href="#问题实例-5">问题实例</a></li>
-      </ul>
-    </li>
-    <li><a href="#k-路归并">K 路归并</a>
-      <ul>
-        <li><a href="#适用范围-7">适用范围</a></li>
-        <li><a href="#基本原理-7">基本原理</a></li>
-        <li><a href="#问题实例-6">问题实例</a></li>
-      </ul>
-    </li>
-    <li><a href="#败胜者树">败/胜者树</a>
-      <ul>
-        <li><a href="#基本原理-8">基本原理</a></li>
-      </ul>
-    </li>
-    <li><a href="#置换选择排序">置换选择排序</a></li>
-    <li><a href="#最佳归并树">最佳归并树</a></li>
-    <li><a href="#trie树">Trie树</a>
-      <ul>
-        <li><a href="#适用范围-8">适用范围</a></li>
-        <li><a href="#基本原理-9">基本原理</a></li>
-        <li><a href="#扩展-6">扩展</a></li>
-        <li><a href="#问题实例-7">问题实例</a></li>
-      </ul>
-    </li>
-    <li><a href="#map-reduce">map-reduce</a>
-      <ul>
-        <li><a href="#适用范围-9">适用范围</a></li>
-        <li><a href="#基本原理及要点">基本原理及要点</a></li>
-        <li><a href="#问题实例-8">问题实例</a></li>
-      </ul>
-    </li>
-    <li><a href="#经典问题分析">经典问题分析</a>
-      <ul>
-        <li><a href="#如何从大量的-url-中找出相同的-url">如何从大量的 URL 中找出相同的 URL？</a></li>
-        <li><a href="#如何从大量数据中找出高频词">如何从大量数据中找出高频词？</a></li>
-        <li><a href="#如何在大量的数据中找出不重复的整数">如何在大量的数据中找出不重复的整数？</a></li>
-        <li><a href="#如何在大量的数据中判断一个数是否存在">如何在大量的数据中判断一个数是否存在？</a></li>
-        <li><a href="#如何查询最热门的查询串">如何查询最热门的查询串？</a></li>
-        <li><a href="#如何统计不同电话号码的个数">如何统计不同电话号码的个数？</a></li>
-        <li><a href="#如何从-5-亿个数中找出中位数">如何从 5 亿个数中找出中位数？</a></li>
-        <li><a href="#如何按照-query-的频度排序">如何按照 query 的频度排序？</a></li>
-        <li><a href="#如何找出排名前-500-的数">如何找出排名前 500 的数？</a></li>
-      </ul>
-    </li>
-    <li><a href="#参考链接">参考链接</a></li>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Architecture</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/base/" class="">
+      系统架构基础</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Bigdata</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/bigdata/algo/" class="active">
+      大数据基础算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/bigdata/hdfs/" class="">
+      HDFS</a>
+  
+
+        </li>
+      
+    
   </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Concurrent</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/concurrent/design/" class="">
+      高并发系统设计</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/concurrent/flow-control/" class="">
+      高并发下的流量控制</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Design</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/design/seckill/" class="">
+      秒杀系统</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/design/tinyURL/" class="">
+      短链接</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Distributed</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/consensus/" class="">
+      分布式一致性和共识协议</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/dubbo/" class="">
+      Dubbo</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/kafka/" class="">
+      Kafka</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/mq/" class="">
+      MQ</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/rpc/" class="">
+      RPC</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/zk/" class="">
+      Zookeeper</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/transaction/" class="">
+      分布式事务</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/cache/" class="">
+      分布式缓存</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/lock/" class="">
+      分布式锁</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/" class="">
+      Basic</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/sql/" class="">
+      SQL</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/redis/" class="">
+      Redis</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/cryptology/" class="">
+      密码学</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/" class="">
+      操作系统基础</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/io/" class="">
+      I/O</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/memory/" class="">
+      内存管理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/disk/" class="">
+      磁盘与文件</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/arch/" class="">
+      计算机体系结构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/device/" class="">
+      设备管理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/concurrency/" class="">
+      进程管理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/questions/" class="">
+      Index</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/" class="">
+      算法</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/kmp/" class="">
+      KMP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/hash/" class="">
+      哈希</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/sort/" class="">
+      排序算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/mst/" class="">
+      最小生成树算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/path/" class="">
+      最短路径算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/search/" class="">
+      查找算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/tree/" class="">
+      树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/skip_list/" class="">
+      跳跃表</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/" class="">
+      网络分层</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/websocket/" class="">
+      Websocket</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/http/" class="">
+      HTTP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/https/" class="">
+      HTTPS</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/ip/" class="">
+      IP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/tcp/" class="">
+      TCP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/protocol/" class="">
+      网络协议</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Mysql</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/sharding/" class="">
+      MySQL 集群</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/architecture/" class="">
+      MySQL 架构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Innodb</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/innodb/transaction/" class="">
+      InnoDB 事务</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/innodb/concurrent/" class="">
+      InnoDB 并发控制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/innodb/index/" class="">
+      InnoDB 索引</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Fromwork</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/netty/" class="">
+      Netty</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/spring/" class="">
+      Spring 基本</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/spring/aop/" class="">
+      AOP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/spring/ioc/" class="">
+      IOC</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/spring/design-partten/" class="">
+      设计模式</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Mybatis</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/mybatis/proxy/" class="">
+      Mybatis 动态代理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/mybatis/cache/" class="">
+      Mybatis 缓存机制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/mybatis/question/" class="">
+      面试题</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/" class="">
+      Java</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/question/" class="">
+      Java面试题</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/nio/" class="">
+      NIO</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/proxy/" class="">
+      Java 代理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/exception/" class="">
+      Java 异常</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/generics/" class="">
+      Java 泛型</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/object/" class="">
+      Object</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/string-builder/" class="">
+      StringBuilder</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/serilaser/" class="">
+      序列化</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/annotation/" class="">
+      注解</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/operator/" class="">
+      运算符</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/collection/" class="">
+      集合框架</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/collection/BlockQueue/" class="">
+      BlockingQueue</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/collection/Concurrenthashmap/" class="">
+      ConcurrentHashmap</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/collection/HashMap/" class="">
+      HashMap</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/oop/" class="">
+      面向对象基础</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Concurrent</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/atomic/" class="">
+      AtomicInteger</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/AQS/" class="">
+      AQS</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/count-down-latch/" class="">
+      CountDownLatch</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/thread/" class="">
+      Java线程</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/synchronized/" class="">
+      Synchronized</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/threadlocal/" class="">
+      ThreadLocal</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/volatile/" class="">
+      Volatile</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/interrupt/" class="">
+      线程中断</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Jvm</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/gc/" class="">
+      垃圾回收</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/architecture/" class="">
+      JVM 架构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/classloader/" class="">
+      类加载器</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/runtime_area/" class="">
+      运行时数据区</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/dispatcher/" class="">
+      Java 分派机制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/string-constant-pool/" class="">
+      String 常量池</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/jvm-object-lifecycle/" class="">
+      对象的生命周期</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/" class="">
+      Leetcode</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/threeSum/" class="">
+      三数之和</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/addTwoNumbers/" class="">
+      两数相加</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/maxProfit/" class="">
+      买卖股票的最佳时机</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/maxProfit2/" class="">
+      买卖股票的最佳时机</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/lowestCommonAncestor/" class="">
+      二叉树的最近公共祖先</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/AllOne/" class="">
+      全 O(1) 的数据结构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/reverseList/" class="">
+      反转链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/mergeKLists/" class="">
+      合并</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/mergeTwoLists/" class="">
+      合并两个有序链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/mergeRagen/" class="">
+      合并区间</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/restoreIpAddresses/" class="">
+      复原</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/checkInclusion/" class="">
+      字符串的排列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/StringMultiply/" class="">
+      字符串相乘</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/maxAreaOfIsland/" class="">
+      岛屿的最大面积</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/sortList/" class="">
+      排序链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/trap/" class="">
+      接雨水</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/searchRote/" class="">
+      搜索旋转排序数组</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/findKthLargest/" class="">
+      数组中的第K个最大元素</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/lengthOfLongestSubstring/" class="">
+      无重复字符的最长子串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/maxSubArray/" class="">
+      最大子序和</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/MinStack/" class="">
+      最小栈</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/longestCommonPrefix/" class="">
+      最长公共前缀</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/longestConsecutive/" class="">
+      最长连续序列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/findLengthOfLCIS/" class="">
+      最长连续递增序列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/findCircleNum/" class="">
+      朋友圈</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/detectCycle/" class="">
+      环形链表 II</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/mySqrt/" class="">
+      的平方根</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/getIntersectionNode/" class="">
+      相交链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/salary/" class="">
+      第二高的薪水</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/simplifyPath/" class="">
+      简化路径</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/LRUCache/" class="">
+      缓存机制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/validUtf8/" class="">
+      编码验证</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/reverseWords/" class="">
+      翻转字符串里的单词</a>
+  
+
+        </li>
+      
+    
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/" class="">
+      Offer</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/Add/" class="">
+      不用加减乘除做加法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetUglyNumber/" class="">
+      丑数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindFirstCommonNode/" class="">
+      两个链表的第一个公共结点</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/SumOfNDice/" class="">
+      个骰子的点数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/BST-Link-Convert/" class="">
+      二叉搜索树与双向链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/VerifySquenceOfBST/" class="">
+      二叉搜索树的后序遍历序列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/BSTKthNode/" class="">
+      二叉搜索树的第</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindPath/" class="">
+      二叉树中和为某一值的路径</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetNext/" class="">
+      二叉树的下一个结点</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/TreeDepth/" class="">
+      二叉树的深度</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/number-of-one/" class="">
+      二进制中</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/PrintFromTopToBottom/" class="">
+      从上往下打印二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/print-link-from-tail/" class="">
+      从尾到头打印链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/CutRope/" class="">
+      剪绳子</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MinStack/" class="">
+      包含</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/Singleton/" class="">
+      单例</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/revert-link/" class="">
+      反转链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/merge-sort-link/" class="">
+      合并两个排序的链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindContinuousSequence/" class="">
+      和为</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindNumbersWithSum/" class="">
+      和为</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/LastRemaining/" class="">
+      圆圈中最后剩下的数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/O1DeleteNode/" class="">
+      在</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/CountOfSortedArray/" class="">
+      在排序数组中查找数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/CloneLink/" class="">
+      复杂链表的复制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/Permutation/" class="">
+      字符串的排列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/IsSymmetrical/" class="">
+      对称的二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/LeftRotateString/" class="">
+      左旋转字符串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/SerializeTree/" class="">
+      序列化二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/isContinuous/" class="">
+      扑克牌顺子</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/printn/" class="">
+      打印最大的</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/TranslateNumToStr/" class="">
+      把数字翻译成字符串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/PrintMinNumber/" class="">
+      把数组排成最小的数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/search-a-2d-matrix/" class="">
+      搜索二维矩阵</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetNumberOfK/" class="">
+      数字在排序数组中出现的次数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/NOfNumberSerialize/" class="">
+      数字序列中的某一位的数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/StreamMid/" class="">
+      数据流中的中位数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MoreThanHalfNum/" class="">
+      数组中出现次数超过一半的数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindNumsAppearOnce/" class="">
+      数组中只出现一次的数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/InversePairs/" class="">
+      数组中的逆序对</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/Duplicate/" class="">
+      数组中重复的数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/NumberOfOneBetweenOneAndN/" class="">
+      整数中</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/fibonacci/" class="">
+      斐波纳切数列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/find-minimum-in-rotated-sorted-array/" class="">
+      旋转数组的最小数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/replay-space/" class="">
+      替换空格</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetLeastNumbers/" class="">
+      最小的</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetLeastNumbersSolution/" class="">
+      最小的</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/LongestNoRepeatSubString/" class="">
+      最长不含重复字符的子字符串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MovingCount/" class="">
+      机器人的运动范围</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/IsPopOrder/" class="">
+      栈的压入</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/HasSubtree/" class="">
+      树的子结构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/PatternMatch/" class="">
+      正则表达式匹配</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/sum/" class="">
+      求</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MaxInWindows/" class="">
+      滑动窗口的最大值</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/two-stack-fifo/" class="">
+      用两个栈实现一个队列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/hasPath/" class="">
+      矩阵中的路径</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MaxGift/" class="">
+      礼物的最大值</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FirstNotRepeatingChar/" class="">
+      第一个只出现一次的字符</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/ReverseSentence/" class="">
+      翻转单词顺序列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MaxProfit/" class="">
+      股票的最大利润</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/IsNumeric/" class="">
+      表示数值的字符串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/reOrderArray/" class="">
+      调整数组顺序使奇数位于偶数前面</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindGreatestSumOfSubArray/" class="">
+      连续子数组的最大和</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/reConstructBinaryTree/" class="">
+      重建二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindKthToTail/" class="">
+      链表中倒数第</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/EntryNodeOfLoop/" class="">
+      链表中环的入口结点</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/mirror-tree/" class="">
+      镜像二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/PrintMatrix/" class="">
+      顺时针打印矩阵</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/power/" class="">
+      题目</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </nav>
 
 
-    </aside>
-  
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+
+  </div>
+</aside>
  
-      </header>
+
+    <header class="book-header hidden">
+      
+  <div class="flex align-center justify-between gap">
+  <input type="checkbox" class="toggle" id="menu-control" />
+  <label for="menu-control" aria-label="Menu">
+    <svg class="book-icon"><use href="/iconset.min.90a7fd302dc1b9bc3c291688faee66a3e60a9209f59b89fa00669e35d6907b3f.svg#menu"></use></svg>
+  </label>
+
+  <div class="book-brand">
+  <a class="flex align-center" href="/"><span>HadYang技术分享</span>
+  </a>
+</div>
+
+
+  
+  <input type="checkbox" class="toggle" id="toc-control" />
+  <label for="toc-control" aria-label="Table of Contents">
+    <svg class="book-icon"><use href="/iconset.min.90a7fd302dc1b9bc3c291688faee66a3e60a9209f59b89fa00669e35d6907b3f.svg#toc"></use></svg>
+  </label>
+  
+</div>
+
+ 
+    </header>
+
+    <main class="book-page">
+      
+      
+  
 
       
-<article class="markdown"><h2 id="bloom-filter">Bloom filter</h2>
-<h3 id="适用范围">适用范围</h3>
+  <article class="markdown book-article"><h2 id="bloom-filter">Bloom filter<a class="anchor" href="#bloom-filter" aria-label="Link"></a></h2>
+<h3 id="适用范围">适用范围<a class="anchor" href="#%e9%80%82%e7%94%a8%e8%8c%83%e5%9b%b4" aria-label="Link"></a></h3>
 <p>实现数据字典，进行数据的判重，或者集合求交集</p>
-<h3 id="基本原理">基本原理</h3>
+<h3 id="基本原理">基本原理<a class="anchor" href="#%e5%9f%ba%e6%9c%ac%e5%8e%9f%e7%90%86" aria-label="Link"></a></h3>
 <p>　　对于原理来说很简单，<strong>Bit-Map + K个独立 Hash 函数</strong>。将 Hash 函数对应的值的位数组置<code>1</code>，<strong>查找时如果发现所有 Hash 函数对应位都是<code>1</code>说明存在</strong>。很明显这个过程并不保证查找的结果是 100% 正确的。同时也不支持删除一个已经插入的关键字，因为该关键字对应的位会牵动到其他的关键字。所以一个简单的改进就是 <strong>Counting Bloom filter</strong>，用一个 Counter 数组代替位数组，就可以支持删除了。</p>
-<p><img src="./assists/Bloom_Filter.png" alt="Bloom_Filter"></p>
-<p>对于元素个数：
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
-        onload="renderMathInElement(document.body);"></script>
-
-
-
-<span class="katex">
-  \(n\)
-</span>
-，错误率（假阳率）：
-
-<span class="katex">
-  \(P\)
-</span>
-。我们可以计算：</p>
+<p><img src="./assists/Bloom_Filter.png" alt="Bloom_Filter" /></p>
+<p>对于元素个数：<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><link rel="stylesheet" href="/katex/katex.min.css" />，错误率（假阳率）：<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi></mrow><annotation encoding="application/x-tex">P</annotation></semantics></math></span>。我们可以计算：</p>
 <ul>
-<li>Bit-Map 大小：
-
-<span class="katex">
-  \(m\ge -\frac{n\times ln^P}{(ln^2)^2}\)
-</span>
-</li>
-<li>Hash 函数个数：
-
-<span class="katex">
-  \(k=log_2^\frac{1}{P}\)
-</span>
-</li>
+<li>Bit-Map 大小：<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi><mo>≥</mo><mo>−</mo><mfrac><mrow><mi>n</mi><mo>×</mo><mi>l</mi><msup><mi>n</mi><mi>P</mi></msup></mrow><mrow><mo stretchy="false">(</mo><mi>l</mi><msup><mi>n</mi><mn>2</mn></msup><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow></mfrac></mrow><annotation encoding="application/x-tex">m\ge -\frac{n\times ln^P}{(ln^2)^2}</annotation></semantics></math></span></li>
+<li>Hash 函数个数：<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>=</mo><mi>l</mi><mi>o</mi><msubsup><mi>g</mi><mn>2</mn><mfrac><mn>1</mn><mi>P</mi></mfrac></msubsup></mrow><annotation encoding="application/x-tex">k=log_2^\frac{1}{P}</annotation></semantics></math></span></li>
 </ul>
-<blockquote>
+<blockquote class=''>
 <p>参数在线计算工具：<a href="https://hur.st/bloomfilter">Bloom Filter Calculator</a></p>
-</blockquote>
-<p>举个例子我们假设 
-
-<span class="katex">
-  \(P=0.01\)
-</span>
-，
-
-<span class="katex">
-  \(n=4000\)
-</span>
-，则此时 m 应大概是 
-
-<span class="katex">
-  \(9.5\times n=38000\)
-</span>
- bit，
-
-<span class="katex">
-  \(k=7\)
-</span>
-</p>
+</blockquote><p>举个例子我们假设 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo>=</mo><mn>0.01</mn></mrow><annotation encoding="application/x-tex">P=0.01</annotation></semantics></math></span>，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>4000</mn></mrow><annotation encoding="application/x-tex">n=4000</annotation></semantics></math></span>，则此时 m 应大概是 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>9.5</mn><mo>×</mo><mi>n</mi><mo>=</mo><mn>38000</mn></mrow><annotation encoding="application/x-tex">9.5\times n=38000</annotation></semantics></math></span> bit，<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>=</mo><mn>7</mn></mrow><annotation encoding="application/x-tex">k=7</annotation></semantics></math></span></p>
 <p>注意这里 m 与 n 的单位不同，m是 <code>bit</code> 为单位，而n则是以元素个数为单位(准确的说是不同元素的个数)。通常单个元素的长度都是有很多 <code>bit</code> 的。所以使用bloom filter内存上通常都是节省的。</p>
-<h3 id="扩展">扩展</h3>
+<h3 id="扩展">扩展<a class="anchor" href="#%e6%89%a9%e5%b1%95" aria-label="Link"></a></h3>
 <p>　　Bloom filter 将集合中的元素映射到位数组中，用 k 个映射位是否全1表示元素在不在这个集合中。<code>Counting bloom filter（CBF）</code>将 <strong>位数组中的每一位扩展为一个 Counter</strong>，从而支持了元素的删除操作。<code>Spectral Bloom Filter（SBF）</code>将其与集合元素的出现次数关联。<strong><code>SBF</code>采用 Counter 中的最小值来近似表示元素的出现频率</strong>。</p>
-<h3 id="问题实例">问题实例</h3>
+<h3 id="问题实例">问题实例<a class="anchor" href="#%e9%97%ae%e9%a2%98%e5%ae%9e%e4%be%8b" aria-label="Link"></a></h3>
 <p>给你A,B两个文件，各存放50亿条URL，每条URL占用64字节，内存限制是4G，让你找出A,B文件共同的URL。如果是三个乃至n个文件呢？</p>
 <p>答：根据这个问题我们来计算下内存的占用，<code>4G=2^32</code>大概是40亿*8大概是 340亿，n=50亿，如果按出错率 0.01 算需要的大概是 475 亿个bit。现在可用的是 340 亿，相差并不多，这样可能会使出错率上升些。另外如果这些url ip是一一对应的，就可以转换成ip，则大大简单了。</p>
 <hr>
-<h2 id="hashing">Hashing</h2>
-<h3 id="适用范围-1">适用范围</h3>
+<h2 id="hashing">Hashing<a class="anchor" href="#hashing" aria-label="Link"></a></h2>
+<h3 id="适用范围-1">适用范围<a class="anchor" href="#%e9%80%82%e7%94%a8%e8%8c%83%e5%9b%b4-1" aria-label="Link"></a></h3>
 <p>快速查找，删除的基本数据结构，通常需要总数据量可以放入内存</p>
-<h3 id="基本原理-1">基本原理</h3>
+<h3 id="基本原理-1">基本原理<a class="anchor" href="#%e5%9f%ba%e6%9c%ac%e5%8e%9f%e7%90%86-1" aria-label="Link"></a></h3>
 <p>　- hash函数选择，针对字符串，整数，排列，具体相应的hash方法。</p>
 <ul>
 <li>碰撞处理，一种是open hashing，也称为拉链法；另一种就是closed hashing，也称开地址法。</li>
 </ul>
-<h3 id="扩展-1">扩展</h3>
+<h3 id="扩展-1">扩展<a class="anchor" href="#%e6%89%a9%e5%b1%95-1" aria-label="Link"></a></h3>
 <p>　　d-left hashing中 的 d 是多个的意思，我们先简化这个问题，看一看 <code>2-left hashing</code>。2-left hashing指的是将一个哈希表分成长度相等的两半，分别叫做 <code>T1</code> 和 <code>T2</code> ，给 <code>T1</code> 和 <code>T2</code> 分别配备一个哈希函数， <code>h1</code> 和 <code>h2</code> 。<strong>在存储一个新的key时，同时用两个哈希函数进行计算，得出两个地址 <code>h1[key]</code>和 <code>h2[key]</code></strong>。这时需要检查 T1 中的 <code>h1[key]</code> 位置和 T2 中的 <code>h2[key]</code> 位置，哪一个位置已经存储的（有碰撞的）key比较多，然后 <strong>将新key存储在负载少的位置</strong>。如果两边一样多，比如两个位置都为空或者都存储了一个key，就把新key存储在左边的T1子表中，2-left也由此而来。<strong>在查找一个key时，必须进行两次hash，同时查找两个位置</strong>。 但是这种方法只能使用在静态集合上，一旦集合发生变化，就需要进行重新计算。</p>
-<h3 id="问题实例-1">问题实例：</h3>
+<h3 id="问题实例-1">问题实例：<a class="anchor" href="#%e9%97%ae%e9%a2%98%e5%ae%9e%e4%be%8b-1" aria-label="Link"></a></h3>
 <p>海量日志数据，提取出某日访问百度次数最多的那个IP。</p>
 <p>答：IP的数目还是有限的，最多2^32个，所以可以考虑使用hash将 ip 直接存入内存，然后进行统计。</p>
 <hr>
-<h2 id="bit-map">bit-map</h2>
-<h3 id="适用范围-2">适用范围</h3>
+<h2 id="bit-map">bit-map<a class="anchor" href="#bit-map" aria-label="Link"></a></h2>
+<h3 id="适用范围-2">适用范围<a class="anchor" href="#%e9%80%82%e7%94%a8%e8%8c%83%e5%9b%b4-2" aria-label="Link"></a></h3>
 <p>可进行数据的快速查找，判重，删除，一般来说数据范围是int的10倍以下</p>
-<h3 id="基本原理-2">基本原理</h3>
+<h3 id="基本原理-2">基本原理<a class="anchor" href="#%e5%9f%ba%e6%9c%ac%e5%8e%9f%e7%90%86-2" aria-label="Link"></a></h3>
 <p>使用bit数组来表示某些元素是否存在，比如8位电话号码。例如bit数组 <code>001101001001101001</code> 代表实际数组 <code>[2,3,5,8]</code> 。新加入一个元素，只需要将已有的bit数组和新加入的数字做按位或 <code>or</code> 计算。bitmap中 <code>1</code> 的数量就是集合的基数值。</p>
-<p>bitmap 有一个很明显的优势是可以轻松合并多个统计结果，只需要对多个结果求异或就可以。也可以大大减少存储内存，可以做个简单的计算，如果要统计1亿个数据的基数值，大约需要内存： 
-
-<span class="katex">
-  \(100000000/8/1024/1024 \approx≈ 12\)
-</span>
-M
-如果用 32bit 的 int 代表每个统计数据，大约需要内存：
-
-<span class="katex">
-  \(32*100000000/8/1024/1024 \approx≈ 381\)
-</span>
-M</p>
+<p>bitmap 有一个很明显的优势是可以轻松合并多个统计结果，只需要对多个结果求异或就可以。也可以大大减少存储内存，可以做个简单的计算，如果要统计1亿个数据的基数值，大约需要内存： <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>100000000</mn><mi mathvariant="normal">/</mi><mn>8</mn><mi mathvariant="normal">/</mi><mn>1024</mn><mi mathvariant="normal">/</mi><mn>1024</mn><mo>≈</mo><mo>≈</mo><mn>12</mn></mrow><annotation encoding="application/x-tex">100000000/8/1024/1024 \approx≈ 12</annotation></semantics></math></span>M
+如果用 32bit 的 int 代表每个统计数据，大约需要内存：<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>32</mn><mo>∗</mo><mn>100000000</mn><mi mathvariant="normal">/</mi><mn>8</mn><mi mathvariant="normal">/</mi><mn>1024</mn><mi mathvariant="normal">/</mi><mn>1024</mn><mo>≈</mo><mo>≈</mo><mn>381</mn></mrow><annotation encoding="application/x-tex">32*100000000/8/1024/1024 \approx≈ 381</annotation></semantics></math></span>M</p>
 <p>bitmap 对于内存的节约量是显而易见的，但还是不够。统计一个对象的基数值需要<code>12M</code>，如果统计 <code>10000</code> 个对象，就需要将近 <code>120G</code> 了，同样不能广泛用于大数据场景。</p>
-<h3 id="扩展-2">扩展</h3>
+<h3 id="扩展-2">扩展<a class="anchor" href="#%e6%89%a9%e5%b1%95-2" aria-label="Link"></a></h3>
 <p>bloom filter可以看做是对bit-map的扩展</p>
-<h3 id="问题实例-2">问题实例</h3>
+<h3 id="问题实例-2">问题实例<a class="anchor" href="#%e9%97%ae%e9%a2%98%e5%ae%9e%e4%be%8b-2" aria-label="Link"></a></h3>
 <ul>
 <li>
 <p>已知某个文件内包含一些电话号码，每个号码为8位数字，统计不同号码的个数。
@@ -601,87 +3150,27 @@ M</p>
 </li>
 </ul>
 <hr>
-<h2 id="hyperloglog">HyperLogLog</h2>
+<h2 id="hyperloglog">HyperLogLog<a class="anchor" href="#hyperloglog" aria-label="Link"></a></h2>
 <p><a href="http://content.research.neustar.biz/blog/hll.html">算法演示</a></p>
-<p>上面我们计算过用 bitmap 存储 1亿 个统计数据大概需要 <code>12M</code> 内存；而在 HLL 中，只需要不到 <code>1K</code> 内存就能做到；redis中实现的 <code>HyperLogLog</code> ，只需要 <code>12K</code> 内存，在标准误差 <code>0.81%</code> 的前提下，能够统计 
-
-<span class="katex">
-  \(2^{64}\)
-</span>
- 个数据。首先容我感叹一下数学的强大和魅力，那么概率算法是怎样做到如此节省内存的，又是怎样控制误差的呢？</p>
+<p>上面我们计算过用 bitmap 存储 1亿 个统计数据大概需要 <code>12M</code> 内存；而在 HLL 中，只需要不到 <code>1K</code> 内存就能做到；redis中实现的 <code>HyperLogLog</code> ，只需要 <code>12K</code> 内存，在标准误差 <code>0.81%</code> 的前提下，能够统计 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>64</mn></msup></mrow><annotation encoding="application/x-tex">2^{64}</annotation></semantics></math></span> 个数据。首先容我感叹一下数学的强大和魅力，那么概率算法是怎样做到如此节省内存的，又是怎样控制误差的呢？</p>
 <p>HLL中实际存储的是一个长度为 <code>m</code> 的大数组 <code>S</code> ，将待统计的数据集合划分成 m 组，每组根据算法记录一个统计值存入数组中。数组的大小 m 由算法实现方自己确定，redis中这个数组的大小是 <code>16834</code>，m 越大，基数统计的误差越小，但需要的内存空间也越大。</p>
 <ol>
 <li>通过hash函数计算输入值对应的比特串</li>
-<li>比特串的低 
-
-<span class="katex">
-  \(t(t=log_2^m)t\)
-</span>
- 位对应的数字用来找到数组 <code>S</code> 中对应的位置 <code>i</code></li>
-<li>
-
-<span class="katex">
-  \(t+1\)
-</span>
- 位开始找到第一个 <code>1</code> 出现的位置 <code>k</code>，将 <code>k</code> 记入数组 
-
-<span class="katex">
-  \(S_i\)
-</span>
- 位置</li>
-<li>基于数组 <code>S</code> 记录的所有数据的统计值，计算整体的基数值，计算公式可以简单表示为：
-
-<span class="katex">
-  \(\hat{n}=f(S)\)
-</span>
-</li>
+<li>比特串的低 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo stretchy="false">(</mo><mi>t</mi><mo>=</mo><mi>l</mi><mi>o</mi><msubsup><mi>g</mi><mn>2</mn><mi>m</mi></msubsup><mo stretchy="false">)</mo><mi>t</mi></mrow><annotation encoding="application/x-tex">t(t=log_2^m)t</annotation></semantics></math></span> 位对应的数字用来找到数组 <code>S</code> 中对应的位置 <code>i</code></li>
+<li><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">t+1</annotation></semantics></math></span> 位开始找到第一个 <code>1</code> 出现的位置 <code>k</code>，将 <code>k</code> 记入数组 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">S_i</annotation></semantics></math></span> 位置</li>
+<li>基于数组 <code>S</code> 记录的所有数据的统计值，计算整体的基数值，计算公式可以简单表示为：<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>n</mi><mo>^</mo></mover><mo>=</mo><mi>f</mi><mo stretchy="false">(</mo><mi>S</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\hat{n}=f(S)</annotation></semantics></math></span></li>
 </ol>
-<h3 id="原理">原理</h3>
-<p>举一个我们最熟悉的抛硬币例子，出现正反面的概率都是 <code>1/2</code> ，一直抛硬币直到出现正面，记录下投掷次数 <code>k</code> ，将这种抛硬币多次直到出现正面的过程记为一次伯努利过程，对于 <code>n</code> 次伯努利过程，我们会得到nn个出现正面的投掷次数值 
-
-<span class="katex">
-  \(k_1\)
-</span>
-, 
-
-<span class="katex">
-  \(k_2\)
-</span>
- …… 
-
-<span class="katex">
-  \(k_n\)
-</span>
-，其中最大值记为 
-
-<span class="katex">
-  \(k_{max}\)
-</span>
-，那么可以得到下面结论：</p>
+<h3 id="原理">原理<a class="anchor" href="#%e5%8e%9f%e7%90%86" aria-label="Link"></a></h3>
+<p>举一个我们最熟悉的抛硬币例子，出现正反面的概率都是 <code>1/2</code> ，一直抛硬币直到出现正面，记录下投掷次数 <code>k</code> ，将这种抛硬币多次直到出现正面的过程记为一次伯努利过程，对于 <code>n</code> 次伯努利过程，我们会得到nn个出现正面的投掷次数值 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>k</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">k_1</annotation></semantics></math></span>, <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>k</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">k_2</annotation></semantics></math></span> …… <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>k</mi><mi>n</mi></msub></mrow><annotation encoding="application/x-tex">k_n</annotation></semantics></math></span>，其中最大值记为 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>k</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub></mrow><annotation encoding="application/x-tex">k_{max}</annotation></semantics></math></span>，那么可以得到下面结论：</p>
 <ul>
-<li>n 次伯努利过程的投掷次数都不大于 
-
-<span class="katex">
-  \(k_{max}\)
-</span>
-</li>
-<li>n 次伯努利过程，至少有一次投掷次数等于 
-
-<span class="katex">
-  \(k_{max}\)
-</span>
-
+<li>n 次伯努利过程的投掷次数都不大于 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>k</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub></mrow><annotation encoding="application/x-tex">k_{max}</annotation></semantics></math></span></li>
+<li>n 次伯努利过程，至少有一次投掷次数等于 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>k</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub></mrow><annotation encoding="application/x-tex">k_{max}</annotation></semantics></math></span>
 ​​
-回到基数统计的问题，我们需要统计一组数据中不重复元素的个数，集合中每个元素的经过hash函数后可以表示成 0 和 1 构成的二进制数串，一个二进制串可以类比为一次抛硬币实验，1 是抛到正面，0 是反面。二进制串中从低位开始第一个 1 出现的位置可以理解为抛硬币试验中第一次出现正面的抛掷次数 <code>k</code> ，那么基于上面的结论，我们可以通过多次抛硬币实验的最大抛到正面的次数来预估总共进行了多少次实验，同样可以可以通过第一个 1 出现位置的最大值 
-
-<span class="katex">
-  \(k_{max}\)
-</span>
- 来预估总共有多少个不同的数字（整体基数）。</li>
+回到基数统计的问题，我们需要统计一组数据中不重复元素的个数，集合中每个元素的经过hash函数后可以表示成 0 和 1 构成的二进制数串，一个二进制串可以类比为一次抛硬币实验，1 是抛到正面，0 是反面。二进制串中从低位开始第一个 1 出现的位置可以理解为抛硬币试验中第一次出现正面的抛掷次数 <code>k</code> ，那么基于上面的结论，我们可以通过多次抛硬币实验的最大抛到正面的次数来预估总共进行了多少次实验，同样可以可以通过第一个 1 出现位置的最大值 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>k</mi><mrow><mi>m</mi><mi>a</mi><mi>x</mi></mrow></msub></mrow><annotation encoding="application/x-tex">k_{max}</annotation></semantics></math></span> 来预估总共有多少个不同的数字（整体基数）。</li>
 </ul>
 <p>这种通过局部信息预估整体数据流特性的方法似乎有些超出我们的基本认知，需要用概率和统计的方法才能推导和验证这种关联关系。HyperLogLog 核心在于观察集合中每个数字对应的比特串，通过统计和记录比特串中最大的出现 1 的位置来估计集合整体的基数，可以大大减少内存耗费。</p>
 <hr>
-<h2 id="simhash">Simhash</h2>
+<h2 id="simhash">Simhash<a class="anchor" href="#simhash" aria-label="Link"></a></h2>
 <p>SimHash算法可计算文本间的相似度，实现文本去重。</p>
 <ol>
 <li>首先，对原始内容分词，并且计算每个词的权重；</li>
@@ -693,30 +3182,29 @@ M</p>
 <p>Simhash 为每一个内容生成一个整数指纹，其中的关键是把每个词哈希成一个整数，这一步常常采用 Jenkins 算法。这里简单示意的整数只有 8 个二进制位，实际上可能需要 64 个二进制位的整数，甚至范围更大。</p>
 <p>得到每个内容的 Simhash 指纹后，可以两两计算 <strong>汉明距离</strong>，比较二进制位不同个数，其实就是计算两个指纹的异或，异或结果中如果包含 3 个以下的 1，则认为两条内容重复。</p>
 <hr>
-<h2 id="堆">堆</h2>
-<h3 id="适用范围-3">适用范围</h3>
+<h2 id="堆">堆<a class="anchor" href="#%e5%a0%86" aria-label="Link"></a></h2>
+<h3 id="适用范围-3">适用范围<a class="anchor" href="#%e9%80%82%e7%94%a8%e8%8c%83%e5%9b%b4-3" aria-label="Link"></a></h3>
 <p>海量数据前n大，并且n比较小，堆可以放入内存</p>
-<h3 id="基本原理-3">基本原理</h3>
+<h3 id="基本原理-3">基本原理<a class="anchor" href="#%e5%9f%ba%e6%9c%ac%e5%8e%9f%e7%90%86-3" aria-label="Link"></a></h3>
 <p>最大堆求前n小，最小堆求前n大。适合大数据量，求前n小，n的大小比较小的情况，这样可以扫描一遍即可得到所有的前n元素，效率很高。</p>
-<h3 id="扩展-3">扩展</h3>
+<h3 id="扩展-3">扩展<a class="anchor" href="#%e6%89%a9%e5%b1%95-3" aria-label="Link"></a></h3>
 <p>双堆，一个最大堆与一个最小堆结合，可以用来维护中位数。</p>
-<h3 id="问题实例-3">问题实例：</h3>
+<h3 id="问题实例-3">问题实例：<a class="anchor" href="#%e9%97%ae%e9%a2%98%e5%ae%9e%e4%be%8b-3" aria-label="Link"></a></h3>
 <ul>
 <li>100w个数中找最大的前100个数。
 答：用一个100个元素大小的最小堆即可。</li>
 </ul>
 <hr>
-<h2 id="双层桶划分">双层桶划分</h2>
-<h3 id="适用范围-4">适用范围</h3>
+<h2 id="双层桶划分">双层桶划分<a class="anchor" href="#%e5%8f%8c%e5%b1%82%e6%a1%b6%e5%88%92%e5%88%86" aria-label="Link"></a></h2>
+<h3 id="适用范围-4">适用范围<a class="anchor" href="#%e9%80%82%e7%94%a8%e8%8c%83%e5%9b%b4-4" aria-label="Link"></a></h3>
 <p>第k大，中位数，不重复或重复的数字</p>
-<h3 id="基本原理-4">基本原理</h3>
+<h3 id="基本原理-4">基本原理<a class="anchor" href="#%e5%9f%ba%e6%9c%ac%e5%8e%9f%e7%90%86-4" aria-label="Link"></a></h3>
 <p>因为元素范围很大，不能利用直接寻址表，所以通过多次划分，逐步确定范围，然后最后在一个可以接受的范围内进行。可以通过多次缩小，双层只是一个例子。</p>
-<blockquote>
+<blockquote class=''>
 <p>其实本质上就是【分而治之】的思想，重在分的技巧上！</p>
-</blockquote>
-<h3 id="扩展-4">扩展</h3>
+</blockquote><h3 id="扩展-4">扩展<a class="anchor" href="#%e6%89%a9%e5%b1%95-4" aria-label="Link"></a></h3>
 <p>当有时候需要用一个小范围的数据来构造一个大数据，也是可以利用这种思想，相比之下不同的，只是其中的逆过程。</p>
-<h3 id="问题实例-4">问题实例</h3>
+<h3 id="问题实例-4">问题实例<a class="anchor" href="#%e9%97%ae%e9%a2%98%e5%ae%9e%e4%be%8b-4" aria-label="Link"></a></h3>
 <ul>
 <li>
 <p>2.5亿个整数中找出不重复的整数的个数，内存空间不足以容纳这2.5亿个整数。
@@ -729,63 +3217,59 @@ M</p>
 </li>
 </ul>
 <hr>
-<h2 id="数据库索引">数据库索引</h2>
-<h3 id="适用范围-5">适用范围</h3>
+<h2 id="数据库索引">数据库索引<a class="anchor" href="#%e6%95%b0%e6%8d%ae%e5%ba%93%e7%b4%a2%e5%bc%95" aria-label="Link"></a></h2>
+<h3 id="适用范围-5">适用范围<a class="anchor" href="#%e9%80%82%e7%94%a8%e8%8c%83%e5%9b%b4-5" aria-label="Link"></a></h3>
 <p>大数据量的增删改查</p>
-<h3 id="基本原理-5">基本原理</h3>
+<h3 id="基本原理-5">基本原理<a class="anchor" href="#%e5%9f%ba%e6%9c%ac%e5%8e%9f%e7%90%86-5" aria-label="Link"></a></h3>
 <p>利用数据的设计实现方法，对海量数据的增删改查进行处理。</p>
 <hr>
-<h2 id="倒排索引inverted-index">倒排索引(Inverted index)</h2>
-<p><img src="./assists/874963-20190127184959667-1135956344.png" alt="874963-20190127184959667-1135956344"></p>
-<h3 id="适用范围-6">适用范围</h3>
+<h2 id="倒排索引inverted-index">倒排索引(Inverted index)<a class="anchor" href="#%e5%80%92%e6%8e%92%e7%b4%a2%e5%bc%95inverted-index" aria-label="Link"></a></h2>
+<p><img src="./assists/874963-20190127184959667-1135956344.png" alt="874963-20190127184959667-1135956344" /></p>
+<h3 id="适用范围-6">适用范围<a class="anchor" href="#%e9%80%82%e7%94%a8%e8%8c%83%e5%9b%b4-6" aria-label="Link"></a></h3>
 <p>搜索引擎，关键字查询</p>
-<h3 id="基本原理-6">基本原理</h3>
+<h3 id="基本原理-6">基本原理<a class="anchor" href="#%e5%9f%ba%e6%9c%ac%e5%8e%9f%e7%90%86-6" aria-label="Link"></a></h3>
 <p>用来存储在全文搜索下某个单词在一个文档或者一组文档中的存储位置的映射。</p>
 <p>以英文为例，下面是要被索引的文本：</p>
-<pre><code>T0 = &quot;it is what it is&quot;
-T1 = &quot;what is it&quot;
-T2 = &quot;it is a banana&quot;
-</code></pre><p>我们就能得到下面的反向文件索引：</p>
-<pre><code>&quot;a&quot;: {2} &quot;banana&quot;: {2} &quot;is&quot;: {0, 1, 2} &quot;it&quot;: {0, 1, 2} &quot;what&quot;: {0, 1}
-</code></pre><p>检索的条件&quot;what&rdquo;,&ldquo;is&quot;和&quot;it&quot;将对应集合的交集。</p>
+<pre tabindex="0"><code>T0 = &#34;it is what it is&#34;
+T1 = &#34;what is it&#34;
+T2 = &#34;it is a banana&#34;</code></pre><p>我们就能得到下面的反向文件索引：</p>
+<pre tabindex="0"><code>&#34;a&#34;: {2} &#34;banana&#34;: {2} &#34;is&#34;: {0, 1, 2} &#34;it&#34;: {0, 1, 2} &#34;what&#34;: {0, 1}</code></pre><p>检索的条件&quot;what&quot;,&ldquo;is&quot;和&quot;it&quot;将对应集合的交集。</p>
 <p>正向索引开发出来用来存储每个文档的单词的列表。正向索引的查询往往满足每个文档有序频繁的全文查询和每个单词在校验文档中的验证这样的查询。在正向索引中，文档占据了中心的位置，每个文档指向了一个它所包含的索引项的序列。也就是说文档指向了它包含的那些单词，而反向索引则是单词指向了包含它的文档，很容易看到这个反向的关系。</p>
-<h3 id="扩展-5">扩展</h3>
-<h3 id="问题实例-5">问题实例</h3>
+<h3 id="扩展-5">扩展<a class="anchor" href="#%e6%89%a9%e5%b1%95-5" aria-label="Link"></a></h3>
+<h3 id="问题实例-5">问题实例<a class="anchor" href="#%e9%97%ae%e9%a2%98%e5%ae%9e%e4%be%8b-5" aria-label="Link"></a></h3>
 <p>文档检索系统，查询那些文件包含了某单词，比如常见的学术论文的关键字搜索。</p>
 <hr>
-<h2 id="k-路归并">K 路归并</h2>
-<h3 id="适用范围-7">适用范围</h3>
+<h2 id="k-路归并">K 路归并<a class="anchor" href="#k-%e8%b7%af%e5%bd%92%e5%b9%b6" aria-label="Link"></a></h2>
+<h3 id="适用范围-7">适用范围<a class="anchor" href="#%e9%80%82%e7%94%a8%e8%8c%83%e5%9b%b4-7" aria-label="Link"></a></h3>
 <p>大数据的排序，去重。</p>
-<h3 id="基本原理-7">基本原理</h3>
+<h3 id="基本原理-7">基本原理<a class="anchor" href="#%e5%9f%ba%e6%9c%ac%e5%8e%9f%e7%90%86-7" aria-label="Link"></a></h3>
 <p>一般来说外排序分为两个步骤：预处理和合并排序。</p>
 <ol>
 <li>按照内存大小，将大文件分成若干长度为 l 的子文件（l 应小于内存的可使用容量），然后将各个子文件依次读入内存，使用适当的内部排序算法对其进行排序（排好序的子文件统称为“归并段”或者“顺段”），将排好序的归并段重新写入外存，为下一个子文件排序腾出内存空间；</li>
 <li>对得到的顺段进行合并，直至得到整个有序的文件为止。</li>
 </ol>
-<h3 id="问题实例-6">问题实例</h3>
+<h3 id="问题实例-6">问题实例<a class="anchor" href="#%e9%97%ae%e9%a2%98%e5%ae%9e%e4%be%8b-6" aria-label="Link"></a></h3>
 <ul>
 <li>有一个1G大小的一个文件，里面每一行是一个词，词的大小不超过16个字节，内存限制大小是1M。返回频数最高的100个词。</li>
 </ul>
 <hr>
-<h2 id="败胜者树">败/胜者树</h2>
+<h2 id="败胜者树">败/胜者树<a class="anchor" href="#%e8%b4%a5%e8%83%9c%e8%80%85%e6%a0%91" aria-label="Link"></a></h2>
 <p>对于外部排序算法来说，其直接影响算法效率的因素为读写外存的次数，即次数越多，算法效率越低。若想提高算法的效率，即减少算法运行过程中读写外存的次数，可以增加 k 路平衡归并中的 k 值。但是如果毫无限度地增加 k 值，虽然会减少读写外存数据的次数，但会增加内部归并的时间，得不偿失。</p>
 <p>为了避免在增加 k 值的过程中影响内部归并的效率，在进行 k-路归并时可以使用 <strong>败者树</strong> 来实现，该方法在增加 k 值时不会影响其内部归并的效率。</p>
-<h3 id="基本原理-8">基本原理</h3>
+<h3 id="基本原理-8">基本原理<a class="anchor" href="#%e5%9f%ba%e6%9c%ac%e5%8e%9f%e7%90%86-8" aria-label="Link"></a></h3>
 <p><strong>败/胜者树实际上是保存部分数据的比较结果</strong>，以减少新增数据的比较次数，以减少IO。对于无序表 <code>{49，38，65，97，76，13，27，49}</code> 创建的完全二叉树如图所示，构建此树的目的是选出无序表中的最小值。</p>
-<p><img src="assists/winner_tree.svg" alt=""></p>
+<p><img src="assists/winner_tree.svg" alt="" /></p>
 <p>这是一棵 <strong>胜者树</strong> 。因为树中每个非终端结点（除叶子结点之外的其它结点）中的值都表示的是左右孩子相比较后的较小值（谁最小即为胜者）。例如叶子结点 49 和 38 相对比，由于 38 更小，所以其双亲结点中的值保留的是胜者 38。然后用 38 去继续同上层去比较，一直比较到树的根结点。</p>
-<blockquote>
+<blockquote class=''>
 <p>胜者树和败者树的区别就是：胜者树中的非终端结点中存储的是胜利的一方；而败者树中的非终端结点存储的是失败的一方。而在比较过程中，都是拿胜者去比较。</p>
-</blockquote>
-<p>对于 10 个临时文件，采用 5-路平衡归并时，若每次从 5 个文件中想得到一个最小值就需要比较 4 次。而采用败者树，只需要进行 2 次比较。以上仅仅是得到一个最小值记录，如要得到整个临时文件，其耗费的时间就会相差很大。</p>
+</blockquote><p>对于 10 个临时文件，采用 5-路平衡归并时，若每次从 5 个文件中想得到一个最小值就需要比较 4 次。而采用败者树，只需要进行 2 次比较。以上仅仅是得到一个最小值记录，如要得到整个临时文件，其耗费的时间就会相差很大。</p>
 <hr>
-<h2 id="置换选择排序">置换选择排序</h2>
+<h2 id="置换选择排序">置换选择排序<a class="anchor" href="#%e7%bd%ae%e6%8d%a2%e9%80%89%e6%8b%a9%e6%8e%92%e5%ba%8f" aria-label="Link"></a></h2>
 <p>除了增加 k-路归并排序中的 k 值来提高外部排序效率的方法，还有另外一条路可走，即减少初始归并段的个数：<strong>置换选择排序</strong> 是为在较小的空间内，得到更大的有序段。相比于按照内存容量大小对初始文件进行等分，大大减少了初始归并段的数量，从而提高了外部排序的整体效率。</p>
-<blockquote>
+<blockquote class=''>
 <p>通过置换选择排序算法得到的初始归并段，其长度并不会受内存容量的限制，且通过证明得知使用该方法所获得的归并段的平均长度为内存工作区大小的两倍。</p>
-</blockquote>
-<p>例如已知初始文件中总共有 24 个记录，假设内存工作区最多可容纳 6 个记录，按照之前的选择排序算法最少也只能分为 4 个初始归并段。而如果使用置换—选择排序，可以实现将 24 个记录分为 3 个初始归并段：</p>
-<p><img src="assists/swap_select.png" alt=""></p>
+</blockquote><p>例如已知初始文件中总共有 24 个记录，假设内存工作区最多可容纳 6 个记录，按照之前的选择排序算法最少也只能分为 4 个初始归并段。而如果使用置换—选择排序，可以实现将 24 个记录分为 3 个初始归并段：</p>
+<p><img src="assists/swap_select.png" alt="" /></p>
 <p>置换—选择排序算法的具体操作过程为：</p>
 <ol>
 <li>首先从初始文件中输入 6 个记录到内存工作区中；</li>
@@ -797,26 +3281,24 @@ T2 = &quot;it is a banana&quot;
 <li>重复 2—6，直至内存工作为空，由此就可以得到全部的初始归并段。</li>
 </ol>
 <hr>
-<h2 id="最佳归并树">最佳归并树</h2>
+<h2 id="最佳归并树">最佳归并树<a class="anchor" href="#%e6%9c%80%e4%bd%b3%e5%bd%92%e5%b9%b6%e6%a0%91" aria-label="Link"></a></h2>
 <p>无论是通过等分还是置换-选择排序得到的归并段，如何设置它们的归并顺序，可以使得对外存的访问次数降到最低？现有通过置换选择排序算法所得到的 9 个初始归并段，其长度分别为：<code>9，30，12，18，3，17，2，6，24</code>。在对其采用 3-路平衡归并的方式时可能出现如图所示的情况：</p>
-<p><img src="assists/best_merge_tree_1.png" alt=""></p>
-<blockquote>
+<p><img src="assists/best_merge_tree_1.png" alt="" /></p>
+<blockquote class=''>
 <p>图中的叶子结点表示初始归并段，各自包含记录的长度用结点的权重来表示；非终端结点表示归并后的临时文件。</p>
-</blockquote>
-<p>假设在进行平衡归并时，操作每个记录都需要单独进行一次对外存的读写，那么图中的归并过程需要对外存进行读或者写的次数为：</p>
+</blockquote><p>假设在进行平衡归并时，操作每个记录都需要单独进行一次对外存的读写，那么图中的归并过程需要对外存进行读或者写的次数为：</p>
 <p>$$(9+30+12+18+3+17+2+6+24)\times 2 \times 2 = 484$$</p>
-<blockquote>
+<blockquote class=''>
 <p>图中涉及到了两次归并，对外存的读和写各进行 2 次</p>
-</blockquote>
-<p>从计算结果上看，对于图中的 3 叉树来讲，其操作外存的次数恰好是树的带权路径长度的 2 倍。所以，对于如何减少访问外存的次数的问题，就等同于考虑如何使 k 路归并所构成的 k 叉树的带权路径长度最短。</p>
+</blockquote><p>从计算结果上看，对于图中的 3 叉树来讲，其操作外存的次数恰好是树的带权路径长度的 2 倍。所以，对于如何减少访问外存的次数的问题，就等同于考虑如何使 k 路归并所构成的 k 叉树的带权路径长度最短。</p>
 <p>若想使树的带权路径长度最短，就是构造<strong>赫夫曼树</strong>。若对上述 9 个初始归并段构造一棵赫夫曼树作为归并树，如图所示：</p>
-<p><img src="assists/best_merge_tree_2.png" alt=""></p>
+<p><img src="assists/best_merge_tree_2.png" alt="" /></p>
 <p>归并过程中需要对外存进行IO的次数为：</p>
 <p>$$(2\times3+3\times3+6\times3+9\times2+12\times2+17\times2+18\times2+24\times2+30)\times2=446$$</p>
 <p>通过以构建赫夫曼树的方式构建归并树，使其对读写外存的次数降至最低（k-路平衡归并，需要选取合适的 k 值，构建赫夫曼树作为归并树），所以称此归并树为 <strong>最佳归并树</strong> 。</p>
 <hr>
-<h2 id="trie树">Trie树</h2>
-<h3 id="适用范围-8">适用范围</h3>
+<h2 id="trie树">Trie树<a class="anchor" href="#trie%e6%a0%91" aria-label="Link"></a></h2>
+<h3 id="适用范围-8">适用范围<a class="anchor" href="#%e9%80%82%e7%94%a8%e8%8c%83%e5%9b%b4-8" aria-label="Link"></a></h3>
 <p>数据量大，重复多，但是数据种类小可以放入内存</p>
 <ul>
 <li>字符串的快速检索</li>
@@ -824,34 +3306,19 @@ T2 = &quot;it is a banana&quot;
 <li>最长公共前缀</li>
 <li>自动匹配前缀显示后缀</li>
 </ul>
-<h3 id="基本原理-9">基本原理</h3>
+<h3 id="基本原理-9">基本原理<a class="anchor" href="#%e5%9f%ba%e6%9c%ac%e5%8e%9f%e7%90%86-9" aria-label="Link"></a></h3>
 <p>Trie树的创建要考虑的是父节点如何保存孩子节点，主要有链表和数组两种方式</p>
 <ul>
 <li>链表：空间占用少，查找效率低</li>
 <li>数组：空间占用多，查找效率高</li>
 <li>Hash：</li>
 </ul>
-<h3 id="扩展-6">扩展</h3>
-<h4 id="压缩trie-patricia-tree">压缩Trie Patricia Tree</h4>
-<p><img src="./assists/800px-Patricia_trie.png" alt="800px-Patricia_trie"></p>
+<h3 id="扩展-6">扩展<a class="anchor" href="#%e6%89%a9%e5%b1%95-6" aria-label="Link"></a></h3>
+<h4 id="压缩trie-patricia-tree">压缩Trie Patricia Tree<a class="anchor" href="#%e5%8e%8b%e7%bc%a9trie-patricia-tree" aria-label="Link"></a></h4>
+<p><img src="./assists/800px-Patricia_trie.png" alt="800px-Patricia_trie" /></p>
 <p>基数树（也叫基数特里树或压缩前缀树）是一种数据结构，是一种更节省空间的Trie（前缀树），其中作为唯一子节点的每个节点都与其父节点合并，<strong>边既可以表示为元素序列又可以表示为单个元素</strong>。</p>
-<p>基数树的查找方式也与常规树不同（常规的树查找一开始就对整个键进行比较，直到不相同为止），基数树查找时节点时，对于节点上的键都按块进行逐块比较，其中该节点中块的长度是基数r； 当 
-
-<span class="katex">
-  \(r\)
-</span>
- 为2时，基数树为二进制的（即该节点的键的长度为1比特位），能最大程度地减小树的深度来最小化稀疏性（最大限度地合并键中没有分叉的节点）。 当 
-
-<span class="katex">
-  \(r≥4\)
-</span>
- 且为2的整数次幂时，基数树是 
-
-<span class="katex">
-  \(r\)
-</span>
- 元基数树，能以潜在的稀疏性为代价降低基数树的深度。</p>
-<h4 id="后缀trie">后缀Trie</h4>
+<p>基数树的查找方式也与常规树不同（常规的树查找一开始就对整个键进行比较，直到不相同为止），基数树查找时节点时，对于节点上的键都按块进行逐块比较，其中该节点中块的长度是基数r； 当 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi></mrow><annotation encoding="application/x-tex">r</annotation></semantics></math></span> 为2时，基数树为二进制的（即该节点的键的长度为1比特位），能最大程度地减小树的深度来最小化稀疏性（最大限度地合并键中没有分叉的节点）。 当 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>≥</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">r≥4</annotation></semantics></math></span> 且为2的整数次幂时，基数树是 <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi></mrow><annotation encoding="application/x-tex">r</annotation></semantics></math></span> 元基数树，能以潜在的稀疏性为代价降低基数树的深度。</p>
+<h4 id="后缀trie">后缀Trie<a class="anchor" href="#%e5%90%8e%e7%bc%80trie" aria-label="Link"></a></h4>
 <p>压缩的后缀字典树</p>
 <ul>
 <li>查找某个字符串s1是否在另外一个字符串s2中</li>
@@ -859,44 +3326,42 @@ T2 = &quot;it is a banana&quot;
 <li>两个字符串S1，S2的最长公共部分</li>
 <li>最长回文串</li>
 </ul>
-<h4 id="双数组字典树-double-array-trie">双数组字典树 Double-Array Trie</h4>
+<h4 id="双数组字典树-double-array-trie">双数组字典树 Double-Array Trie<a class="anchor" href="#%e5%8f%8c%e6%95%b0%e7%bb%84%e5%ad%97%e5%85%b8%e6%a0%91-double-array-trie" aria-label="Link"></a></h4>
 <p>双数组Trie (Double-Array Trie)结构由日本人JUN-ICHI AOE于1989年提出的，是 <strong>Trie结构的压缩形式</strong>，仅用两个线性数组来表示Trie树，该结构有效结合了数字搜索树(Digital Search Tree)检索时间高效的特点和链式表示的Trie空间结构紧凑的特点。双数组Trie的本质是一个确定有限状态自动机（DFA），每个节点代表自动机的一个状态，根据变量不同，进行状态转移，当到达结束状态或无法转移时，完成一次查询操作。<strong>在双数组所有键中包含的字符之间的联系都是通过简单的数学加法运算表示，不仅提高了检索速度，而且省去了链式结构中使用的大量指针，节省了存储空间</strong>。</p>
-<blockquote>
+<blockquote class=''>
 <p>DAT的生成如上说的只能对 <strong>排序</strong> 好的单词进行构建</p>
-</blockquote>
-<p>双数组Trie树归根结底还是属于Trie树，所以免不了有一颗树的构造过程。不过这棵树并没有保存下来，而是边构造树边维护双数组以表示整棵树。</p>
-<pre><code>//i 为状态值 c为当前字符 parent(i) 为i的前置状态
+</blockquote><p>双数组Trie树归根结底还是属于Trie树，所以免不了有一颗树的构造过程。不过这棵树并没有保存下来，而是边构造树边维护双数组以表示整棵树。</p>
+<pre tabindex="0"><code>//i 为状态值 c为当前字符 parent(i) 为i的前置状态
 base[i]=base[parent(i)+c]
 check[i]=base[parent(i)]
 
-base[i]&lt;0 即为结束
-</code></pre><h3 id="问题实例-7">问题实例</h3>
+base[i]&lt;0 即为结束</code></pre><h3 id="问题实例-7">问题实例<a class="anchor" href="#%e9%97%ae%e9%a2%98%e5%ae%9e%e4%be%8b-7" aria-label="Link"></a></h3>
 <ul>
 <li>有10个文件，每个文件1G，每个文件的每一行都存放的是用户的query，每个文件的query都可能重复。要你按照query的频度排序。</li>
 <li>1000万字符串，其中有些是相同的(重复),需要把重复的全部去掉，保留没有重复的字符串。请问怎么设计和实现？</li>
 <li>寻找热门查询：查询串的重复度比较高，虽然总数是1千万，但如果除去重复后，不超过3百万个，每个不超过255字节。</li>
 </ul>
 <hr>
-<h2 id="map-reduce">map-reduce</h2>
-<h3 id="适用范围-9">适用范围</h3>
+<h2 id="map-reduce">map-reduce<a class="anchor" href="#map-reduce" aria-label="Link"></a></h2>
+<h3 id="适用范围-9">适用范围<a class="anchor" href="#%e9%80%82%e7%94%a8%e8%8c%83%e5%9b%b4-9" aria-label="Link"></a></h3>
 <p>数据量大，但是数据种类小可以放入内存</p>
-<h3 id="基本原理及要点">基本原理及要点</h3>
+<h3 id="基本原理及要点">基本原理及要点<a class="anchor" href="#%e5%9f%ba%e6%9c%ac%e5%8e%9f%e7%90%86%e5%8f%8a%e8%a6%81%e7%82%b9" aria-label="Link"></a></h3>
 <p>将数据交给不同的机器去处理，数据划分，结果归约。</p>
-<h3 id="问题实例-8">问题实例</h3>
+<h3 id="问题实例-8">问题实例<a class="anchor" href="#%e9%97%ae%e9%a2%98%e5%ae%9e%e4%be%8b-8" aria-label="Link"></a></h3>
 <ul>
 <li>The canonical example application of MapReduce is a process to count the appearances ofeach different word in a set of documents:</li>
 <li>海量数据分布在100台电脑中，想个办法高效统计出这批数据的TOP10。</li>
 <li>一共有N个机器，每个机器上有N个数。每个机器最多存O(N)个数并对它们操作。如何找到N^2个数的中数(median)？</li>
 </ul>
-<h2 id="经典问题分析">经典问题分析</h2>
-<h3 id="如何从大量的-url-中找出相同的-url">如何从大量的 URL 中找出相同的 URL？</h3>
+<h2 id="经典问题分析">经典问题分析<a class="anchor" href="#%e7%bb%8f%e5%85%b8%e9%97%ae%e9%a2%98%e5%88%86%e6%9e%90" aria-label="Link"></a></h2>
+<h3 id="如何从大量的-url-中找出相同的-url">如何从大量的 URL 中找出相同的 URL？<a class="anchor" href="#%e5%a6%82%e4%bd%95%e4%bb%8e%e5%a4%a7%e9%87%8f%e7%9a%84-url-%e4%b8%ad%e6%89%be%e5%87%ba%e7%9b%b8%e5%90%8c%e7%9a%84-url" aria-label="Link"></a></h3>
 <p>给定 a、b 两个文件，各存放 50 亿个 URL，每个 URL 各占 64B，内存限制是 4G。请找出 a、b 两个文件共同的 URL。</p>
 <p>解答思路：</p>
 <ul>
 <li>分而治之，进行哈希取余；</li>
 <li>对每个子文件进行 HashSet 统计。</li>
 </ul>
-<h3 id="如何从大量数据中找出高频词">如何从大量数据中找出高频词？</h3>
+<h3 id="如何从大量数据中找出高频词">如何从大量数据中找出高频词？<a class="anchor" href="#%e5%a6%82%e4%bd%95%e4%bb%8e%e5%a4%a7%e9%87%8f%e6%95%b0%e6%8d%ae%e4%b8%ad%e6%89%be%e5%87%ba%e9%ab%98%e9%a2%91%e8%af%8d" aria-label="Link"></a></h3>
 <p>有一个 1GB 大小的文件，文件里每一行是一个词，每个词的大小不超过 16B，内存大小限制是 1MB，要求返回频数最高的 100 个词(Top 100)。</p>
 <p>解答思路：</p>
 <ul>
@@ -904,29 +3369,29 @@ base[i]&lt;0 即为结束
 <li>使用 HashMap 统计频数；</li>
 <li>求解最大的 TopN 个，用小顶堆；求解最小的 TopN 个，用大顶堆。</li>
 </ul>
-<h3 id="如何在大量的数据中找出不重复的整数">如何在大量的数据中找出不重复的整数？</h3>
+<h3 id="如何在大量的数据中找出不重复的整数">如何在大量的数据中找出不重复的整数？<a class="anchor" href="#%e5%a6%82%e4%bd%95%e5%9c%a8%e5%a4%a7%e9%87%8f%e7%9a%84%e6%95%b0%e6%8d%ae%e4%b8%ad%e6%89%be%e5%87%ba%e4%b8%8d%e9%87%8d%e5%a4%8d%e7%9a%84%e6%95%b4%e6%95%b0" aria-label="Link"></a></h3>
 <p>在 2.5 亿个整数中找出不重复的整数。注意：内存不足以容纳这 2.5 亿个整数。</p>
 <p>解题思路：位图法</p>
-<h3 id="如何在大量的数据中判断一个数是否存在">如何在大量的数据中判断一个数是否存在？</h3>
+<h3 id="如何在大量的数据中判断一个数是否存在">如何在大量的数据中判断一个数是否存在？<a class="anchor" href="#%e5%a6%82%e4%bd%95%e5%9c%a8%e5%a4%a7%e9%87%8f%e7%9a%84%e6%95%b0%e6%8d%ae%e4%b8%ad%e5%88%a4%e6%96%ad%e4%b8%80%e4%b8%aa%e6%95%b0%e6%98%af%e5%90%a6%e5%ad%98%e5%9c%a8" aria-label="Link"></a></h3>
 <p>给定 40 亿个不重复的没排过序的 unsigned int 型整数，然后再给定一个数，如何快速判断这个数是否在这 40 亿个整数当中？</p>
 <p>解题思路：位图法</p>
-<h3 id="如何查询最热门的查询串">如何查询最热门的查询串？</h3>
+<h3 id="如何查询最热门的查询串">如何查询最热门的查询串？<a class="anchor" href="#%e5%a6%82%e4%bd%95%e6%9f%a5%e8%af%a2%e6%9c%80%e7%83%ad%e9%97%a8%e7%9a%84%e6%9f%a5%e8%af%a2%e4%b8%b2" aria-label="Link"></a></h3>
 <p>搜索引擎会通过日志文件把用户每次检索使用的所有查询串都记录下来，每个查询串的长度不超过 255 字节。</p>
 <p>假设目前有 1000w 个记录（这些查询串的重复度比较高，虽然总数是 1000w，但如果除去重复后，则不超过 300w 个）。请统计最热门的 10 个查询串，要求使用的内存不能超过 1G。（一个查询串的重复度越高，说明查询它的用户越多，也就越热门。）</p>
 <p>解题思路：HashMap、前缀树+小顶堆</p>
-<h3 id="如何统计不同电话号码的个数">如何统计不同电话号码的个数？</h3>
+<h3 id="如何统计不同电话号码的个数">如何统计不同电话号码的个数？<a class="anchor" href="#%e5%a6%82%e4%bd%95%e7%bb%9f%e8%ae%a1%e4%b8%8d%e5%90%8c%e7%94%b5%e8%af%9d%e5%8f%b7%e7%a0%81%e7%9a%84%e4%b8%aa%e6%95%b0" aria-label="Link"></a></h3>
 <p>已知某个文件内包含一些电话号码，每个号码为 8 位数字，统计不同号码的个数。</p>
 <p>解题思路：位图法（将电话号码作为整型）</p>
-<h3 id="如何从-5-亿个数中找出中位数">如何从 5 亿个数中找出中位数？</h3>
+<h3 id="如何从-5-亿个数中找出中位数">如何从 5 亿个数中找出中位数？<a class="anchor" href="#%e5%a6%82%e4%bd%95%e4%bb%8e-5-%e4%ba%bf%e4%b8%aa%e6%95%b0%e4%b8%ad%e6%89%be%e5%87%ba%e4%b8%ad%e4%bd%8d%e6%95%b0" aria-label="Link"></a></h3>
 <p>从 5 亿个数中找出中位数。数据排序后，位置在最中间的数就是中位数。当样本数为奇数时，中位数为 第 <code>(N+1)/2</code> 个数；当样本数为偶数时，中位数为 第 <code>N/2</code> 个数与第 <code>1+N/2</code> 个数的均值。</p>
 <p>解题思路：双堆法、分治法</p>
-<h3 id="如何按照-query-的频度排序">如何按照 query 的频度排序？</h3>
+<h3 id="如何按照-query-的频度排序">如何按照 query 的频度排序？<a class="anchor" href="#%e5%a6%82%e4%bd%95%e6%8c%89%e7%85%a7-query-%e7%9a%84%e9%a2%91%e5%ba%a6%e6%8e%92%e5%ba%8f" aria-label="Link"></a></h3>
 <p>有 10 个文件，每个文件大小为 1G，每个文件的每一行存放的都是用户的 query，每个文件的 query 都可能重复。要求按照 query 的频度排序。</p>
 <p>解题思路：外排序</p>
-<h3 id="如何找出排名前-500-的数">如何找出排名前 500 的数？</h3>
+<h3 id="如何找出排名前-500-的数">如何找出排名前 500 的数？<a class="anchor" href="#%e5%a6%82%e4%bd%95%e6%89%be%e5%87%ba%e6%8e%92%e5%90%8d%e5%89%8d-500-%e7%9a%84%e6%95%b0" aria-label="Link"></a></h3>
 <p>有 20 个数组，每个数组有 500 个元素，并且有序排列。如何在这 <code>20*500</code> 个数中找出前 <code>500</code> 的数？</p>
 <p>解题思路：败者树</p>
-<h2 id="参考链接">参考链接</h2>
+<h2 id="参考链接">参考链接<a class="anchor" href="#%e5%8f%82%e8%80%83%e9%93%be%e6%8e%a5" aria-label="Link"></a></h2>
 <ul>
 <li><a href="https://www.infoq.cn/article/pF3_wx3rQ43VYMpLdAPC">360 搜索的百亿级网页搜索引擎架构实现</a></li>
 <li><a href="http://data.biancheng.net/view/79.html">最佳归并树</a></li>
@@ -934,48 +3399,66 @@ base[i]&lt;0 即为结束
 </ul>
 </article>
  
+      
 
       <footer class="book-footer">
         
-  <div class="flex justify-between">
+  <div class="flex flex-wrap justify-between">
 
-
-
-  <div>
-    
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/88f93968a82e1aaa4a9df106918bcfbcf310fc21" title='Last modified by shihaoyang | 2020-04-22' target="_blank" rel="noopener">
-      <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-04-22</span>
-    </a>
-  </div>
-
-
-
-  <div>
-    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/architecture/bigdata/algo/index.md" target="_blank" rel="noopener">
-      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
-      <span>Edit this page</span>
-    </a>
-  </div>
+<div>
 
 </div>
+
+<div>
+
+</div>
+
+</div>
+
+<div class="flex flex-wrap justify-between">
+    <span>
+    
+      <a href="/docs/architecture/base/" class="flex align-center">
+        <svg class="book-icon" aria-hidden="true"><use href="/iconset.min.90a7fd302dc1b9bc3c291688faee66a3e60a9209f59b89fa00669e35d6907b3f.svg#backward"></use></svg>
+        <span>系统架构基础</span>
+      </a>
+    
+    </span>
+    <span>
+    
+      <a href="/docs/architecture/bigdata/hdfs/" class="flex align-center">
+        <span>HDFS</span>
+        <svg class="book-icon" aria-hidden="true"><use href="/iconset.min.90a7fd302dc1b9bc3c291688faee66a3e60a9209f59b89fa00669e35d6907b3f.svg#forward"></use></svg>
+      </a>
+    
+    </span>
+  </div>
 
  
         
   
-  <div class="book-comments">
-
-</div>
+ 
+        
+        
   
  
+        
+  
+    <script>(function(){document.querySelectorAll("pre:has(code)").forEach(e=>{e.addEventListener("click",e.focus),e.addEventListener("copy",function(t){if(t.preventDefault(),navigator.clipboard){const t=window.getSelection().toString()||e.textContent;navigator.clipboard.writeText(t)}})})})()</script>
+  
+
       </footer>
-      
-    </div>
+
+      <label for="menu-control" class="hidden book-menu-overlay" aria-hidden="true"></label>
+    </main>
 
     
-    <aside class="book-toc">
+  
+  <aside class="book-toc" aria-label="Table of Contents">
+    <div class="book-toc-content">
       
-  <nav id="TableOfContents">
+  
+<nav id="TableOfContents">
   <ul>
     <li><a href="#bloom-filter">Bloom filter</a>
       <ul>
@@ -1083,15 +3566,31 @@ base[i]&lt;0 即为结束
   </ul>
 </nav>
 
+
+
+
+
+
+
+    </div>
+  </aside>
+  
  
-    </aside>
-    
-  </main>
+  </div>
 
   
 </body>
-
 </html>
+
+
+
+
+
+
+
+
+
+
 
 
 

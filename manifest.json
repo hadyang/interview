@@ -1,0 +1,21 @@
+{
+  "name": "HadYang技术分享",
+  "short_name": "HadYang技术分享",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF",
+  "icons": [
+    {
+      "type": "image/png",
+      "src": "/favicon.png",
+      "sizes": "96x96"
+    },
+    {
+      "type": "image/svg+xml",
+      "src": "/favicon.svg",
+      "sizes": "any"
+    }
+  ]
+}

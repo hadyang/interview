@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Basic on HadYang技术分享</title>
+		<link>https://hadyang.com/categories/basic/</link>
+		<description>Recent content in Basic on HadYang技术分享</description>
+		<generator>Hugo</generator>
+		<language>zh-CN</language>
+		
+		
+		
+		
+			<lastBuildDate>Sat, 28 Sep 2019 09:50:48 +0800</lastBuildDate>
+		
+			<atom:link href="https://hadyang.com/categories/basic/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>算法</title>
+				<link>https://hadyang.com/docs/basic/algo/</link>
+				<pubDate>Wed, 21 Aug 2019 11:00:41 +0800</pubDate>
+				<guid>https://hadyang.com/docs/basic/algo/</guid>
+				<description>&lt;h1 id=&#34;算法&#34;&gt;算法&lt;a class=&#34;anchor&#34; href=&#34;#%e7%ae%97%e6%b3%95&#34; aria-label=&#34;Link&#34;&gt;&lt;/a&gt;&lt;/h1&gt;</description>
+			</item>
+	</channel>
+</rss>

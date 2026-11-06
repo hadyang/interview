@@ -1,455 +1,3131 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN" dir="ltr"
+    data-theme="light"
+    data-layout="centered">
 
 <head>
-  <meta charset="UTF-8">
+  
+  <meta name="generator" content="Hugo 0.169.0">
+  <meta name="generator-theme" content="Book Theme: https://github.com/alex-shpak/hugo-book">
+
+
+
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="InnoDB 并发控制"><meta property="og:title" content="InnoDB 并发控制" />
-<meta property="og:description" content="InnoDB 并发控制 InnoDB 锁机制 InnoDB默认使用行锁，实现了两种标准的行锁——共享锁与排他锁；
-   行锁类型 锁功能 锁兼容性 加锁 释放锁     共享锁（读锁、S锁） 允许获取共享锁的亊务读数据 与共享锁兼容，与排它锁不兼容 只有 SerializaWe 隔离级别会默认为：读加共享锁；其他隔离级别下，可显示使用 select...lock in share model 为读加共享锁 在事务提交或回滚后会自动同时释放锁；除了使用 start transaction 的方式显式开启事务，InnoDB 也会自动为增删改査语句开启事务，并自动提交或回滚；(autocommit=1)   排它锁（写锁、X锁） 允许获取排它锁的事务更新或删除数据 与共享锁不兼容，与排它锁不兼容 在默认的 Reapeatable Read 隔离级别下，InnoDB 会自动为增删改操作的行加排它锁；也可显式使用 select...for update 为读加排它锁 &hellip;      除了显式加锁的情况，其他情况下的加锁与解锁都无需人工干预 InnoDB 所有的行锁算法都是基于索引实现的，锁定的也都是索引或索引区间   当前读 &amp; 快照读 当前读：即加锁读，读取记录的最新版本，会加锁保证其他并发事务不能修改当前记录，直至获取锁的事务释放锁；使用当前读的操作主要包括：显式加锁的读操作与插入/更新/删除等写操作，如下所示：
-select * from table where ? lock in share mode; select * from table where ?" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://hadyang.github.io/interview/docs/basic/database/mysql/innodb/concurrent/" />
-<meta property="article:published_time" content="2020-02-19T00:00:00+00:00" />
-<meta property="article:modified_time" content="2020-03-16T15:19:55+08:00" />
-<title>InnoDB 并发控制 | Interview</title>
-<link rel="icon" href="/interview/favicon.png" type="image/x-icon">
+<meta name="description" content="InnoDB 并发控制 InnoDB 锁机制 InnoDB默认使用行锁，实现了两种标准的行锁——共享锁与排他锁；
+行锁类型 锁功能 锁兼容性 加锁 释放锁 共享锁（读锁、S锁） 允许获取共享锁的亊务读数据 与共享锁兼容，与排它锁不兼容 只有 SerializaWe 隔离级别会默认为：读加共享锁；其他隔离级别下，可显示使用 select...lock in share model 为读加共享锁 在事务提交或回滚后会自动同时释放锁；除了使用 start transaction 的方式显式开启事务，InnoDB 也会自动为增删改査语句开启事务，并自动提交或回滚；(autocommit=1) 排它锁（写锁、X锁） 允许获取排它锁的事务更新或删除数据 与共享锁不兼容，与排它锁不兼容 在默认的 Reapeatable Read 隔离级别下，InnoDB 会自动为增删改操作的行加排它锁；也可显式使用 select...for update 为读加排它锁 … 除了显式加锁的情况，其他情况下的加锁与解锁都无需人工干预 InnoDB 所有的行锁算法都是基于索引实现的，锁定的也都是索引或索引区间 当前读 &amp; 快照读 当前读：即加锁读，读取记录的最新版本，会加锁保证其他并发事务不能修改当前记录，直至获取锁的事务释放锁；使用当前读的操作主要包括：显式加锁的读操作与插入/更新/删除等写操作，如下所示：
+select * from table where ? lock in share mode; select * from table where ? for update; insert into table values (…); update table set ? where ?; delete from table where ?; 注：当 Update SQL 被发给 MySQL 后， MySQL Server 会根据where条件，读取第一条满足条件的记录，然后 InnoDB 引擎会将第一条记录返回，并加锁，待 MySQL Server 收到这条加锁的记录之后，会再发起一个 Update 请求，更新这条记录。一条记录操作完成，再读取下一条记录，直至没有满足条件的记录为止。因此， Update 操作内部，就包含了当前读。同理， Delete 操作也一样。 Insert 操作会稍微有些不同，简单来说，就是 Insert 操作可能会触发 Unique Key 的冲突检查，也会进行一个当前读。
+">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#2e3440">
+<meta name="color-scheme" content="light dark">
+<meta name="format-detection" content="telephone=no"><meta property="og:url" content="https://hadyang.com/docs/basic/database/mysql/innodb/concurrent/">
+	<meta property="og:site_name" content="HadYang技术分享">
+	<meta property="og:title" content="InnoDB 并发控制">
+	<meta property="og:description" content="InnoDB 并发控制 InnoDB 锁机制 InnoDB默认使用行锁，实现了两种标准的行锁——共享锁与排他锁；
+行锁类型 锁功能 锁兼容性 加锁 释放锁 共享锁（读锁、S锁） 允许获取共享锁的亊务读数据 与共享锁兼容，与排它锁不兼容 只有 SerializaWe 隔离级别会默认为：读加共享锁；其他隔离级别下，可显示使用 select...lock in share model 为读加共享锁 在事务提交或回滚后会自动同时释放锁；除了使用 start transaction 的方式显式开启事务，InnoDB 也会自动为增删改査语句开启事务，并自动提交或回滚；(autocommit=1) 排它锁（写锁、X锁） 允许获取排它锁的事务更新或删除数据 与共享锁不兼容，与排它锁不兼容 在默认的 Reapeatable Read 隔离级别下，InnoDB 会自动为增删改操作的行加排它锁；也可显式使用 select...for update 为读加排它锁 … 除了显式加锁的情况，其他情况下的加锁与解锁都无需人工干预 InnoDB 所有的行锁算法都是基于索引实现的，锁定的也都是索引或索引区间 当前读 &amp; 快照读 当前读：即加锁读，读取记录的最新版本，会加锁保证其他并发事务不能修改当前记录，直至获取锁的事务释放锁；使用当前读的操作主要包括：显式加锁的读操作与插入/更新/删除等写操作，如下所示：
+select * from table where ? lock in share mode; select * from table where ? for update; insert into table values (…); update table set ? where ?; delete from table where ?; 注：当 Update SQL 被发给 MySQL 后， MySQL Server 会根据where条件，读取第一条满足条件的记录，然后 InnoDB 引擎会将第一条记录返回，并加锁，待 MySQL Server 收到这条加锁的记录之后，会再发起一个 Update 请求，更新这条记录。一条记录操作完成，再读取下一条记录，直至没有满足条件的记录为止。因此， Update 操作内部，就包含了当前读。同理， Delete 操作也一样。 Insert 操作会稍微有些不同，简单来说，就是 Insert 操作可能会触发 Unique Key 的冲突检查，也会进行一个当前读。">
+	<meta property="og:locale" content="zh_CN">
+	<meta property="og:type" content="article">
+		<meta property="article:section" content="docs">
+		<meta property="article:published_time" content="2020-02-19T00:00:00+00:00">
+		<meta property="article:modified_time" content="2020-03-16T15:19:55+08:00">
 
 
-<link rel="stylesheet" href="/interview/book.min.edc993575be58655f3e49634e3ca6db09cc38ac9aa03ecdbe81d941636e35273.css" integrity="sha256-7cmTV1vlhlXz5JY048ptsJzDismqA&#43;zb6B2UFjbjUnM=">
+	<meta itemprop="name" content="InnoDB 并发控制">
+	<meta itemprop="description" content="InnoDB 并发控制 InnoDB 锁机制 InnoDB默认使用行锁，实现了两种标准的行锁——共享锁与排他锁；
+行锁类型 锁功能 锁兼容性 加锁 释放锁 共享锁（读锁、S锁） 允许获取共享锁的亊务读数据 与共享锁兼容，与排它锁不兼容 只有 SerializaWe 隔离级别会默认为：读加共享锁；其他隔离级别下，可显示使用 select...lock in share model 为读加共享锁 在事务提交或回滚后会自动同时释放锁；除了使用 start transaction 的方式显式开启事务，InnoDB 也会自动为增删改査语句开启事务，并自动提交或回滚；(autocommit=1) 排它锁（写锁、X锁） 允许获取排它锁的事务更新或删除数据 与共享锁不兼容，与排它锁不兼容 在默认的 Reapeatable Read 隔离级别下，InnoDB 会自动为增删改操作的行加排它锁；也可显式使用 select...for update 为读加排它锁 … 除了显式加锁的情况，其他情况下的加锁与解锁都无需人工干预 InnoDB 所有的行锁算法都是基于索引实现的，锁定的也都是索引或索引区间 当前读 &amp; 快照读 当前读：即加锁读，读取记录的最新版本，会加锁保证其他并发事务不能修改当前记录，直至获取锁的事务释放锁；使用当前读的操作主要包括：显式加锁的读操作与插入/更新/删除等写操作，如下所示：
+select * from table where ? lock in share mode; select * from table where ? for update; insert into table values (…); update table set ? where ?; delete from table where ?; 注：当 Update SQL 被发给 MySQL 后， MySQL Server 会根据where条件，读取第一条满足条件的记录，然后 InnoDB 引擎会将第一条记录返回，并加锁，待 MySQL Server 收到这条加锁的记录之后，会再发起一个 Update 请求，更新这条记录。一条记录操作完成，再读取下一条记录，直至没有满足条件的记录为止。因此， Update 操作内部，就包含了当前读。同理， Delete 操作也一样。 Insert 操作会稍微有些不同，简单来说，就是 Insert 操作可能会触发 Unique Key 的冲突检查，也会进行一个当前读。">
+	<meta itemprop="datePublished" content="2020-02-19T00:00:00+00:00">
+	<meta itemprop="dateModified" content="2020-03-16T15:19:55+08:00">
+	<meta itemprop="wordCount" content="561">
+	<meta itemprop="keywords" content="Database">
+
+<title>InnoDB 并发控制 • HadYang技术分享</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.png" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<link rel="manifest" href="/manifest.json">
+<link rel="canonical" href="https://hadyang.com/docs/basic/database/mysql/innodb/concurrent/">
+<link rel="stylesheet" href="/book.min.3b47c5c3053ddd1846b44ca0278f9365d1cc6def0c56efaee4fbb8b7a57c782b.css" integrity="sha256-O0fFwwU93RhGtEygJ4&#43;TZdHMbe8MVu&#43;u5Pu4t6V8eCs=" crossorigin="anonymous">
 
 
-<script defer src="/interview/en.search.min.51eaac1d27afa630aa5121b26a137e4a1060429577e041714b91afd0aabeecb6.js" integrity="sha256-UeqsHSevpjCqUSGyahN&#43;ShBgQpV34EFxS5Gv0Kq&#43;7LY="></script>
-
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-	ga('create', 'UA-157595781-3', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
-
-<!--
-Made with Book Theme
-https://github.com/alex-shpak/hugo-book
--->
-
+<script type="module" src="/en.search.min.b47060fc7a23e8d87f711a51b12b14f2dcc3aa45572ee4a9e1129fbbe13243de.js" integrity="sha256-tHBg/Hoj6Nh/cRpRsSsU8tzDqkVXLuSp4RKfu&#43;EyQ94=" crossorigin="anonymous"></script>
   
 </head>
 
-<body>
-  <input type="checkbox" class="hidden" id="menu-control" />
-  <main class="container flex">
-    <aside class="book-menu">
-      
+<body dir="ltr" class="book-kind-page book-type-docs">
+  <div class="book-container flex">
+    
+<aside class="book-menu" aria-label="Menu">
+  <div class="book-menu-content">
+    
   <nav>
-<h2 class="book-brand">
-  <a href="/interview"><span>Interview</span>
+<div class="book-brand">
+  <a class="flex align-center" href="/"><span>HadYang技术分享</span>
   </a>
-</h2>
-
-
-<div class="book-search">
-  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
-  <div class="book-search-spinner spinner hidden"></div>
-  <ul id="book-search-results"></ul>
 </div>
 
-
-
-
-
-
-
-
-
-  <ul>
-<li><a href="/interview/docs/basic/">计算机基础</a>
-<ul>
-<li><a href="/interview/docs/basic/algo/">算法</a>
-<ul>
-<li><a href="/interview/docs/basic/algo/tree/">树</a></li>
-<li><a href="/interview/docs/basic/algo/hash/">Hash</a></li>
-<li><a href="/interview/docs/basic/algo/mst/">最小生成树算法</a></li>
-<li><a href="/interview/docs/basic/algo/path/">最短路径算法</a></li>
-<li><a href="/interview/docs/basic/algo/kmp/">KMP算法</a></li>
-<li><a href="/interview/docs/basic/algo/search/">查找算法</a></li>
-<li><a href="/interview/docs/basic/algo/sort/">排序算法</a></li>
-<li><a href="/interview/docs/basic/algo/skip_list/">跳跃表</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/basic/os/">操作系统</a>
-<ul>
-<li><a href="/interview/docs/basic/os/arch/">计算机体系结构</a></li>
-<li><a href="/interview/docs/basic/os/concurrency/">进程管理</a></li>
-<li><a href="/interview/docs/basic/os/memory/">内存管理</a></li>
-<li><a href="/interview/docs/basic/os/disk/">磁盘与文件</a></li>
-<li><a href="/interview/docs/basic/os/device/">设备管理</a></li>
-<li><a href="/interview/docs/basic/os/io/">I/O</a></li>
-<li><a href="/interview/docs/basic/os/questions/">面试题</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/basic/net/">计算机网络</a>
-<ul>
-<li><a href="/interview/docs/basic/net/protocol/">底层网络协议</a></li>
-<li><a href="/interview/docs/basic/net/tcp/">TCP</a></li>
-<li><a href="/interview/docs/basic/net/ip/">IP</a></li>
-<li><a href="/interview/docs/basic/net/http/">HTTP</a></li>
-<li><a href="/interview/docs/basic/net/https/">HTTPS</a></li>
-<li><a href="/interview/docs/basic/net/websocket/">Websocket</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/basic/database/mysql/">MySQL</a>
-<ul>
-<li><a href="/interview/docs/basic/database/sql/">SQL</a></li>
-<li><a href="/interview/docs/basic/database/mysql/architecture/">MySQL架构</a></li>
-<li><a href="/interview/docs/basic/database/mysql/innodb/">InnoDB</a>
-<ul>
-<li><a href="/interview/docs/basic/database/mysql/innodb/index/">InnoDB索引</a></li>
-<li><a href="/interview/docs/basic/database/mysql/innodb/concurrent/"class=active>InnoDB并发控制</a></li>
-<li><a href="/interview/docs/basic/database/mysql/innodb/transaction/">InnoDB事务</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/basic/database/mysql/sharding/">MySQL集群</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/basic/database/redis/">Redis</a></li>
-<li><a href="/interview/docs/basic/cryptology/">密码学</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/java/">Java</a>
-<ul>
-<li><a href="/interview/docs/java/oop/">OOP</a></li>
-<li><a href="/interview/docs/java/serilaser/">序列化</a></li>
-<li><a href="/interview/docs/java/operator/">运算符</a></li>
-<li><a href="/interview/docs/java/exception/">异常</a></li>
-<li><a href="/interview/docs/java/generics/">泛型</a></li>
-<li><a href="/interview/docs/java/object/">Object</a></li>
-<li><a href="/interview/docs/java/string-builder/">StringBuilder</a></li>
-<li><a href="/interview/docs/java/proxy/">代理</a></li>
-<li><a href="/interview/docs/java/annotation/">注解</a></li>
-<li><a href="/interview/docs/java/nio/">NIO</a></li>
-<li><a href="/interview/docs/java/question/">面试题</a></li>
-<li><a href="/interview/docs/java/">集合</a>
-<ul>
-<li><a href="/interview/docs/java/collection/HashMap/">HashMap</a></li>
-<li><a href="/interview/docs/java/collection/Concurrenthashmap/">Concurrenthashmap</a></li>
-<li><a href="/interview/docs/java/collection/BlockQueue/">BlockQueue</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/java/concurrent/">并发</a>
-<ul>
-<li><a href="/interview/docs/java/concurrent/thread/">线程</a></li>
-<li><a href="/interview/docs/java/concurrent/volatile/">Volatile</a></li>
-<li><a href="/interview/docs/java/concurrent/atomic/">AtomicInteger</a></li>
-<li><a href="/interview/docs/java/concurrent/synchronized/">Synchronized</a></li>
-<li><a href="/interview/docs/java/concurrent/AQS/">AQS</a></li>
-<li><a href="/interview/docs/java/concurrent/count-down-latch/">CountDownLatch</a></li>
-<li><a href="/interview/docs/java/concurrent/threadlocal/">Threadlocal</a></li>
-<li><a href="/interview/docs/java/concurrent/interrupt/">线程中断</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/java/jvm/">Java虚拟机</a>
-<ul>
-<li><a href="/interview/docs/java/jvm/architecture/">JVM架构</a></li>
-<li><a href="/interview/docs/java/jvm/classloader/">类加载器</a></li>
-<li><a href="/interview/docs/java/jvm/runtime_area/">内存模型</a></li>
-<li><a href="/interview/docs/java/jvm/gc/">垃圾收集</a></li>
-<li><a href="/interview/docs/java/jvm/dispatcher/">Java分派机制</a></li>
-<li><a href="/interview/docs/java/jvm/string-constant-pool/">String常量池</a></li>
-<li><a href="/interview/docs/java/jvm/jvm-object-lifecycle/">对象生命周期</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="/interview/docs/fromwork/">框架</a>
-<ul>
-<li><a href="/interview/docs/fromwork/netty/">Netty</a></li>
-<li><a href="/interview/docs/fromwork/mybatis/">Mybatis</a>
-<ul>
-<li><a href="/interview/docs/fromwork/mybatis/question/">面试题</a></li>
-<li><a href="/interview/docs/fromwork/mybatis/cache/">缓存</a></li>
-<li><a href="/interview/docs/fromwork/mybatis/proxy/">代理</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/fromwork/spring/">Spring</a>
-<ul>
-<li><a href="/interview/docs/fromwork/spring/ioc/">IOC</a></li>
-<li><a href="/interview/docs/fromwork/spring/design-partten/">设计模式</a></li>
-<li><a href="/interview/docs/fromwork/spring/aop/">AOP</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="/interview/docs/architecture/">系统架构</a>
-<ul>
-<li><a href="/interview/docs/architecture/base/">基本概念</a></li>
-<li><a href="/interview/docs/architecture/concurrent/">高并发</a>
-<ul>
-<li><a href="/interview/docs/architecture/concurrent/design/">高并发系统设计</a></li>
-<li><a href="/interview/docs/architecture/concurrent/flow-control/">流量控制</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/architecture/design/">系统设计</a>
-<ul>
-<li><a href="/interview/docs/architecture/design/tinyURL/">短链接系统</a></li>
-<li><a href="/interview/docs/architecture/design/seckill/">秒杀系统</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/architecture/distributed/">分布式</a>
-<ul>
-<li><a href="/interview/docs/architecture/distributed/consensus/">分布式一致性与共识算法</a></li>
-<li><a href="/interview/docs/architecture/distributed/cache/">分布式缓存</a></li>
-<li><a href="/interview/docs/architecture/distributed/lock/">分布式锁</a></li>
-<li><a href="/interview/docs/architecture/distributed/transaction/">分布式事务</a></li>
-<li><a href="/interview/docs/architecture/distributed/mq/">消息队列</a></li>
-<li><a href="/interview/docs/architecture/distributed/zk/">Zookeeper</a></li>
-<li><a href="/interview/docs/architecture/distributed/kafka/">Kafka</a></li>
-<li><a href="/interview/docs/architecture/distributed/rpc/">远程调用</a></li>
-<li><a href="/interview/docs/architecture/distributed/dubbo/">Dubbo</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/architecture/bigdata/">大数据</a>
-<ul>
-<li><a href="/interview/docs/architecture/bigdata/algo/">基础算法</a></li>
-<li><a href="/interview/docs/architecture/bigdata/hdfs/">HDFS</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="/interview/docs/offer/">剑指offer</a>
-<ul>
-<li><a href="/interview/docs/offer/search-a-2d-matrix/">搜索二维矩阵</a></li>
-<li><a href="/interview/docs/offer/replay-space/">替换空格</a></li>
-<li><a href="/interview/docs/offer/print-link-from-tail/">从尾到头打印链表</a></li>
-<li><a href="/interview/docs/offer/reConstructBinaryTree/">重建二叉树</a></li>
-<li><a href="/interview/docs/offer/two-stack-fifo/">用两个栈实现一个队列</a></li>
-<li><a href="/interview/docs/offer/find-minimum-in-rotated-sorted-array/">旋转数组的最小数字</a></li>
-<li><a href="/interview/docs/offer/fibonacci/">斐波纳切数列</a></li>
-<li><a href="/interview/docs/offer/number-of-one/">二进制中1的个数</a></li>
-<li><a href="/interview/docs/offer/power/">数值的整数次方</a></li>
-<li><a href="/interview/docs/offer/printn/">打印最大的 n 位数</a></li>
-<li><a href="/interview/docs/offer/O1DeleteNode/">在O(1)的时间复杂度下删除节点</a></li>
-<li><a href="/interview/docs/offer/reOrderArray/">调整数组顺序使奇数位于偶数前面</a></li>
-<li><a href="/interview/docs/offer/FindKthToTail/">链表中倒数第k个结点</a></li>
-<li><a href="/interview/docs/offer/revert-link/">反转链表</a></li>
-<li><a href="/interview/docs/offer/merge-sort-link/">合并两个排序的链表</a></li>
-<li><a href="/interview/docs/offer/HasSubtree/">树的子结构</a></li>
-<li><a href="/interview/docs/offer/mirror-tree/">二叉树的镜像</a></li>
-<li><a href="/interview/docs/offer/PrintMatrix/">顺时针打印矩阵</a></li>
-<li><a href="/interview/docs/offer/MinStack/">包含min函数的栈</a></li>
-<li><a href="/interview/docs/offer/IsPopOrder/">栈的压入、弹出序列</a></li>
-<li><a href="/interview/docs/offer/PrintFromTopToBottom/">从上往下打印二叉树</a></li>
-<li><a href="/interview/docs/offer/VerifySquenceOfBST/">二叉搜索树的后序遍历序列</a></li>
-<li><a href="/interview/docs/offer/FindPath/">二叉树中和为某一值的路径</a></li>
-<li><a href="/interview/docs/offer/CloneLink/">复杂链表的复制</a></li>
-<li><a href="/interview/docs/offer/BST-Link-Convert/">二叉搜索树与双向链表</a></li>
-<li><a href="/interview/docs/offer/Permutation/">字符串的排列</a></li>
-<li><a href="/interview/docs/offer/MoreThanHalfNum/">数组中出现次数超过一半的数字</a></li>
-<li><a href="/interview/docs/offer/GetLeastNumbers/">最小的K个数</a></li>
-<li><a href="/interview/docs/offer/FindGreatestSumOfSubArray/">连续子数组的最大和</a></li>
-<li><a href="/interview/docs/offer/NumberOfOneBetweenOneAndN/">从1到n整数中1出现的次数</a></li>
-<li><a href="/interview/docs/offer/PrintMinNumber/">把数组排成最小的数</a></li>
-<li><a href="/interview/docs/offer/GetUglyNumber/">丑数</a></li>
-<li><a href="/interview/docs/offer/FirstNotRepeatingChar/">第一个只出现一次的字符</a></li>
-<li><a href="/interview/docs/offer/InversePairs/">数组中的逆序对</a></li>
-<li><a href="/interview/docs/offer/FindFirstCommonNode/">两个链表的第一个公共结点</a></li>
-<li><a href="/interview/docs/offer/GetNumberOfK/">数字在排序数组中出现的次数</a></li>
-<li><a href="/interview/docs/offer/TreeDepth/">二叉树的深度</a></li>
-<li><a href="/interview/docs/offer/FindNumsAppearOnce/">数组中只出现一次的数字</a></li>
-<li><a href="/interview/docs/offer/FindNumbersWithSum/">和为S的两个数字</a></li>
-<li><a href="/interview/docs/offer/FindContinuousSequence/">和为S的连续正数序列</a></li>
-<li><a href="/interview/docs/offer/ReverseSentence/">翻转单词顺序列</a></li>
-<li><a href="/interview/docs/offer/LeftRotateString/">左旋转字符串</a></li>
-<li><a href="/interview/docs/offer/SumOfNDice/">n个骰子的点数</a></li>
-<li><a href="/interview/docs/offer/isContinuous/">扑克牌顺子</a></li>
-<li><a href="/interview/docs/offer/LastRemaining/">圆圈中最后剩下的数</a></li>
-<li><a href="/interview/docs/offer/sum/">求1+2+3+&hellip;+n</a></li>
-<li><a href="/interview/docs/offer/Add/">不用加减乘除做加法</a></li>
-<li><a href="/interview/docs/offer/Singleton/">单例</a></li>
-<li><a href="/interview/docs/offer/Duplicate/">数组中重复的数字</a></li>
-<li><a href="/interview/docs/offer/GetNext/">二叉树的下一个结点</a></li>
-<li><a href="/interview/docs/offer/hasPath/">矩阵中的路径</a></li>
-<li><a href="/interview/docs/offer/MovingCount/">机器人的运动范围</a></li>
-<li><a href="/interview/docs/offer/CutRope/">剪绳子</a></li>
-<li><a href="/interview/docs/offer/PatternMatch/">正则表达式匹配</a></li>
-<li><a href="/interview/docs/offer/IsNumeric/">表示数值的字符串</a></li>
-<li><a href="/interview/docs/offer/EntryNodeOfLoop/">链表中环的入口</a></li>
-<li><a href="/interview/docs/offer/IsSymmetrical/">对称二叉树</a></li>
-<li><a href="/interview/docs/offer/SerializeTree/">序列化二叉树</a></li>
-<li><a href="/interview/docs/offer/StreamMid/">数据流中的中位数</a></li>
-<li><a href="/interview/docs/offer/NOfNumberSerialize/">数字序列中的某一位的数字</a></li>
-<li><a href="/interview/docs/offer/TranslateNumToStr/">把数字翻译成字符串</a></li>
-<li><a href="/interview/docs/offer/MaxGift/">礼物的最大价值</a></li>
-<li><a href="/interview/docs/offer/LongestNoRepeatSubString/">最长不含重复字符的子字符串</a></li>
-<li><a href="/interview/docs/offer/CountOfSortedArray/">在排序数组中查找数字</a></li>
-<li><a href="/interview/docs/offer/BSTKthNode/">二叉搜索树的第K大节点</a></li>
-<li><a href="/interview/docs/offer/MaxInWindows/">滑动窗口的最大值</a></li>
-<li><a href="/interview/docs/offer/MaxProfit/">股票的最大利润</a></li>
-</ul>
-</li>
-<li><a href="/interview/docs/leetcode/">LeetCode</a>
-<ul>
-<li><a href="/interview/docs/leetcode/lengthOfLongestSubstring/">* 无重复字符的最长子串</a></li>
-<li><a href="/interview/docs/leetcode/longestCommonPrefix/">最长公共前缀</a></li>
-<li><a href="/interview/docs/leetcode/checkInclusion/">字符串的排列</a></li>
-<li><a href="/interview/docs/leetcode/StringMultiply/">字符串相乘</a></li>
-<li><a href="/interview/docs/leetcode/reverseWords/">翻转字符串里的单词</a></li>
-<li><a href="/interview/docs/leetcode/simplifyPath/">* 简化路径</a></li>
-<li><a href="/interview/docs/leetcode/restoreIpAddresses/">* 复原IP地址</a></li>
-<li><a href="/interview/docs/leetcode/threeSum/">* 三数之和</a></li>
-<li><a href="/interview/docs/leetcode/maxAreaOfIsland/">* 岛屿的最大面积</a></li>
-<li><a href="/interview/docs/leetcode/searchRote/">* 搜索旋转排序数组</a></li>
-<li><a href="/interview/docs/leetcode/findLengthOfLCIS/">最长连续递增序列</a></li>
-<li><a href="/interview/docs/leetcode/findKthLargest/">数组中的第K个最大元素</a></li>
-<li><a href="/interview/docs/leetcode/longestConsecutive/">最长连续序列</a></li>
-<li><a href="/interview/docs/leetcode/findCircleNum/">* 朋友圈</a></li>
-<li><a href="/interview/docs/leetcode/mergeRagen/">合并区间</a></li>
-<li><a href="/interview/docs/leetcode/trap/">* 接雨水</a></li>
-<li><a href="/interview/docs/leetcode/mergeTwoLists/">合并两个有序链表</a></li>
-<li><a href="/interview/docs/leetcode/reverseList/">* 反转链表</a></li>
-<li><a href="/interview/docs/leetcode/addTwoNumbers/">* 两数相加</a></li>
-<li><a href="/interview/docs/leetcode/sortList/">* 排序链表</a></li>
-<li><a href="/interview/docs/leetcode/detectCycle/">环形链表 II</a></li>
-<li><a href="/interview/docs/leetcode/getIntersectionNode/">相交链表</a></li>
-<li><a href="/interview/docs/leetcode/mergeKLists/">* 合并K个排序链表</a></li>
-<li><a href="/interview/docs/leetcode/lowestCommonAncestor/">二叉树的最近公共祖先</a></li>
-<li><a href="/interview/docs/leetcode/zigzagLevelOrder/">二叉树的锯齿形层次遍历</a></li>
-<li><a href="/interview/docs/leetcode/maxProfit/">* 买卖股票的最佳时机</a></li>
-<li><a href="/interview/docs/leetcode/maxProfit2/">* 买卖股票的最佳时机 II</a></li>
-<li><a href="/interview/docs/leetcode/maxSubArray/">最大子序和</a></li>
-<li><a href="/interview/docs/leetcode/MinStack/">* 最小栈</a></li>
-<li><a href="/interview/docs/leetcode/LRUCache/">* LRU缓存机制</a></li>
-<li><a href="/interview/docs/leetcode/AllOne/">全 O(1) 的数据结构</a></li>
-<li><a href="/interview/docs/leetcode/mySqrt/">* x 的平方根</a></li>
-<li><a href="/interview/docs/leetcode/validUtf8/">* UTF-8 编码验证</a></li>
-<li><a href="/interview/docs/leetcode/salary/">* 第二高的薪水</a></li>
-</ul>
-</li>
-</ul>
-
-
-
-
-
-
-
-
-</nav>
-
-
-
-
-  <script>(function(){var menu=document.querySelector("aside.book-menu nav");addEventListener("beforeunload",function(event){localStorage.setItem("menu.scrollTop",menu.scrollTop);});menu.scrollTop=localStorage.getItem("menu.scrollTop");})();</script>
-
-
- 
-    </aside>
-
-    <div class="book-page">
-      <header class="book-header">
-        
-  <div class="flex align-center justify-between">
-  <label for="menu-control">
-    <img src="/interview/svg/menu.svg" class="book-icon" alt="Menu" />
-  </label>
-
-  <strong>InnoDB 并发控制</strong>
-
-  <label for="toc-control">
-    <img src="/interview/svg/toc.svg" class="book-icon" alt="Table of Contents" />
-  </label>
+<div class="book-search hidden">
+  <input id="book-search-input" type="text" role="searchbox" enterkeyhint="search"
+    placeholder="Search"
+    aria-label="Search"
+    maxlength="64" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results" aria-live="polite"></ul>
 </div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
 
 
   
-    <input type="checkbox" class="hidden" id="toc-control" />
-    <aside class="hidden clearfix">
-      
-  <nav id="TableOfContents">
   <ul>
-    <li><a href="#innodb-锁机制">InnoDB 锁机制</a>
-      <ul>
-        <li><a href="#当前读--快照读">当前读 & 快照读</a></li>
-        <li><a href="#共享锁与独占锁">共享锁与独占锁</a></li>
-        <li><a href="#意向锁">意向锁</a></li>
-        <li><a href="#record-lock">Record Lock</a></li>
-        <li><a href="#gap-lock">Gap Lock</a></li>
-        <li><a href="#插入意向锁">插入意向锁</a></li>
-        <li><a href="#自增锁">自增锁</a></li>
-        <li><a href="#锁选择">锁选择</a></li>
-      </ul>
-    </li>
-    <li><a href="#mvcc">MVCC</a>
-      <ul>
-        <li><a href="#mvcc-二级索引">MVCC 二级索引</a></li>
-        <li><a href="#mvcc-vs-乐观锁">MVCC vs 乐观锁</a></li>
-      </ul>
-    </li>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Architecture</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/base/" class="">
+      系统架构基础</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Bigdata</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/bigdata/algo/" class="">
+      大数据基础算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/bigdata/hdfs/" class="">
+      HDFS</a>
+  
+
+        </li>
+      
+    
   </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Concurrent</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/concurrent/design/" class="">
+      高并发系统设计</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/concurrent/flow-control/" class="">
+      高并发下的流量控制</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Design</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/design/seckill/" class="">
+      秒杀系统</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/design/tinyURL/" class="">
+      短链接</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Distributed</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/consensus/" class="">
+      分布式一致性和共识协议</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/dubbo/" class="">
+      Dubbo</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/kafka/" class="">
+      Kafka</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/mq/" class="">
+      MQ</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/rpc/" class="">
+      RPC</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/zk/" class="">
+      Zookeeper</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/transaction/" class="">
+      分布式事务</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/cache/" class="">
+      分布式缓存</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/architecture/distributed/lock/" class="">
+      分布式锁</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/" class="">
+      Basic</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/sql/" class="">
+      SQL</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/redis/" class="">
+      Redis</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/cryptology/" class="">
+      密码学</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/" class="">
+      操作系统基础</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/io/" class="">
+      I/O</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/memory/" class="">
+      内存管理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/disk/" class="">
+      磁盘与文件</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/arch/" class="">
+      计算机体系结构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/device/" class="">
+      设备管理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/concurrency/" class="">
+      进程管理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/os/questions/" class="">
+      Index</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/" class="">
+      算法</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/kmp/" class="">
+      KMP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/hash/" class="">
+      哈希</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/sort/" class="">
+      排序算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/mst/" class="">
+      最小生成树算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/path/" class="">
+      最短路径算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/search/" class="">
+      查找算法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/tree/" class="">
+      树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/algo/skip_list/" class="">
+      跳跃表</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/" class="">
+      网络分层</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/websocket/" class="">
+      Websocket</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/http/" class="">
+      HTTP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/https/" class="">
+      HTTPS</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/ip/" class="">
+      IP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/tcp/" class="">
+      TCP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/net/protocol/" class="">
+      网络协议</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Mysql</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/sharding/" class="">
+      MySQL 集群</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/architecture/" class="">
+      MySQL 架构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Innodb</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/innodb/transaction/" class="">
+      InnoDB 事务</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/innodb/concurrent/" class="active">
+      InnoDB 并发控制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/basic/database/mysql/innodb/index/" class="">
+      InnoDB 索引</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Fromwork</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/netty/" class="">
+      Netty</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/spring/" class="">
+      Spring 基本</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/spring/aop/" class="">
+      AOP</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/spring/ioc/" class="">
+      IOC</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/spring/design-partten/" class="">
+      设计模式</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Mybatis</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/mybatis/proxy/" class="">
+      Mybatis 动态代理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/mybatis/cache/" class="">
+      Mybatis 缓存机制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/fromwork/mybatis/question/" class="">
+      面试题</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/" class="">
+      Java</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/question/" class="">
+      Java面试题</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/nio/" class="">
+      NIO</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/proxy/" class="">
+      Java 代理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/exception/" class="">
+      Java 异常</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/generics/" class="">
+      Java 泛型</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/object/" class="">
+      Object</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/string-builder/" class="">
+      StringBuilder</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/serilaser/" class="">
+      序列化</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/annotation/" class="">
+      注解</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/operator/" class="">
+      运算符</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/collection/" class="">
+      集合框架</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/collection/BlockQueue/" class="">
+      BlockingQueue</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/collection/Concurrenthashmap/" class="">
+      ConcurrentHashmap</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/collection/HashMap/" class="">
+      HashMap</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/oop/" class="">
+      面向对象基础</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Concurrent</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/atomic/" class="">
+      AtomicInteger</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/AQS/" class="">
+      AQS</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/count-down-latch/" class="">
+      CountDownLatch</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/thread/" class="">
+      Java线程</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/synchronized/" class="">
+      Synchronized</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/threadlocal/" class="">
+      ThreadLocal</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/volatile/" class="">
+      Volatile</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/concurrent/interrupt/" class="">
+      线程中断</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a>
+      Jvm</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/gc/" class="">
+      垃圾回收</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/architecture/" class="">
+      JVM 架构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/classloader/" class="">
+      类加载器</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/runtime_area/" class="">
+      运行时数据区</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/dispatcher/" class="">
+      Java 分派机制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/string-constant-pool/" class="">
+      String 常量池</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/java/jvm/jvm-object-lifecycle/" class="">
+      对象的生命周期</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/" class="">
+      Leetcode</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/threeSum/" class="">
+      三数之和</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/addTwoNumbers/" class="">
+      两数相加</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/maxProfit/" class="">
+      买卖股票的最佳时机</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/maxProfit2/" class="">
+      买卖股票的最佳时机</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/lowestCommonAncestor/" class="">
+      二叉树的最近公共祖先</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/AllOne/" class="">
+      全 O(1) 的数据结构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/reverseList/" class="">
+      反转链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/mergeKLists/" class="">
+      合并</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/mergeTwoLists/" class="">
+      合并两个有序链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/mergeRagen/" class="">
+      合并区间</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/restoreIpAddresses/" class="">
+      复原</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/checkInclusion/" class="">
+      字符串的排列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/StringMultiply/" class="">
+      字符串相乘</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/maxAreaOfIsland/" class="">
+      岛屿的最大面积</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/sortList/" class="">
+      排序链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/trap/" class="">
+      接雨水</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/searchRote/" class="">
+      搜索旋转排序数组</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/findKthLargest/" class="">
+      数组中的第K个最大元素</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/lengthOfLongestSubstring/" class="">
+      无重复字符的最长子串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/maxSubArray/" class="">
+      最大子序和</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/MinStack/" class="">
+      最小栈</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/longestCommonPrefix/" class="">
+      最长公共前缀</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/longestConsecutive/" class="">
+      最长连续序列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/findLengthOfLCIS/" class="">
+      最长连续递增序列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/findCircleNum/" class="">
+      朋友圈</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/detectCycle/" class="">
+      环形链表 II</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/mySqrt/" class="">
+      的平方根</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/getIntersectionNode/" class="">
+      相交链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/salary/" class="">
+      第二高的薪水</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/simplifyPath/" class="">
+      简化路径</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/LRUCache/" class="">
+      缓存机制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/validUtf8/" class="">
+      编码验证</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/leetcode/reverseWords/" class="">
+      翻转字符串里的单词</a>
+  
+
+        </li>
+      
+    
+      
+    
+  </ul>
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/" class="">
+      Offer</a>
+  
+
+          
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/Add/" class="">
+      不用加减乘除做加法</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetUglyNumber/" class="">
+      丑数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindFirstCommonNode/" class="">
+      两个链表的第一个公共结点</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/SumOfNDice/" class="">
+      个骰子的点数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/BST-Link-Convert/" class="">
+      二叉搜索树与双向链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/VerifySquenceOfBST/" class="">
+      二叉搜索树的后序遍历序列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/BSTKthNode/" class="">
+      二叉搜索树的第</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindPath/" class="">
+      二叉树中和为某一值的路径</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetNext/" class="">
+      二叉树的下一个结点</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/TreeDepth/" class="">
+      二叉树的深度</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/number-of-one/" class="">
+      二进制中</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/PrintFromTopToBottom/" class="">
+      从上往下打印二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/print-link-from-tail/" class="">
+      从尾到头打印链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/CutRope/" class="">
+      剪绳子</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MinStack/" class="">
+      包含</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/Singleton/" class="">
+      单例</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/revert-link/" class="">
+      反转链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/merge-sort-link/" class="">
+      合并两个排序的链表</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindContinuousSequence/" class="">
+      和为</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindNumbersWithSum/" class="">
+      和为</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/LastRemaining/" class="">
+      圆圈中最后剩下的数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/O1DeleteNode/" class="">
+      在</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/CountOfSortedArray/" class="">
+      在排序数组中查找数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/CloneLink/" class="">
+      复杂链表的复制</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/Permutation/" class="">
+      字符串的排列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/IsSymmetrical/" class="">
+      对称的二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/LeftRotateString/" class="">
+      左旋转字符串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/SerializeTree/" class="">
+      序列化二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/isContinuous/" class="">
+      扑克牌顺子</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/printn/" class="">
+      打印最大的</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/TranslateNumToStr/" class="">
+      把数字翻译成字符串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/PrintMinNumber/" class="">
+      把数组排成最小的数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/search-a-2d-matrix/" class="">
+      搜索二维矩阵</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetNumberOfK/" class="">
+      数字在排序数组中出现的次数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/NOfNumberSerialize/" class="">
+      数字序列中的某一位的数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/StreamMid/" class="">
+      数据流中的中位数</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MoreThanHalfNum/" class="">
+      数组中出现次数超过一半的数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindNumsAppearOnce/" class="">
+      数组中只出现一次的数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/InversePairs/" class="">
+      数组中的逆序对</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/Duplicate/" class="">
+      数组中重复的数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/NumberOfOneBetweenOneAndN/" class="">
+      整数中</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/fibonacci/" class="">
+      斐波纳切数列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/find-minimum-in-rotated-sorted-array/" class="">
+      旋转数组的最小数字</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/replay-space/" class="">
+      替换空格</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetLeastNumbers/" class="">
+      最小的</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/GetLeastNumbersSolution/" class="">
+      最小的</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/LongestNoRepeatSubString/" class="">
+      最长不含重复字符的子字符串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MovingCount/" class="">
+      机器人的运动范围</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/IsPopOrder/" class="">
+      栈的压入</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/HasSubtree/" class="">
+      树的子结构</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/PatternMatch/" class="">
+      正则表达式匹配</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/sum/" class="">
+      求</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MaxInWindows/" class="">
+      滑动窗口的最大值</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/two-stack-fifo/" class="">
+      用两个栈实现一个队列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/hasPath/" class="">
+      矩阵中的路径</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MaxGift/" class="">
+      礼物的最大值</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FirstNotRepeatingChar/" class="">
+      第一个只出现一次的字符</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/ReverseSentence/" class="">
+      翻转单词顺序列</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/MaxProfit/" class="">
+      股票的最大利润</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/IsNumeric/" class="">
+      表示数值的字符串</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/reOrderArray/" class="">
+      调整数组顺序使奇数位于偶数前面</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindGreatestSumOfSubArray/" class="">
+      连续子数组的最大和</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/reConstructBinaryTree/" class="">
+      重建二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/FindKthToTail/" class="">
+      链表中倒数第</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/EntryNodeOfLoop/" class="">
+      链表中环的入口结点</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/mirror-tree/" class="">
+      镜像二叉树</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/PrintMatrix/" class="">
+      顺时针打印矩阵</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/docs/offer/power/" class="">
+      题目</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </nav>
 
 
-    </aside>
-  
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+
+  </div>
+</aside>
  
-      </header>
+
+    <header class="book-header hidden">
+      
+  <div class="flex align-center justify-between gap">
+  <input type="checkbox" class="toggle" id="menu-control" />
+  <label for="menu-control" aria-label="Menu">
+    <svg class="book-icon"><use href="/iconset.min.90a7fd302dc1b9bc3c291688faee66a3e60a9209f59b89fa00669e35d6907b3f.svg#menu"></use></svg>
+  </label>
+
+  <div class="book-brand">
+  <a class="flex align-center" href="/"><span>HadYang技术分享</span>
+  </a>
+</div>
+
+
+  
+  <input type="checkbox" class="toggle" id="toc-control" />
+  <label for="toc-control" aria-label="Table of Contents">
+    <svg class="book-icon"><use href="/iconset.min.90a7fd302dc1b9bc3c291688faee66a3e60a9209f59b89fa00669e35d6907b3f.svg#toc"></use></svg>
+  </label>
+  
+</div>
+
+ 
+    </header>
+
+    <main class="book-page">
+      
+      
+  
 
       
-<article class="markdown"><h1 id="innodb-并发控制">InnoDB 并发控制</h1>
-<h2 id="innodb-锁机制">InnoDB 锁机制</h2>
-<p><img src="images/e86d2bb63f9ecf327e588f352bb26d3b.png" alt=""></p>
+  <article class="markdown book-article"><h1 id="innodb-并发控制">InnoDB 并发控制<a class="anchor" href="#innodb-%e5%b9%b6%e5%8f%91%e6%8e%a7%e5%88%b6" aria-label="Link"></a></h1>
+<h2 id="innodb-锁机制">InnoDB 锁机制<a class="anchor" href="#innodb-%e9%94%81%e6%9c%ba%e5%88%b6" aria-label="Link"></a></h2>
+<p><img src="images/e86d2bb63f9ecf327e588f352bb26d3b.png" alt="" /></p>
 <p>InnoDB默认使用行锁，实现了两种标准的行锁——共享锁与排他锁；</p>
 <table>
-<thead>
-<tr>
-<th align="left">行锁类型</th>
-<th align="left">锁功能</th>
-<th align="left">锁兼容性</th>
-<th align="left">加锁</th>
-<th align="left">释放锁</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left">共享锁（读锁、S锁）</td>
-<td align="left">允许获取共享锁的亊务读数据</td>
-<td align="left">与共享锁兼容，与排它锁不兼容</td>
-<td align="left">只有 <code>SerializaWe</code> 隔离级别会默认为：读加共享锁；其他隔离级别下，可显示使用 <code>select...lock in share model</code> 为读加共享锁</td>
-<td align="left">在事务提交或回滚后会自动同时释放锁；除了使用 <code>start transaction</code> 的方式显式开启事务，InnoDB 也会自动为增删改査语句开启事务，并自动提交或回滚；(<code>autocommit=1</code>)</td>
-</tr>
-<tr>
-<td align="left">排它锁（写锁、X锁）</td>
-<td align="left">允许获取排它锁的事务更新或删除数据</td>
-<td align="left">与共享锁不兼容，与排它锁不兼容</td>
-<td align="left">在默认的 <code>Reapeatable Read</code> 隔离级别下，InnoDB 会自动为增删改操作的行加排它锁；也可显式使用 <code>select...for update</code> 为读加排它锁</td>
-<td align="left">&hellip;</td>
-</tr>
-</tbody>
+	<thead>
+			<tr>
+					<th style="text-align: left">行锁类型</th>
+					<th style="text-align: left">锁功能</th>
+					<th style="text-align: left">锁兼容性</th>
+					<th style="text-align: left">加锁</th>
+					<th style="text-align: left">释放锁</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td style="text-align: left">共享锁（读锁、S锁）</td>
+					<td style="text-align: left">允许获取共享锁的亊务读数据</td>
+					<td style="text-align: left">与共享锁兼容，与排它锁不兼容</td>
+					<td style="text-align: left">只有 <code>SerializaWe</code> 隔离级别会默认为：读加共享锁；其他隔离级别下，可显示使用 <code>select...lock in share model</code> 为读加共享锁</td>
+					<td style="text-align: left">在事务提交或回滚后会自动同时释放锁；除了使用 <code>start transaction</code> 的方式显式开启事务，InnoDB 也会自动为增删改査语句开启事务，并自动提交或回滚；(<code>autocommit=1</code>)</td>
+			</tr>
+			<tr>
+					<td style="text-align: left">排它锁（写锁、X锁）</td>
+					<td style="text-align: left">允许获取排它锁的事务更新或删除数据</td>
+					<td style="text-align: left">与共享锁不兼容，与排它锁不兼容</td>
+					<td style="text-align: left">在默认的 <code>Reapeatable Read</code> 隔离级别下，InnoDB 会自动为增删改操作的行加排它锁；也可显式使用 <code>select...for update</code> 为读加排它锁</td>
+					<td style="text-align: left">&hellip;</td>
+			</tr>
+	</tbody>
 </table>
-<blockquote>
+<blockquote class=''>
 <ol>
 <li>除了显式加锁的情况，其他情况下的加锁与解锁都无需人工干预</li>
 <li>InnoDB 所有的行锁算法都是基于索引实现的，锁定的也都是索引或索引区间</li>
 </ol>
-</blockquote>
-<h3 id="当前读--快照读">当前读 &amp; 快照读</h3>
+</blockquote><h3 id="当前读--快照读">当前读 &amp; 快照读<a class="anchor" href="#%e5%bd%93%e5%89%8d%e8%af%bb--%e5%bf%ab%e7%85%a7%e8%af%bb" aria-label="Link"></a></h3>
 <p><strong>当前读</strong>：即加锁读，读取记录的最新版本，会加锁保证其他并发事务不能修改当前记录，直至获取锁的事务释放锁；使用当前读的操作主要包括：<strong>显式加锁的读操作与插入/更新/删除等写操作</strong>，如下所示：</p>
-<pre><code>select * from table where ? lock in share mode;
+<pre tabindex="0"><code>select * from table where ? lock in share mode;
 select * from table where ? for update;
 insert into table values (…);
 update table set ? where ?;
-delete from table where ?;
-</code></pre><blockquote>
+delete from table where ?;</code></pre><blockquote class=''>
 <p>注：当 <code>Update</code> SQL 被发给 <code>MySQL</code> 后， <code>MySQL Server</code> 会根据where条件，读取第一条满足条件的记录，然后 InnoDB 引擎会将第一条记录返回，并加锁，待 <code>MySQL Server</code> 收到这条加锁的记录之后，会再发起一个 <code>Update</code> 请求，更新这条记录。一条记录操作完成，再读取下一条记录，直至没有满足条件的记录为止。因此， <code>Update</code> 操作内部，就包含了当前读。同理， <code>Delete</code> 操作也一样。 <code>Insert</code> 操作会稍微有些不同，简单来说，就是 <code>Insert</code> 操作可能会触发 <code>Unique Key</code> 的冲突检查，也会进行一个当前读。</p>
-</blockquote>
-<p><strong>快照读：即不加锁读，读取记录的快照版本而非最新版本，通过MVCC实现</strong>；</p>
+</blockquote><p><strong>快照读：即不加锁读，读取记录的快照版本而非最新版本，通过MVCC实现</strong>；</p>
 <p>InnoDB 默认的 <code>RR</code> 事务隔离级别下，不显式加<code>lock in share mode</code>与<code>for update</code>的 <code>select</code> 操作都属于快照读，保证事务执行过程中只有第一次读之前提交的修改和自己的修改可见，其他的均不可见；</p>
-<h3 id="共享锁与独占锁">共享锁与独占锁</h3>
-<h3 id="意向锁">意向锁</h3>
+<h3 id="共享锁与独占锁">共享锁与独占锁<a class="anchor" href="#%e5%85%b1%e4%ba%ab%e9%94%81%e4%b8%8e%e7%8b%ac%e5%8d%a0%e9%94%81" aria-label="Link"></a></h3>
+<h3 id="意向锁">意向锁<a class="anchor" href="#%e6%84%8f%e5%90%91%e9%94%81" aria-label="Link"></a></h3>
 <p>InnoDB 支持多粒度的锁，允许表级锁和行级锁共存。一个类似于 <code>LOCK TABLES ... WRITE</code> 的语句会获得这个表的 <code>x</code> 锁。为了实现多粒度锁，InnoDB 使用了意向锁（简称 I 锁）。I 锁是表明一个事务稍后要获得针对一行记录的某种锁（<code>s or x</code>）的对应表的表级锁，有两种：</p>
 <ul>
 <li>意向排它锁（简称 IX 锁）表明一个事务意图在某个表中设置某些行的 x 锁</li>
@@ -461,9 +3137,9 @@ delete from table where ?;
 <li>一个事务必须先持有该表上的 IX 锁才能持有该表中某行的 X 锁</li>
 </ul>
 <p>新请求的锁只有兼容已有锁才能被允许，否则必须等待不兼容的已有锁被释放。<strong>一个不兼容的锁请求不被允许是因为它会引起死锁，错误会发生</strong>。意向锁只会阻塞全表请求（比如 <code>LOCK TABLES ... WRITE</code> ）。<strong>意向锁的主要目的是展示某人正在锁定表中一行，或者将要锁定一行</strong>。</p>
-<h3 id="record-lock">Record Lock</h3>
+<h3 id="record-lock">Record Lock<a class="anchor" href="#record-lock" aria-label="Link"></a></h3>
 <p>记录锁（Record Lock）是加到<strong>索引记录</strong>上的锁，假设我们存在下面的一张表 <code>users</code>：</p>
-<pre><code>    CREATE TABLE users(
+<pre tabindex="0"><code>    CREATE TABLE users(
         id INT NOT NULL AUTO_INCREMENT,
         last_name VARCHAR(255) NOT NULL,
         first_name VARCHAR(255),
@@ -471,24 +3147,22 @@ delete from table where ?;
         PRIMARY KEY(id),
         KEY(last_name),
         KEY(age)
-    );
-</code></pre><p>如果我们使用 <code>id</code> 或者 <code>last_name</code> 作为 SQL 中 <code>WHERE</code> 语句的过滤条件，那么 InnoDB 就可以通过索引建立的 B+ 树找到行记录并添加索引，但是如果使用 <code>first_name</code> 作为过滤条件时，由于 InnoDB 不知道待修改的记录具体存放的位置，也无法对将要修改哪条记录提前做出判断就会锁定整个表。</p>
-<h3 id="gap-lock">Gap Lock</h3>
+    );</code></pre><p>如果我们使用 <code>id</code> 或者 <code>last_name</code> 作为 SQL 中 <code>WHERE</code> 语句的过滤条件，那么 InnoDB 就可以通过索引建立的 B+ 树找到行记录并添加索引，但是如果使用 <code>first_name</code> 作为过滤条件时，由于 InnoDB 不知道待修改的记录具体存放的位置，也无法对将要修改哪条记录提前做出判断就会锁定整个表。</p>
+<h3 id="gap-lock">Gap Lock<a class="anchor" href="#gap-lock" aria-label="Link"></a></h3>
 <p>记录锁是在存储引擎中最为常见的锁，除了记录锁之外，InnoDB 中还存在间隙锁（Gap Lock），间隙锁是对索引记录中的一段连续区域的锁；当使用类似 <code>SELECT * FROM users WHERE id BETWEEN 10 AND 20 FOR UPDATE;</code> 的 SQL 语句时，就会阻止其他事务向表中插入 <code>id = 15</code> 的记录，因为整个范围都被间隙锁锁定了。</p>
-<blockquote>
+<blockquote class=''>
 <p>间隙锁是存储引擎对于性能和并发做出的权衡，并且只用于某些事务隔离级别。</p>
-</blockquote>
-<p>虽然间隙锁中也分为共享锁和互斥锁，不过它们之间并不是互斥的，也就是不同的事务可以同时持有一段相同范围的共享锁和互斥锁，它唯一阻止的就是<strong>其他事务向这个范围中添加新的记录</strong>。</p>
-<h4 id="间隙锁的缺点">间隙锁的缺点</h4>
+</blockquote><p>虽然间隙锁中也分为共享锁和互斥锁，不过它们之间并不是互斥的，也就是不同的事务可以同时持有一段相同范围的共享锁和互斥锁，它唯一阻止的就是<strong>其他事务向这个范围中添加新的记录</strong>。</p>
+<h4 id="间隙锁的缺点">间隙锁的缺点<a class="anchor" href="#%e9%97%b4%e9%9a%99%e9%94%81%e7%9a%84%e7%bc%ba%e7%82%b9" aria-label="Link"></a></h4>
 <ul>
 <li>间隙锁有一个比较致命的弱点，就是当锁定一个范围键值之后，即使某些不存在的键值也会被无辜的锁定，而造成在锁定的时候无法插入锁定键值范围内的任何数据。在某些场景下这可能会对性能造成很大的危害</li>
 <li>当Query无法利用索引的时候， InnoDB会放弃使用行级别锁定而改用表级别的锁定，造成并发性能的降低；</li>
 <li>当Quuery使用的索引并不包含所有过滤条件的时候，数据检索使用到的索引键所指向的数据可能有部分并不属于该Query的结果集的行列，但是也会被锁定，因为间隙锁锁定的是一个范围，而不是具体的索引键；</li>
 <li>当Query在使用索引定位数据的时候，如果使用的索引键一样但访问的数据行不同的时候（索引只是过滤条件的一部分），一样会被锁定</li>
 </ul>
-<h4 id="next-key-lock">Next-Key Lock</h4>
+<h4 id="next-key-lock">Next-Key Lock<a class="anchor" href="#next-key-lock" aria-label="Link"></a></h4>
 <p>Next-Key 锁相比前两者就稍微有一些复杂，它是记录锁和记录前的间隙锁的结合，在 <code>users</code> 表中有以下记录：</p>
-<pre><code>    +------|-------------|--------------|-------+
+<pre tabindex="0"><code>    +------|-------------|--------------|-------+
     |   id | last_name   | first_name   |   age |
     |------|-------------|--------------|-------|
     |    4 | stark       | tony         |    21 |
@@ -496,27 +3170,23 @@ delete from table where ?;
     |    3 | morgan      | freeman      |    40 |
     |    5 | jeff        | dean         |    50 |
     |    2 | donald      | trump        |    80 |
-    +------|-------------|--------------|-------+
-</code></pre><p>如果使用 Next-Key 锁，那么 Next-Key 锁就可以在需要的时候锁定以下的范围：</p>
-<pre><code>    (-∞, 21]
+    +------|-------------|--------------|-------+</code></pre><p>如果使用 Next-Key 锁，那么 Next-Key 锁就可以在需要的时候锁定以下的范围：</p>
+<pre tabindex="0"><code>    (-∞, 21]
     (21, 30]
     (30, 40]
     (40, 50]
     (50, 80]
-    (80, ∞)
-</code></pre><blockquote>
+    (80, ∞)</code></pre><blockquote class=''>
 <p>既然叫 Next-Key 锁，锁定的应该是当前值和后面的范围，但是实际上却不是，Next-Key 锁锁定的是当前值和前面的范围。</p>
-</blockquote>
-<p>当我们更新一条记录，比如 <code>SELECT * FROM users WHERE age = 30 FOR UPDATE;</code>，InnoDB 不仅会在范围 <code>(21, 30]</code> 上加 Next-Key 锁，还会在这条该记录索引增长方向的范围 <code>(30, 40]</code> 加间隙锁，所以插入 <code>(21, 40]</code> 范围内的记录都会被锁定。</p>
-<blockquote>
+</blockquote><p>当我们更新一条记录，比如 <code>SELECT * FROM users WHERE age = 30 FOR UPDATE;</code>，InnoDB 不仅会在范围 <code>(21, 30]</code> 上加 Next-Key 锁，还会在这条该记录索引增长方向的范围 <code>(30, 40]</code> 加间隙锁，所以插入 <code>(21, 40]</code> 范围内的记录都会被锁定。</p>
+<blockquote class=''>
 <p>Next-Key 锁的作用其实是为了解决幻读的问题。</p>
-</blockquote>
-<h3 id="插入意向锁">插入意向锁</h3>
+</blockquote><h3 id="插入意向锁">插入意向锁<a class="anchor" href="#%e6%8f%92%e5%85%a5%e6%84%8f%e5%90%91%e9%94%81" aria-label="Link"></a></h3>
 <p>插入意向锁是在插入一行记录操作之前设置的一种间隙锁，这个锁释放了一种插入方式的信号，亦即多个事务在相同的索引间隙插入时如果不是插入间隙中相同的位置就不需要互相等待。假设有索引值<code>4、7</code>，几个不同的事务准备插入<code>5、6</code>，每个锁都在获得插入行的独占锁之前用插入意向锁各自锁住了<code>4、7</code>之间的间隙，但是不阻塞对方因为插入行不冲突。</p>
-<h3 id="自增锁">自增锁</h3>
+<h3 id="自增锁">自增锁<a class="anchor" href="#%e8%87%aa%e5%a2%9e%e9%94%81" aria-label="Link"></a></h3>
 <p>自增锁是一个特殊的表级锁，事务插入自增列的时候需要获取，最简单情况下如果一个事务插入一个值到表中，任何其他事务都要等待，这样第一个事物才能获得连续的主键值。</p>
-<h3 id="锁选择">锁选择</h3>
-<pre><code>+——-+————-+
+<h3 id="锁选择">锁选择<a class="anchor" href="#%e9%94%81%e9%80%89%e6%8b%a9" aria-label="Link"></a></h3>
+<pre tabindex="0"><code>+——-+————-+
 | id | name |
 +——-+————-+
 | 1 | title1 |
@@ -528,13 +3198,12 @@ delete from table where ?;
 | 9 | title9 |
 +——-+————-+
 | 10 | title10 |
-+——-+————-+
-</code></pre><p>按照原理来说，<code>id&gt;5 and id&lt;7</code>这个查询条件，在表中找不到满足条件的项，因此会对第一个不满足条件的项(<code>id = 9</code>)上加GAP锁，防止后续其他事务插入满足条件的记录。</p>
++——-+————-+</code></pre><p>按照原理来说，<code>id&gt;5 and id&lt;7</code>这个查询条件，在表中找不到满足条件的项，因此会对第一个不满足条件的项(<code>id = 9</code>)上加GAP锁，防止后续其他事务插入满足条件的记录。</p>
 <p>而 <strong>GAP 锁与GAP 锁是不冲突的</strong>，那么为什么两个同时执行<code>id&gt;5 and id&lt;7</code>查询的事务会冲突呢？</p>
 <p>原因在于，<code>MySQL Server</code>并没有将<code>id&lt;7</code>这个查询条件下降到<code>InnoDB</code>引擎层，因此<code>InnoDB</code>看到的查询，是<code>id&gt;5</code>，正向扫描。读出的记录<code>id=9</code>，先加上<code>next key锁</code>(Lock X + GAP lock)，然后返回给 MySQL Server 进行判断。
 MySQL Server 此时才会判断返回的记录是否满足<code>id&lt;7</code>的查询条件。此处不满足，查询结束。</p>
 <p>因此，<code>id=9</code>记录上，真正持有的锁是<code>next key</code>锁，<strong>而<code>next key</code>锁之间是相互冲突的</strong>，这也说明了为什么两个<code>id&gt;5 and id&lt;7</code>查询的事务会冲突的原因。</p>
-<h2 id="mvcc">MVCC</h2>
+<h2 id="mvcc">MVCC<a class="anchor" href="#mvcc" aria-label="Link"></a></h2>
 <p>InnoDB 引擎支持 MVCC(Multiversion Concurrency Control)：InnoDB 保存了行的历史版本，以支持事务的并发控制和回滚。这些历史信息保存在表空间的 <strong>回滚段（Rollback Segment）</strong> 里，回滚段中存储着 <strong>Undo Log</strong>。当事务需要进行回滚时，InnoDB 就会使用这些信息来进行 Undo 操作，同时这些信息也可用来实现 <strong>一致性读</strong>。</p>
 <p>InnoDB 在存储的每行数据中都增加了三列隐藏属性：</p>
 <ul>
@@ -544,10 +3213,10 @@ MySQL Server 此时才会判断返回的记录是否满足<code>id&lt;7</code>�
 </ul>
 <p>在回滚段的 Undo Log 被分为 <code>Insert Undo Log</code> 和 <code>Update Undo Log</code>。Insert Undo Log 只是在事务回滚的时候需要，在事务提交后就可丢弃。Update Undo Log 不仅仅在回滚的时候需要，还要提供一致性读，所以只有在所有需要该 Update Undo Log 构建历史版本数据的事务都提交后才能丢弃。MySQL 建议尽量频繁的提交事务，这样可以保证 InnoDB 快速的丢弃 Update Undo Log，防止其过大。</p>
 <p>在 InnoDB 中，行数据的物理删除不是立刻执行，InnoDB 会在行删除的 Undo Log 被丢弃时才会进行物理删除。这个过程被称之为 <strong>清理（Purge）</strong>，其执行过程十分迅速。</p>
-<h3 id="mvcc-二级索引">MVCC 二级索引</h3>
+<h3 id="mvcc-二级索引">MVCC 二级索引<a class="anchor" href="#mvcc-%e4%ba%8c%e7%ba%a7%e7%b4%a2%e5%bc%95" aria-label="Link"></a></h3>
 <p>InnoDB 在更新时对 二级索引 和 聚集索引的处理方式不一样。在聚集索引上的更新是原地更新（in-place），其中的隐藏属性 <code>DB_ROLL_PTR</code> 指向的 Undo Log 可以重建历史数据。但是二级索引没有隐藏属性，所以不能原地更新。</p>
 <p>当二级索引的数据被更新时，旧的二级索引记录标记为 <strong>标记删除（delete-marked）</strong>，然后插入一条新的索引记录，最终标记删除的索引记录会被清除。当二级索引记录被标记为 delete-marked 或者有更新的事务更新时，InnoDB 会查找聚集索引。在聚集索引中检查行的 <code>DB_TRX_ID</code>，如果事务修改了记录，则从 Undo Log 中构建行数据的正确版本。如果二级索引记录被标记为 delete-marked 或者 二级索引有更新的事务更新，覆盖索引技术不会被使用（获取行任意数据均需要回表）。</p>
-<h3 id="mvcc-vs-乐观锁">MVCC vs 乐观锁</h3>
+<h3 id="mvcc-vs-乐观锁">MVCC vs 乐观锁<a class="anchor" href="#mvcc-vs-%e4%b9%90%e8%a7%82%e9%94%81" aria-label="Link"></a></h3>
 <p><strong>MVCC 并不是一个与乐观和悲观并发控制对立的东西，它能够与两者很好的结合以增加事务的并发量</strong>，在目前最流行的 SQL 数据库 MySQL 和 PostgreSQL 中都对 MVCC 进行了实现；但是由于它们分别实现了悲观锁和乐观锁，所以 MVCC 实现的方式也不同。</p>
 <p>MVCC 可以保证不阻塞地读到一致的数据。但是，MVCC 并没有对实现细节做约束，为此不同的数据库的语义有所不同，比如：</p>
 <ul>
@@ -561,52 +3230,70 @@ MySQL Server 此时才会判断返回的记录是否满足<code>id&lt;7</code>�
 <p>可见 MVCC 中的写操作仍可以按悲观并发控制实现，而 <code>CAS</code> 的写操作只能是乐观并发控制。还有一个不同在于，MVCC 在语境中倾向于 “对多行数据打快照造平行宇宙”，然而 <code>CAS</code> 一般只是保护单行数据而已。比如 mongodb 有 CAS 的支持，但不能说这是 MVCC。</p>
 </article>
  
+      
 
       <footer class="book-footer">
         
-  <div class="flex justify-between">
+  <div class="flex flex-wrap justify-between">
 
-
-
-  <div>
-    
-    <a class="flex align-center" href="https://github.com/hadyang/interview/commit/4cabcb8e36bc6701dd3a5de6cad4e6f48bcb6f64" title='Last modified by haoyang.shi | 2020-03-16' target="_blank" rel="noopener">
-      <img src="/interview/svg/calendar.svg" class="book-icon" alt="Calendar" />
-      <span>2020-03-16</span>
-    </a>
-  </div>
-
-
-
-  <div>
-    <a class="flex align-center" href="https://github.com/hadyang/interview/edit/master/content/docs/basic/database/mysql/innodb/concurrent/index.md" target="_blank" rel="noopener">
-      <img src="/interview/svg/edit.svg" class="book-icon" alt="Edit" />
-      <span>Edit this page</span>
-    </a>
-  </div>
+<div>
 
 </div>
+
+<div>
+
+</div>
+
+</div>
+
+<div class="flex flex-wrap justify-between">
+    <span>
+    
+      <a href="/docs/basic/database/mysql/innodb/transaction/" class="flex align-center">
+        <svg class="book-icon" aria-hidden="true"><use href="/iconset.min.90a7fd302dc1b9bc3c291688faee66a3e60a9209f59b89fa00669e35d6907b3f.svg#backward"></use></svg>
+        <span>InnoDB 事务</span>
+      </a>
+    
+    </span>
+    <span>
+    
+      <a href="/docs/basic/database/mysql/innodb/index/" class="flex align-center">
+        <span>InnoDB 索引</span>
+        <svg class="book-icon" aria-hidden="true"><use href="/iconset.min.90a7fd302dc1b9bc3c291688faee66a3e60a9209f59b89fa00669e35d6907b3f.svg#forward"></use></svg>
+      </a>
+    
+    </span>
+  </div>
 
  
         
   
-  <div class="book-comments">
-
-</div>
+ 
+        
+        
   
  
+        
+  
+    <script>(function(){document.querySelectorAll("pre:has(code)").forEach(e=>{e.addEventListener("click",e.focus),e.addEventListener("copy",function(t){if(t.preventDefault(),navigator.clipboard){const t=window.getSelection().toString()||e.textContent;navigator.clipboard.writeText(t)}})})})()</script>
+  
+
       </footer>
-      
-    </div>
+
+      <label for="menu-control" class="hidden book-menu-overlay" aria-hidden="true"></label>
+    </main>
 
     
-    <aside class="book-toc">
+  
+  <aside class="book-toc" aria-label="Table of Contents">
+    <div class="book-toc-content">
       
-  <nav id="TableOfContents">
+  
+<nav id="TableOfContents">
   <ul>
     <li><a href="#innodb-锁机制">InnoDB 锁机制</a>
       <ul>
-        <li><a href="#当前读--快照读">当前读 & 快照读</a></li>
+        <li><a href="#当前读--快照读">当前读 &amp; 快照读</a></li>
         <li><a href="#共享锁与独占锁">共享锁与独占锁</a></li>
         <li><a href="#意向锁">意向锁</a></li>
         <li><a href="#record-lock">Record Lock</a></li>
@@ -625,15 +3312,31 @@ MySQL Server 此时才会判断返回的记录是否满足<code>id&lt;7</code>�
   </ul>
 </nav>
 
+
+
+
+
+
+
+    </div>
+  </aside>
+  
  
-    </aside>
-    
-  </main>
+  </div>
 
   
 </body>
-
 </html>
+
+
+
+
+
+
+
+
+
+
 
 
 
