@@ -1,0 +1,41 @@
+language: go
+
+go:
+- 1.x
+
+branches:
+  only:
+  - master
+
+notifications:
+  email:
+    recipients:
+      - $EMAIL # 设置通知邮件
+    on_success: change
+    on_failure: always
+
+before_install:
+  - wget https://github.com/gohugoio/hugo/releases/download/v0.62.2/hugo_extended_0.62.2_Linux-64bit.deb
+  - sudo dpkg -i hugo_extended_0.62.2_Linux-64bit.deb
+
+before_script:
+  - git submodule add -f https://github.com/alex-shpak/hugo-book themes/hugo-book
+
+
+script:
+  - hugo
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $TOKEN  # Set in travis-ci.org dashboard, marked secure
+  verbose: true
+  keep-history: true
+  local-dir: public
+  target_branch: gh-pages  # branch contains blog content
+  on:
+    branch: master
+
+env:
+  global:
+    - REF=github.com/hadyang/interview.git # 设置 github 地址

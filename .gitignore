@@ -1,0 +1,6 @@
+_book
+*.pdf
+.DS_Store
+public/
+interview_book/
+resources

@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1141px" height="1021px" viewBox="0 0 1141 1021" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 63.1 (92452) - https://sketch.com -->
+    <title>偏向锁</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="210" y="193" width="176" height="48" rx="2"></rect>
+        <filter x="-4.3%" y="-13.5%" width="109.7%" height="135.4%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="1" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-3" x="210" y="65" width="176" height="48" rx="2"></rect>
+        <filter x="-4.3%" y="-13.5%" width="109.7%" height="135.4%" filterUnits="objectBoundingBox" id="filter-4">
+            <feOffset dx="1" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-5" x="210" y="321" width="176" height="48" rx="2"></rect>
+        <filter x="-4.3%" y="-13.5%" width="109.7%" height="135.4%" filterUnits="objectBoundingBox" id="filter-6">
+            <feOffset dx="1" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-7" x="210" y="785" width="176" height="48" rx="2"></rect>
+        <filter x="-4.3%" y="-13.5%" width="109.7%" height="135.4%" filterUnits="objectBoundingBox" id="filter-8">
+            <feOffset dx="1" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-9" x="210" y="913" width="176" height="48" rx="2"></rect>
+        <filter x="-4.3%" y="-13.5%" width="109.7%" height="135.4%" filterUnits="objectBoundingBox" id="filter-10">
+            <feOffset dx="1" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-11" x="0" y="0" width="176" height="48"></rect>
+        <filter x="-4.3%" y="-13.5%" width="109.7%" height="135.4%" filterUnits="objectBoundingBox" id="filter-12">
+            <feOffset dx="1" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-13" x="0" y="0" width="176" height="48"></rect>
+        <filter x="-4.3%" y="-13.5%" width="109.7%" height="135.4%" filterUnits="objectBoundingBox" id="filter-14">
+            <feOffset dx="1" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-15" x="0" y="0" width="176" height="48"></rect>
+        <filter x="-4.3%" y="-13.5%" width="109.7%" height="135.4%" filterUnits="objectBoundingBox" id="filter-16">
+            <feOffset dx="1" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-17" x="0" y="0" width="176" height="48"></rect>
+        <filter x="-4.3%" y="-13.5%" width="109.7%" height="135.4%" filterUnits="objectBoundingBox" id="filter-18">
+            <feOffset dx="1" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-19" x="0" y="0" width="176" height="48"></rect>
+        <filter x="-4.3%" y="-13.5%" width="109.7%" height="135.4%" filterUnits="objectBoundingBox" id="filter-20">
+            <feOffset dx="1" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-21" x="0" y="0" width="176" height="48"></rect>
+        <filter x="-4.3%" y="-13.5%" width="109.7%" height="135.4%" filterUnits="objectBoundingBox" id="filter-22">
+            <feOffset dx="1" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Synchronized" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="偏向锁">
+            <g id="Rectangle">
+                <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
+                <use fill="#FEFED5" fill-rule="evenodd" xlink:href="#path-1"></use>
+            </g>
+            <text id="Mark-Word-中偏向锁标识" font-family="PingFangSC-Regular, PingFang SC" font-size="12" font-weight="normal" fill="#000000">
+                <tspan x="230.192" y="223">Mark Word 中偏向锁标识</tspan>
+            </text>
+            <g id="Rectangle">
+                <use fill="black" fill-opacity="1" filter="url(#filter-4)" xlink:href="#path-3"></use>
+                <use fill="#FEFED5" fill-rule="evenodd" xlink:href="#path-3"></use>
+            </g>
+            <text id="线程T1获取对象O锁" font-family="PingFangSC-Regular, PingFang SC" font-size="12" font-weight="normal" fill="#000000">
+                <tspan x="246.278" y="95">线程T1获取对象O锁</tspan>
+            </text>
+            <g id="Rectangle-Copy">
+                <use fill="black" fill-opacity="1" filter="url(#filter-6)" xlink:href="#path-5"></use>
+                <use fill="#FEFED5" fill-rule="evenodd" xlink:href="#path-5"></use>
+            </g>
+            <text id="Mark-Word-当前偏向线程" font-family="PingFangSC-Regular, PingFang SC" font-size="12" font-weight="normal" fill="#000000">
+                <tspan x="230.192" y="351">Mark Word 当前偏向线程</tspan>
+            </text>
+            <g id="Rectangle-Copy">
+                <use fill="black" fill-opacity="1" filter="url(#filter-8)" xlink:href="#path-7"></use>
+                <use fill="#FEFED5" fill-rule="evenodd" xlink:href="#path-7"></use>
+            </g>
+            <text id="执行同步代码" font-family="PingFangSC-Regular, PingFang SC" font-size="12" font-weight="normal" fill="#000000">
+                <tspan x="263" y="815">执行同步代码</tspan>
+            </text>
+            <g id="Rectangle-Copy">
+                <use fill="black" fill-opacity="1" filter="url(#filter-10)" xlink:href="#path-9"></use>
+                <use fill="#FEFED5" fill-rule="evenodd" xlink:href="#path-9"></use>
+            </g>
+            <text id="等待下次获取偏向锁" font-family="PingFangSC-Regular, PingFang SC" font-size="12" font-weight="normal" fill="#000000">
+                <tspan x="245" y="943">等待下次获取偏向锁</tspan>
+            </text>
+            <g id="Retrangle-With-Text" transform="translate(210.000000, 449.000000)">
+                <g>
+                    <g>
+                        <use fill="black" fill-opacity="1" filter="url(#filter-12)" xlink:href="#path-11"></use>
+                        <use fill="#FEFED5" fill-rule="evenodd" xlink:href="#path-11"></use>
+                    </g>
+                    <text fill="#000000" font-family="PingFangSC-Regular, PingFang SC" font-size="12" font-weight="normal">
+                        <tspan x="42.398" y="29">CAS更新偏向线程</tspan>
+                    </text>
+                </g>
+            </g>
+            <g id="Retrangle-With-Text-Copy" transform="translate(498.000000, 449.000000)">
+                <g id="Retrangle-With-Text">
+                    <g>
+                        <use fill="black" fill-opacity="1" filter="url(#filter-14)" xlink:href="#path-13"></use>
+                        <use fill="#FEFED5" fill-rule="evenodd" xlink:href="#path-13"></use>
+                    </g>
+                    <text fill="#000000" font-family="PingFangSC-Regular, PingFang SC" font-size="12" font-weight="normal">
+                        <tspan x="33.186" y="29">暂停T2、撤销偏向锁</tspan>
+                    </text>
+                </g>
+            </g>
+            <g id="Retrangle-With-Text-Copy-2" transform="translate(498.000000, 577.000000)">
+                <g id="Retrangle-With-Text">
+                    <g>
+                        <use fill="black" fill-opacity="1" filter="url(#filter-16)" xlink:href="#path-15"></use>
+                        <use fill="#FEFED5" fill-rule="evenodd" xlink:href="#path-15"></use>
+                    </g>
+                    <text fill="#000000" font-family="PingFangSC-Regular, PingFang SC" font-size="12" font-weight="normal">
+                        <tspan x="33.692" y="29">Mark Word 置为无锁</tspan>
+                    </text>
+                </g>
+            </g>
+            <g id="Retrangle-With-Text-Copy-4" transform="translate(786.000000, 449.000000)">
+                <g id="Retrangle-With-Text">
+                    <g>
+                        <use fill="black" fill-opacity="1" filter="url(#filter-18)" xlink:href="#path-17"></use>
+                        <use fill="#FEFED5" fill-rule="evenodd" xlink:href="#path-17"></use>
+                    </g>
+                    <text fill="#000000" font-family="PingFangSC-Regular, PingFang SC" font-size="12" font-weight="normal">
+                        <tspan x="48.5" y="29">升级为轻量级锁</tspan>
+                    </text>
+                </g>
+            </g>
+            <g id="Retrangle-With-Text-Copy-5" transform="translate(786.000000, 577.000000)">
+                <g id="Retrangle-With-Text">
+                    <g>
+                        <use fill="black" fill-opacity="1" filter="url(#filter-20)" xlink:href="#path-19"></use>
+                        <use fill="#FEFED5" fill-rule="evenodd" xlink:href="#path-19"></use>
+                    </g>
+                    <text fill="#000000" font-family="PingFangSC-Regular, PingFang SC" font-size="12" font-weight="normal">
+                        <tspan x="60.38" y="29">T1自旋等待</tspan>
+                    </text>
+                </g>
+            </g>
+            <g id="Retrangle-With-Text-Copy-3" transform="translate(498.000000, 705.000000)">
+                <g id="Retrangle-With-Text">
+                    <g>
+                        <use fill="black" fill-opacity="1" filter="url(#filter-22)" xlink:href="#path-21"></use>
+                        <use fill="#FEFED5" fill-rule="evenodd" xlink:href="#path-21"></use>
+                    </g>
+                    <text fill="#000000" font-family="PingFangSC-Regular, PingFang SC" font-size="12" font-weight="normal">
+                        <tspan x="48.38" y="29">偏向线程置为T1</tspan>
+                    </text>
+                </g>
+            </g>
+            <path id="Line" d="M299,256 L299,291 L305,291 L298,305 L291,291 L297,291 L297,256 L299,256 Z" fill="#8A9199" fill-rule="nonzero"></path>
+            <text fill="#000000" font-family="PingFangSC-Regular, PingFang SC" font-size="10" font-weight="normal">
+                <tspan x="308" y="281">偏向锁</tspan>
+            </text>
+            <path id="Line-2" d="M195,345 L195,347 L115,347 L115,809 L180,809 L180,803 L194,810 L180,817 L180,811 L113,811 L113,345 L195,345 Z" fill="#8A9199" fill-rule="nonzero"></path>
+            <path id="Line-3" d="M299,128 L299,163 L305,163 L298,177 L291,163 L297,163 L297,128 L299,128 Z" fill="#8A9199" fill-rule="nonzero"></path>
+            <path id="Line-4" d="M299,384 L299,419 L305,419 L298,433 L291,419 L297,419 L297,384 L299,384 Z" fill="#8A9199" fill-rule="nonzero"></path>
+            <text id="当前偏向T2" fill="#000000" font-family="PingFangSC-Regular, PingFang SC" font-size="10" font-weight="normal">
+                <tspan x="306.405" y="412">当前偏向T2</tspan>
+            </text>
+            <text id="当前偏向T1" fill="#000000" font-family="PingFangSC-Regular, PingFang SC" font-size="10" font-weight="normal">
+                <tspan x="121.4" y="540">当前偏向T1</tspan>
+            </text>
+            <path id="Line-5" d="M299,512 L299,755 L305,755 L298,769 L291,755 L297,755 L297,512 L299,512 Z" fill="#8A9199" fill-rule="nonzero"></path>
+            <path id="Line-9" d="M1028.00149,473 L1028,474.001485 L1027.4996,811.001485 L1027.49812,812 L416,812 L416,818 L402,811 L416,804 L416,810 L1025.5,810 L1025.999,475 L961.948759,475 L961.948759,473 L1028.00149,473 Z" fill="#8A9199" fill-rule="nonzero"></path>
+            <path d="M587,777 C587,799.666667 587,811 587,811 C587,811 526.333333,810.534874 405,809.604621" id="Line-8" stroke="#8A9199" stroke-width="2" stroke-linecap="square"></path>
+            <text id="更新成功" fill="#000000" font-family="PingFangSC-Regular, PingFang SC" font-size="10" font-weight="normal">
+                <tspan x="308" y="617">更新成功</tspan>
+            </text>
+            <path id="Line-6" d="M467.5,466.5 L481.5,473.5 L467.5,480.5 L467.5,474.5 L400.5,474.5 L400.5,472.5 L467.5,472.5 L467.5,466.5 Z" fill="#8A9199" fill-rule="nonzero"></path>
+            <text id="更新失败" fill="#000000" font-family="PingFangSC-Regular, PingFang SC" font-size="10" font-weight="normal">
+                <tspan x="421" y="465">更新失败</tspan>
+            </text>
+            <text id="等待-Safe-Point" fill="#000000" font-family="PingFangSC-Regular, PingFang SC" font-size="10" font-weight="normal">
+                <tspan x="405.085" y="490">等待 Safe Point</tspan>
+            </text>
+            <path id="Line-7" d="M587.489419,512.48953 L587.499945,513.489474 L587.852,546.99 L593.852252,546.927095 L587,561 L579.853028,547.074456 L585.852,547.011 L585.500055,513.510526 L585.48953,512.510581 L587.489419,512.48953 Z" fill="#8A9199" fill-rule="nonzero"></path>
+            <path id="Line-7-Copy-2" d="M755.75,467.25 L769.75,474.25 L755.75,481.25 L755.75,475.25 L688.75,475.25 L688.75,473.25 L755.75,473.25 L755.75,467.25 Z" fill="#8A9199" fill-rule="nonzero"></path>
+            <path id="Line-7-Copy-3" d="M875.5,512 L875.5,547 L881.5,547 L874.5,561 L867.5,547 L873.5,547 L873.5,512 L875.5,512 Z" fill="#8A9199" fill-rule="nonzero"></path>
+            <path id="Line-7-Copy" d="M586.489419,641.48953 L586.499945,642.489474 L586.852,675.99 L592.852252,675.927095 L586,690 L578.853028,676.074456 L584.852,676.011 L584.500055,642.510526 L584.48953,641.510581 L586.489419,641.48953 Z" fill="#8A9199" fill-rule="nonzero"></path>
+            <text id="T2已终止" font-family="PingFangSC-Regular, PingFang SC" font-size="10" font-weight="normal" fill="#000000">
+                <tspan x="594.405" y="537">T2已终止</tspan>
+            </text>
+            <text id="T2运行中" fill="#000000" font-family="PingFangSC-Regular, PingFang SC" font-size="10" font-weight="normal">
+                <tspan x="709.405" y="465">T2运行中</tspan>
+            </text>
+            <text id="T1" font-family="PingFangSC-Regular, PingFang SC" font-size="10" font-weight="normal" fill="#000000">
+                <tspan x="594.4" y="798">T1</tspan>
+            </text>
+            <text id="T2" font-family="PingFangSC-Regular, PingFang SC" font-size="10" font-weight="normal" fill="#000000">
+                <tspan x="748.405" y="806">T2</tspan>
+            </text>
+            <path id="Line-10" d="M299.5,851.5 L299.5,885.5 L305.5,885.5 L298.5,899.5 L291.5,885.5 L297.5,885.5 L297.5,851.5 L299.5,851.5 Z" fill="#8A9199" fill-rule="nonzero"></path>
+            <text id="释放锁" font-family="PingFangSC-Regular, PingFang SC" font-size="12" font-weight="normal" fill="#000000">
+                <tspan x="306" y="876">释放锁</tspan>
+            </text>
+        </g>
+    </g>
+</svg>

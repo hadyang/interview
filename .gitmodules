@@ -1,0 +1,3 @@
+[submodule "themes/hugo-book"]
+	path = themes/hugo-book
+	url = git@github.com:alex-shpak/hugo-book.git
